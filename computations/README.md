@@ -9,6 +9,7 @@ and tqdm, and run on a laptop.
 | [rule30.py](rule30.py) | The center column and small spacetime diagrams | (library) | |
 | [game.py](game.py) | [The finite game](../Rule30Open/Columns/FiniteGame.md)'s certificates and [the 76 excluded blocks](../findings/columns/game-blocks.md) | `python -m computations.game --max-period 14` | 2.5 min |
 | [right_half.py](right_half.py) | [Period-four locking](../findings/columns/period-four-locking.md) and [the right channel](../findings/period-two/right-channel.md) | `python -m computations.right_half 12000 30 --max-period 7` | 15 s |
+| [lock_certificate.py](lock_certificate.py) | [The period-four certificate](../findings/columns/period-four-certificate.md) | `python -m computations.lock_certificate 0001 --widths 14 16 --steps 20000` | 5 s |
 | [held_map.py](held_map.py) | [The period-two integer map](../findings/period-two/left-half-alone.md) | `python -m computations.held_map 22` | 5 s |
 | [left_diagonals.py](left_diagonals.py) | [The white diagonals and period records](../findings/diagonals/left-records.md) | `python -m computations.left_diagonals 140000 100000` | 3 s |
 | [frames.py](frames.py) | [The seed's past](../findings/frames/seed-past.md) and [the 2-adic trace](../findings/frames/two-adic-trace.md) | `python -m computations.frames 3000` | 16 s |
@@ -16,6 +17,7 @@ and tqdm, and run on a laptop.
 | [sensitivity.py](sensitivity.py) | [The one-way valve](../findings/dynamics/one-way-valve.md) | `python -m computations.sensitivity 1024 8242` | 10 s |
 | [algebra.py](algebra.py) | [The degree](../findings/structure/center-degree.md) and [the Duhamel form](../findings/structure/duhamel.md) | `python -m computations.algebra 9` | 1 s |
 | [linear_complexity.py](linear_complexity.py) | [The linear complexity](../negative-results/complexity/linear-complexity.md) | `python -m computations.linear_complexity 65536` | seconds |
+| [deformation.py](deformation.py) | [The deformation to Rule 150](../negative-results/structure/deformation-interpolation.md) | `python -m computations.deformation 16` | 1 s |
 
 Several entries quote numbers whose code is not in this repository: the pruned search over seed extensions, the
 period-two searches past support 24, the learned models, the automaton bounds, the coarse-graining closures and the

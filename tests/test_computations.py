@@ -7,7 +7,8 @@ import pytest
 
 from pathlib import Path
 
-from computations import algebra, frames, game, held_map, left_diagonals, linear_complexity, sensitivity
+from computations import (algebra, deformation, frames, game, held_map, left_diagonals, linear_complexity,
+                          lock_certificate, right_half, sensitivity)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -187,3 +188,159 @@ def test_step_is_rule_30() -> None:
         left, center, right = neighborhood >> 2, (neighborhood >> 1) & 1, neighborhood & 1
         row = (left << 1) | (center << 2) | (right << 3)  # cells x - 1, x, x + 1 at bits 1, 2, 3
         assert (step(row) >> 2) & 1 == (30 >> neighborhood) & 1
+
+
+CORE_0001 = [{1: 0, 2: 0, 3: 1}, {1: 0, 2: 1, 3: 1}, {1: 1, 2: 1, 3: 0}, {1: 1, 2: 0, 3: 1}]  # 001, 011, 110, 101
+
+
+def driven_rows(word: str, start: int, steps: int, width: int) -> np.ndarray:
+    """Columns 1 .. width at times 0 .. steps - 1 of a right half driven by a center repeating `word`, by direct
+    evolution of a bool array long enough that its white right end is exact."""
+    size = start.bit_length() + steps + 2
+    row = np.array([(start >> i) & 1 for i in range(size)], dtype=bool)  # (size,), cells 1 .. size
+    out = np.zeros((steps, width), dtype=np.uint8)  # (steps, width)
+    for t in range(steps):
+        out[t] = row[:width]
+        left = np.concatenate([[word[t % len(word)] == "1"], row[:-1]])  # (size,)
+        right = np.concatenate([row[1:], [False]])  # (size,)
+        row = left ^ (row | right)
+    return out  # (steps, width)
+
+
+def stays_inside(word: str, member: np.ndarray) -> bool:
+    """Every window of each phase's set, stepped as a full integer row with `rule30.step`, lands in the next phase's
+    set for both values of the cell beyond the window."""
+    # member: (period, 2^W)
+    period, size = member.shape
+    width = size.bit_length() - 1
+    for ph in range(period):
+        for state in np.flatnonzero(member[ph]).tolist():
+            for beyond in (0, 1):
+                row = int(word[ph]) | (state << 1) | (beyond << (width + 1))  # center at bit 0, column j at bit j
+                if not member[(ph + 1) % period][(step(row) >> 1) & (size - 1)]:
+                    return False
+    return True
+
+
+@pytest.fixture(scope="module")
+def certificate() -> np.ndarray:
+    """The greatest invariant set of 0001 at width 16, seeded with the three-column core."""
+    member, _ = lock_certificate.greatest_invariant_set("0001", CORE_0001, 16)  # (4, 2^16)
+    return member  # (4, 2^16)
+
+
+def test_driven_spacetime() -> None:
+    """The integer spacetime against direct evolution of a bool array, and its column 1 against `column_one`."""
+    for start in right_half.random_starts(3, 64):
+        rows = lock_certificate.spacetime("0001", start, 300, 20)  # (300, 20)
+        assert np.array_equal(rows, driven_rows("0001", start, 300, 20))
+        assert np.array_equal(rows[:, 0], right_half.column_one("0001", start, 300))
+
+
+def test_phase_tables() -> None:
+    """The empty start's table under 0001 has the core 0011, 0110, 1101 in columns 1 to 3, 28 forced cells in columns
+    1 to 11 shared by three starts, and the forced cells the rule does not derive in three-valued logic are the ones
+    the certificate finding lists; the tables of 0011 and 0111 are the 0001 table from column 2, and from column 4
+    with the phases rotated by two."""
+    base = lock_certificate.phase_table("0001", 0, 6000, 1000, 40)  # (40, 4)
+    assert [lock_certificate.column_text(base, c) for c in (1, 2, 3)] == ["0011", "0110", "1101"]
+    assert lock_certificate.core_seed(base, 3) == CORE_0001
+    forced, agree = lock_certificate.forced_lattice("0001", right_half.random_starts(2, 64), 6000, 1000, 40)
+    assert agree and (forced >= 0).sum(axis=1)[:12].tolist() == [4, 4, 4, 2, 1, 2, 1, 3, 2, 2, 3, 0]
+    assert lock_certificate.underived_cells("0001", forced[:12]) == [[6, 8], [4, 8, 9], [5, 7, 10, 11], []]
+    assert np.array_equal(lock_certificate.phase_table("0011", 0, 6000, 1000, 39), base[1:])
+    assert np.array_equal(lock_certificate.phase_table("0111", 0, 6000, 1000, 37), np.roll(base[3:], 2, axis=1))
+
+
+def test_affine_hull() -> None:
+    """The hull's basis and constraint columns against brute force over all vectors of 8 bits."""
+    rng = np.random.default_rng(30)
+    width = 8
+    for _ in range(20):
+        codes = rng.integers(0, 1 << width, size=int(rng.integers(1, 5)))  # (n,), at most 4 points: some constraints
+        base, basis = lock_certificate.affine_hull(codes)
+        span = {0}
+        for code in codes.tolist():
+            span |= {x ^ code ^ base for x in span}
+        assert len(span) == 1 << len(basis)
+        orthogonal = [y for y in range(1 << width) if all(((y & v).bit_count() & 1) == 0 for v in span)]
+        support = sorted({j + 1 for y in orthogonal for j in range(width) if (y >> j) & 1})
+        assert lock_certificate.constraint_columns(basis, width) == support
+
+
+def test_certificate(certificate: np.ndarray) -> None:
+    """Seeded with the core, the greatest invariant set of 0001 is empty at width 14 and has 433, 533, 344 and 605
+    windows at width 16, every one inside the core and stepping into the next phase's set for both beyond cells."""
+    # certificate: (4, 2^16)
+    empty, _ = lock_certificate.greatest_invariant_set("0001", CORE_0001, 14)  # (4, 2^14)
+    assert not empty.any()
+    assert certificate.sum(axis=1).tolist() == [433, 533, 344, 605]
+    windows = np.arange(1 << 16)  # (2^16,)
+    for ph in range(4):
+        core = sum(value << (column - 1) for column, value in CORE_0001[ph].items())
+        assert ((windows[certificate[ph]] & 0b111) == core).all()
+    assert stays_inside("0001", certificate)
+
+
+def test_core_persists_after_entry(certificate: np.ndarray) -> None:
+    """Thirty of the 31 starts enter the width-16 set by step 207, and in a direct simulation columns 1 to 3 then read
+    the core at every one of the next 2,000 steps; start 4 does not enter within 2,000 steps."""
+    # certificate: (4, 2^16)
+    for i, start in enumerate(right_half.random_starts(30, 64)):
+        entry = lock_certificate.entry_time("0001", certificate, start, 2000)
+        if i == 4:
+            assert entry is None
+            continue
+        assert entry is not None and entry <= 207, i
+        rows = driven_rows("0001", start, entry + 2000, 3)[entry:]  # (2000, 3)
+        core = np.array([[CORE_0001[(entry + t) % 4][c] for c in (1, 2, 3)] for t in range(2000)])  # (2000, 3)
+        assert np.array_equal(rows, core), i
+
+
+def test_jen_certificates() -> None:
+    """Seeded only with column 1 at the white phases, the certificate of 0111 exists at width 14 (column 1 white at
+    phase 0 on all of it) and that of 0001 at width 16 extends the core set at phases 2 and 3; both are invariant."""
+    seeds = lock_certificate.jen_seeds("0111")
+    assert seeds == [[{1: 0}, {}, {}, {}], [{1: 1}, {}, {}, {}]]
+    member = np.logical_or.reduce([lock_certificate.greatest_invariant_set("0111", seed, 14)[0]
+                                   for seed in seeds])  # (4, 2^14)
+    assert member.sum(axis=1).tolist() == [878, 1544, 1110, 1366]
+    assert not (np.flatnonzero(member[0]) & 1).any()
+    assert stays_inside("0111", member)
+    member = np.logical_or.reduce([lock_certificate.greatest_invariant_set("0001", seed, 16)[0]
+                                   for seed in lock_certificate.jen_seeds("0001")])  # (4, 2^16)
+    assert member.sum(axis=1).tolist() == [433, 533, 944, 701]
+    assert stays_inside("0001", member)
+
+
+def test_forced_entry(certificate: np.ndarray) -> None:
+    """From a window where entry is forced, random beyond cells, stepped with integer rows, reach the set within 30
+    periods; and the counts the certificate finding quotes."""
+    # certificate: (4, 2^16)
+    forced = lock_certificate.forced_entry("0001", certificate)  # (4, 2^16)
+    assert forced.sum(axis=1).tolist() == [2212, 2066, 1730, 1647]
+    rng = np.random.default_rng(30)
+    for _ in range(300):
+        ph = int(rng.integers(0, 4))
+        window = int(rng.choice(np.flatnonzero(forced[ph])))
+        for _ in range(4 * 30):
+            if certificate[ph][window]:
+                break
+            row = int("0001"[ph]) | (window << 1) | (int(rng.integers(0, 2)) << 17)  # center, window, beyond cell
+            window, ph = (step(row) >> 1) & 0xFFFF, (ph + 1) % 4
+        assert certificate[ph][window]
+
+
+def test_deformation() -> None:
+    """The deformed center cell's T-degrees and term counts for t <= 12; at T = 1 it is Rule 30's center column and at
+    T = 0 Rule 150's whole row."""
+    table = deformation.center_degrees(12)
+    assert [degree for degree, _ in table] == [0, 1, 0, 3, 6, 10, 16, 27, 44, 70, 114, 190]
+    assert [terms for _, terms in table] == [1, 2, 1, 3, 5, 6, 10, 15, 21, 38, 54, 102]
+    rows = deformation.deformed_rows(16)
+    assert [rows[t].get(0, 0).bit_count() & 1 for t in range(17)] == center_column(17).tolist()
+    cells = np.zeros(35, dtype=bool)  # (35,), cell x at index x + 17
+    cells[17] = True
+    for t in range(17):
+        assert [int(x) - 17 for x in np.flatnonzero(cells)] == sorted(x for x, cell in rows[t].items() if cell & 1)
+        cells = np.concatenate([[False], cells[:-1]]) ^ cells ^ np.concatenate([cells[1:], [False]])  # (35,), Rule 150

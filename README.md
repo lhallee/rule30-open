@@ -6,7 +6,7 @@ computational finding comes with the code that reproduces it. And every approach
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
 None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 14 Lean modules with 50
-headline theorems, 13 findings and 18 negative results.
+headline theorems, 14 findings and 19 negative results.
 
 ## The problems
 
@@ -27,7 +27,7 @@ extension of one.
 
 | Problem | Proved in Lean here | Computed here | Open leads |
 |---|---|---|---|
-| 1 | No column of a row with a leftmost black cell is eventually constant, nor eventually periodic with all runs of 1s at least nine long; two blocks of period 8 excluded by a finite game; period 2 reduced to a question about one integer map | The game excludes 76 of 2,538 blocks up to period 14; the integer map fails below $2^{52}$; no row with its leftmost 1 within 120 cells has an alternating center | [Period-four locking](findings/columns/period-four-locking.md), [the integer map](Rule30Open/PeriodTwo/HeldColumn.md) |
+| 1 | No column of a row with a leftmost black cell is eventually constant, nor eventually periodic with all runs of 1s at least nine long; two blocks of period 8 excluded by a finite game; period 2 reduced to a question about one integer map | The game excludes 76 of 2,538 blocks up to period 14; the integer map fails below $2^{52}$; no row with its leftmost 1 within 120 cells has an alternating center | [Period-four locking](findings/columns/period-four-locking.md), with [a width-16 certificate](findings/columns/period-four-certificate.md) that leaves only attraction open; [the integer map](Rule30Open/PeriodTwo/HeldColumn.md) |
 | 2 | Nothing | Density 0.500169 over $2^{22}$ cells; no additive conservation law | None found |
 | 3 | Nothing | No automaton under 131,070 states; linear complexity $n/2$; no learned shortcut | [Why it is hard](negative-results/complexity/problem-three-barrier.md) |
 

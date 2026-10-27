@@ -6,6 +6,10 @@ masked Jen (the kit's `Rule30MaskedJen.masked_jen`) excludes the word as the cen
 bit i is cell i + 1; the center is the left neighbor of bit 0.
 
     python -m computations.right_half 12000 30 --max-period 7   # which primitive words lock column 1
+    python -m computations.right_half 12000 30 --min-period 8 --max-period 12   # about 5 min
+
+Primitive words that lock for all 31 starts, by period: 2: 0 of 1, 3: 0 of 2, 4: 3 of 3, 5: 0 of 6, 6: 0 of 9,
+7: 0 of 18, 8: 8 of 30, 9: 0 of 56, 10: 17 of 99, 11: 35 of 186, 12: 46 of 335.
 """
 
 from __future__ import annotations
@@ -46,23 +50,33 @@ def locked_period(word: str, start: int, steps: int, max_multiple: int = 400) ->
     return None
 
 
+def random_starts(count: int, width: int) -> list[int]:
+    """The empty right half, then `count` random right halves of `width` cells from `numpy.random.default_rng(30)`."""
+    rng = np.random.default_rng(30)
+    return [0] + [sum(int(bit) << i for i, bit in enumerate(rng.integers(0, 2, width))) for _ in range(count)]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("steps", type=int)
     parser.add_argument("random_starts", type=int)
     parser.add_argument("--width", type=int, default=64, help="cells of each random right half")
+    parser.add_argument("--min-period", type=int, default=2)
     parser.add_argument("--max-period", type=int, default=5)
     args = parser.parse_args()
 
-    rng = np.random.default_rng(30)
-    starts = [0] + [sum(int(bit) << i for i, bit in enumerate(rng.integers(0, 2, args.width)))
-                    for _ in range(args.random_starts)]
-    words = [word for period in range(2, args.max_period + 1) for word in necklaces(period)]
-    for word in tqdm(words, desc="words", file=sys.stderr):
-        periods = [locked_period(word, start, args.steps) for start in starts]
-        found = sorted({period for period in periods if period is not None})
-        locked = sum(period is not None for period in periods)
-        print(f"{word:>8}: column 1 locks for {locked} of {len(starts)} starts" + (f", periods {found}" if found else ""))
+    starts = random_starts(args.random_starts, args.width)
+    for period in range(args.min_period, args.max_period + 1):
+        words = necklaces(period)
+        always = 0
+        for word in tqdm(words, desc=f"words of period {period}", file=sys.stderr):
+            periods = [locked_period(word, start, args.steps) for start in starts]
+            found = sorted({period for period in periods if period is not None})
+            locked = sum(period is not None for period in periods)
+            always += locked == len(starts)
+            print(f"{word:>12}: column 1 locks for {locked} of {len(starts)} starts"
+                  + (f", periods {found}" if found else ""))
+        print(f"period {period}: {always} of {len(words)} primitive words lock for every start")
 
 
 if __name__ == "__main__":

@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-14 Lean modules with 50 headline theorems, 13 findings (proved on paper,
-computed or conjectured) and 18 negative results. Prize problem 1 asks whether the center column
+14 Lean modules with 50 headline theorems, 14 findings (proved on paper,
+computed or conjectured) and 19 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,13 +12,13 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 5 | 2 | 0 |
+| [Columns](#columns) | 5 | 3 | 0 |
 | [Period two](#period-two) | 2 | 3 | 2 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
-| [Hidden structure](#hidden-structure) | 0 | 2 | 4 |
+| [Hidden structure](#hidden-structure) | 0 | 2 | 5 |
 | [Statistics](#statistics) | 0 | 0 | 2 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 0 | 0 | 3 |
@@ -34,6 +34,7 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
+- [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md): problem 1
@@ -96,6 +97,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
 | [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md) | computed | 1 | partial |
+| [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
 
 ## Period two
@@ -210,6 +212,7 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 |---|---|---|
 | [Rule 30 has no coarse-graining with blocks of up to 8 cells](negative-results/structure/coarse-graining.md) | no signal | 1, 3 |
 | [Rule 30 has no additive conservation law](negative-results/structure/conservation-laws.md) | no signal | 1, 2 |
+| [Deforming the rule to Rule 150 gives a polynomial of exponential degree](negative-results/structure/deformation-interpolation.md) | dead end | 3 |
 | [No linear relation among subsequences of the center column](negative-results/structure/linear-relations.md) | no signal | 1, 3 |
 | [The center cell is a random-looking polynomial](negative-results/structure/polynomial-structure.md) | no signal | 3 |
 
