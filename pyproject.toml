@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rule30-open"
+version = "0.1.0"
+description = "Computations behind the findings and negative results of an open effort on the Rule 30 Prize problems"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = ["numpy>=2.5.3", "pyyaml>=6.0.3", "scipy>=1.18.1", "tqdm>=4.70.1"]
+
+[project.optional-dependencies]
+test = ["pytest>=9.1.1"]
+
+[tool.setuptools]
+packages = ["computations"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

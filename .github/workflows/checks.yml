@@ -1,0 +1,33 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lean:
+    name: Lean proofs and axioms
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - run: python scripts/catalog.py audit
+
+  python:
+    name: Catalog and computations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[test]"
+      - run: python scripts/catalog.py check
+      - run: python -m pytest

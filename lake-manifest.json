@@ -1,0 +1,16 @@
+{"version": "1.3.0",
+ "packagesDir": ".lake/packages",
+ "packages":
+ [{"url": "https://github.com/WolframInstitute/Rule30PrizeKit",
+   "type": "git",
+   "subDir": "lean",
+   "scope": "",
+   "rev": "7d665044b904117af9e82328aeb90a30692b2b85",
+   "name": "rule30prize",
+   "manifestFile": "lake-manifest.json",
+   "inputRev": "7d665044b904117af9e82328aeb90a30692b2b85",
+   "inherited": false,
+   "configFile": "lakefile.toml"}],
+ "name": "rule30open",
+ "lakeDir": ".lake",
+ "fixedToolchain": false}

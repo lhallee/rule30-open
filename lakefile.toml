@@ -1,0 +1,13 @@
+name = "rule30open"
+version = "0.1.0"
+defaultTargets = ["Rule30Open"]
+
+# The official statements and the catalog of partial results, pinned to one commit of the prize kit.
+[[require]]
+name = "rule30prize"
+git = "https://github.com/WolframInstitute/Rule30PrizeKit"
+rev = "7d665044b904117af9e82328aeb90a30692b2b85"
+subDir = "lean"
+
+[[lean_lib]]
+name = "Rule30Open"

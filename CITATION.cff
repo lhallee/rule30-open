@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use these results or this code, please cite the repository."
+title: "rule30-open: an open effort on the Rule 30 Prize problems"
+authors:
+  - family-names: Hallee
+    given-names: Logan
+repository-code: "https://github.com/lhallee/rule30-open"
+license: Apache-2.0
+date-released: 2026-10-27
+keywords:
+  - Rule 30
+  - cellular automata
+  - Lean 4
+  - formal verification
+  - negative results

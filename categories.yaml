@@ -1,0 +1,56 @@
+# The categories of this repository, in reading order. Every Lean module, finding and negative result names one.
+# `lean` is the directory under Rule30Open/ that holds a category's Lean modules, when it has any.
+
+- id: foundations
+  title: Foundations
+  lean: Foundations
+  summary: The definitions every module uses, the bridge to the prize's official statements, and finite windows of a row.
+
+- id: seeds
+  title: Seeds
+  lean: Seeds
+  summary: Initial rows that give exactly the center column of the single black cell.
+
+- id: columns
+  title: Columns
+  lean: Columns
+  summary: What an eventually periodic column forces on its neighbors, and which eventual periods that excludes.
+
+- id: period-two
+  title: Period two
+  lean: PeriodTwo
+  summary: The first open period of Prize Problem 1, reduced to a question about one integer map.
+
+- id: diagonals
+  title: Diagonals
+  lean: Diagonals
+  summary: The periodic diagonals of the regular left side, and where their periods grow.
+
+- id: frames
+  title: Frames and the seed's past
+  summary: Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and the rows that lead to the seed.
+
+- id: analogs
+  title: Sibling rules
+  lean: Analogs
+  summary: Results for Rules 210 and 150 that show which features of Rule 30 a proof has to use.
+
+- id: dynamics
+  title: Dynamics of the two halves
+  summary: How information crosses the center column, and reformulations of Problem 1 that did not close.
+
+- id: structure
+  title: Hidden structure
+  summary: Exact searches for invariants, coarse-grainings, automata and algebraic relations in the center column.
+
+- id: statistics
+  title: Statistics
+  summary: Tests of the center column against randomness.
+
+- id: learned-models
+  title: Learned models
+  summary: Whether trained predictors find a shortcut for the center column.
+
+- id: complexity
+  title: Complexity
+  summary: Prize Problem 3, and what an answer either way would imply.
