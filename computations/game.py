@@ -7,7 +7,16 @@ hold a play forever. If in each of those the column left of the repeating one, c
 function of the phase, it is eventually periodic for every row, and Jen's theorem excludes the block in every rotation
 (Lean: `game_column` in `Rule30Open.Columns.FiniteGame`).
 
+`--jen` also closes a component when a farther column is eventually periodic along every play that stays in it, which
+Jen's theorem forbids as well (`jen_open`), and reports the blocks that this adds.
+
+`--kit` also lists the excluded blocks that the pinned kit does not exclude (`kit_blocks`), each at the least width the
+game needs and with the number of nodes there; `lean_mask` writes the certificate Lean checks for one
+(`Rule30Open.Columns.GameBlocks`).
+
     python -m computations.game --max-period 14 --widths 6,10,14   # which primitive blocks the game excludes
+    python -m computations.game --max-period 12 --widths 6,10 --jen   # what Jen's theorem on farther columns adds
+    python -m computations.game --max-period 14 --widths 6,10,14 --kit   # which of those are new to the kit
 """
 
 from __future__ import annotations
@@ -21,6 +30,17 @@ from graphlib import TopologicalSorter
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
+
+# The words of the kit's strip-certificate table (`Rule30StripCertificateTable.certTable`) and of its three single strip
+# certificates (`Rule30StripCertificates.not_eventually_01111111`, `not_eventually_00000011` and
+# `not_eventually_000000000101`), each as its least rotation. tests/test_computations.py reads them from the kit.
+KIT_WORDS = (
+    "01111111", "0000000011", "0011111111", "0111111111", "00000000001", "00000000011", "00111111111", "01011111111",
+    "01111111111", "000000000001", "000000000011", "000111111111", "001111111111", "010111111111", "011111111111",
+    "0000000000001", "0000000000011", "0000000000101", "0000000001011", "0000000010011", "0000000101111",
+    "0000111111111", "0001011111111", "0001111111111", "0010111111111", "0011111111101", "0011111111111",
+    "0101111111111", "0110111111111", "0111111111111", "00000011", "000000000101",
+)
 
 
 def necklaces(period: int) -> list[str]:
@@ -70,13 +90,54 @@ def bad_pairs(pattern: str, width: int) -> int:
     return int(((ones > 0) & (ones < count)).sum())
 
 
-def game_certificate(pattern: str, width: int) -> dict[str, int]:
-    """The packed numbers `ranks`, `transient` and `values` of the Lean `GameCert` for `pattern` at `width`.
+def jen_open(pattern: str, width: int) -> list[int]:
+    """The sizes of the components that `bad_pairs` counts and that Jen's theorem on a farther column does not close
+    either. A component is closed when one of columns 1 .. width is a function of the phase on it, when the free cell
+    is a function of the phase on the moves inside it, or when for some j the moves inside it, read on the phase and
+    columns 1 .. j, are a function of the phase and columns 1 .. j at the start; each makes some column right of the
+    repeating one eventually periodic along every play that stays in the component, against Jen's theorem."""
+    source, target, label, recurrent, column = game_graph(pattern, width)
+    period, n_cells = len(pattern), 1 << width
+    phase_of, cells = np.arange(label.size) >> width, np.arange(label.size) & (n_cells - 1)  # (p n,), (p n,)
+    free = np.repeat(np.arange(2 * period) % 2, n_cells)  # (2 p n,), the free cell of each move
+    sizes = []
+    for component in np.flatnonzero(recurrent).tolist():
+        members = np.flatnonzero(label == component)  # (m,)
+        moves = (label[source] == component) & (label[target] == component)  # (2 p n,)
+
+        def constant(values: np.ndarray, phases: np.ndarray) -> bool:
+            seen = np.zeros((period, 2), dtype=bool)  # (p, 2)
+            seen[phases, values] = True
+            return not seen.all(axis=1).any()
+
+        if constant(column[members].astype(np.int64), phase_of[members]):
+            continue
+        if any(constant((cells[members] >> j) & 1, phase_of[members]) for j in range(width)):
+            continue
+        if constant(free[moves], phase_of[source[moves]]):
+            continue
+        deterministic = False
+        for j in range(1, width + 1):
+            start = phase_of[source[moves]] * n_cells + (cells[source[moves]] & ((1 << j) - 1))  # (k,)
+            end = phase_of[target[moves]] * n_cells + (cells[target[moves]] & ((1 << j) - 1))  # (k,)
+            order = np.lexsort((end, start))  # (k,)
+            start, end = start[order], end[order]  # (k,), (k,)
+            if not ((start[1:] == start[:-1]) & (end[1:] != end[:-1])).any():
+                deterministic = True
+                break
+        if not deterministic:
+            sizes.append(int(members.size))
+    return sorted(sizes, reverse=True)
+
+
+def game_ranks(pattern: str, width: int) -> tuple[np.ndarray, int, int]:
+    """Each node's rank, the transient ranks as the bits of a number, and the left column at rank r and phase at bit
+    r * period + phase of another.
 
     A node's rank is its component's layer in the condensation (the longest path into it) times one more than the
     number of components that can hold a play, plus the component's place among those (0 for the others), so a move
     between components raises the rank and only transient components share a rank. Raises ValueError when the game
-    has a bad pair or the ranks do not fit in 8 bits.
+    has a bad pair.
     """
     source, target, label, recurrent, column = game_graph(pattern, width)
     period = len(pattern)
@@ -97,13 +158,35 @@ def game_certificate(pattern: str, width: int) -> dict[str, int]:
     ones[slot[value]] = True
     if ones[slot[~value]].any():
         raise ValueError(f"{pattern} at width {width}: the left column is not a function of the phase in a component")
+    transient = sum(1 << r for r in range(0, int(rank.max()) + 1, stride))
+    return rank, transient, sum(1 << int(i) for i in np.flatnonzero(ones))  # (p n,), int, int
+
+
+def game_certificate(pattern: str, width: int) -> dict[str, int]:
+    """The packed numbers `ranks`, `transient` and `values` of the Lean `GameCert` for `pattern` at `width`, from
+    `game_ranks`. Raises ValueError when the game has a bad pair or the ranks do not fit in 8 bits."""
+    rank, transient, values = game_ranks(pattern, width)  # (p n,), int, int
     if rank.max() > 255:
         raise ValueError(f"{pattern} at width {width}: ranks reach {rank.max()}, past 8 bits")
     return {
         "ranks": int.from_bytes(rank.astype(np.uint8).tobytes(), "little"),  # node v's rank at bits 8v .. 8v + 7
-        "transient": sum(1 << r for r in range(0, int(rank.max()) + 1, stride)),
-        "values": sum(1 << int(i) for i in np.flatnonzero(ones)),
+        "transient": transient,
+        "values": values,
     }
+
+
+def game_mask(pattern: str, width: int) -> dict[str, int | list[int]]:
+    """The fields `bits`, `ranks`, `transient` and `values` of the Lean `GameMask` for `pattern` at `width`: as
+    `game_certificate`, with each rank in `bits` bits, the fewest that hold the largest rank, and one number of ranks
+    for each phase, which keeps every number the kernel shifts small."""
+    rank, transient, values = game_ranks(pattern, width)  # (p n,), int, int
+    bits = max(1, int(rank.max()).bit_length())
+    planes = (rank.reshape(len(pattern), -1)[:, :, None] >> np.arange(bits)) & 1  # (p, n, bits), rank bit i at [.., i]
+    ranks = [
+        int.from_bytes(np.packbits(plane.astype(np.uint8).ravel(), bitorder="little").tobytes(), "little")
+        for plane in planes  # plane: (n, bits), the rank of cells r at bits r bits .. r bits + bits - 1
+    ]
+    return {"bits": bits, "ranks": ranks, "transient": transient, "values": values}
 
 
 def lean_certificate(pattern: str, width: int) -> str:
@@ -120,13 +203,59 @@ def lean_certificate(pattern: str, width: int) -> str:
     return "\n".join(lines)
 
 
-def excluded_blocks(max_period: int, widths: list[int]) -> tuple[dict[str, int], int]:
+def lean_mask(pattern: str, width: int) -> str:
+    """The Lean definition `mask<pattern>` of `game_mask(pattern, width)`, as `GameBlocks.lean` has it."""
+    mask = game_mask(pattern, width)
+    ranks = ",\n    ".join(f"0x{number:x}" for number in mask["ranks"])
+    return "\n".join([
+        f'/-- The block {pattern} at width {width}, from `game_mask("{pattern}", {width})` in `computations/game.py`. -/',
+        f"def mask{pattern} : GameMask where",
+        f"  block := wordOf {len(pattern)} 0b{pattern}",
+        f"  width := {width}",
+        f"  bits := {mask['bits']}",
+        f"  ranks := [{ranks}]",
+        f"  transient := 0x{mask['transient']:x}",
+        f"  values := 0x{mask['values']:x}",
+    ])
+
+
+def kit_blocks(max_period: int) -> dict[str, str]:
+    """The primitive blocks of period up to `max_period` that the pinned kit excludes as the eventual period of the
+    center column, each with the reason: a strip certificate (`KIT_WORDS`), every run of 1s lasting at least 9 steps
+    (`Rule30BlackRuns.not_eventuallyPeriodic_of_long_one_runs`, the constant blocks included), or a padded word of
+    `Rule30PaddedWords`: 0^q 1 with q >= 9, 0^r 11 with r >= 8, or 0^q 10111 with q >= 9."""
+    found = {word: "strip certificate" for word in KIT_WORDS if len(word) <= max_period}
+    for period in range(1, max_period + 1):
+        padded = {least_rotation("0" * (period - len(tail)) + tail)
+                  for tail, white in (("1", 9), ("11", 8), ("10111", 9)) if period - len(tail) >= white}
+        for word in necklaces(period):
+            start = word.find("0")  # a 0 to cut the cycle at, -1 for the block 1
+            ones = [len(run) for run in (word[start:] + word[:start]).split("0") if run] if start >= 0 else []
+            if word not in found and all(run >= 9 for run in ones):
+                found[word] = "long runs of 1s"
+            elif word not in found and word in padded:
+                found[word] = "padded word"
+    return found
+
+
+def least_rotation(word: str) -> str:
+    """The least rotation of `word`."""
+    return min(word[i:] + word[:i] for i in range(len(word)))
+
+
+def least_width(pattern: str, max_width: int = 14) -> int | None:
+    """The least width at which the game excludes `pattern`, or None up to `max_width`."""
+    return next((width for width in range(1, max_width + 1) if bad_pairs(pattern, width) == 0), None)
+
+
+def excluded_blocks(max_period: int, widths: list[int], jen: bool = False) -> tuple[dict[str, int], int]:
     """Each primitive block of period up to `max_period` that the game excludes, with the first width that does, and
-    the number of blocks tried."""
+    the number of blocks tried. With `jen`, a component also closes by Jen's theorem on a farther column."""
     blocks = [pattern for period in range(1, max_period + 1) for pattern in necklaces(period)]
     excluded = {}
     for pattern in tqdm(blocks, desc="blocks", unit="block", file=sys.stderr, mininterval=5):
-        width = next((width for width in widths if bad_pairs(pattern, width) == 0), None)
+        open_at = (lambda width: len(jen_open(pattern, width))) if jen else (lambda width: bad_pairs(pattern, width))
+        width = next((width for width in widths if open_at(width) == 0), None)
         if width is not None:
             excluded[pattern] = width
     return excluded, len(blocks)
@@ -136,14 +265,33 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=14)
     parser.add_argument("--widths", default="6,10,14", help="widths tried in order, comma separated")
+    parser.add_argument("--jen", action="store_true", help="also close components by Jen's theorem on farther columns")
+    parser.add_argument("--kit", action="store_true", help="also list the excluded blocks the kit does not exclude")
     args = parser.parse_args()
 
     started = time.perf_counter()
-    excluded, tried = excluded_blocks(args.max_period, [int(width) for width in args.widths.split(",")])
+    widths = [int(width) for width in args.widths.split(",")]
+    excluded, tried = excluded_blocks(args.max_period, widths)
     for pattern, width in excluded.items():
         print(f"{pattern:>14}: excluded at width {width}")
     print(f"{len(excluded)} of {tried} primitive blocks of period up to {args.max_period} excluded "
           f"({time.perf_counter() - started:.0f} s)")
+    if args.jen:
+        extended, _ = excluded_blocks(args.max_period, widths, jen=True)
+        print(f"with Jen's theorem on farther columns: {len(extended)} excluded, "
+              f"{sorted(set(extended) - set(excluded))} beyond the game")
+        for pattern in ("0001", "0011", "0111"):
+            print(f"{pattern}: open components at widths 6 to 12 have "
+                  + "; ".join(f"{jen_open(pattern, width)} nodes" for width in (6, 8, 10, 12)))
+    if args.kit:
+        kit = kit_blocks(args.max_period)
+        new = [pattern for pattern in excluded if pattern not in kit]
+        print(f"the kit excludes {len(kit)} primitive blocks of period up to {args.max_period}, "
+              f"{len(set(kit) & set(excluded))} of the game's; {sorted(set(kit) - set(excluded))} only the kit; "
+              f"{len(new)} only the game:")
+        for pattern in new:
+            width = least_width(pattern)
+            print(f"{pattern:>14}: least width {width}, {len(pattern) << width} nodes")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@ spot check against the same computation, so a definition that drifted from Rule 
 
 from __future__ import annotations
 
+import re
+import sys
 import numpy as np
 
 from pathlib import Path
@@ -175,3 +177,132 @@ def test_held150() -> None:
         orbit.append("true" if V & 1 else "false")
         V = (V >> 1) ^ V ^ (V << 1)
     assert "[" + ", ".join(orbit) + "] := by decide" in module("Analogs/Rule150Descent")
+
+
+ETHER = ["0011", "0110", "1101", "0101", "0011", "0001", "0001"]  # B1 B2 B3 B4 B5 c c at phases 0 .. 3, the kit's table
+
+
+def test_ether_domain() -> None:
+    """The kit's ether, evolved by Rule 30 on a ring of 7 r cells, returns after 4 steps; read leftward from its second
+    0001 column it is the half with bits 3, 10, 17, ... at phase 0 (-8/127), and that half under the held map stays the
+    ether's left half and reads 0001 next to the column (`held_etherLeft`, `ether_fits`); a half sharing exactly its k
+    lowest bits with it, k the 2-adic valuation of 127U + 8, follows 0001 for exactly k steps (`ether_countdown`), for
+    every U < 2^14, with the spot check `ether_countdown_spot`; and domain B reads 0 at even steps and 1 at odd ones
+    (`domainB_repeats`)."""
+    reps, steps = 30, 60
+    ring = np.array([[int(ETHER[j % 7][ph]) for j in range(7 * reps)] for ph in range(4)], dtype=bool)  # (4, 7 reps)
+    for ph in range(4):
+        row = ring[ph]  # (7 reps,)
+        assert np.array_equal(np.roll(row, 1) ^ (row | np.roll(row, -1)), ring[(ph + 1) % 4]), ph
+    left = [[int(ETHER[(5 - j) % 7][ph]) for j in range(7 * reps)] for ph in range(4)]  # cell j + 1 left of column 6
+    E = [sum(bit << j for j, bit in enumerate(cells)) for cells in left]  # (4,), as truncated integers
+    assert E[0] == sum(1 << j for j in range(3, 7 * reps, 7))
+    V = E[0]
+    for t in range(steps):
+        exact = (1 << (7 * reps - t - 1)) - 1  # bits the truncation has not reached
+        assert (V ^ E[t % 4]) & exact == 0 and V & 1 == (t % 4 == 3), t
+        V = held(V)
+    for U in range(1, 1 << 14):
+        k = ((127 * U + 8) & -(127 * U + 8)).bit_length() - 1  # v2(127U + 8)
+        assert ((U ^ E[0]) & ((1 << k) - 1)) == 0 and (U ^ E[0]) >> k & 1 == 1, U
+        V = U
+        for t in range(k):
+            assert V & 1 == (t % 4 == 3), (U, t)
+            V = held(V)
+        assert V & 1 != (k % 4 == 3), U
+    orbit = [1032]
+    for _ in range(17):
+        orbit.append(held(orbit[-1]))
+    assert "[" + ", ".join(str(V & 1) for V in orbit) + "] := by decide" in module("Columns/EtherDomain")
+    B = sum(1 << j for j in range(1, 80, 2))
+    for t in range(40):
+        assert B & 1 == t % 2, t
+        B = held(B)
+
+
+def test_no_kicks() -> None:
+    """In the orbits of random rows with a leftmost 1, wherever the center does not read 1 at two consecutive steps,
+    the cells left of it take one step of the held map (`left_kicked_zero`, `left_kicked_succ`), which is the step
+    `period_four_0001_held` uses for 0001."""
+    rng = np.random.default_rng(13)
+    steps, edge, center = 50, 60, 120
+    width = center + steps + 2
+    checked = 0
+    for _ in range(30):
+        row = np.zeros(width, dtype=bool)  # (width,)
+        row[edge] = True
+        row[edge + 1:] = rng.integers(0, 2, width - edge - 1).astype(bool)
+        rows = [row]
+        for _ in range(steps):
+            r = rows[-1]  # (width,)
+            rows.append(np.concatenate([[False], r[:-2] ^ (r[1:-1] | r[2:]), [False]]))
+        for t in range(steps - 1):
+            if rows[t][center] and rows[t + 1][center]:
+                continue
+            exact = center - edge + t  # cells -1 .. -exact of the half lie right of the row's left end
+            U = sum(1 << j for j in range(exact) if rows[t][center - 1 - j])
+            nxt = sum(1 << j for j in range(exact - 1) if rows[t + 1][center - 1 - j])
+            assert held(U) & ((1 << (exact - 1)) - 1) == nxt, t
+            checked += 1
+    assert checked > 1000
+
+
+def test_small_right() -> None:
+    """Each entry certificate of `SmallRight`: every right half of at most six cells, driven by the word from its phase
+    and stepped as cells, is in the kit's family at the listed step and depth k, with columns 1 .. k the ether of one of
+    the word's alignments, column k a B3 and the next 13 columns a wall state read from the kit's source; each of the
+    12 lists covers all 64 halves."""
+    source = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30Ether.lean"
+    text = source.read_text(encoding="utf-8")
+    body = text.split("def wallStates : List (Nat × List Bool) := [", 1)[1].split("\n]", 1)[0]
+    wall = {(int(phase), tuple(cell == "true" for cell in cells.split(", ")))
+            for phase, cells in re.findall(r"\((\d), \[([a-z, ]+)\]\)", body)}
+    assert len(wall) == 109
+    alignments = {"0001": [(5, 0), (6, 0)], "0011": [(0, 0), (1, 3), (4, 0)], "0111": [(2, 2)]}  # the kit's A0001 ..
+    lists = re.findall(r"def entries(\d{4})_(\d) : List \(Nat × Nat\) :=\s*\[([^\]]*)\]", module("Columns/EmptyRight"))
+    assert sorted((word, int(phase)) for word, phase, _ in lists) == [(w, ph) for w in alignments for ph in range(4)]
+    for word, phase, entries in lists:
+        phase, entries = int(phase), [(int(t), int(k)) for t, k in re.findall(r"\((\d+), (\d+)\)", entries)]
+        assert len(entries) == 64
+        for half, (t1, k) in enumerate(entries):
+            row = np.zeros(t1 + k + 20, dtype=bool)  # (n,), columns 1 .. n, white past the light cone
+            row[:6] = [(half >> i) & 1 for i in range(6)]
+            for t in range(t1):
+                left = np.concatenate([[word[(t + phase) % 4] == "1"], row[:-1]])  # (n,)
+                right = np.concatenate([row[1:], [False]])  # (n,)
+                row = left ^ (row | right)
+            strip = tuple(bool(cell) for cell in row[k:k + 13])
+            assert any((j0 + k) % 7 == 2 and (psi := (t1 + s + phase) % 4, strip) in wall
+                       and all(row[p - 1] == (ETHER[(j0 + p) % 7][psi] == "1") for p in range(1, k + 1))
+                       for j0, s in alignments[word]), (word, phase, half)
+
+
+def test_empty_right_001() -> None:
+    """The entries of `emptyRight_001`: the white right half, driven by 001 from phase 0, 1 or 2 and stepped as cells,
+    has columns 1 .. 47 equal to state 597 of the kit's trap `t001` at step 1270, 1269 or 1268, whose label has the
+    phase of that step; the states and labels are unpacked from the kit's source."""
+    kit = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata"
+    packed = dict(re.findall(r"def t001_(\w+) : Nat := (\d+)", (kit / "Rule30EtherThreeTrap.lean").read_text("utf-8")))
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
+    try:
+        states, labels = int(packed["R"]), int(packed["L"])
+    finally:
+        sys.set_int_max_str_digits(digits)
+    width, label_bits, index = 47, int(packed["lb"]), 597
+    state = (states >> (width * index)) % (1 << width)
+    label = (labels >> (label_bits * index)) % (1 << label_bits)
+    pattern = r"w001 \(t \+ (\d)\)\) 0 (\d+) % 2 \^ 47"
+    sources = (kit / "Rule30EtherThreeReach.lean").read_text("utf-8") + module("Columns/EmptyRight")
+    entries = re.findall(pattern, sources)
+    assert sorted(entries) == [("0", "1270"), ("1", "1269"), ("2", "1268")]
+    for phase, steps in ((int(phase), int(steps)) for phase, steps in entries):
+        row = np.zeros(steps + width, dtype=bool)  # (n,), columns 1 .. n, white past the light cone
+        for t in range(steps):
+            left = np.concatenate([["001"[(t + phase) % 3] == "1"], row[:-1]])  # (n,)
+            right = np.concatenate([row[1:], [False]])  # (n,)
+            row = left ^ (row | right)
+        assert [int(cell) for cell in row[:width]] == [(state >> i) & 1 for i in range(width)], phase
+        assert (steps + phase) % 3 == label % 3, phase
+
+

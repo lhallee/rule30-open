@@ -56,6 +56,13 @@ A file in `negative-results/<category>/` with `status: negative` and `kind`:
 State the question, what was done, the outcome with its numbers, and what it means. Say plainly when the code is not
 in this repository.
 
+## A source
+
+An entry in the theme file of [literature/](literature/README.md) that fits it, in the format that page gives. Add a
+source only after checking it against a bibliographic record (a publisher or DOI page, an arXiv abstract, or the source
+itself), summarize it in your own words, and say where it bears on the entries here. Report an unrefereed claim as a
+claim.
+
 ## Checks
 
 ```bash

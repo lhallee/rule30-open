@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 14 Lean modules with 50
-headline theorems, 14 findings and 19 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 17 Lean modules with 65
+headline theorems, 17 findings and 21 negative results.
 
 ## The problems
 
@@ -27,7 +27,7 @@ extension of one.
 
 | Problem | Proved in Lean here | Computed here | Open leads |
 |---|---|---|---|
-| 1 | No column of a row with a leftmost black cell is eventually constant, nor eventually periodic with all runs of 1s at least nine long; two blocks of period 8 excluded by a finite game; period 2 reduced to a question about one integer map | The game excludes 76 of 2,538 blocks up to period 14; the integer map fails below $2^{52}$; no row with its leftmost 1 within 120 cells has an alternating center | [Period-four locking](findings/columns/period-four-locking.md), with [a width-16 certificate](findings/columns/period-four-certificate.md) that leaves only attraction open; [the integer map](Rule30Open/PeriodTwo/HeldColumn.md) |
+| 1 | No column of a row with a leftmost black cell is eventually constant, nor eventually periodic with all runs of 1s at least nine long; two blocks of period 8 excluded by a finite game, and 32 more of period 8 to 14 that the kit does not exclude; period 2, and the period-four word $0001$, reduced to questions about one integer map; no finite row whose right half has at most six cells has a center repeating a word of period four, nor one whose right half is white a center repeating $001$ | The game excludes 76 of 2,538 blocks up to period 14, 34 of them beyond the kit; the integer map fails below $2^{52}$; no row with its leftmost 1 within 120 cells has an alternating center; every right half of up to 20 cells enters the kit's ether-and-wall family under each period-four word, and no left half of up to 80 cells meets the kit's left-half statement for one; against a white right half no left half of fewer than a million cells keeps the center alternating | [Period-four locking](findings/columns/period-four-locking.md), with [a width-16 certificate](findings/columns/period-four-certificate.md) and [the absorption census](findings/columns/absorption-census.md) that leave only attraction open; [the kit's left-half statements](findings/columns/left-half-c3.md); [the white right half](findings/period-two/white-right-half.md); [the integer map](Rule30Open/PeriodTwo/HeldColumn.md) |
 | 2 | Nothing | Density 0.500169 over $2^{22}$ cells; no additive conservation law | None found |
 | 3 | Nothing | No automaton under 131,070 states; linear complexity $n/2$; no learned shortcut | [Why it is hard](negative-results/complexity/problem-three-barrier.md) |
 
@@ -35,7 +35,8 @@ extension of one.
 
 [CATALOG.md](CATALOG.md#open-work) lists the open work: conjectures to settle, and findings proved on paper or by
 computation that still want a Lean proof. For Problem 1, start from the open leads in the table above. Before starting
-in a category, read its negative results; each says where an approach stopped and why.
+in a category, read its negative results; each says where an approach stopped and why. [The literature](literature/README.md)
+collects what is published around the problems, from Jen's theorem to the claims made since 2019.
 
 ## Layout
 
@@ -44,6 +45,7 @@ in a category, read its negative results; each says where an approach stopped an
 | `Rule30Open/<Category>/<Name>.lean` | A Lean module, beside `<Name>.md`, its argument in plain mathematics |
 | [`findings/<category>/`](findings/README.md) | Results proved on paper, computed, or conjectured, each with its evidence |
 | [`negative-results/<category>/`](negative-results/README.md) | What was tried and did not work, and why |
+| [`literature/`](literature/README.md) | The published work around the three problems, by theme, tied to the entries here |
 | [`computations/`](computations/README.md) | Python that reproduces the numbers the entries quote |
 | `tests/` | Each computation and each computable Lean statement against an independent check |
 | [`categories.yaml`](categories.yaml) | The categories, from foundations to complexity |

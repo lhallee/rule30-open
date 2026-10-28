@@ -35,7 +35,10 @@ lengths 20 and 28 nearly as many distinct words as the 60,000 samples allow.
 Under an eventual period the cells left of the center are a function of the center and of column 1 at its white times
 ([HeldColumn.md](../../Rule30Open/PeriodTwo/HeldColumn.md)). A locked column 1 would make the left half eventually
 periodic, against Jen's theorem. The slips are the obstruction: column 1 keeps a positive rate of fresh information,
-so the left half it reconstructs need not be periodic.
+so the left half it reconstructs need not be periodic. The kit's ether-and-wall family, which every small right half
+enters under a word of period four, catches almost none of the right halves here
+([the absorption route](../../negative-results/period-two/absorption-route.md)), and against the white right half the
+left half that would keep the center alternating looks random ([the white right half](white-right-half.md)).
 
 ## Reproduce
 

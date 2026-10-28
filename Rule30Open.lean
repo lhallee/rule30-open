@@ -7,8 +7,11 @@ public import Rule30Open.Seeds.SeedExtensions
 public import Rule30Open.Columns.AdjacentColumns
 public import Rule30Open.Columns.LongRuns
 public import Rule30Open.Columns.FiniteGame
+public import Rule30Open.Columns.GameBlocks
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
+public import Rule30Open.Columns.EtherDomain
+public import Rule30Open.Columns.EmptyRight
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.Diagonals.LeftMemory

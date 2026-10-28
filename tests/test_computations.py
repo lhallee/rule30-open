@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import re
 import numpy as np
 import pytest
 
 from pathlib import Path
 
-from computations import (algebra, deformation, frames, game, held_map, left_diagonals, linear_complexity,
-                          lock_certificate, right_half, sensitivity)
+from computations import (absorption, algebra, coupled, deformation, frames, game, held_map, left_diagonals,
+                          linear_complexity, lock_certificate, right_half, sensitivity)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -135,6 +136,81 @@ def test_held_map() -> None:
     assert [int(held_map.first_failures(20, phase).max()) for phase in (0, 1)] == [37, 30]
 
 
+def test_held_map_0001() -> None:
+    """The search for the condition of 0001 against Python integers for every support to 11, every phase, with and
+    without the right half's check; and the latest first failures the ether-domain argument quotes, between M and
+    M + 9, with 19 at support 11."""
+    for support in range(1, 12):
+        for phase in range(4):
+            for check in (False, True):
+                expected = []
+                for U in range(1 << (support - 1), 1 << support):
+                    V, t, last = U, 0, 0
+                    while t < 63:
+                        ph, odd = (t + phase) % 4, V & 1
+                        if (ph in (0, 2) and odd) or (ph == 3 and not odd) or (ph == 1 and check and odd and last):
+                            break
+                        if ph == 1:
+                            last = odd
+                        V, t = held_map.held(V), t + 1
+                    expected.append(t)
+                assert held_map.first_failures_0001(support, phase, check).tolist() == expected, (support, phase)
+    latest = [max(int(held_map.first_failures_0001(support, phase, False).max()) for phase in range(4))
+              for support in range(1, 17)]
+    assert all(support <= late <= support + 9 for support, late in zip(range(1, 17), latest))
+    assert latest[10] == 19
+
+
+def c3_brute(word: str, support: int, phase: int) -> int:
+    """The latest first failure of the kit's `C3 word` pattern over the left halves of exactly `support` cells, each
+    stepped as an integer with the kit's effective boundary as the cell right of bit 0."""
+    boundary = {"0001": "0000", "0011": "0010", "0111": "0110"}[word]
+    pattern = {"0001": "0*01", "0011": "*001", "0111": "*001"}[word]
+    latest = 0
+    for U in range(1 << (support - 1), 1 << support):
+        t = 0
+        while t < 200 and pattern[(t + phase) % 4] in ("*", str(U & 1)):
+            U = (U >> 1) ^ (U | (U << 1) | int(boundary[(t + phase) % 4]))
+            t += 1
+        latest = max(latest, t)
+    return latest
+
+
+def test_c3_ether() -> None:
+    """For each word, the ether's left half, read from an ether column aligned with the word, keeps the kit's C3
+    pattern under the kit's effective boundary: a 400-cell truncation is exact at cell -1 for 100 steps, and the ether
+    repeats every 4, so each C3 has this infinite solution."""
+    for word, j0, shift in (("0001", 6, 0), ("0011", 0, 0), ("0011", 1, 3), ("0111", 2, 2)):
+        assert absorption.aligned(word, j0, shift)
+        boundary = {"0001": "0000", "0011": "0010", "0111": "0110"}[word]
+        pattern = {"0001": "0*01", "0011": "*001", "0111": "*001"}[word]
+        U = sum(absorption.ether(j0 - 1 - j, shift) << j for j in range(400))
+        for t in range(100):
+            assert pattern[t % 4] in ("*", str(U & 1)), (word, j0, t)
+            U = ((U >> 1) ^ (U | (U << 1) | int(boundary[t % 4]))) & ((1 << 400) - 1)
+            assert U & ((1 << 200) - 1) == sum(absorption.ether(j0 - 1 - j, t + 1 + shift) << j for j in range(200))
+
+
+def test_held_map_tree() -> None:
+    """The tree of readings against stepping every half: for 0001 with and without the check against the search over
+    every integer to support 15, and for C3 of 0011 and 0111 against integers to support 13, in every phase; the
+    Fibonacci count of the branches of 0001 with the check; and the ether-domain argument's step 115 at support 100."""
+    for phase in range(4):
+        for check in (False, True):
+            latest, _ = held_map.tree_failures("0001", 15, phase, check)
+            assert latest == [int(held_map.first_failures_0001(support, phase, check).max())
+                              for support in range(1, 16)], (phase, check)
+        for word in ("0011", "0111"):
+            latest, _ = held_map.tree_failures(word, 13, phase, False)
+            assert latest == [c3_brute(word, support, phase) for support in range(1, 14)], (word, phase)
+    latest, branches = held_map.tree_failures("0001", 100, 0, True)
+    fibonacci = [1, 2]
+    while len(fibonacci) < 26:
+        fibonacci.append(fibonacci[-1] + fibonacci[-2])
+    assert [branches[4 * j - 1] for j in range(1, 26)] == fibonacci[1:]
+    assert latest[99] == 115
+
+
 def test_linear_complexity() -> None:
     """Berlekamp-Massey recovers an LFSR's order and a period's bound, and puts the center column at n / 2."""
     lfsr = [1, 0, 0, 1, 1]
@@ -179,6 +255,146 @@ def test_game() -> None:
         assert game.lean_certificate(pattern, width) in lean, pattern
     with pytest.raises(ValueError, match="not a function of the phase"):
         game.game_certificate("01", 8)
+
+
+def jen_open_brute(pattern: str, width: int) -> list[int]:
+    """`game.jen_open` by plain Python: components by mutual reachability, then the same three closures."""
+    period, n = len(pattern), 1 << width
+    moves = {}
+    for ph in range(period):
+        for r in range(n):
+            cells = [(r >> x) & 1 for x in range(width)]
+            for free in (0, 1):
+                left = [int(pattern[ph])] + cells[:-1]
+                right = cells[1:] + [free]
+                nxt = sum((l ^ (c | rr)) << x for x, (l, c, rr) in enumerate(zip(left, cells, right)))
+                moves.setdefault((ph, r), []).append((((ph + 1) % period, nxt), free))
+    reach = {}
+    for node in moves:
+        seen, todo = {node}, [node]
+        while todo:
+            for target, _ in moves[todo.pop()]:
+                if target not in seen:
+                    seen.add(target)
+                    todo.append(target)
+        reach[node] = seen
+    components = {frozenset(m for m in reach[node] if node in reach[m]) for node in moves}
+    sizes = []
+    for component in components:
+        inside = [(a, b, free) for a in component for b, free in moves[a] if b in component]
+        if not inside:
+            continue
+
+        def constant(pairs: list[tuple[int, int]]) -> bool:
+            return all(len({v for p, v in pairs if p == ph}) <= 1 for ph in range(period))
+
+        left_column = [(ph, int(pattern[(ph + 1) % period]) ^ (int(pattern[ph]) | (r & 1))) for ph, r in component]
+        if constant(left_column):
+            continue
+        if any(constant([(ph, (r >> x) & 1) for ph, r in component]) for x in range(width)):
+            continue
+        if constant([(a[0], free) for a, _, free in inside]):
+            continue
+        if any(all(len({(b[0], b[1] & ((1 << j) - 1)) for a, b, _ in inside if (a[0], a[1] & ((1 << j) - 1)) == key})
+                   <= 1 for key in {(a[0], a[1] & ((1 << j) - 1)) for a, _, _ in inside}) for j in range(1, width + 1)):
+            continue
+        sizes.append(len(component))
+    return sorted(sizes, reverse=True)
+
+
+def test_jen_open() -> None:
+    """The extended game against plain Python on six blocks at widths 4 and 5, and up to period 8 at width 6 it
+    excludes exactly the blocks the game excludes."""
+    for pattern in ("0001", "0011", "0111", "01", "001", "00000011"):
+        for width in (4, 5):
+            assert game.jen_open(pattern, width) == jen_open_brute(pattern, width), (pattern, width)
+    blocks = [pattern for period in range(1, 9) for pattern in game.necklaces(period)]
+    assert [p for p in blocks if not game.jen_open(p, 6)] == [p for p in blocks if game.bad_pairs(p, 6) == 0]
+
+
+KIT_SOURCE = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata"
+
+
+def test_kit_blocks() -> None:
+    """`KIT_WORDS` is the kit's strip-certificate table, read from its source, and its three single strip certificates;
+    and `kit_blocks` agrees on every primitive block up to period 14 with each family read directly: cyclic runs of 1s
+    found position by position, and every rotation of each padded word. That makes 43 blocks, 0^9 1 among them and
+    0^7 1 not."""
+    table = re.findall(r"\((\d+), (\d+), \d+, \d+\)",
+                       (KIT_SOURCE / "Rule30StripCertificateTable.lean").read_text(encoding="utf-8"))
+    singles = re.findall(r"theorem not_eventually_([01]+) :",
+                         (KIT_SOURCE / "Rule30StripCertificates.lean").read_text(encoding="utf-8"))
+    assert len(table) == 30 and len(singles) == 3
+    words = {game.least_rotation(format(int(bits), f"0{n}b")) for n, bits in table} | set(singles)
+    assert set(game.KIT_WORDS) == words and len(game.KIT_WORDS) == len(words) == 32  # 01111111 is in both
+    expected = set(game.KIT_WORDS)
+    for period in range(1, 15):
+        padded = {("0" * (period - len(tail)) + tail)[i:] + ("0" * (period - len(tail)) + tail)[:i]
+                  for tail, white in (("1", 9), ("11", 8), ("10111", 9)) if period - len(tail) >= white
+                  for i in range(period)}
+        for word in game.necklaces(period):
+            runs = []
+            for start in range(period):
+                if word[start] == "1" and word[start - 1] == "0":
+                    length = 0
+                    while word[(start + length) % period] == "1":
+                        length += 1
+                    runs.append(length)
+            if all(run >= 9 for run in runs) or word in padded:
+                expected.add(word)
+    kit = game.kit_blocks(14)
+    assert set(kit) == expected and len(kit) == 43
+    assert "0000000001" in kit and "00000001" not in kit
+
+
+def mask_ok(pattern: str, width: int, mask: dict) -> bool:
+    """`GameMask.check` in plain Python: cells as lists stepped by the rule, ranks read bit by bit."""
+    period, bits = len(pattern), mask["bits"]
+
+    def rank(phase: int, cells: list[bool]) -> int:
+        code = sum(1 << i for i, cell in enumerate(cells) if cell)
+        return (mask["ranks"][phase] >> (bits * code)) & ((1 << bits) - 1)
+
+    for phase in range(period):
+        c, c_next = pattern[phase] == "1", pattern[(phase + 1) % period] == "1"
+        for code in range(1 << width):
+            cells = [bool(code >> i & 1) for i in range(width)]
+            here = rank(phase, cells)
+            transient = bool(mask["transient"] >> here & 1)
+            for free in (False, True):
+                row = [c] + cells + [free]
+                after = [row[i] ^ (row[i + 1] | row[i + 2]) for i in range(width)]
+                there = rank((phase + 1) % period, after)
+                if there < here or (transient and there == here):
+                    return False
+            if not transient and bool(mask["values"] >> (here * period + phase) & 1) != (c_next ^ (c | cells[0])):
+                return False
+    return True
+
+
+def test_game_masks() -> None:
+    """The 32 certificates in GameBlocks.lean are `lean_mask` at the least width of blocks the kit does not exclude,
+    `gameBlocks` lists the same blocks, and each certificate passes the check in plain Python and fails it with its
+    values cleared. The two blocks left out need 114,688 and 229,376 nodes. A certificate at one width gives one at
+    every larger width, checked for three blocks up to width 11."""
+    lean = (ROOT / "Rule30Open" / "Columns" / "GameBlocks.lean").read_text(encoding="utf-8")
+    masks = re.findall(r"def mask([01]+) : GameMask where\n  block := wordOf (\d+) 0b\1\n  width := (\d+)", lean)
+    listed = re.findall(r"\((\d+), 0b([01]+)\)", lean.split("def gameBlocks", 1)[1].split("\n\n", 1)[0])
+    assert len(masks) == 32 and [(n, p) for p, n, _ in masks] == listed
+    kit = game.kit_blocks(14)
+    for pattern, n, width in masks:
+        width = int(width)
+        assert int(n) == len(pattern) and pattern == game.least_rotation(pattern) and pattern not in kit
+        assert game.least_width(pattern) == width and len(pattern) << width <= 1 << 15
+        assert game.lean_mask(pattern, width) in lean, pattern
+        mask = game.game_mask(pattern, width)
+        assert mask_ok(pattern, width, mask) and not mask_ok(pattern, width, {**mask, "values": 0}), pattern
+    for pattern, width in (("00000001001111", 13), ("00000000010001", 14)):
+        assert pattern not in kit and game.least_width(pattern) == width
+    assert [len(p) << w for p, w in (("00000001001111", 13), ("00000000010001", 14))] == [114688, 229376]
+    for pattern in ("00010111111111", "00000000110011", "0000000001101"):
+        least = game.least_width(pattern)
+        assert all(game.bad_pairs(pattern, width) == 0 for width in range(least, 12))
 
 
 def test_step_is_rule_30() -> None:
@@ -344,3 +560,170 @@ def test_deformation() -> None:
     for t in range(17):
         assert [int(x) - 17 for x in np.flatnonzero(cells)] == sorted(x for x, cell in rows[t].items() if cell & 1)
         cells = np.concatenate([[False], cells[:-1]]) ^ cells ^ np.concatenate([cells[1:], [False]])  # (35,), Rule 150
+
+
+def test_ether_and_walls(certificate: np.ndarray) -> None:
+    """The ether table is a Rule 30 orbit on a ring and every listed alignment holds; the greatest wall is the last 13
+    columns of the core certificate of 0001 at width 16, which the core fixes to the ether's B1 B2 B3; the computed wall
+    has the kit's 26, 29, 27 and 27 states, steps into itself for both cells beyond, and is the closure of any one of
+    its states."""
+    # certificate: (4, 2^16)
+    ring = np.array([[absorption.ether(j, ph) for j in range(70)] for ph in range(4)], dtype=bool)  # (4, 70)
+    for ph in range(4):
+        assert np.array_equal(np.roll(ring[ph], 1) ^ (ring[ph] | np.roll(ring[ph], -1)), ring[(ph + 1) % 4])
+    assert all(absorption.aligned(word, j0, shift) for word in absorption.WORDS
+               for j0, shift in absorption.ALIGNMENTS[word])
+    greatest, wall = absorption.greatest_wall(), absorption.kit_wall()  # (4, 2^13) each
+    for ph in range(4):
+        assert set((np.flatnonzero(certificate[ph]) >> 3).tolist()) == set(np.flatnonzero(greatest[ph]).tolist())
+    assert wall.sum(axis=1).tolist() == [26, 29, 27, 27] and not (wall & ~greatest).any()
+    states = [(ph, s) for ph in range(4) for s in np.flatnonzero(wall[ph]).tolist()]
+    for ph, s in states:
+        for beyond in (0, 1):
+            row = absorption.ether(2, ph) | (s << 1) | (beyond << 14)  # B3 at bit 0, the wall at bits 1 .. 13
+            assert wall[(ph + 1) % 4][(step(row) >> 1) & 0x1FFF]
+    seen, todo = {states[0]}, [states[0]]
+    while todo:
+        ph, s = todo.pop()
+        for beyond in (0, 1):
+            nxt = ((ph + 1) % 4, (step(absorption.ether(2, ph) | (s << 1) | (beyond << 14)) >> 1) & 0x1FFF)
+            if nxt not in seen:
+                seen.add(nxt)
+                todo.append(nxt)
+    assert seen == set(states)
+
+
+def in_family_slow(word: str, row: int, phase: int, wall: np.ndarray) -> bool:
+    """The kit's `InFamily` for a right half held as an integer (bit j is column j + 1), checked column by column."""
+    for j0, shift in absorption.ALIGNMENTS[word]:
+        psi = (phase + shift) % 4
+        for k in range(52):
+            if (j0 + k) % 7 == 2 and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, psi) for p in range(1, k + 1)) \
+                    and wall[psi][(row >> k) & 0x1FFF]:
+                return True
+    return False
+
+
+def test_absorption_census() -> None:
+    """Every right half of up to 6 cells, in every phase of the three words, enters the family exactly when integer
+    rows stepped one at a time first meet the family checked column by column; and at 12 cells the latest entries are
+    the absorption finding's 544, 980 and 416 at phase 0."""
+    wall = absorption.kit_wall()  # (4, 2^13)
+    for word in absorption.WORDS:
+        for phase in range(4):
+            times = absorption.census(word, 6, phase, 600, wall)  # (64,)
+            for start in range(64):
+                row, t = start, 0
+                while not in_family_slow(word, row, (t + phase) % 4, wall):
+                    row = ((row << 1) | int(word[(t + phase) % 4])) ^ (row | (row >> 1))
+                    t += 1
+                assert times[start] == t, (word, phase, start)
+    assert [int(absorption.census(word, 12, 0, 1200, wall).max()) for word in absorption.WORDS] == [544, 980, 416]
+
+
+def lean_states(name: str) -> set[tuple[int, int]]:
+    """The (phase, strip) pairs of the list `name` in the kit's `Rule30Ether.lean`, the strip's first cell at bit 0."""
+    source = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30Ether.lean"
+    body = source.read_text(encoding="utf-8").split(f"def {name} : List (Nat × List Bool) := [", 1)[1].split("\n]", 1)[0]
+    return {(int(phase), sum(1 << i for i, cell in enumerate(cells.split(", ")) if cell == "true"))
+            for phase, cells in re.findall(r"\((\d), \[([a-z, ]+)\]\)", body)}
+
+
+def test_wall_is_the_kits() -> None:
+    """The computed wall is the kit's `wallStates`, read from its source, and the kit's `S0001` is the ether's B1 B2 B3
+    followed by a wall state at the same phase."""
+    wall = absorption.kit_wall()  # (4, 2^13)
+    computed = {(ph, s) for ph in range(4) for s in np.flatnonzero(wall[ph]).tolist()}
+    assert len(computed) == 109 and lean_states("wallStates") == computed
+    b123 = {ph: sum(absorption.ether(j, ph) << j for j in range(3)) for ph in range(4)}
+    assert lean_states("S0001") == {(ph, b123[ph] | (s << 3)) for ph, s in computed}
+
+
+def test_pure_ether() -> None:
+    """Under 0001 the periodic half 0010000 is the aligned ether at phase 0, and 1110110 becomes it two steps after
+    phase 1, checked on integer rows; neither enters the family, and the aligned ether is outside the family at every
+    phase, checked column by column."""
+    wall = absorption.kit_wall()  # (4, 2^13)
+    for name, phase, when in (("0010000", 0, 0), ("1110110", 1, 2)):
+        row = sum(int(name[j % 7]) << j for j in range(400))
+        for t in range(when):
+            row = (((row << 1) | int("0001"[(t + phase) % 4])) ^ (row | (row >> 1))) & ((1 << 400) - 1)
+        assert any(all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, when + phase + shift) for p in range(1, 200))
+                   for j0, shift in absorption.ALIGNMENTS["0001"])
+        rows = absorption.packed(np.array([[int(name[j % 7]) for j in range(4070)]], dtype=np.uint8))  # (1, 64)
+        assert absorption.pure_ether("0001", rows, phase, 8).tolist() == [when]
+        assert absorption.absorb("0001", rows, phase, 400, wall, 4070).tolist() == [-1]
+    for j0, shift in absorption.ALIGNMENTS["0001"]:
+        for phase in range(4):
+            row = sum(absorption.ether(j0 + p, phase + shift) << (p - 1) for p in range(1, 120))
+            assert not in_family_slow("0001", row, phase, wall)
+
+
+def test_deep_depth() -> None:
+    """The family at any depth: a row with the aligned ether on columns 1 .. k, a wall state from the kit's source on
+    the next 13 and random cells beyond is in the family at depth k (k past the 64-column window included), and stops
+    being so when one ether column is flipped; the deepest depth is at least the least one `family_depth` finds."""
+    rng = np.random.default_rng(17)
+    wall = absorption.kit_wall()  # (4, 2^13)
+    states = sorted(lean_states("wallStates"))
+    for word in absorption.WORDS:
+        for j0, shift in absorption.ALIGNMENTS[word]:
+            for _ in range(6):
+                phase = int(rng.integers(4))
+                psi = (phase + shift) % 4
+                k = int(rng.choice([k for k in range(3, 140) if (j0 + k) % 7 == 2]))
+                strip = rng.choice([s for ph, s in states if ph == psi])
+                row = rng.integers(0, 2, 200).astype(bool)  # (200,), column p + 1 at index p
+                row[:k] = [absorption.ether(j0 + p, psi) for p in range(1, k + 1)]
+                row[k:k + 13] = [(strip >> q) & 1 for q in range(13)]
+                assert absorption.deep_depth(word, row[None, :], phase, wall, 180)[0] >= k, (word, k)
+                low = np.uint64(sum(int(row[p]) << p for p in range(64)))
+                least = absorption.family_depth(word, np.array([low]), phase, wall)[0]
+                assert least <= absorption.deep_depth(word, row[None, :], phase, wall, 180)[0]
+                row[int(rng.integers(k))] ^= True
+                assert absorption.deep_depth(word, row[None, :], phase, wall, 180)[0] < k
+
+
+def test_lean_entries() -> None:
+    """The entry lists of `SmallRight` in `EmptyRight.lean` are the ones `lean_entries` builds."""
+    lean = (ROOT / "Rule30Open" / "Columns" / "EmptyRight.lean").read_text(encoding="utf-8")
+    assert absorption.lean_entries(6, absorption.kit_wall()) in lean
+
+
+def test_coupled_exact_death() -> None:
+    """Psi against stepping whole rows: a left half equal to Psi(R) at depths 1 .. W and white beyond keeps the center
+    on the word exactly until the first black depth of Psi(R) past W, for random words, phases, right halves and
+    widths."""
+    rng = np.random.default_rng(11)
+    steps = 120
+    for _ in range(40):
+        word = coupled.WORDS[int(rng.integers(len(coupled.WORDS)))]
+        phase, right, width = int(rng.integers(len(word))), int(rng.integers(1 << 10)), int(rng.integers(1, 60))
+        row = coupled.psi(word, phase, right, steps)
+        death = next(j for j in range(width, steps) if (row >> j) & 1) + 1
+        middle = width + steps
+        cells = np.zeros(middle + steps + 12, dtype=bool)  # (n,), the center at index `middle`
+        cells[middle - width:middle] = [(row >> j) & 1 for j in reversed(range(width))]
+        cells[middle] = word[phase] == "1"
+        cells[middle + 1:middle + 11] = [(right >> i) & 1 for i in range(10)]
+        column = spacetime(cells, death)[:, middle]  # (death + 1,)
+        want = [int(word[(t + phase) % len(word)]) for t in range(death + 1)]
+        assert column[:death].tolist() == want[:death] and column[death] != want[death]
+
+
+def test_coupled_rebuilds() -> None:
+    """Psi of the empty right half against the antidiagonal rebuild of `held_map` with the center as the boundary, and
+    for 0011 at phase 2 against the left half of the kit's ether, which it equals from depth 1."""
+    c, column = coupled.center("01", 1, 301), coupled.drive_column("01", 1, 0, 301)
+    rebuilt, a1, a2 = 0, 0, 0
+    for m in range(300):
+        reading = ((c >> (m + 1)) ^ ((c >> m) | (column >> m))) & 1  # column -1 at time m, forced
+        d = a1 | a2 | ((((c >> (m - 1)) & 1) << (m - 1)) if m else 0)
+        bit = reading ^ ((d & ((1 << m) - 1)).bit_count() & 1)
+        a1, a2 = held_map.next_diagonal(bit, d, m), a1
+        rebuilt |= bit << m
+    assert rebuilt == coupled.psi("01", 1, 0, 300)
+    ether_left = sum(int(absorption.ETHER[-k % 7][2]) << (k - 1) for k in range(1, 701))
+    assert coupled.psi("0011", 2, 0, 700) == ether_left
+    assert coupled.ether_after("10001010111100") == 4 and coupled.ether_after("0010011") == 0
+

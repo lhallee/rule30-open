@@ -59,7 +59,11 @@ white times of the center. The single cell's right half at any time is finite. S
 locks under $w$ excludes $w$ as the center's eventual period, and doing so for the three words above excludes least
 period 4 entirely. The finite game ([FiniteGame.md](../../Rule30Open/Columns/FiniteGame.md)) cannot do it, because
 it lets the free cell break the lock. With [the certificate](period-four-certificate.md), what remains is attraction:
-that every finite right half enters a certificate set.
+that every finite right half enters a certificate set. The kit states attraction into its ether-and-wall family, which
+contains the certificate, as the open `Rule30Ether.Absorption`, and
+[the absorption census](absorption-census.md) finds that every right half of up to 20 cells enters that family, for
+each word and phase. For $0001$, [EtherDomain.md](../../Rule30Open/Columns/EtherDomain.md) reduces the same question
+on the left half to an integer condition.
 
 ## Reproduce
 

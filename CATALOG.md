@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-14 Lean modules with 50 headline theorems, 14 findings (proved on paper,
-computed or conjectured) and 19 negative results. Prize problem 1 asks whether the center column
+17 Lean modules with 65 headline theorems, 17 findings (proved on paper,
+computed or conjectured) and 21 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,8 +12,8 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 5 | 3 | 0 |
-| [Period two](#period-two) | 2 | 3 | 2 |
+| [Columns](#columns) | 8 | 5 | 1 |
+| [Period two](#period-two) | 2 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
@@ -34,11 +34,14 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
+- [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
+- [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
+- [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
 - [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md): problem 3
 - [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md): problems 1, 2, 3
 
@@ -87,7 +90,10 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
 | [No two adjacent columns are eventually periodic](Rule30Open/Columns/AdjacentColumns.md) | [`Columns.AdjacentColumns`](Rule30Open/Columns/AdjacentColumns.lean) | `adjacent_columns`, `no_constant_column`, `center_not_eventually_constant` | 1 | independent proof of a kit result |
+| [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
+| [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |
 | [A finite game rules out repeating blocks](Rule30Open/Columns/FiniteGame.md) | [`Columns.FiniteGame`](Rule30Open/Columns/FiniteGame.lean) | `game_column`, `center_not_01111111`, `center_not_00000011` | 1 | independent proof of a kit result |
+| [The finite game, checked in bit masks, excludes 32 more blocks of period at most 14](Rule30Open/Columns/GameBlocks.md) | [`Columns.GameBlocks`](Rule30Open/Columns/GameBlocks.lean) | `mask_column`, `center_not_gameBlocks`, `not_eventually_gameBlocks` | 1 | not in the kit |
 | [The kicked form of the left half](Rule30Open/Columns/KickedForm.md) | [`Columns.KickedForm`](Rule30Open/Columns/KickedForm.lean) | `left_kicked_zero`, `left_kicked_succ`, `left_kicked_check`, `period_two_golden` | 1 | extends a kit result |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |
@@ -96,9 +102,17 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
+| [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | wanted |
 | [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md) | computed | 1 | partial |
+| [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | wanted |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
+
+**Negative results**
+
+| Result | Kind | Problems |
+|---|---|---|
+| [Jen's theorem on farther columns does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
 
 ## Period two
 
@@ -118,11 +132,13 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md) | computed | 1 | wanted |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
+| [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | wanted |
 
 **Negative results**
 
 | Result | Kind | Problems |
 |---|---|---|
+| [The ether-and-wall family does not catch the right half beside an alternating center](negative-results/period-two/absorption-route.md) | dead end | 1 |
 | [The left half is not a patchwork of ether domains](negative-results/period-two/ether-patchwork.md) | refuted | 1 |
 | [No finite certificate settles period two](negative-results/period-two/no-finite-certificate.md) | dead end | 1 |
 

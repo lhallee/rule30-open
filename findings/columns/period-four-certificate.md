@@ -82,7 +82,10 @@ the start of the word's phase table.
 - $0111$, starts 8 and 18: column 7 reads $0111$. They enter at $W = 20$ but not at $W \le 18$.
 
 The certificate is seeded at column 1 and tested with an adversarial beyond cell, so a half whose structure beyond the
-plug is itself a shifted driven half is covered only when the window holds the plug and enough of the copy. Heuristic:
+plug is itself a shifted driven half is covered only when the window holds the plug and enough of the copy. The plugs
+are ether prefixes: columns 1 to 10 of the $0001$ outlier are the ether's $B_1 B_2 B_3 B_4 B_5\,c\,c\,B_1 B_2 B_3$.
+All four starts enter the kit's ether-and-wall family, which allows a prefix of any length
+([the absorption census](absorption-census.md)). Heuristic:
 this suggests an induction on the plug, since the half beyond a column that repeats the drive word is the same problem
 shifted.
 
@@ -129,6 +132,17 @@ window with a free beyond cell does not force entry, so attraction needs informa
 
 ## What the kit has
 
+The kit's
+[`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Ether.lean)
+holds certificates of this kind for all three words, as one family: ether columns ending in a $B_3$ column, followed
+by one of 109 states of a 13-cell wall that is closed under every beyond cell. The core certificate of $0001$ at
+$W = 16$ above is the family's member with three ether columns, $B_1 B_2 B_3$, and a larger wall, the greatest closed
+set of strips; the kit's wall is that set's only strongly connected component with no move out, and the kit's trap
+`S0001` is $B_1 B_2 B_3$ followed by it. The four starts below that enter no certificate all enter the family, which
+allows an ether prefix of any length. The kit states entry for every finite right half as its open `Absorption`.
+[The absorption census](absorption-census.md) gives the comparison and finds that every right half of up to 20 cells
+enters.
+
 The kit's bitmask strip certificates
 ([`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean))
 run the strip forward from all states with a free beyond cell and ask column 1 to be constant at the white phases on
@@ -137,8 +151,7 @@ the closure, which is entry and invariance together. For the period-four words,
 proves, if the center is eventually $w^\infty$, that the strip eventually stays in an exempt class where column 1 at
 the white times is not periodic, and reduces least period 4 to open statements `C3 w` about the left half. The sets
 here are the complementary object: windows from which the lock is certain. If every finite right half entered one, the
-true history could not stay in the exempt class, and masked Jen would exclude $w$. The kit's module docstrings describe
-no certificate of this kind for the period-four words.
+true history could not stay in the exempt class, and masked Jen would exclude $w$.
 
 ## Reproduce
 
