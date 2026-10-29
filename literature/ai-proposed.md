@@ -6,9 +6,9 @@ and says whether it opens a route here. Every item is a claim: the collections b
 are at different stages of verification, and none is refereed unless stated. The work of agents on the prize itself is
 in [rule-30.md](rule-30.md#work-on-the-prize-problems-since-2019).
 
-The search found no AI-proposed result about cellular automata, normal numbers, 2-adic maps or the pseudorandomness
-of an explicit sequence. The items below are the nearest ones, and the bearing of each is assessed against the routes in
-[the roadmap](../ROADMAP.md).
+The search found one AI-proposed result about cellular automata, on nonsofic groups (family 197 below), and none about
+normal numbers, 2-adic maps or the pseudorandomness of an explicit sequence. The items below are the nearest ones, and
+the bearing of each is assessed against the routes in [the roadmap](../ROADMAP.md).
 
 ## OpenAI's manuscript collection
 
@@ -30,18 +30,40 @@ of an explicit sequence. The items below are the nearest ones, and the bearing o
   - **005 and 017, irrationality.** The irrationality of Catalan's constant, and irrationality exponent 2 for $\pi$.
   - **154, multiple ergodic averages.** Almost-everywhere convergence of consecutive multiple ergodic averages for
     invertible mixing transformations.
+  - **197, surjunctivity.** A finitely presented torsion-free nonsofic group whose group algebra over GF(2) is not
+    directly finite, and from the same elements an injective cellular automaton on that group that is not surjective,
+    against Gottschalk's surjunctivity conjecture.
+  - **155, periodic tiling.** A finite tile of $\mathbb{Z}^3$ that tiles space but admits no periodic tiling.
+  - **179, Barker sequences.** Real circulant Hadamard matrices exist only in orders 1 and 4, so binary sequences whose
+    nontrivial aperiodic autocorrelations are at most 1 in magnitude exist, beyond length 1, only at lengths 2, 3, 4,
+    5, 7, 11 and 13.
+  - **127, 132 and 192, measures of Boolean functions.** Average sensitivity at most $8d\sqrt{n}$ for polynomial
+    threshold functions of degree $d$; total functions whose block sensitivity exceeds a power above 2 of their
+    sensitivity; and functions whose linear Fourier weight exceeds any constant times the square root of their
+    degree.
 
-  *Here:* 102 and 378 are the subject of [the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md),
-  which explains why neither decides Problem 3; 378's lower bounds are for nondeterministic exponential time, not for
-  an explicit function such as the center column. 112 is a lower bound for one constructed language in a restricted
-  circuit model; the same model for the center column would ask for lower bounds on $c(n)$ as a function of the digits of
-  $n$, about which nothing structural is known. 129 concerns automata on growing alphabets; an automaton that reads the
-  digits of $n$ and computes $c(n)$, the model of [the automaton search](../negative-results/complexity/automaton-lower-bounds.md),
-  is one-way or two-way equivalently, since both recognize the regular languages. 005 and 017 are irrationality results
-  of the kind Problem 1 is, in its 2-adic form ([the 2-adic trace](../findings/frames/two-adic-trace.md)), but their
-  methods use analytic structure that the center column is not known to have. 103 and 154 bear on no route here: the
-  first concerns space-bounded randomness, the second almost every point, while the problems concern one point
-  ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
+  *Here:* 102 and 378 are the subject of [the hardness
+  hypotheses](../negative-results/complexity/hardness-hypotheses.md), which explains why neither decides Problem 3;
+  378's lower bounds are for nondeterministic exponential time, not for an explicit function such as the center column.
+  112 is a lower bound for one constructed language in a restricted circuit model; the same model for the center column
+  would ask for lower bounds on $c(n)$ as a function of the digits of $n$, about which nothing structural is known. 129
+  concerns automata on growing alphabets; an automaton that reads the digits of $n$ and computes $c(n)$, the model of
+  [the automaton search](../negative-results/complexity/automaton-lower-bounds.md), is one-way or two-way equivalently,
+  since both recognize the regular languages. 005 and 017 are irrationality results of the kind Problem 1 is, in its
+  2-adic form ([the 2-adic trace](../findings/frames/two-adic-trace.md)), but their methods use analytic structure that
+  the center column is not known to have. 103 and 154 bear on no route here: the first concerns space-bounded
+  randomness, the second almost every point, while the problems concern one point ([the random-row
+  barrier](../negative-results/random-rows/almost-every-row.md)). 197 concerns groups that are not sofic; Rule 30 lives
+  on the integers, which are amenable, where the Garden of Eden theorem makes every injective automaton onto, and Rule
+  30 is onto and not injective (the kit's equivalent forms, `Preimages`). 155 is about tile sets that force every tiling
+  to be aperiodic, while Problem 1 asks about one column of one orbit, which no local rule forces: Rules 90 and 150
+  share every structural fact the kit's argument uses and have eventually constant center columns (the kit's
+  `Rule30Realization`). 179 settles short words with tiny autocorrelations; the center column's autocorrelations are of
+  the size of a random sequence's (the kit's `Autocorrelation`, [the randomness
+  tests](../negative-results/statistics/randomness-tests.md)). For 127, 132 and 192: the center cell after $t$ steps, as
+  a function of its $2t + 1$ initial cells, has degree $2t - 1$ and flips with its leftmost cell (the kit's
+  `AlgebraicDegree`, `QueryComplexity`), so these measures are near their maximum for it, and the problems concern its
+  value on the single cell, which they do not see.
 
 ## Other claims
 

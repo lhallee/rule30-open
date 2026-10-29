@@ -818,6 +818,20 @@ def test_ether_prefix() -> None:
                 assert own_depth(word, j0, shift, stepped(word, phase, row, t), (t + phase) % 4) == k + 7 * extra
 
 
+def test_ether_agreement() -> None:
+    """`ether_agreement` against a direct comparison of cell strings with every rotation of the ether, on random halves
+    and on halves that are a rotation of the ether on a known prefix."""
+    rng = np.random.default_rng(36)
+    halves = [int(h) for h in rng.integers(0, 1 << 16, 50)]
+    halves += [ether_prefix.ether_bits(j0, psi, k) | (1 - absorption.ether(j0 + k + 1, psi)) << k
+               for j0, psi, k in ((2, 1, 9), (6, 3, 12), (0, 0, 5))]
+    for half in halves:
+        cells = format(half, "016b")[::-1]
+        best = max(next((k for k in range(16) if cells[k] != str(absorption.ether(j0 + k + 1, psi))), 16)
+                   for j0 in range(7) for psi in range(4))
+        assert ether_prefix.ether_agreement(half, 16) == best
+
+
 def lean_states(name: str) -> set[tuple[int, int]]:
     """The (phase, strip) pairs of the list `name` in the kit's `Rule30Ether.lean`, the strip's first cell at bit 0."""
     source = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30Ether.lean"

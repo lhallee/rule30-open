@@ -13,6 +13,7 @@ entry (t, k) as t * 64 + k, the direct entries for K = 0 .. B - 1 and then the b
 
     python -m computations.ether_prefix --tail 4            # B and the latest entries for tails of up to 4 cells
     python -m computations.ether_prefix --tail 4 --lean     # the certificate section of EtherPrefix.lean
+    python -m computations.ether_prefix --slowest 16        # the slowest halves of 16 cells and their ether agreement
 """
 
 from __future__ import annotations
@@ -138,13 +139,45 @@ def lean_data(tail_cells: int) -> str:
     return "\n".join(blocks)
 
 
+def ether_agreement(half: int, cells: int) -> int:
+    """The longest prefix of a half of `cells` cells that agrees with some rotation of the ether, in space and in
+    phase."""
+    best = 0
+    for j0 in range(7):
+        for psi in range(4):
+            differ = half ^ ether_bits(j0, psi, cells)
+            best = max(best, (differ & -differ).bit_length() - 1 if differ else cells)
+    return best
+
+
+def slowest(cells: int, count: int) -> list[tuple[str, int, list[tuple[int, int, int]]]]:
+    """For each word and phase, the `count` right halves of at most `cells` cells that enter the family last: each
+    half, its entry step and its longest agreement with a rotation of the ether."""
+    wall = absorption.kit_wall()  # (4, 2^13)
+    out = []
+    for word in absorption.WORDS:
+        for phase in range(4):
+            times = absorption.census(word, cells, phase, STEPS * 2, wall)  # (2^cells,)
+            order = np.argsort(-times, kind="stable")[:count].tolist()
+            out.append((word, phase, [(h, int(times[h]), ether_agreement(h, cells)) for h in order]))
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--tail", type=int, default=4, help="tail words of at most this many cells")
     parser.add_argument("--lean", action="store_true", help="print the Lean certificate section")
+    parser.add_argument("--slowest", type=int, default=0, help="instead, the slowest halves of this many cells")
     args = parser.parse_args()
 
     started = time.perf_counter()
+    if args.slowest:
+        rows = slowest(args.slowest, 3)
+        for word, phase, halves in rows:
+            print(f"{word} phase {phase}: " + "  ".join(f"{format(h, f'0{args.slowest}b')[::-1]} enters at {t}, "
+                                                      f"agrees with the ether on {a} cells" for h, t, a in halves))
+        print(f"longest agreement among them: {max(a for _, _, hs in rows for _, _, a in hs)} cells")
+        return
     if args.lean:
         print(lean_data(args.tail))
         return

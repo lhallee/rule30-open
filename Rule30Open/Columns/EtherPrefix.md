@@ -65,9 +65,12 @@ The truncation point is unbounded, so these halves have any number of cells, bet
 phase. A long truncation enters at a step that depends only on its length modulo 7: its boundary sends a disturbance
 into the ether, which leaves a wall a fixed distance from the boundary, at most 37 cells behind it for the white tail,
 while column 1 never sees it. A short one may enter only through another alignment. The argument does not reach the
-infinite ether, which has no boundary to send the wall. Together with [SparseRight](SparseRight.md) and
-[WhiteGap](WhiteGap.md), a finite right half that never enters, if one exists, has at least three black cells among its
-first cells, a black cell among cells 7 to $B$, and is not a truncated aligned ether with a tail of at most four cells.
+infinite ether, which has no boundary to send the wall. Nor does it reach the halves that enter last in the census: the
+three slowest halves of 16 cells for each word and phase agree with a rotation of the ether on at most their first 7
+cells (`python -m computations.ether_prefix --slowest 16`), so their delay comes from elsewhere. Together with
+[SparseRight](SparseRight.md) and [WhiteGap](WhiteGap.md), a finite right half that never enters, if one exists, has at
+least three black cells among its first cells, a black cell among cells 7 to $B$, and is not a truncated aligned ether
+with a tail of at most four cells.
 
 ## Relation to the kit
 
