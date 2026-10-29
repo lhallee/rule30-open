@@ -8,8 +8,8 @@ import pytest
 
 from pathlib import Path
 
-from computations import (absorption, algebra, coupled, deformation, frames, game, held_map, left_diagonals,
-                          linear_complexity, lock_certificate, right_half, sensitivity)
+from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
+                          left_diagonals, linear_complexity, lock_certificate, right_half, sensitivity)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -545,6 +545,97 @@ def test_forced_entry(certificate: np.ndarray) -> None:
             row = int("0001"[ph]) | (window << 1) | (int(rng.integers(0, 2)) << 17)  # center, window, beyond cell
             window, ph = (step(row) >> 1) & 0xFFFF, (ph + 1) % 4
         assert certificate[ph][window]
+
+
+@pytest.fixture(scope="module")
+def coin_certificate() -> np.ndarray:
+    """The certificate of 0111 at width 14, the smallest the coin finding uses."""
+    return coin_lock.certificate("0111", 14)  # (4, 2^14)
+
+
+def step_window(word: str, ph: int, window: int, beyond: int, width: int) -> int:
+    """One step of a window of columns 1 .. width at phase `ph`, stepped as a whole integer row with `rule30.step`, with
+    the center left of it and `beyond` right of it."""
+    row = int(word[ph]) | (window << 1) | (beyond << (width + 1))  # center at bit 0, column j at bit j
+    return (step(row) >> 1) & ((1 << width) - 1)
+
+
+def test_coin_entry_paths(coin_certificate: np.ndarray) -> None:
+    """Every window of width 14 can enter the certificate of 0111, the farthest in 61 steps; along the recorded first
+    values from 300 random windows, stepped as integer rows, the distance drops by one per step and is the smaller of
+    the two successors' distances, which makes it the least number of steps."""
+    # coin_certificate: (4, 2^14)
+    dist, first = coin_lock.entry_paths("0111", coin_certificate)  # (4, 2^14) each
+    assert (dist < coin_lock.UNREACHED).all() and int(dist.max()) == 61
+    assert (dist[coin_certificate] == 0).all() and (dist[~coin_certificate] > 0).all()
+    rng = np.random.default_rng(30)
+    for _ in range(300):
+        ph, window = int(rng.integers(0, 4)), int(rng.integers(0, 1 << 14))
+        for remaining in range(int(dist[ph, window]), 0, -1):
+            successors = [step_window("0111", ph, window, beyond, 14) for beyond in (0, 1)]
+            assert min(dist[(ph + 1) % 4, s] for s in successors) == remaining - 1
+            window, ph = successors[int(first[ph, window])], (ph + 1) % 4
+            assert dist[ph, window] == remaining - 1
+        assert coin_certificate[ph, window]
+
+
+def test_universal_word(coin_certificate: np.ndarray) -> None:
+    """The universal word of 0111 at width 14 has 209 values and brings every one of the 2^14 windows into the
+    certificate, stepped as bool arrays; at width 16 the words of 0001, 0011 and 0111 have 425, 697 and 297 values."""
+    # coin_certificate: (4, 2^14)
+    values = coin_lock.universal_word("0111", coin_certificate)
+    assert len(values) == 209
+    rows = ((np.arange(1 << 14)[:, None] >> np.arange(14)[None, :]) & 1).astype(bool)  # (2^14, 14), column j + 1
+    for t, value in enumerate(values):
+        left = np.concatenate([np.full((rows.shape[0], 1), "0111"[t % 4] == "1"), rows[:, :-1]], axis=1)  # (2^14, 14)
+        right = np.concatenate([rows[:, 1:], np.full((rows.shape[0], 1), value == 1)], axis=1)  # (2^14, 14)
+        rows = left ^ (rows | right)
+    codes = rows.astype(np.int64) @ (1 << np.arange(14))  # (2^14,)
+    assert coin_certificate[len(values) % 4][codes].all()
+    for word, length in (("0001", 425), ("0011", 697), ("0111", 297)):
+        member = coin_lock.certificate(word, 16)  # (4, 2^16)
+        values = coin_lock.universal_word(word, member)
+        assert len(values) == length and member[length % 4][coin_lock.run_word(word, member, values)].all()
+
+
+def test_coin_chain(coin_certificate: np.ndarray) -> None:
+    """With a fair coin beyond width 14 under 0111, the expected entry time solves its equation with integer-row
+    successors and matches 400 simulated runs from the slowest window within four standard errors, and the chance of
+    staying out falls by the decay factor per step; at width 16, the finding's expected times and decay factor."""
+    # coin_certificate: (4, 2^14)
+    expected = coin_lock.expected_entry("0111", coin_certificate)  # (4, 2^14)
+    assert (expected[coin_certificate] == 0).all()
+    rng = np.random.default_rng(30)
+    for _ in range(300):
+        ph, window = int(rng.integers(0, 4)), int(rng.integers(0, 1 << 14))
+        if not coin_certificate[ph, window]:
+            later = sum(expected[(ph + 1) % 4, step_window("0111", ph, window, beyond, 14)] for beyond in (0, 1))
+            assert abs(expected[ph, window] - 1 - later / 2) < 1e-4
+    slowest = int(np.argmax(expected[0]))
+    times = np.zeros(400)  # (400,)
+    for run in range(400):
+        ph, window = 0, slowest
+        while not coin_certificate[ph, window]:
+            window, ph = step_window("0111", ph, window, int(rng.integers(0, 2)), 14), (ph + 1) % 4
+            times[run] += 1
+    assert abs(times.mean() - expected[0, slowest]) < 4 * times.std() / np.sqrt(times.size)
+    rate = coin_lock.decay_rate("0111", coin_certificate)
+    before, after = coin_lock.stay_out("0111", coin_certificate, 400), coin_lock.stay_out("0111", coin_certificate, 404)
+    assert abs(after.max() / before.max() - rate ** 4) < 1e-3
+    member = coin_lock.certificate("0111", 16)  # (4, 2^16)
+    expected = coin_lock.expected_entry("0111", member)  # (4, 2^16)
+    assert (round(float(expected.max()), 1), round(float(expected[0].mean()), 1)) == (139.9, 49.8)
+    assert round(coin_lock.decay_rate("0111", member), 5) == 0.98251
+
+
+def test_coin_sample() -> None:
+    """In Rule 30 itself, of the 31 starts of the locking finding, exactly those the certificate finding names stay out
+    of the width-16 certificate for 2,000 steps (start 4 under 0001, 24 under 0011, 8 and 18 under 0111), and each of
+    them enters the kit's ether-and-wall family."""
+    for word, missing in (("0001", [4]), ("0011", [24]), ("0111", [8, 18])):
+        times, family = coin_lock.sample(word, coin_lock.certificate(word, 16), 31, 2000)  # (31,), (m,)
+        assert np.flatnonzero(times < 0).tolist() == missing, word
+        assert (family >= 0).all(), word
 
 
 def test_deformation() -> None:

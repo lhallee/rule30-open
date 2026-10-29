@@ -37,4 +37,5 @@ version of Problem 3. So Problem 3 is at least as hard as Problem 1.
 
 **What would help.** A reduction showing that computing $c$ is hard for exponential time, or a proof that Rule 30's
 center column can simulate arbitrary computation, would turn the question into known separations; neither is in
-sight.
+sight. Hypotheses about satisfiability do not substitute for such a reduction, settled or not:
+[the hardness hypotheses](hardness-hypotheses.md).

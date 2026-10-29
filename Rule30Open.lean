@@ -17,6 +17,7 @@ public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
+public import Rule30Open.RandomRows.LeftWindow
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

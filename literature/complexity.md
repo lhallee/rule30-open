@@ -84,6 +84,27 @@ any natural function in exponential time (see the barrier entry).
   if strong pseudorandom generators exist. If Rule 30 behaves like such a generator, circuit-style arguments for
   Problem 3 meet this barrier; that is an analogy, not a theorem about Rule 30.
 
+## Satisfiability and unique games
+
+Two unrefereed claims of October 2026, each released with a Lean formalization. If correct, the first settles the
+Unique Games Conjecture and the second refutes the Exponential Time Hypothesis.
+[The hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md) explains why neither bears on
+Problem 3.
+
+- **OpenAI (2026).** [The Unique Games conjecture and optimal approximation thresholds](https://github.com/openai/math/blob/main/lean/docs/102.md).
+  A page of the repository openai/math, with preprints dated September 23, 2026, among them *The Unique Games
+  Theorem*, and their Lean files.
+  Claims a deterministic polynomial-time reduction from 3-SAT to bipartite unique games over an alphabet
+  $\mathbb{F}_2^s$ with translation constraints, with completeness at least $1 - \varepsilon$ and soundness at most
+  $\delta$ for every fixed $0 < \varepsilon, \delta < 1/2$. The repository says that its results are at different
+  stages of verification.
+  *Here:* [the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md).
+- **Anthropic (2026).** [A 2^o(n) time algorithm for 3-SAT](https://github.com/anthropics/formal-math/pull/31).
+  The paper and its Lean 4 formalization, merged into the repository anthropics/formal-math on October 27, 2026.
+  Claims one deterministic machine that counts, for every $k$, the satisfying assignments of $k$-CNF formulas on $n$
+  variables in time $2^{o(n)}$.
+  *Here:* [the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md).
+
 ## Rule 30 as a pseudorandom generator and a cipher
 
 - **Wolfram (1986).** [Cryptography with cellular automata](https://doi.org/10.1007/3-540-39799-X_32).

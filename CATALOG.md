@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-17 Lean modules with 65 headline theorems, 17 findings (proved on paper,
-computed or conjectured) and 21 negative results. Prize problem 1 asks whether the center column
+18 Lean modules with 71 headline theorems, 18 findings (proved on paper,
+computed or conjectured) and 23 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,16 +12,17 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 8 | 5 | 1 |
+| [Columns](#columns) | 8 | 6 | 1 |
 | [Period two](#period-two) | 2 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 2 | 5 |
+| [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 2 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 0 | 0 | 3 |
+| [Complexity](#complexity) | 0 | 0 | 4 |
 
 ## Open work
 
@@ -35,6 +36,7 @@ approach stopped.
 **Findings that want a Lean proof**
 
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
+- [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
@@ -103,6 +105,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | wanted |
+| [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | wanted |
 | [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | wanted |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
@@ -232,6 +235,22 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 | [No linear relation among subsequences of the center column](negative-results/structure/linear-relations.md) | no signal | 1, 3 |
 | [The center cell is a random-looking polynomial](negative-results/structure/polynomial-structure.md) | no signal | 3 |
 
+## Random rows
+
+What holds for a random initial row, and why it does not reach the single cell.
+
+**Proved in Lean**
+
+| Result | Module | Headline theorems | Problems | Kit |
+|---|---|---|---|---|
+| [A random left window gives a fair center window, for every row](Rule30Open/RandomRows/LeftWindow.md) | [`RandomRows.LeftWindow`](Rule30Open/RandomRows/LeftWindow.lean) | `cone_left_xor`, `count_centerWindow`, `centerWindow_unique`, `count_adapted`, `count_periodic`, `seed_window` | 1, 2 | extends a kit result |
+
+**Negative results**
+
+| Result | Kind | Problems |
+|---|---|---|
+| [Randomness proves Problems 1 and 2 for almost every row and stops at the single cell](negative-results/random-rows/almost-every-row.md) | barrier | 1, 2, 3 |
+
 ## Statistics
 
 Tests of the center column against randomness.
@@ -263,5 +282,6 @@ Prize Problem 3, and what an answer either way would imply.
 | Result | Kind | Problems |
 |---|---|---|
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
+| [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
 | [The linear complexity is n/2, the most a sequence can have](negative-results/complexity/linear-complexity.md) | no signal | 1, 3 |
 | [Problem 3 asks for a lower bound beyond current complexity theory](negative-results/complexity/problem-three-barrier.md) | barrier | 3, 1 |

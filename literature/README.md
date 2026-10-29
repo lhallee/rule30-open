@@ -27,16 +27,20 @@ eventually periodic center column, so a proof has to use more than the propertie
 claims a solution; none is refereed, and the prize is unclaimed.
 
 **Problem 2.** For a uniformly random initial row each center cell is black with probability exactly 1/2, because
-Rule 30 is onto; the single cell has measure zero, so this says nothing about it. Theorems that drive measures to the
-uniform one exist only for linear rules, whose single-cell center columns are periodic. The evidence for density 1/2 is
-statistical: the first million cells counted in *A New Kind of Science*, a billion published, and test batteries that
-find no deviation.
+Rule 30 is onto; the single cell has measure zero, so this says nothing about it. Here the center cells of a random
+left half are proved independent and fair, and the step from almost every row to the single cell is recorded as a
+barrier ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)). Theorems that drive
+measures to the uniform one exist only for linear rules, whose single-cell center columns are periodic. The evidence
+for density 1/2 is statistical: the first million cells counted in *A New Kind of Science*, a billion published, and
+test batteries that find no deviation.
 
 **Problem 3.** Only upper bounds are known: about $n^2$ cell updates by direct simulation, $O(n^2/\log n)$ for whole
 rows, and $O(n)$ operations on a random-access machine with bitwise operations. No lower bound is known for Rule 30 or
 for any comparable explicit function. Predicting Rule 110 is P-complete; natural proofs bar many circuit techniques if
 Rule 30 behaves as a pseudorandom generator; and Rule 30's orbits compute every Boolean function of up to five
-variables, short of the universality a reduction would need.
+variables, short of the universality a reduction would need. The October 2026 claims of a proof of the Unique Games
+Conjecture and of 3-SAT in time $2^{o(n)}$ would change none of this
+([the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md)).
 
 ## Leads not yet checked
 
@@ -68,6 +72,9 @@ The search found these but could not confirm the record or read the text. Check 
   estimate densities from preimage counts.
 - Bobenko, Bordemann, Gunn and Pinkall (1993), *On two integrable cellular automata*, *Communications in Mathematical
   Physics* 158(1), 127 to 134; the record is in the authors' publication list, the text was not read.
+- OpenAI (2026), a deterministic algorithm counting the satisfying assignments of 3-SAT in subexponential time,
+  reported in secondary sources at the end of October 2026 with a paper and Lean files; the primary record was not
+  reached. [The hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md) does not depend on it.
 
 Kumar (2024), arXiv:2411.03468, which claimed to settle Mahler's 3/2 problem, was withdrawn; do not cite it.
 

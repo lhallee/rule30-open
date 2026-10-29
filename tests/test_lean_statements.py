@@ -306,3 +306,57 @@ def test_empty_right_001() -> None:
         assert (steps + phase) % 3 == label % 3, phase
 
 
+
+
+def centers(rows: np.ndarray, n: int) -> np.ndarray:
+    """The center cells at times 1 .. n of each row of `rows`, cells -n .. n at indices 0 .. 2n, white beyond, which
+    is exact inside the center's light cone."""
+    # rows: (m, 2n + 1)
+    out = np.zeros((rows.shape[0], n), dtype=bool)  # (m, n)
+    for t in range(n):
+        left = np.concatenate([np.zeros((rows.shape[0], 1), dtype=bool), rows[:, :-1]], axis=1)  # (m, 2n + 1)
+        right = np.concatenate([rows[:, 1:], np.zeros((rows.shape[0], 1), dtype=bool)], axis=1)  # (m, 2n + 1)
+        rows = left ^ (rows | right)
+        out[:, t] = rows[:, n]
+    return out  # (m, n)
+
+
+def test_left_window() -> None:
+    """Over the 2^n left windows of n <= 10 cells, the center cells at times 1 .. n take every value exactly once, for
+    the single cell and 20 random rows (`count_centerWindow`, `centerWindow_unique`). Freeing random sets S of depths,
+    exactly 2^(depths of S below T + p) of the rows repeat the center with period p at every depth of S from T + p on
+    (`count_adapted`), and no more than that repeat it at every time from T + p to n (`count_periodic`). The single
+    cell's window of three cells is the module's spot check."""
+    rng = np.random.default_rng(30)
+    for n in range(1, 11):
+        windows = ((np.arange(1 << n)[:, None] >> np.arange(n)[None, :]) & 1).astype(bool)  # (2^n, n), depth j + 1
+        for trial in range(21):
+            row = np.zeros(2 * n + 1, dtype=bool) if trial == 0 else rng.integers(0, 2, 2 * n + 1).astype(bool)
+            if trial == 0:
+                row[n] = True  # the single cell
+            rows = np.tile(row, (1 << n, 1))  # (2^n, 2n + 1)
+            rows[:, n - 1::-1][:, :n] = windows  # depth j + 1 is index n - 1 - j
+            words = centers(rows, n).astype(np.int64) @ (1 << np.arange(n))  # (2^n,)
+            assert np.array_equal(np.sort(words), np.arange(1 << n)), (n, trial)
+    for _ in range(200):
+        n = int(rng.integers(2, 11))
+        depths = np.flatnonzero(rng.integers(0, 2, n)) + 1  # (k,), the free depths
+        p, T = int(rng.integers(1, 4)), int(rng.integers(0, n))
+        row = rng.integers(0, 2, 2 * n + 1).astype(bool)  # (2n + 1,)
+        values = ((np.arange(1 << depths.size)[:, None] >> np.arange(depths.size)[None, :]) & 1).astype(bool)
+        rows = np.tile(row, (1 << depths.size, 1))  # (2^k, 2n + 1)
+        rows[:, n - depths] = values
+        column = np.concatenate([rows[:, n:n + 1], centers(rows, n)], axis=1)  # (2^k, n + 1), times 0 .. n
+        held = [s for s in depths.tolist() if s >= T + p]
+        meets = np.ones(1 << depths.size, dtype=bool)  # (2^k,)
+        for s in held:
+            meets &= column[:, s] == column[:, s - p]
+        assert int(meets.sum()) == 2 ** sum(s < T + p for s in depths.tolist())
+        periodic = np.ones(1 << depths.size, dtype=bool)  # (2^k,)
+        for t in range(T + p, n + 1):
+            periodic &= column[:, t] == column[:, t - p]
+        assert int(periodic.sum()) <= int(meets.sum())
+    single = np.zeros(7, dtype=bool)  # (7,), cells -3 .. 3
+    single[3] = True
+    assert centers(single[None, :], 3)[0, ::-1].tolist() == [True, False, True]
+    assert "centerWindow single [false, false, false] = [true, false, true]" in module("RandomRows/LeftWindow")

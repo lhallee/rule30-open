@@ -9,7 +9,9 @@ and why. This file collects both, with what each result does and does not say ab
 A cellular automaton that is onto keeps the uniform Bernoulli measure invariant. Rule 30 is onto because it is
 permutive in its left input. So for a uniformly random initial row, every cell, the center included, is black with
 probability exactly 1/2 at every time. The single cell is one row, of measure zero, so none of this decides Problem 2;
-a proof has to use the single cell's orbit itself.
+a proof has to use the single cell's orbit itself. [LeftWindow.md](../Rule30Open/RandomRows/LeftWindow.md) proves
+the finite form in Lean, with the center cells of a random left half independent, and with only some cells random;
+[the random-row barrier](../negative-results/random-rows/almost-every-row.md) says where such arguments stop.
 
 - **Hedlund (1969).** [Endomorphisms and automorphisms of the shift dynamical system](https://doi.org/10.1007/BF01691062).
   *Mathematical Systems Theory* 3, 320 to 375.

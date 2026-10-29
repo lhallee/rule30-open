@@ -43,6 +43,11 @@
   title: Hidden structure
   summary: Exact searches for invariants, coarse-grainings, automata and algebraic relations in the center column.
 
+- id: random-rows
+  title: Random rows
+  lean: RandomRows
+  summary: What holds for a random initial row, and why it does not reach the single cell.
+
 - id: statistics
   title: Statistics
   summary: Tests of the center column against randomness.
