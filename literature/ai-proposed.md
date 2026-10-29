@@ -6,10 +6,11 @@ and says whether it opens a route here. Every item is a claim: the collections b
 are at different stages of verification, and none is refereed unless stated. The work of agents on the prize itself is
 in [rule-30.md](rule-30.md#work-on-the-prize-problems-since-2019).
 
-The search found one AI-proposed result about cellular automata, on nonsofic groups (family 197 below), one about the
-pseudorandomness of an explicit sequence, the Liouville function (family 007), and none about normal numbers or 2-adic
-maps. The items below are the nearest ones, and the bearing of each is assessed against the routes in [the
-roadmap](../ROADMAP.md).
+The search found three AI-proposed results about cellular automata: one on nonsofic groups (family 197 below) and two
+OEIS conjectures proved by formal proof search, one of them on the center column of rule 167 (Other claims). It found
+one about the pseudorandomness of an explicit sequence, the Liouville function (family 007), and none about normal
+numbers or 2-adic maps. The items below are the nearest ones, and the bearing of each is assessed against the routes in
+[the roadmap](../ROADMAP.md).
 
 ## OpenAI's manuscript collection
 
@@ -97,6 +98,21 @@ roadmap](../ROADMAP.md).
   Lean formalizations of two human results, on simple zeros of the Riemann zeta function on the critical line and on
   faster 3SUM and all-pairs shortest paths on a word RAM; neither bears on the problems. *Here:* [the hardness
   hypotheses](../negative-results/complexity/hardness-hypotheses.md).
+
+- **Google DeepMind (2026).** [formal-conjectures](https://github.com/google-deepmind/formal-conjectures), the
+  conjectures marked solved with a formal proof found by the methods of G. Tsoukalas et al., *Advancing Mathematics
+  Research with AI-Driven Formal Proof Search*, arXiv:2605.22763 (the paper's text was not read). On October 29, 2026,
+  38 entries of the repository cite it: 36 conjectures from the OEIS, one Erdős problem and one from *Written on the
+  Wall II*. Two concern cellular automata: [A300997](https://oeis.org/A300997), on an automaton that redistributes mass,
+  and [A267581](https://oeis.org/A267581), the center column of the elementary rule 167 from a single black cell, whose
+  recurrence $a(n) = 2a(n - 1) + 1 - [\,n \mid 2^{n+1}]$ says that from time 2 on the column is black except at the
+  powers of two. *Here:* rule 167 is an elementary automaton whose center column is not eventually periodic and yet
+  2-automatic, so the analog of Problem 1 holds while that of Problem 3 fails: a finite automaton reads the cell at time
+  $n$ from the binary digits of $n$. For Rule 30 the kit proves that Problem 3 implies the column is not 2-automatic,
+  and no automaton with fewer than 131,070 states fits its first $2^{22}$ cells ([the automaton
+  search](../negative-results/complexity/automaton-lower-bounds.md)); rule 167's column follows its nested pattern,
+  which Rule 30 does not have. The same repository states Prize Problems 1 and 2 in Lean as open
+  ([rule-30.md](rule-30.md#the-prize-and-its-formal-statements)).
 
 ## Checked records, texts not read
 
