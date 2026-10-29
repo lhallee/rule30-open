@@ -10,6 +10,7 @@ function of the column, and no column of a row with a leftmost 1 can repeat the 
     python -m computations.wall_segments --max-period 20   # the family's blocks by period, against the kit's runs
     python -m computations.wall_segments --max-period 16 --game   # and against the finite game
     python -m computations.wall_segments --brute 12   # segments that brute force accepts beyond the five forms
+    python -m computations.wall_segments --tails   # the tails long runs rule out, against the kit's Theorems B and D
 """
 
 from __future__ import annotations
@@ -155,13 +156,19 @@ def windows_after_ones(ones: int, width: int = 3) -> frozenset[Window]:
     return frozenset(out)
 
 
-def shield_known_steps(j: int) -> int:
-    """The first step at which three-valued Rule 30, started from the shield (0 1)^j that 9 j 1s leave with every
-    cell beyond unknown, can lose the cell right of the column, over every column it may read (Lean: `shield_agree`
-    proves that it does not before step 4 j)."""
-    start = tuple([i % 2 for i in range(2 * j)] + [None] * 2)
+def stripe(length: int) -> list[int]:
+    """The stripe of `length` cells right of the column that ends in a black cell: cell i, counted from 1, is black when
+    `length - i` is even. The shield (0 1)^j that 9 j 1s leave is the stripe of length 2 j."""
+    return [int((length - i) % 2 == 0) for i in range(1, length + 1)]
+
+
+def stripe_known_steps(length: int) -> int:
+    """The first step at which three-valued Rule 30, started from the stripe of `length` cells with every cell beyond
+    unknown, can lose the cell right of the column, over every column it may read (Lean: `stripe_agree` proves that it
+    does not before step 2 L)."""
+    start = tuple(stripe(length) + [None] * 2)
     frontier = {start}
-    for s in range(1, 8 * j + 4):
+    for s in range(1, 4 * length + 4):
         nxt = set()
         for cells in frontier:
             for col in (0, 1):
@@ -174,14 +181,16 @@ def shield_known_steps(j: int) -> int:
     return -1
 
 
-def shield_brute(j: int, steps: int) -> bool:
+def stripe_brute(length: int, steps: int) -> bool:
     """Whether the true cell right of the column at each step below `steps` is the same for every choice of the cells
-    beyond the shield (0 1)^j, for every column of `steps` values: brute force, independent of the three values."""
-    beyond = steps + 1
+    beyond the stripe of `length` cells, for every column of `steps` values: brute force, independent of the three
+    values. Cells farther than `steps` from the column cannot reach it in time, so the cells up to `steps + 1` are
+    free and the rest are 0."""
+    beyond = max(steps + 1 - length, 1)
     for col in itertools.product((0, 1), repeat=steps):
         seen: list[set[int]] = [set() for _ in range(steps)]
         for bits in itertools.product((0, 1), repeat=beyond):
-            cells = [i % 2 for i in range(2 * j)] + list(bits)
+            cells = stripe(length) + list(bits)  # (length + beyond,)
             for s in range(steps):
                 seen[s].add(cells[0])
                 ext = [col[s]] + cells + [0]
@@ -189,6 +198,26 @@ def shield_brute(j: int, steps: int) -> bool:
         if any(len(values) > 1 for values in seen):
             return False
     return True
+
+
+def least_white_run(tail: int) -> tuple[int, int]:
+    """The least white run b, after nine or more 1s, that rules out every tail of `tail` steps: by
+    `black_white_tail_column` (a tail of at most 4 floor((b - 1)/9) + 2 steps) and by the kit's Theorem D
+    (b at least 1 + 9 ceil((tail + 8)/2))."""
+    ours = 1
+    while tail > 4 * ((ours - 1) // 9) + 2:
+        ours += 1
+    return ours, 1 + 9 * ((tail + 9) // 2)
+
+
+def longest_tail(run: int) -> tuple[int, int]:
+    """The longest tail that a black run of `run` steps, at least nine, rules out: by `long_run_tail_column`
+    (4 floor(run/9) steps) and by the kit's Theorem B (the longest tail t with 9 ceil((t + 9)/2) at most `run`, or -1
+    when there is none)."""
+    kit = -1
+    while 9 * ((kit + 1 + 10) // 2) <= run:
+        kit += 1
+    return 4 * (run // 9), kit
 
 
 def necklaces(period: int) -> list[str]:
@@ -218,7 +247,19 @@ def main() -> None:
                         help="instead, the windows that runs of 1 to 9 ones leave")
     parser.add_argument("--brute", type=int, default=0,
                         help="instead, the segments up to this length that brute force accepts and the run does not")
+    parser.add_argument("--tails", action="store_true",
+                        help="instead, the tails that long black runs and white runs after them rule out, against "
+                             "the kit's Theorems B and D")
     args = parser.parse_args()
+
+    if args.tails:
+        for run in (9, 18, 27, 45, 90):
+            ours, kit = longest_tail(run)
+            print(f"black run of {run}: tails of at most {ours} steps (kit's Theorem B: {kit})")
+        for tail in range(0, 12):
+            ours, kit = least_white_run(tail)
+            print(f"tail of {tail} after nine 1s and a white run: white run of at least {ours} (kit's Theorem D: {kit})")
+        return
 
     if args.after_ones:
         for ones in range(1, 10):

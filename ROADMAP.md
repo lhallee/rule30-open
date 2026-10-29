@@ -26,8 +26,10 @@ kit's commit 932cf8d.
   follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game excludes, 616 blocks up to
   period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a \ge 9$
   ([WallSegments](Rule30Open/Columns/WallSegments.md) with three values per cell,
-  [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows), and a run of $r \ge 9$ 1s rules out every tail of
-  at most $4 \lfloor r/9 \rfloor$ steps, which sharpens the kit's Theorem B ([WideWall](Rule30Open/Columns/WideWall.md)).
+  [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows). A run of $r \ge 9$ 1s rules out every tail of
+  at most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most
+  $4 \lfloor (b - 1)/9 \rfloor + 2$ steps, which sharpen the kit's Theorems B and D
+  ([WideWall](Rule30Open/Columns/WideWall.md)).
   Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536 cells](Rule30Open/Columns/LongWindow.md), where
   the kit has 16,359). Open pull requests to the kit claim every
   eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the
