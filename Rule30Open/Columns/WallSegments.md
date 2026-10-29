@@ -92,7 +92,8 @@ The three-valued run forgets correlations between unknown cells. Brute force ove
 (`brute_segment`) accepts 84 more segments of at most 12 cells that start and end with 0
 (`python -m computations.wall_segments --brute 12`), in patterns with a parity, such as $0^b 1 0 0$ and $0^b 1 1 0$
 for odd $b \ge 3$ and $0^b 1 0 1 0$ for even $b \ge 2$. A finer abstraction that keeps those correlations would exclude
-more families by the same argument; for one block at a time, [the finite game](FiniteGame.md) already does.
+more families by the same argument; [WallSets](WallSets.md) does so with sets of three-cell windows, which accept 123
+of the 124 segments of at most 12 cells that brute force accepts.
 
 ## Relation to the kit
 

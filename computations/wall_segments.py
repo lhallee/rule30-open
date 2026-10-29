@@ -95,6 +95,53 @@ def in_family(block: str) -> bool:
     return True
 
 
+Window = tuple[int, ...]
+
+
+def window_step(windows: frozenset[Window], col: int) -> frozenset[Window]:
+    """One step of the set of windows right of a column that reads `col`, the cell beyond a window free (Lean:
+    `sstep` for windows of three cells)."""
+    out = set()
+    for window in windows:
+        for free in (0, 1):
+            cells = (col,) + window + (free,)
+            out.add(tuple(cells[i - 1] ^ (cells[i] | cells[i + 1]) for i in range(1, len(window) + 1)))
+    return frozenset(out)
+
+
+def wall_windows(width: int) -> frozenset[Window]:
+    """The windows that nine 1s leave: the first two cells 0 1, the rest free."""
+    return frozenset(w for w in itertools.product((0, 1), repeat=width) if w[0] == 0 and w[1] == 1)
+
+
+def set_segment_good(segment: str, width: int = 3) -> bool:
+    """Whether, from the wall, every window of the set has the same first cell at every 0 of `segment`."""
+    windows = wall_windows(width)
+    for ch in segment:
+        if ch == "0" and len({w[0] for w in windows}) > 1:
+            return False
+        windows = window_step(windows, int(ch))
+    return True
+
+
+def in_set_family(block: str, width: int = 3) -> bool:
+    """`in_family` with the set of windows in place of the three values (Lean: `wallSet` for width 3)."""
+    period = len(block)
+    col = [int(c) for c in block]
+    resets = [i for i in range(period) if all(col[(i - 1 - j) % period] for j in range(9))]
+    if not resets:
+        return False
+    windows = wall_windows(width)
+    for j in range(period):
+        i = (resets[0] + j) % period
+        if j > 0 and i in resets:
+            windows = wall_windows(width)
+        if col[i] == 0 and len({w[0] for w in windows}) > 1:
+            return False
+        windows = window_step(windows, col[i])
+    return True
+
+
 def necklaces(period: int) -> list[str]:
     """The primitive binary necklaces of length `period`, each as its least rotation."""
     out = []
@@ -128,22 +175,36 @@ def main() -> None:
                  if u[0] == "0" and u[-1] == "0" and "1" * 9 not in u and not segment_good(u) and brute_segment(u)]
         print(f"{len(extra)} segments of at most {args.brute} cells that start and end with 0 are determined by brute "
               f"force and not by the three-valued run: {extra}")
+        segments = [u for m in range(1, args.brute + 1)
+                    for u in ("".join(bits) for bits in itertools.product("01", repeat=m))
+                    if u[0] == "0" and u[-1] == "0" and "1" * 9 not in u]
+        brute = {u for u in segments if brute_segment(u)}
+        for width in (3, 8):
+            accepted = {u for u in segments if set_segment_good(u, width)}
+            print(f"sets of windows of {width} cells: accept {len(accepted & brute)} of the {len(brute)} segments "
+                  f"brute force accepts, and {len(accepted - brute)} it does not")
         return
 
-    total = runs = 0
+    total = runs = sets = 0
     for period in tqdm(range(1, args.max_period + 1), desc="periods", file=sys.stderr):
         blocks = necklaces(period)
         family = [b for b in blocks if in_family(b)]
         kit = [b for b in family if long_runs(b)]
-        total, runs = total + len(family), runs + len(kit)
+        windows = [b for b in blocks if in_set_family(b)]
+        total, runs, sets = total + len(family), runs + len(kit), sets + len(windows)
         print(f"period {period}: {len(family)} blocks in the family, {len(kit)} with every run of 1s at least nine "
-              f"long")
-    print(f"up to period {args.max_period}: {total} blocks, {total - runs} beyond the black-runs family")
+              f"long, {len(windows)} in the family of sets of windows")
+    print(f"up to period {args.max_period}: {total} blocks, {total - runs} beyond the black-runs family; {sets} with "
+          f"sets of windows of three cells")
     if args.game:
         from computations import game
         nine = [b for p in range(1, args.max_period + 1) for b in necklaces(p) if "1" * 9 in b + b or b == "1"]
         excluded = {b for b in tqdm(nine, desc="game", file=sys.stderr) if game.least_width(b, 14) is not None}
         family = {b for b in nine if in_family(b)}
+        windows = {b for b in nine if in_set_family(b)}
+        print(f"sets of windows: {len(windows)} blocks; not excluded by the game: {sorted(windows - excluded)}; "
+              f"excluded by the game only: {len(excluded - windows)}; beyond the kit's blocks: "
+              f"{len(windows - set(game.kit_blocks(args.max_period)))}")
         kit = game.kit_blocks(args.max_period)
         print(f"{len(nine)} blocks with nine 1s in a row; the game excludes {len(excluded)}, the family {len(family)}; "
               f"in the family but not excluded by the game: {sorted(family - excluded)}; excluded by the game only: "

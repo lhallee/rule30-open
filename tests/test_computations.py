@@ -1108,3 +1108,28 @@ def test_wall_segments() -> None:
     family = [b for p in range(1, 14) for b in wall_segments.necklaces(p) if wall_segments.in_family(b)]
     assert len(family) == 16
     assert all(game.least_width(b, 10) is not None for b in family if b != "1")
+
+
+def test_window_sets() -> None:
+    """The sets of windows of `wall_segments` against brute force and the three values: every segment of up to nine
+    cells that the sets of three-cell windows pass, brute force passes too, and so do the sets for every segment the
+    three values pass; the parity families pass for small lengths; and the family's blocks of period up to 13 are
+    among those the finite game excludes, the blocks with nine 1s in a row all of them."""
+    import itertools
+    from computations import wall_segments
+    for m in range(1, 10):
+        for bits in itertools.product("01", repeat=m):
+            u = "".join(bits)
+            if wall_segments.set_segment_good(u):
+                assert wall_segments.brute_segment(u), u
+            if wall_segments.segment_good(u):
+                assert wall_segments.set_segment_good(u), u
+    for k in range(4):
+        assert wall_segments.set_segment_good("0" * (2 * k + 3) + "100")
+        assert wall_segments.set_segment_good("0" * (2 * k + 3) + "110")
+        assert wall_segments.set_segment_good("0" * (2 * k + 2) + "1010")
+        assert not wall_segments.set_segment_good("0" * (2 * k + 4) + "100")
+    family = [b for p in range(1, 14) for b in wall_segments.necklaces(p) if wall_segments.in_set_family(b)]
+    nine = [b for p in range(2, 14) for b in wall_segments.necklaces(p) if "1" * 9 in b + b]
+    excluded = [b for b in nine if game.least_width(b, 12) is not None]
+    assert sorted(b for b in family if b != "1") == sorted(excluded)

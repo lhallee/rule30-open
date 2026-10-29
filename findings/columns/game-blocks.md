@@ -25,7 +25,8 @@ $000001011111011$, whose runs are at most five long, and $000010111111011$, with
 blocks whose runs of 1s all last at least nine steps are among the 197, as
 [the long-runs theorem](../../Rule30Open/Columns/LongRuns.md) requires, and so are the 64 blocks of the family of
 [WallSegments](../../Rule30Open/Columns/WallSegments.md), which proves them, with every period of the family, by one
-argument; of the 77 blocks with nine 1s in a row that the game excludes, 13 are outside that family.
+argument; of the 77 blocks with nine 1s in a row that the game excludes, 13 are outside that family, and
+[WallSets](../../Rule30Open/Columns/WallSets.md), with sets of three-cell windows, proves all 77 the same way.
 
 A certificate at one width gives one at every larger width, since a play of the larger game, read on its first cells,
 is a play of the smaller one. So these are exactly the blocks of period at most 16 that the game excludes at some width

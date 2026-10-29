@@ -21,9 +21,12 @@ kit's commit 932cf8d.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
   specific repeating blocks: 197 of the 8,800 blocks of period at most 16, 129 of the 136 beyond the kit in Lean ([game
   blocks](findings/columns/game-blocks.md)), every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially
-  many white cells (the kit). A three-valued run of the two cells beside the column extends the kit's long black runs
-  to every period whose runs of nine or more 1s are separated by segments the run follows, among them $1^a 0^b 1 0$,
-  $1^a 0 1 1 0^c$ and $1^a 0 1 1 0^c 1 0$ for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md)).
+  many white cells (the kit). Following the cells beside the column after nine 1s extends the kit's long black runs
+  to every period whose runs of nine or more 1s are separated by segments that the possible windows of three cells
+  follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game excludes, 616 blocks up to
+  period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a \ge 9$
+  ([WallSegments](Rule30Open/Columns/WallSegments.md) with three values per cell,
+  [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows).
   Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536 cells](Rule30Open/Columns/LongWindow.md), where
   the kit has 16,359). Open pull requests to the kit claim every
   eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the

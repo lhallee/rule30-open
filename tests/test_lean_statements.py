@@ -626,3 +626,22 @@ def test_wall_segments_lean() -> None:
     assert listed == tails
     assert all(wall_segments.segment_good(u) for u in tails)
     assert wall_segments.in_family("1" * 9 + "010" + "1" * 9 + "01100")
+
+
+def test_wall_sets_lean() -> None:
+    """`WallSets`, read from its source: the wall is the four windows `0 1 *` and the zero cycle of the parity
+    families is the one that `wall_segments` computes, with the set numbered by the windows' bits."""
+    import itertools
+    from computations import wall_segments
+    source = module("Columns/WallSets")
+    def number(windows: frozenset) -> int:
+        return sum(1 << (w[0] + 2 * w[1] + 4 * w[2]) for w in windows)
+    wall = wall_segments.wall_windows(3)
+    assert "def wall3 : Nat := " + str(number(wall)) in source
+    states = [wall]
+    for _ in range(5):
+        states.append(wall_segments.window_step(states[-1], 0))
+    assert [number(s) for s in states[1:]] == [136, 34, 168, 34, 168]
+    for a, b in ((0, 136), (136, 34), (34, 168), (168, 34)):
+        name = "wall0" if a == 0 else str(a)
+        assert f"theorem sstep_{name} : sstep false {a if a else 'wall3'} = {b} := by decide" in source
