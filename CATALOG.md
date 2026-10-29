@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 31 Lean modules with 150 headline theorems, 20 findings (proved on paper,
-computed or conjectured) and 27 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 28 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 20 | 7 | 4 |
+| [Columns](#columns) | 20 | 7 | 5 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -127,6 +127,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Kind | Problems |
 |---|---|---|
+| [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
 | [Jen's theorem on farther columns does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
 | [Driven by 011, the right half does not settle next to the center](negative-results/columns/period-three-011.md) | no signal | 1 |
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |

@@ -35,7 +35,8 @@ kit's commit 932cf8d.
   eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the
   kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Outside such
   families each block needs its own certificate, and most blocks do not lock the right half
-  ([locking](findings/columns/period-four-locking.md)).
+  ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a long
+  run exist, but exclude no block the game misses up to period 20 ([forcing words](negative-results/columns/forcing-words.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
@@ -142,9 +143,10 @@ In order of the assessment above.
    ([WallSets](Rule30Open/Columns/WallSets.md)), which matches the game on every such block to period 16. The open
    cases are blocks without a long run of 1s: port the seven computed-only certificates of [the game
    blocks](findings/columns/game-blocks.md), none of which has nine 1s in a row, to Lean, which needs a denser form
-   for games of 12 to 14 cells; extend the game past period 16; and look for a wall after other runs, since a long run
-   of 0s fixes nothing near the column by itself. *Assessment:* every family found so far rests on long runs, and a
-   typical block of large period has only short ones, so these exclusions stay thin.
+   for games of 12 to 14 cells; and extend the game past period 16. Column words without long runs also fix the cell
+   beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses ([forcing
+   words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long runs, and
+   a typical block of large period has only short ones, so these exclusions stay thin.
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the coin lock and
    the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree and the Duhamel
    form are proved in the kit's equivalent forms, which a search should include before any formalization
