@@ -333,7 +333,7 @@ def validate() -> tuple[list[str], list[Category], list[Entry]]:
     for entry in entries:
         errors += check_entry(entry, by_id)
     # PUBLIC_README.md is the repository's README.md in the published projection.
-    documents = ["README.md", "PUBLIC_README.md", "CONTRIBUTING.md", "AGENTS.md", "computations/README.md"]
+    documents = ["README.md", "PUBLIC_README.md", "CONTRIBUTING.md", "AGENTS.md", "ROADMAP.md", "computations/README.md"]
     documents += [path.relative_to(ROOT).as_posix() for path in sorted((ROOT / "literature").glob("*.md"))]
     for document in documents:
         path = ROOT / document

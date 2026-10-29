@@ -9,7 +9,7 @@ import pytest
 from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
-                          left_diagonals, linear_complexity, lock_certificate, right_half, sensitivity)
+                          left_diagonals, linear_complexity, lock_certificate, right_half, sensitivity, slow_halves)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -636,6 +636,20 @@ def test_coin_sample() -> None:
         times, family = coin_lock.sample(word, coin_lock.certificate(word, 16), 31, 2000)  # (31,), (m,)
         assert np.flatnonzero(times < 0).tolist() == missing, word
         assert (family >= 0).all(), word
+
+
+def test_slow_halves() -> None:
+    """With a beam as wide as the number of halves, the beam search is exhaustive and matches the census of up to 10
+    cells under 0001; with the finding's beam it matches the census at its starting length, 12 cells, for all three
+    words, as the slow-half finding quotes (544, 980 and 416)."""
+    wall = absorption.kit_wall()  # (4, 2^13)
+    census = absorption.census("0001", 10, 0, 4000, wall)  # (2^10,)
+    best = slow_halves.beam_search("0001", 1 << 10, 6, 10, 4000, wall)
+    assert best[10][0] == int(census.max())
+    half = best[10][1]  # (10,)
+    assert slow_halves.entry_times("0001", half[None, :], 4000, wall)[0] == best[10][0]
+    for word, latest in (("0001", 544), ("0011", 980), ("0111", 416)):
+        assert slow_halves.beam_search(word, 512, 12, 12, 4000, wall)[12][0] == latest
 
 
 def test_deformation() -> None:

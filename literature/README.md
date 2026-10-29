@@ -12,6 +12,7 @@ entry says where the source bears on this repository. The search covers sources 
 | [measure-and-analogs.md](measure-and-analogs.md) | 2, 1 | Invariant measures, randomization, entropy, the statistics of the center column, and sibling rules |
 | [complexity.md](complexity.md) | 3 | The cost of computing Rule 30, prediction hardness, the lower-bound landscape, and Rule 30 as a cipher |
 | [certified-computation.md](certified-computation.md) | all | Precedents for proofs by kernel-checked computation, the method of many Lean entries here |
+| [ai-proposed.md](ai-proposed.md) | 1, 2, 3 | Results proposed by AI systems in 2025 and 2026 near the problems, and what each bears on |
 
 ## Where the problems stand
 
@@ -72,9 +73,11 @@ The search found these but could not confirm the record or read the text. Check 
   estimate densities from preimage counts.
 - Bobenko, Bordemann, Gunn and Pinkall (1993), *On two integrable cellular automata*, *Communications in Mathematical
   Physics* 158(1), 127 to 134; the record is in the authors' publication list, the text was not read.
-- OpenAI (2026), a deterministic algorithm counting the satisfying assignments of 3-SAT in subexponential time,
-  reported in secondary sources at the end of October 2026 with a paper and Lean files; the primary record was not
-  reached. [The hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md) does not depend on it.
+- Deva (2026), an SSRN preprint reported in public issue threads to claim an $\Omega(n)$ decision-tree lower bound
+  for the center cell; the record was not reached. A lower bound for the cell as a function of a variable row is not a
+  bound for the fixed function of Problem 3 ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
+- Goux (2026), prize submission R30-20261025-0554f7, credited in the kit's pull request #46 with the black-run slope
+  $3/5$; the submission was not reached.
 
 Kumar (2024), arXiv:2411.03468, which claimed to settle Mahler's 3/2 problem, was withdrawn; do not cite it.
 

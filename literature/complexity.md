@@ -84,6 +84,28 @@ any natural function in exponential time (see the barrier entry).
   if strong pseudorandom generators exist. If Rule 30 behaves like such a generator, circuit-style arguments for
   Problem 3 meet this barrier; that is an analogy, not a theorem about Rule 30.
 
+## Checking and derandomization
+
+Verifying a computation is cheap whatever the computation, and an explicit lower bound in exponential time would
+derandomize probabilistic algorithms. [Probabilistic checking](../negative-results/complexity/probabilistic-checking.md)
+explains why neither bears on computing the center column.
+
+- **Babai, Fortnow, Levin and Szegedy (1991).** [Checking computations in polylogarithmic time](https://doi.org/10.1145/103418.103428).
+  STOC 1991, 21 to 31; the record was checked through dblp and BibSLEIGH.
+  Every computation of $T$ steps has a proof of length about $T^{1 + \varepsilon}$ that a randomized verifier checks in
+  time polylogarithmic in $T$.
+  *Here:* [probabilistic checking](../negative-results/complexity/probabilistic-checking.md).
+- **Goldwasser, Kalai and Rothblum (2008).** [Delegating computation: interactive proofs for muggles](https://eccc.weizmann.ac.il/report/2017/108/).
+  STOC 2008; the journal version is ECCC TR17-108.
+  An efficient prover convinces a verifier of the output of a uniform circuit of depth $d$ in time about $d$ times a
+  polylogarithm of its size.
+  *Here:* [probabilistic checking](../negative-results/complexity/probabilistic-checking.md).
+- **Impagliazzo and Wigderson (1997).** [P = BPP if E requires exponential circuits: derandomizing the XOR lemma](https://doi.org/10.1145/258533.258590).
+  STOC 1997, 220 to 229.
+  If some language in exponential time needs circuits of size $2^{\Omega(n)}$, then $\mathrm{P} = \mathrm{BPP}$.
+  *Here:* a circuit form of Problem 3 would supply such a language
+  ([probabilistic checking](../negative-results/complexity/probabilistic-checking.md)).
+
 ## Satisfiability and unique games
 
 Two unrefereed claims of October 2026, each released with a Lean formalization. If correct, the first settles the

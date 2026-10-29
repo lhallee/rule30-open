@@ -33,8 +33,9 @@ extension of one.
 
 ## Where to start
 
-[CATALOG.md](CATALOG.md#open-work) lists the open work: conjectures to settle, and findings proved on paper or by
-computation that still want a Lean proof. For Problem 1, start from the open leads in the table above. Before starting
+[ROADMAP.md](ROADMAP.md) groups every result by route, says which routes are closed and which are open, and lists
+the next steps. [CATALOG.md](CATALOG.md#open-work) lists the open work: conjectures to settle, and findings proved on
+paper or by computation that still want a Lean proof. For Problem 1, start from the open leads in the table above. Before starting
 in a category, read its negative results; each says where an approach stopped and why. [The literature](literature/README.md)
 collects what is published around the problems, from Jen's theorem to the claims made since 2019.
 
@@ -48,6 +49,7 @@ collects what is published around the problems, from Jen's theorem to the claims
 | [`literature/`](literature/README.md) | The published work around the three problems, by theme, tied to the entries here |
 | [`computations/`](computations/README.md) | Python that reproduces the numbers the entries quote |
 | `tests/` | Each computation and each computable Lean statement against an independent check |
+| [`ROADMAP.md`](ROADMAP.md) | The routes toward each problem, their status, and the next steps |
 | [`categories.yaml`](categories.yaml) | The categories, from foundations to complexity |
 | [`scripts/catalog.py`](scripts/catalog.py) | Checks every entry and generates [CATALOG.md](CATALOG.md) |
 

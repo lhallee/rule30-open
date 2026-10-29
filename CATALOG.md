@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 18 Lean modules with 71 headline theorems, 18 findings (proved on paper,
-computed or conjectured) and 23 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 25 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 8 | 6 | 1 |
+| [Columns](#columns) | 8 | 6 | 2 |
 | [Period two](#period-two) | 2 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 2 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 0 | 0 | 4 |
+| [Complexity](#complexity) | 0 | 0 | 5 |
 
 ## Open work
 
@@ -116,6 +116,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Kind | Problems |
 |---|---|---|
 | [Jen's theorem on farther columns does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
+| [A search for slow right halves finds no counterexample and misses the slowest halves](negative-results/columns/slow-half-search.md) | no signal | 1 |
 
 ## Period two
 
@@ -284,4 +285,5 @@ Prize Problem 3, and what an answer either way would imply.
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
 | [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
 | [The linear complexity is n/2, the most a sequence can have](negative-results/complexity/linear-complexity.md) | no signal | 1, 3 |
+| [Probabilistic checking verifies the center cell cheaply, as it does every computation, and does not compute it](negative-results/complexity/probabilistic-checking.md) | barrier | 3, 1, 2 |
 | [Problem 3 asks for a lower bound beyond current complexity theory](negative-results/complexity/problem-three-barrier.md) | barrier | 3, 1 |

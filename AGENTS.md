@@ -3,8 +3,9 @@
 This repository works on the three Rule 30 Prize problems in the open. Read [README.md](README.md) for the layout and
 [CONTRIBUTING.md](CONTRIBUTING.md) for the entry format. These rules apply to every agent:
 
-- **Start from the open work.** [CATALOG.md](CATALOG.md#open-work) lists conjectures to settle and findings that want a
-  Lean proof. Before working in a category, read its negative results, so you do not retry an approach that stopped,
+- **Start from the open work.** [ROADMAP.md](ROADMAP.md) says where each route stands and what is next, and
+  [CATALOG.md](CATALOG.md#open-work) lists conjectures to settle and findings that want a Lean proof. When an entry
+  changes a route's status, update the roadmap. Before working in a category, read its negative results, so you do not retry an approach that stopped,
   and the [literature](literature/README.md) on its theme, so you do not redo published work.
 - **A claim of proof needs a Lean proof that builds.** Run `lake build` and `python scripts/catalog.py audit` before
   saying a theorem is proved. Never use `sorry`, `native_decide`, `decide +native`, `bv_decide`, `skipKernelTC` or a
