@@ -45,13 +45,15 @@ kit's commit 932cf8d.
   one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
   Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the
   same kind as the problem.
-- **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite
-  left half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left
-  half of up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)),
-  and for $0001$ Lean checks every half that lies within depth 88 at the time it starts to keep the pattern
-  ([LeftHalf0001](Rule30Open/Columns/LeftHalf0001.md), with the kit's lane checker). *Assessment:* the latest failure
-  outlasts the half's length by about a third of it, and the work of a check doubles with every four cells, so checks
-  settle bounded cases only; a proof needs an argument that uses the finiteness of the half.
+- **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite left
+  half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left half of
+  up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)), and
+  Lean checks, for each word, every half that lies within depth 88 at the time it starts to keep the pattern
+  ([LeftHalf0001](Rule30Open/Columns/LeftHalf0001.md) with the kit's lane checker,
+  [LeftHalfDriven](Rule30Open/Columns/LeftHalfDriven.md) with the checker extended to a boundary that is not white).
+  *Assessment:* the latest failure outlasts the half's length by about a third of it, and the work of a check doubles
+  with every four cells, so checks settle bounded cases only; a proof needs an argument that uses the finiteness of the
+  half.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,

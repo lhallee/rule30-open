@@ -79,7 +79,8 @@ the number of levels: phase 0 alone at depth 92 took 53 seconds with 135 levels,
 three minutes, and depth 100 over ten. The latest failure keeps growing past the half's length, by about a third of the
 length ([the left-half finding](../../findings/columns/left-half-c3.md)), so a check of this kind settles bounded
 cases only. `C3 w0001` asks for every finite half, whatever its depth at time $K$, and needs an argument that
-uses the finiteness of the half.
+uses the finiteness of the half. [LeftHalfDriven](LeftHalfDriven.md) proves the same bounded case for $0011$ and
+$0111$.
 
 ## Relation to the kit
 

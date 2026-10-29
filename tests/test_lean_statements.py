@@ -576,3 +576,36 @@ def test_left_half_0001() -> None:
         assert int(p1) == int(p2) == phase
         latest, _ = held_map.tree_failures("0001", 20, phase, False)
         assert int(passes) == int(fails) + 1 == max(latest) + 1, phase
+
+
+def test_left_half_driven() -> None:
+    """The checks of `LeftHalfDriven`, read from its source: the masks `ones` and `bnd` are the kit's pattern and
+    effective boundary of 0011 and 0111 (as `held_map` spells them) with the phase moved by one; for each word and
+    phase the chunks cover every choice of the free readings before depth 88; and at depth 20 the least number of
+    levels that passes, from `sharp20_<word>_<φ>`, is one more than the latest first failure that the tree search of
+    `held_map` finds from the kit's phase φ - 1."""
+    from computations import held_map
+    source = module("Columns/LeftHalfDriven")
+    masks = {}
+    for word in ("0011", "0111"):
+        ones = sum(1 << ((phase + 1) % 4) for phase in range(4) if held_map.PATTERN[word][phase] == "1")
+        bnd = sum(1 << ((phase + 1) % 4) for phase in range(4) if held_map.EFFECTIVE[word][phase] == "1")
+        assert all(held_map.PATTERN[word][phase] == "*" for phase in range(4) if (phase + 1) % 4 == 1)
+        masks[word] = (ones, bnd)
+    assert masks == {"0011": (1, 8), "0111": (1, 12)}
+    chunks = re.findall(r"theorem chunk(\d{4})_(\d)_(\d+) : checkG (\d+) (\d+) (\d) (\d+) (\d+) (\d+) (\d+) = true", source)
+    assert {(w, k, n) for _, _, _, w, k, _, n, _, _, _ in chunks} == {("88", "115", "18")}
+    for word, (ones, bnd) in masks.items():
+        for phase in range(4):
+            free = sum(1 for t in range(88) if (t + phase) % 4 == 1)  # free readings at times t with t + 1 <= 88
+            found = sorted(int(c) for w, p, i, _, _, q, _, o, b, c in chunks
+                           if w == word and int(p) == int(q) == phase and i == c and int(o) == ones and int(b) == bnd)
+            assert found == list(range(2 ** (free - 18))), (word, phase)
+    sharp = re.findall(r"theorem sharp20_(\d{4})_(\d) : checkG 20 (\d+) (\d) 5 1 (\d+) 0 = true ∧ "
+                       r"checkG 20 (\d+) (\d) 5 1 (\d+) 0 = false", source)
+    assert len(sharp) == 8
+    for word, name, passes, p1, b1, fails, p2, b2 in sharp:
+        phase = int(name)
+        assert int(p1) == int(p2) == phase and int(b1) == int(b2) == masks[word][1]
+        latest, _ = held_map.tree_failures(word, 20, (phase + 3) % 4, False)
+        assert int(passes) == int(fails) + 1 == max(latest) + 1, (word, phase)

@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-26 Lean modules with 123 headline theorems, 20 findings (proved on paper,
+27 Lean modules with 129 headline theorems, 20 findings (proved on paper,
 computed or conjectured) and 27 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 16 | 7 | 4 |
+| [Columns](#columns) | 17 | 7 | 4 |
 | [Period two](#period-two) | 2 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -100,6 +100,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [A right half white on its first 1,317 cells enters the kit's trap for 001](Rule30Open/Columns/HighThree.md) | [`Columns.HighThree`](Rule30Open/Columns/HighThree.lean) | `highRight3_of_entry`, `highRight_001` | 1 | extends a kit result |
 | [The kicked form of the left half](Rule30Open/Columns/KickedForm.md) | [`Columns.KickedForm`](Rule30Open/Columns/KickedForm.lean) | `left_kicked_zero`, `left_kicked_succ`, `left_kicked_check`, `period_two_golden` | 1 | extends a kit result |
 | [No left half within depth 88 keeps the kit's left-half pattern for 0001](Rule30Open/Columns/LeftHalf0001.md) | [`Columns.LeftHalf0001`](Rule30Open/Columns/LeftHalf0001.lean) | `c3_0001_bounded`, `c3_0001_small`, `c3_0001_depth`, `c3_0001_of_checks` | 1 | extends a kit result |
+| [No left half within depth 88 keeps the kit's left-half pattern for 0011 or 0111](Rule30Open/Columns/LeftHalfDriven.md) | [`Columns.LeftHalfDriven`](Rule30Open/Columns/LeftHalfDriven.lean) | `c3_0011_bounded`, `c3_0111_bounded`, `c3_0011_small`, `c3_0111_small`, `c3G_of_checks`, `history_eq_reconB` | 1 | extends a kit result |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
 | [An eventual period of the center column needs T + P of at least 65,518](Rule30Open/Columns/LongWindow.md) | [`Columns.LongWindow`](Rule30Open/Columns/LongWindow.lean) | `center_eq_big`, `factor_new`, `transient_add_period_ge_65518` | 1 | extends a kit result |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |

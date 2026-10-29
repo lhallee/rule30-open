@@ -63,10 +63,12 @@ margin past $M$, over the four phases:
 | `C3 0011` | 25, at $M = 71$ | 19 | 13 | 16 | 24 |
 | `C3 0111` | 27, at $M = 76$ | 8 | 12 | 20 | 24 |
 
-For $0001$ alone the search runs further: over the halves of at most 92 cells the latest first failure is at step 118,
-118, 117 and 117 by phase, and over those of at most 88 cells at step 112, 109, 113 and 113.
-[LeftHalf0001](../../Rule30Open/Columns/LeftHalf0001.md) checks the case of 88 cells in Lean with the kit's lane
-checker: no left half that lies within depth 88 at some time keeps $P_{0001}$ from that time on, in any phase.
+Over the halves of at most 88 cells the latest first failure is at step 112, 109, 113 and 113 by phase for $0001$,
+114, 113, 112 and 112 for $0011$, and 114, 113, 113 and 112 for $0111$; for $0001$ over those of at most 92 cells it
+is at step 118, 118, 117 and 117. Lean checks the case of 88 cells for each word: no left half that lies within depth
+88 at some time keeps $P_w$ from that time on, in any phase ([LeftHalf0001](../../Rule30Open/Columns/LeftHalf0001.md)
+with the kit's lane checker, [LeftHalfDriven](../../Rule30Open/Columns/LeftHalfDriven.md) with the checker extended
+to the boundaries of $0011$ and $0111$, which are not white).
 
 For $0001$ with the check at phase 0, Lean's statement `center_period_four_0001_integer`, every positive integer
 below $2^{140}$ fails, the latest at step 166, after 24,157,817 branches keep the condition through step 139. The
@@ -92,10 +94,12 @@ suggests a finite certificate: the margins grow here, and the entry times grow w
 
 ```bash
 python -m computations.held_map 80 --tree c3
+python -m computations.held_map 88 --tree c3 --word 0011
 python -m computations.held_map 92 --tree c3 --word 0001
 python -m computations.held_map 140 --tree check
 ```
 
 [computations/held_map.py](../../computations/held_map.py) (`tree_failures`) runs the first in about 3 min, the
-second in about 15 min and the third in about 8 min; `--tree c3` at 56 cells takes 3 s, and `--tree check` at 100
+second in about 8 min (the same for `--word 0111` and, at 88 cells, `--word 0001`), the third in about 15 min and the
+fourth in about 8 min; `--tree c3` at 56 cells takes 3 s, and `--tree check` at 100
 cells 4 s. The tests check the tree against stepping every half, and the ether's solutions against direct stepping.
