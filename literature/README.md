@@ -23,11 +23,11 @@ for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 c
 Lean, none of which has led to a proof. Specific eventual periods are excluded by certificates: between the kit and this
 repository, 75 of the 2,538 primitive blocks of period at most 14 are excluded in Lean and 2 more by computation, and
 the kit also excludes families of padded words and shows that an eventual period $P$ after a transient $T$ needs
-$T + P \ge 16{,}359$. The general theory of single columns reaches pairs of columns and special classes of automata, not
-one column of one orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic
-and states the one-cell center column as open, and Rule 90, in the same class, has an eventually periodic center column,
-so a proof has to use more than the properties that define the class. One preprint claims a solution; none is refereed,
-and the prize is unclaimed.
+$T + P \ge 16{,}359$, which a window of 65,536 cells raises to 65,518 here. The general theory of single columns reaches
+pairs of columns and special classes of automata, not one column of one orbit: Kopra (2023) puts Rule 30 in a class
+whose traces two cells wide are never eventually periodic and states the one-cell center column as open, and Rule 90, in
+the same class, has an eventually periodic center column, so a proof has to use more than the properties that define the
+class. One preprint claims a solution; none is refereed, and the prize is unclaimed.
 
 **Problem 2.** For a uniformly random initial row each center cell is black with probability exactly 1/2, because Rule
 30 is onto; the single cell has measure zero, so this says nothing about it. The kit's equivalent forms prove in Lean

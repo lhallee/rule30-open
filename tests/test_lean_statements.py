@@ -496,3 +496,24 @@ def test_high_three() -> None:
             rows = left ^ (rows | right)
         assert (rows[:, :width].astype(int) == np.array(state)[None, :]).all(), phase
 
+
+def test_long_window() -> None:
+    """The literals of `LongWindow`, read from its source: `bigBits` holds the first 65,536 center cells and each
+    `rowAt<t>` the row at time t with the seed at bit 65,536, both from rows stepped as integers one at a time; the
+    theorem's bound is one more than the time of the factor that `factor_new` checks."""
+    source = module("Columns/LongWindow")
+    assert ("theorem transient_add_period_ge_65518 (T P : Nat) (hP : 0 < P)\n"
+            "    (h : ∀ t, T ≤ t → center (t + P) = center t) : 65518 ≤ T + P") in source
+    assert "def lastFactor : Nat := (bigBits >>> 65517) % 2 ^ 19" in source
+    rows = {int(t): int(body, 16) << int(shift)
+            for t, body, shift in re.findall(r"def rowAt(\d+) : Nat :=\n  0x([0-9a-f]+) <<< (\d+)\n", source)}
+    big = int(re.search(r"def bigBits : Nat :=\n  0x([0-9a-f]+)\n", source).group(1), 16)
+    assert sorted(rows) == [16384, 32768, 49152]
+    n = 65536
+    row, bits = 1 << n, 0
+    for t in range(n):
+        if t in rows:
+            assert rows[t] == row, t
+        bits |= ((row >> n) & 1) << t
+        row = (row << 1) ^ (row | (row >> 1))
+    assert big == bits

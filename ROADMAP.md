@@ -19,12 +19,13 @@ kit's commit 932cf8d.
   ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). The kit proves that Rules 90, 150 and 210 share every
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
-  specific repeating blocks: 76 of the 2,538 blocks of period at most 14 ([game blocks](findings/columns/game-blocks.md)),
-  every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially many white cells (the kit). Any eventual
-  period needs $T + P \ge 16{,}359$ (the kit). Open pull requests to the kit claim every eventual period whose white
-  runs are all at least 17, and four more families of blocks with long white runs
-  ([the kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
-  Outside such families each block needs its own certificate, and most blocks do not lock the right half
+  specific repeating blocks: 76 of the 2,538 blocks of period at most 14 ([game
+  blocks](findings/columns/game-blocks.md)), every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially
+  many white cells (the kit). Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536
+  cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every
+  eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the
+  kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Outside such
+  families each block needs its own certificate, and most blocks do not lock the right half
   ([locking](findings/columns/period-four-locking.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half

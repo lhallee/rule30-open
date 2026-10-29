@@ -9,8 +9,8 @@ import pytest
 from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
-                          left_diagonals, linear_complexity, lock_certificate, periodic_columns, right_half,
-                          sensitivity, slow_halves, sparse_halves, ether_prefix)
+                          left_diagonals, linear_complexity, lock_certificate, long_window, periodic_columns,
+                          right_half, sensitivity, slow_halves, sparse_halves, ether_prefix)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -830,6 +830,27 @@ def test_ether_agreement() -> None:
         best = max(next((k for k in range(16) if cells[k] != str(absorption.ether(j0 + k + 1, psi))), 16)
                    for j0 in range(7) for psi in range(4))
         assert ether_prefix.ether_agreement(half, 16) == best
+
+
+def test_long_window() -> None:
+    """The window of `LongWindow`: the packed center cells against `center_column`, each checkpoint row against the
+    integer rows stepped to its time, and the new factor against the set of every earlier factor, read as strings."""
+    bits, checkpoints = long_window.simulate()
+    column = center_column(long_window.N)  # (N,)
+    assert np.array_equal(np.array([(bits >> t) & 1 for t in range(long_window.N)], dtype=np.uint8), column)
+    row = 1 << long_window.N
+    for t in range(1, max(checkpoints) + 1):
+        row = step(row)
+        if t in checkpoints:
+            assert checkpoints[t] == row, t
+    assert sorted(checkpoints) == [16384, 32768, 49152]
+    length = long_window.new_factor(bits)
+    cells = "".join(map(str, column.tolist()))
+    for size, new in ((length - 1, False), (length, True)):
+        start = long_window.N - size
+        earlier = {cells[j:j + size] for j in range(start)}
+        assert (cells[start:] not in earlier) == new, size
+    assert length == 19
 
 
 def lean_states(name: str) -> set[tuple[int, int]]:
