@@ -86,6 +86,14 @@ the 77 blocks with nine 1s in a row that [the finite game](../../findings/column
 them are beyond the blocks of that range that the kit excludes (`--max-period 16 --game`). The game proves those 30 one certificate at a time; this
 module proves them, and the family at every period, with one argument.
 
+## Beyond three values
+
+The three-valued run forgets correlations between unknown cells. Brute force over every row in the light cone
+(`brute_segment`) accepts 84 more segments of at most 12 cells that start and end with 0
+(`python -m computations.wall_segments --brute 12`), in patterns with a parity, such as $0^b 1 0 0$ and $0^b 1 1 0$
+for odd $b \ge 3$ and $0^b 1 0 1 0$ for even $b \ge 2$. A finer abstraction that keeps those correlations would exclude
+more families by the same argument; for one block at a time, [the finite game](FiniteGame.md) already does.
+
 ## Relation to the kit
 
 The kit's

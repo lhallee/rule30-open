@@ -9,6 +9,7 @@ function of the column, and no column of a row with a leftmost 1 can repeat the 
 
     python -m computations.wall_segments --max-period 20   # the family's blocks by period, against the kit's runs
     python -m computations.wall_segments --max-period 16 --game   # and against the finite game
+    python -m computations.wall_segments --brute 12   # segments that brute force accepts beyond the five forms
 """
 
 from __future__ import annotations
@@ -117,7 +118,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=20)
     parser.add_argument("--game", action="store_true", help="also run the finite game on the blocks with nine 1s")
+    parser.add_argument("--brute", type=int, default=0,
+                        help="instead, the segments up to this length that brute force accepts and the run does not")
     args = parser.parse_args()
+
+    if args.brute:
+        extra = [u for m in tqdm(range(1, args.brute + 1), desc="lengths", file=sys.stderr)
+                 for u in ("".join(bits) for bits in itertools.product("01", repeat=m))
+                 if u[0] == "0" and u[-1] == "0" and "1" * 9 not in u and not segment_good(u) and brute_segment(u)]
+        print(f"{len(extra)} segments of at most {args.brute} cells that start and end with 0 are determined by brute "
+              f"force and not by the three-valued run: {extra}")
+        return
 
     total = runs = 0
     for period in tqdm(range(1, args.max_period + 1), desc="periods", file=sys.stderr):
