@@ -1145,6 +1145,30 @@ def test_windows_after_ones() -> None:
     assert all(len({w[0] for w in wall_segments.windows_after_ones(ones)}) == 2 for ones in range(1, 9))
 
 
+def test_bit_game() -> None:
+    """The check of `BitGame` against the finite game: on every primitive block of period at most 9, at widths 5 and 6,
+    it decides exactly the blocks the game excludes; and the bit tables' images and preimages agree with the game
+    graph on random sets of nodes."""
+    from computations import bit_game
+    for period in range(1, 10):
+        for block in game.necklaces(period):
+            for width in (5, 6):
+                assert bit_game.criterion(block, width)[0] == (game.bad_pairs(block, width) == 0)
+    rng = np.random.default_rng(3)
+    for block, width in (("0001", 5), ("00000001", 6), ("0110", 4)):
+        tables = bit_game.BitTables(block, width)
+        source, target, _, _, _ = game.game_graph(block, width)
+        for _ in range(3):
+            nodes = rng.random(len(block) << width) < 0.3  # (p 2^K,)
+            image = np.zeros_like(nodes)  # (p 2^K,)
+            image[target[nodes[source]]] = True
+            preimage = np.zeros_like(nodes)  # (p 2^K,)
+            preimage[source[nodes[target]]] = True
+            table = tables.table(nodes)
+            assert (tables.nodes(tables.post(table)) == image).all()
+            assert (tables.nodes(tables.pre(table)) == preimage).all()
+
+
 def test_forcing() -> None:
     """Forcing words: the search over sets of configurations against brute force over every start, for every word of up
     to nine values; the shortest forcing words have seven values; and the blocks of period up to 12 whose 0s all follow

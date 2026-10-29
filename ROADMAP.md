@@ -19,24 +19,24 @@ kit's commit 932cf8d.
   ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). The kit proves that Rules 90, 150 and 210 share every
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
-  specific repeating blocks: 197 of the 8,800 blocks of period at most 16, 129 of the 136 beyond the kit in Lean ([game
-  blocks](findings/columns/game-blocks.md)), every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially
-  many white cells (the kit). Following the cells beside the column after nine 1s extends the kit's long black runs
-  to every period whose runs of nine or more 1s are separated by segments that the possible windows of three cells
-  follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game excludes, 616 blocks up to
-  period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a \ge 9$
-  ([WallSegments](Rule30Open/Columns/WallSegments.md) with three values per cell,
-  [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows). A run of $r \ge 9$ 1s rules out every tail of
-  at most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most
+  specific repeating blocks: 197 of the 8,800 blocks of period at most 16, all 136 beyond the kit in Lean ([game
+  blocks](findings/columns/game-blocks.md), [BitGame](Rule30Open/Columns/BitGame.md)), every $1\,0^q$ with $q \ge 9$,
+  and every block followed by exponentially many white cells (the kit). Following the cells beside the column after nine
+  1s extends the kit's long black runs to every period whose runs of nine or more 1s are separated by segments that the
+  possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game
+  excludes, 616 blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for
+  every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md) with three values per cell,
+  [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows). A run of $r \ge 9$ 1s rules out every tail of at
+  most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most
   $4 \lfloor (b - 1)/9 \rfloor + 2$ steps, which sharpen the kit's Theorems B and D
-  ([WideWall](Rule30Open/Columns/WideWall.md)).
-  Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536 cells](Rule30Open/Columns/LongWindow.md), where
-  the kit has 16,359). Open pull requests to the kit claim every
+  ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536
+  cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every
   eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the
   kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Outside such
   families each block needs its own certificate, and most blocks do not lock the right half
   ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a long
-  run exist, but exclude no block the game misses up to period 20 ([forcing words](negative-results/columns/forcing-words.md)).
+  run exist, but exclude no block the game misses up to period 20 ([forcing
+  words](negative-results/columns/forcing-words.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
@@ -140,13 +140,13 @@ In order of the assessment above.
    proof for every finite half needs an argument that the chaotic part near the center delivers a wall, which none of
    these gives.
 2. **Block exclusions.** Blocks with nine 1s in a row now have a uniform argument
-   ([WallSets](Rule30Open/Columns/WallSets.md)), which matches the game on every such block to period 16. The open
-   cases are blocks without a long run of 1s: port the seven computed-only certificates of [the game
-   blocks](findings/columns/game-blocks.md), none of which has nine 1s in a row, to Lean, which needs a denser form
-   for games of 12 to 14 cells; and extend the game past period 16. Column words without long runs also fix the cell
-   beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses ([forcing
-   words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long runs, and
-   a typical block of large period has only short ones, so these exclusions stay thin.
+   ([WallSets](Rule30Open/Columns/WallSets.md)), which matches the game on every such block to period 16. The open cases
+   are blocks without a long run of 1s. All 197 blocks [the game](findings/columns/game-blocks.md) excludes up to period
+   16 are kernel-checked, seven of them by [BitGame](Rule30Open/Columns/BitGame.md), which decides the game from the
+   block alone, without a certificate; next, extend the game past period 16. Column words without long runs also fix the
+   cell beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses
+   ([forcing words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long
+   runs, and a typical block of large period has only short ones, so these exclusions stay thin.
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the coin lock and
    the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree and the Duhamel
    form are proved in the kit's equivalent forms, which a search should include before any formalization

@@ -12,6 +12,7 @@ public import Rule30Open.Columns.GameBlocksLong
 public import Rule30Open.Columns.WallSegments
 public import Rule30Open.Columns.WallSets
 public import Rule30Open.Columns.WideWall
+public import Rule30Open.Columns.BitGame
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.EtherDomain

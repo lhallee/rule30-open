@@ -22,7 +22,8 @@ of them.
 Run on every primitive block of period at most 16, [the finite game](FiniteGame.md) excludes 197, and 136 of them are
 beyond the kit ([the game blocks finding](../../findings/columns/game-blocks.md)). Of these, 102 have period 15 or 16,
 and 97 need a game of at most 9 cells: 38 at width 5, 41 at width 6, 6 at width 7, 8 at width 8 and 4 at width 9. This
-module checks those 97 in the kernel. The other five need 12 to 14 cells and are left to the computation.
+module checks those 97 in the kernel. The other five need 12 to 14 cells; [BitGame](BitGame.md) excludes them with a
+check that needs no certificate.
 
 All but one have a run of at least six 0s or at least seven 1s; $000010111111011$ has at most four 0s and six 1s in a
 row. Most are a long black run with a short pattern, such as $000010111111111$ and $0101111111111111$, or a long white

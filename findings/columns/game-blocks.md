@@ -12,9 +12,10 @@ evidence: [computations/game.py]
 [The finite game](../../Rule30Open/Columns/FiniteGame.md) was run on every primitive block of period at most 16, at
 widths 6, 10 and 14 in turn. It excludes 197 of the 8,800 blocks as the eventual period of any column of any row with a
 leftmost 1, the center column of the single cell included. The kit excludes 61 of the 197 for the center column, and
-136 are new. Lean checks 129 of the 136 by kernel computation ([the game in bit masks](../../Rule30Open/Columns/GameBlocks.md)
-for 32 of period at most 14, [its sequel](../../Rule30Open/Columns/GameBlocksLong.md) for 97 of period 15 and 16); for
-the other seven the computation is the proof.
+136 are new. Lean checks all 136 by kernel computation: [the game in bit masks](../../Rule30Open/Columns/GameBlocks.md)
+for 32 of period at most 14 and [its sequel](../../Rule30Open/Columns/GameBlocksLong.md) for 97 of period 15 and 16 from
+stored certificates, and [the game decided in the kernel](../../Rule30Open/Columns/BitGame.md) for the other seven from
+the block alone. That these 197 are all the game excludes up to period 16 rests on the computation.
 
 ## Result
 
@@ -51,7 +52,8 @@ exclude. The 136 blocks only the game excludes are 1 of period 8 ($00000001$), 2
 $00000000010001$, which needs width 14 and 229,376 nodes. [`GameBlocksLong`](../../Rule30Open/Columns/GameBlocksLong.md)
 checks 97 of the 102 of period 15 and 16, at widths 5 to 9 with 134,720 nodes in all; the other five need width 12 to 14
 and 65,536 to 262,144 nodes: $000000000101101$ and $000001011111011$ at width 14, $0000001011111011$ at 12,
-$0000101111111011$ at 13 and $0001011111111001$ at 14.
+$0000101111111011$ at 13 and $0001011111111001$ at 14. [`BitGame`](../../Rule30Open/Columns/BitGame.md) excludes these
+seven without certificates: the kernel holds each set of nodes as one number and runs the game's criterion on it.
 
 ## Reproduce
 
@@ -70,8 +72,6 @@ that `GameBlocks.lean` and `GameBlocksLong.lean` check.
 
 ## Open
 
-The seven certificates left out have the same form as the others. At widths 12 to 14 each holds 65,536 to 262,144 nodes,
-so together they would add a few megabytes of hexadecimal, and the kernel pays more per node there: about 0.1 ms at
-width 12 and about 0.7 ms at width 14, where each number of ranks holds 16,384 of them. Packing the ranks in smaller
-numbers may bring the time down. Adding them would make every one of the 197 exclusions kernel-checked, here or in the
-kit.
+Every one of the 197 exclusions is kernel-checked, here or in the kit. The game has not been run past period 16. Up to
+period 16 every block it excludes has a run of at least five equal values, and for blocks with only short runs it fails
+at every width tried, so it does not reach the typical blocks of large period.

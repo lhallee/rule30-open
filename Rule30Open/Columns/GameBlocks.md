@@ -15,7 +15,8 @@ evidence: [computations/game.py]
 The center column of the single cell does not eventually repeat any of the 32 blocks below, from any time on and in any
 rotation (`center_not_gameBlocks`). More generally, no column of the orbit of a row with a leftmost 1 does
 (`mask_column`). The kit excludes none of these blocks. They are 32 of the 34 blocks of period at most 14 that [the
-finite game](FiniteGame.md) excludes beyond the kit; the other two need certificates too large for the build.
+finite game](FiniteGame.md) excludes beyond the kit; the other two need certificates too large for the build, and
+[BitGame](BitGame.md) excludes them without one.
 [GameBlocksLong](GameBlocksLong.md) adds 97 blocks of period 15 and 16.
 
 ## Statement
@@ -68,8 +69,8 @@ module builds in about 11 s.
 The other two blocks the game excludes beyond the kit are $00000001001111$, at width 13 with 114,688 nodes, and
 $00000000010001$, at width 14 with 229,376 nodes. Their certificates would add about 0.9 MB of hexadecimal to this file,
 and checked on their own in the same form they take about 16 s and 163 s, against about 11 s for this whole module.
-So they are left out of the build; for these two the computation in
-[the game blocks finding](../../findings/columns/game-blocks.md) is the proof.
+So they are left out of this module; [BitGame](BitGame.md) excludes both with a check that the kernel runs on the
+block alone, without a certificate.
 
 ## Relation to the kit
 
