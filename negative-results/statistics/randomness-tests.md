@@ -35,7 +35,10 @@ proof of Problem 2 (density 1/2) or to structure for Problem 3?
   $2^k$ modulo 2, 4 and 8, shows a pattern for $k \le 20$.
 
 **What it means.** The column looks like ChaCha20 to every test here. That is evidence consistent with Problem 2, not a
-proof, and it says nothing about cells beyond the range tested.
+proof, and it says nothing about cells beyond the range tested. The kit's equivalent forms prove in Lean the laws these
+tests compare against for the column of a random row, among them the law of the iterated logarithm, the Erdős-Rényi
+law and the longest run ([`IteratedLogarithm`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/IteratedLogarithm.lean), [`ErdosRenyi`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/ErdosRenyi.lean),
+[`LongestRuns`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/LongestRuns.lean)); none of them reaches the single cell.
 
 **Evidence.** Quoted from code that is not in this repository; the $2^{22}$ cells agree with all 100,001 terms of the OEIS b-file of
 [A051023](https://oeis.org/A051023). [computations/rule30.py](../../computations/rule30.py) generates the column.

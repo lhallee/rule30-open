@@ -36,5 +36,7 @@ their difference sets by direct evolution for $k \le 5$.
 ## What it means
 
 The map from finite rows to center columns identifies the single cell with an infinite but thin family of other rows,
-all sharing its left edge. A port of the pruned search to this repository, and its extension past 40 cells, would be a
-welcome contribution.
+all sharing its left edge. The kit's equivalent forms prove the two families in Lean as its stripe seeds and report
+the same count numerically for seeds within 13 cells and 300 steps
+([`TransformsSeeds`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/TransformsSeeds.lean)). A port of the pruned search to this repository, and its extension past
+40 cells, would be a welcome contribution.

@@ -21,6 +21,10 @@ The same predictors take Rudin-Shapiro to 0.0005 (zstd), Rule 150's column 1 to 
 
 **What it means.** No short-range dependency of the kinds these models capture exists in the first $2^{22}$ cells. It
 does not exclude long-range or arithmetic structure; see [the linear complexity](../complexity/linear-complexity.md)
-and [the learned models](../learned-models/next-cell-transformers.md).
+and [the learned models](../learned-models/next-cell-transformers.md). The kit's equivalent forms prove in Lean that
+Problem 1 holds exactly when the Lempel-Ziv complexity of the column's prefixes is unbounded
+([`LempelZiv`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/LempelZiv.lean):
+`problem1_iff_lz_unbounded`): a column whose prefixes all had Lempel-Ziv histories of boundedly many components would be
+eventually periodic.
 
 **Evidence.** Quoted from code that is not in this repository.
