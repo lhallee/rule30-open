@@ -53,7 +53,8 @@ phase $\varphi$.
 ## What it covers
 
 A finite right half that never enters the family, if one exists, has a black cell among cells $7, \dots, B$
-(statement 3) and one among cells $1, \dots, 30$ (statement 5), and is not a single black cell (the kit). The bound $B$ comes from the latest entry among the
+(statement 3) and one among cells $1, \dots, 30$ (statement 5), and at least three among its first cells
+([SparseRight.md](SparseRight.md), which also proves one black cell anywhere for all three words). The bound $B$ comes from the latest entry among the
 halves of six cells; the census of every half of up to 20 cells ([absorption census](../../findings/columns/absorption-census.md))
 gives, by the same argument, white gaps after cell 20 of length about the latest entry there, about 2,000 steps, but
 that census is computed and not yet in Lean.

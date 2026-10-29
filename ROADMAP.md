@@ -23,20 +23,23 @@ kit's commit 932cf8d.
   every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially many white cells (the kit). Any eventual
   period needs $T + P \ge 16{,}359$ (the kit). Open pull requests to the kit claim every eventual period whose white
   runs are all at least 17, and four more families of blocks with long white runs
-  ([the kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Each block needs its own certificate, and most blocks do not lock the
-  right half ([locking](findings/columns/period-four-locking.md)).
+  ([the kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
+  Outside such families each block needs its own certificate, and most blocks do not lock the right half
+  ([locking](findings/columns/period-four-locking.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
-  of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); a single black cell, and every half
-  white on columns 1 to 30, enter (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three
-  words); halves of up to six cells enter in Lean ([EmptyRight](Rule30Open/Columns/EmptyRight.md)), and so does every
-  half white on columns 7 to $B$, whatever lies beyond, with $B$ = 316, 535 and 310
-  ([WhiteGap](Rule30Open/Columns/WhiteGap.md)); a window of 16 columns has a certificate
-  ([the certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few
-  hundred values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)). Open: attraction for
-  halves with black cells both near the center and among columns 7 to $B$, beyond the census's 20 cells. *Assessment:* the most direct route to a full
-  case of Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a
-  statement of the same kind as the problem.
+  of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
+  enters (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three words); in Lean, halves of up
+  to six cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md)), so does every half white on columns 7 to $B$,
+  whatever lies beyond, with $B$ = 316, 535 and 310 ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), and so does every
+  half with at most two black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which
+  includes one black cell anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for
+  $0001$); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)),
+  every window can reach it, and one word of a few hundred values in column 17 forces entry
+  ([the coin lock](findings/columns/coin-lock.md)). Open: attraction for halves with at least three black cells among
+  the first $G$ columns, one of them among columns 1 to 30 and one among columns 7 to $B$, beyond the census's 20
+  cells. *Assessment:* the most direct route to a full case of Problem 1, though attraction asks the chaotic part of
+  the right half to deliver an entry pattern, a statement of the same kind as the problem.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,
@@ -89,7 +92,8 @@ In order of the assessment above.
 
 1. **Attraction for period four.** Formalize [the census](findings/columns/absorption-census.md) beyond six cells,
    extending [EmptyRight](Rule30Open/Columns/EmptyRight.md); prove entry for classes of halves between the kit's single
-   cell and its high-support halves (sparse halves, halves with a long white stretch next to the center); study the
+   cell and its high-support halves (three black cells, which [SparseRight](Rule30Open/Columns/SparseRight.md) puts at
+   32,219 to 476,314 kernel checks per word and phase; halves with a long white stretch next to the center); study the
    slowest halves, which are rare and which local and beam searches do not find
    ([the slow-half searches](negative-results/columns/slow-half-search.md)).
 2. **Block exclusions.** Port the two computed-only certificates of [the game blocks](findings/columns/game-blocks.md)

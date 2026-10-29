@@ -391,3 +391,44 @@ def test_white_gap() -> None:
         tails[:, 30:230] = rng.integers(0, 2, (20, 200))
         times = absorption.absorb(word, absorption.packed(tails), phase, 700, wall, 230)  # (20,)
         assert ((times >= 0) & (times <= pairs[0][0])).all(), (word, phase)
+
+
+def test_sparse_right() -> None:
+    """The certificates in `SparseRight`, read from its source: for each word and phase, 30 numbers, the first entry of
+    each a one-cell half and then one entry per second cell up to its step plus depth plus 13, every step plus depth plus
+    13 at most the module's G. Sampled halves with those black cells, white elsewhere up to G and random beyond G,
+    driven as cells, enter no later than the listed step (`sparse_0001`, `sparse_0011`, `sparse_0111`)."""
+    from computations import absorption, sparse_halves
+    wall = absorption.kit_wall()  # (4, 2^13)
+    source = module("Columns/SparseRight")
+    bounds = {"0001": 778, "0011": 1359, "0111": 623}
+    for word, g in bounds.items():
+        assert f"theorem sparse_{word} (φ : Nat) (x : Nat → Bool) (hx : AtMostTwo {g} x)" in source
+    data = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+            for word, phase, body in re.findall(r"def cells(\d{4})_(\d) : List Nat := \[([^\]]*)\]", source)}
+    assert len(data) == 12
+    rng = np.random.default_rng(32)
+    for (word, phase), numbers in data.items():
+        g = bounds[word]
+        assert len(numbers) == 30
+        halves, listed = [], []
+        for p1, number in enumerate(numbers, start=1):
+            (t, k), = sparse_halves.decode(number, 1)
+            count = max(0, t + k + 13 - p1)
+            pairs = sparse_halves.decode(number >> sparse_halves.BITS, count)
+            assert number >> (sparse_halves.BITS * (count + 1)) == 0
+            assert max(a + b + 13 for a, b in [(t, k), *pairs]) <= g
+            halves.append([p1, t + k + 14 + int(rng.integers(0, 50))])  # the second cell beyond the single's bound
+            listed.append(t)
+            for j in rng.choice(count, size=min(2, count), replace=False).tolist():
+                halves.append([p1, p1 + 1 + j])
+                listed.append(pairs[j][0])
+        cells = np.zeros((len(halves), g + 300 + 1400), dtype=np.uint8)  # (n, width), column j + 1 at index j
+        for i, black in enumerate(halves):
+            for q in black:
+                if q <= g:
+                    cells[i, q - 1] = 1
+        cells[:, g:g + 300] = rng.integers(0, 2, (len(halves), 300))
+        times = absorption.absorb(word, absorption.packed(cells), phase, 1400, wall, g + 300)  # (n,)
+        assert ((times >= 0) & (times <= np.array(listed))).all(), (word, phase)
+

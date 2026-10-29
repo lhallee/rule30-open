@@ -10,7 +10,7 @@ from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
                           left_diagonals, linear_complexity, lock_certificate, periodic_columns, right_half,
-                          sensitivity, slow_halves)
+                          sensitivity, slow_halves, sparse_halves)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -746,6 +746,40 @@ def test_absorption_census() -> None:
                     t += 1
                 assert times[start] == t, (word, phase, start)
     assert [int(absorption.census(word, 12, 0, 1200, wall).max()) for word in absorption.WORDS] == [544, 980, 416]
+
+
+def least_depth_slow(word: str, row: int, phase: int, wall: np.ndarray) -> int:
+    """The least depth at which an integer right half is in the kit's family, checked column by column, or -1."""
+    depths = [k for j0, shift in absorption.ALIGNMENTS[word] for k in range(52)
+              if (j0 + k) % 7 == 2 and wall[(phase + shift) % 4][(row >> k) & 0x1FFF]
+              and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, phase + shift) for p in range(1, k + 1))]
+    return min(depths, default=-1)
+
+
+def test_sparse_halves() -> None:
+    """The certificates of `SparseRight`: packing round-trips, each first black cell lists one entry per second cell up
+    to its step plus depth plus 13, and sampled entries are the first step at which integer rows stepped one at a time
+    meet the family, at the least depth there, checked column by column."""
+    rng = np.random.default_rng(31)
+    entries = [(int(t), int(k)) for t, k in zip(rng.integers(0, 2000, 50), rng.integers(0, 64, 50))]
+    assert sparse_halves.decode(sparse_halves.encode(entries[0], entries[1:]), 50) == entries
+    wall = absorption.kit_wall()  # (4, 2^13)
+    word, phase = "0111", 2
+    certs = sparse_halves.certificates(word, phase, wall)
+    assert len(certs) == 30
+    samples = []
+    for p1, ((t, k), pairs) in enumerate(certs, start=1):
+        assert len(pairs) == max(0, t + k + 13 - p1)
+        samples.append((1 << (p1 - 1), t, k))
+        for j in rng.choice(len(pairs), size=min(3, len(pairs)), replace=False).tolist():
+            samples.append(((1 << (p1 - 1)) | (1 << (p1 + j)), *pairs[j]))
+    for half, t, k in samples:
+        row = half
+        for s in range(t):
+            assert least_depth_slow(word, row, (s + phase) % 4, wall) < 0
+            row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
+        assert least_depth_slow(word, row, (t + phase) % 4, wall) == k
+    assert sparse_halves.bound(certs) == 623
 
 
 def lean_states(name: str) -> set[tuple[int, int]]:

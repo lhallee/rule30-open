@@ -119,8 +119,9 @@ advancing a column at a time.
 - **For each half it covers.** Entry is a finite computation, and Lean's `no_finite_of_family`
   ([EmptyRight.md](../../Rule30Open/Columns/EmptyRight.md)) turns entry of one right half into a proof that no finite
   configuration with that right half, whatever its left half, has a center repeating the word from then on. Lean
-  checks the entry of every right half of at most six cells, by step 521 for every word and phase; for the larger
-  halves the computation is the proof.
+  checks the entry of every right half of at most six cells, by step 521 for every word and phase, and of every half
+  with at most two black cells among its first 623 to 1,359 cells, whatever lies beyond
+  ([SparseRight.md](../../Rule30Open/Columns/SparseRight.md)); for the other halves the computation is the proof.
 - **For a proof.** Entry looks like a chance event at a steady rate, so a proof cannot bound the entry time by a
   function of a bounded window
   ([the certificate finding](period-four-certificate.md#attraction-is-open),
