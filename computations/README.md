@@ -15,6 +15,7 @@ and tqdm, and run on a laptop.
 | [ether_prefix.py](ether_prefix.py) | [Truncated ether](../Rule30Open/Columns/EtherPrefix.md) | `python -m computations.ether_prefix --tail 4` | 2 min |
 | [long_window.py](long_window.py) | [The 65,536-cell window](../Rule30Open/Columns/LongWindow.md) | `python -m computations.long_window` | 1 s |
 | [period_three.py](period_three.py) | [The word 011 does not settle](../negative-results/columns/period-three-011.md) | `python -m computations.period_three --cells 12 --steps 6000` | 3 min |
+| [small_halves.py](small_halves.py) | [Ten cells](../Rule30Open/Columns/TenCells.md) | `python -m computations.small_halves --cells 10` | 30 s |
 | [sparse_halves.py](sparse_halves.py) | [Sparse right halves](../Rule30Open/Columns/SparseRight.md) | `python -m computations.sparse_halves` | 30 s |
 | [periodic_columns.py](periodic_columns.py) | [Columns that repeat from time 0](../negative-results/columns/periodic-from-start.md) | `python -m computations.periodic_columns --cells 20 --max-period 32 --steps 256` | 15 s |
 | [held_map.py](held_map.py) | [The period-two integer map](../findings/period-two/left-half-alone.md), [its condition for 0001](../Rule30Open/Columns/EtherDomain.md) and [the kit's C3](../findings/columns/left-half-c3.md) | `python -m computations.held_map 22` | 5 s |

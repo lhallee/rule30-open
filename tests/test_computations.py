@@ -10,7 +10,8 @@ from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
                           left_diagonals, linear_complexity, lock_certificate, long_window, period_three,
-                          periodic_columns, right_half, sensitivity, slow_halves, sparse_halves, ether_prefix)
+                          periodic_columns, right_half, sensitivity, slow_halves, small_halves, sparse_halves,
+                          ether_prefix)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -780,6 +781,26 @@ def test_sparse_halves() -> None:
             row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
         assert least_depth_slow(word, row, (t + phase) % 4, wall) == k
     assert sparse_halves.bound(certs) == 623
+
+
+def test_small_halves() -> None:
+    """The certificates of `TenCells`: packing round-trips, and for sampled halves of up to seven cells each entry is the
+    first step at which integer rows stepped one at a time meet the family, at the least depth there, checked column
+    by column."""
+    rng = np.random.default_rng(43)
+    entries = [(int(t), int(k)) for t, k in zip(rng.integers(0, 2000, 40), rng.integers(0, 64, 40))]
+    assert small_halves.decode(small_halves.encode(entries), 40) == entries
+    wall = absorption.kit_wall()  # (4, 2^13)
+    for word, phase in (("0001", 2), ("0011", 1), ("0111", 3)):
+        certs = small_halves.certificates(word, 7, phase)
+        assert len(certs) == 128
+        for half in rng.choice(128, size=12, replace=False).tolist():
+            t, k = certs[half]
+            row = half
+            for s in range(t):
+                assert least_depth_slow(word, row, (s + phase) % 4, wall) < 0
+                row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
+            assert least_depth_slow(word, row, (t + phase) % 4, wall) == k
 
 
 def test_ether_prefix() -> None:

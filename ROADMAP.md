@@ -31,17 +31,20 @@ kit's commit 932cf8d.
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
   enters (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three words); in Lean, halves of up to
-  six cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md)), so does every half white on columns 7 to $B$,
-  whatever lies beyond, with $B$ = 316, 535 and 310 ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), and so does every half
-  with at most two black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which
-  includes one black cell anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$),
-  and so does every truncation of the aligned ether, the only infinite half seen to stay out, followed by at most four
-  cells ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
+  ten cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md) for six, [TenCells](Rule30Open/Columns/TenCells.md)
+  for ten), so does every half white on columns 7 to $B$, whatever lies beyond, with $B$ = 316, 535 and 310
+  ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), and every half white on columns 11 to $G'$, with $G'$ = 562, 654 and 371
+  ([TenCells](Rule30Open/Columns/TenCells.md)), and so does every half with at most two black cells among columns 1 to
+  $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell anywhere
+  ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every truncation of
+  the aligned ether, the only infinite half seen to stay out, followed by at most four cells
+  ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
   certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few hundred
   values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)). Open: attraction for halves with at
-  least three black cells among the first $G$ columns, one of them among columns 1 to 30 and one among columns 7 to $B$,
-  beyond the census's 20 cells. *Assessment:* the most direct route to a full case of Problem 1, though attraction asks
-  the chaotic part of the right half to deliver an entry pattern, a statement of the same kind as the problem.
+  least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$ and
+  one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
+  Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the
+  same kind as the problem.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,

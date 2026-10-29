@@ -433,6 +433,35 @@ def test_sparse_right() -> None:
         assert ((times >= 0) & (times <= np.array(listed))).all(), (word, phase)
 
 
+def test_ten_cells() -> None:
+    """The certificates in `TenCells`, read from its source: for each word and phase, eight chunks of 128 packed
+    entries, every step plus depth plus 13 at most the module's G. Sampled halves of ten cells, white on cells 11 to G
+    and random beyond, driven as cells, enter no later than the listed step (`ten_0001`, `ten_0011`, `ten_0111`)."""
+    from computations import absorption, small_halves
+    wall = absorption.kit_wall()  # (4, 2^13)
+    source = module("Columns/TenCells")
+    bounds = {"0001": 562, "0011": 654, "0111": 371}
+    for word, g in bounds.items():
+        assert f"theorem ten_{word} (φ : Nat) (x : Nat → Bool) (hx : ∀ p, 10 < p → p ≤ {g} → x p = false)" in source
+    data = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+            for word, phase, body in re.findall(r"def halves(\d{4})_(\d) : List Nat := \[([^\]]*)\]", source)}
+    assert len(data) == 12
+    rng = np.random.default_rng(44)
+    for (word, phase), numbers in data.items():
+        g = bounds[word]
+        assert len(numbers) == 8
+        entries = [e for number in numbers for e in small_halves.decode(number, 128)]
+        assert max(t + k + 13 for t, k in entries) <= g
+        halves = rng.choice(1024, size=16, replace=False).tolist()
+        cells = np.zeros((len(halves), g + 300 + 700), dtype=np.uint8)  # (n, width), column j + 1 at index j
+        for i, half in enumerate(halves):
+            cells[i, :10] = [(half >> j) & 1 for j in range(10)]
+        cells[:, g:g + 300] = rng.integers(0, 2, (len(halves), 300))
+        times = absorption.absorb(word, absorption.packed(cells), phase, 700, wall, g + 300)  # (n,)
+        listed = np.array([entries[half][0] for half in halves])
+        assert ((times >= 0) & (times <= listed)).all(), (word, phase)
+
+
 def test_ether_prefix_data() -> None:
     """The certificates in `EtherPrefix`, read from its source: 16 tail words for each word, alignment and phase, each
     with B + 7 <= 64. Sampled truncations, driven as integer rows one step at a time, are in the family at the listed
