@@ -107,17 +107,18 @@ kit's commit 932cf8d.
 
 In order of the assessment above.
 
-1. **Attraction for period four.** The Lean classes so far are halves of at most six cells, a white gap after the sixth
-   cell, at most two black cells among the first $G$, and the aligned ether cut anywhere with at most four cells after
-   it. Next: the shift lemma of [EtherPrefix](Rule30Open/Columns/EtherPrefix.md) applies to any half whose column 1
-   stays the ether's until it enters, so ether prefixes in front of the census halves, or of longer tails, need only
-   base checks; three black cells by [SparseRight](Rule30Open/Columns/SparseRight.md)'s route need 32,219 to 476,314
-   kernel checks per word and phase; the census beyond six cells; and the slowest halves, which are rare and which
-   local and beam searches do not find ([the slow-half searches](negative-results/columns/slow-half-search.md)).
-   *Assessment:* each class is thin; a proof for every finite half needs an argument that the chaotic part near the
-   center delivers a wall, which none of these gives.
-2. **Block exclusions.** Port the two computed-only certificates of [the game blocks](findings/columns/game-blocks.md)
-   to Lean, and extend the game past period 14.
+1. **Attraction for period four.** The Lean classes so far are halves of at most ten cells, a white gap after the sixth
+   or the tenth cell, at most two black cells among the first $G$, and the aligned ether cut anywhere with at most four
+   cells after it. Next: the shift lemma of [EtherPrefix](Rule30Open/Columns/EtherPrefix.md) applies to any half whose
+   column 1 stays the ether's until it enters, so ether prefixes in front of the census halves, or of longer tails, need
+   only base checks; three black cells by [SparseRight](Rule30Open/Columns/SparseRight.md)'s route need 32,219 to
+   476,314 kernel checks per word and phase; halves of 12 cells by [TenCells](Rule30Open/Columns/TenCells.md)'s route
+   need a few minutes of kernel time; and the slowest halves, which are rare and which local and beam searches do not
+   find ([the slow-half searches](negative-results/columns/slow-half-search.md)). *Assessment:* each class is thin; a
+   proof for every finite half needs an argument that the chaotic part near the center delivers a wall, which none of
+   these gives.
+2. **Block exclusions.** Port the seven computed-only certificates of [the game blocks](findings/columns/game-blocks.md)
+   to Lean, which needs a denser form for games of 12 to 14 cells, and extend the game past period 16.
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the coin lock and
    the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree and the Duhamel
    form are proved in the kit's equivalent forms, which a search should include before any formalization

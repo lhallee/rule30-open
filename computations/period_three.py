@@ -114,13 +114,16 @@ def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) ->
         for j in range(0, width, 64):
             rows[i, j // 64] = np.uint64((half >> j) & ((1 << 64) - 1))
     entry = np.full(len(halves), -1, dtype=np.int64)  # (n,)
+    alive = np.arange(len(halves))  # (m,), the halves still outside the trap, row i of `rows` being half alive[i]
     mask = np.uint64((1 << TRAP_WIDTH) - 1)
     for t in tqdm(range(steps), desc=f"t001 phase {phase}", file=sys.stderr, leave=False, mininterval=5):
         drive = (t + phase) % 3
-        hit = np.isin((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys) & (entry < 0)  # (n,)
-        entry[hit] = t
-        if (entry >= 0).all():
-            break
+        hit = np.isin((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys)  # (m,)
+        if hit.any():
+            entry[alive[hit]] = t
+            rows, alive = rows[~hit], alive[~hit]  # the trap is closed: an entered half stays in
+            if len(alive) == 0:
+                break
         active = (width + t) // 64 + 2  # the half reaches column width + t + 1 at most
         rows[:, :active] = step_rows(rows[:, :active], int("001"[drive]))
     return entry  # (n,)
