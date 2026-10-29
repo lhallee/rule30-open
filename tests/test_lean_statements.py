@@ -609,3 +609,20 @@ def test_left_half_driven() -> None:
         assert int(p1) == int(p2) == phase and int(b1) == int(b2) == masks[word][1]
         latest, _ = held_map.tree_failures(word, 20, (phase + 3) % 4, False)
         assert int(passes) == int(fails) + 1 == max(latest) + 1, (word, phase)
+
+
+def test_wall_segments_lean() -> None:
+    """`WallSegments`, read from its source: `segOK_kit_tails` lists exactly the tails of the kit's Theorem B′, read
+    from the kit's `Rule30BlackRunBlocks` (its theorems `det_<tail>`), and each passes the three-valued run of
+    `wall_segments`; the block of `wallGood_two_runs` is in the family."""
+    from computations import wall_segments
+    source = module("Columns/WallSegments")
+    kit = (ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30BlackRunBlocks.lean").read_text()
+    tails = sorted(set(re.findall(r"theorem det_([01]+)\b", kit)))
+    assert len(tails) == 8
+    body = re.search(r"theorem segOK_kit_tails :\n    \(\[(.*?)\] : List \(List Bool\)\)", source, re.S).group(1)
+    listed = sorted("".join("1" if v == "true" else "0" for v in re.findall(r"true|false", word))
+                    for word in re.findall(r"\[([^\[\]]*)\]", body))
+    assert listed == tails
+    assert all(wall_segments.segment_good(u) for u in tails)
+    assert wall_segments.in_family("1" * 9 + "010" + "1" * 9 + "01100")
