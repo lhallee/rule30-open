@@ -247,33 +247,59 @@ def entries0111_3 : List (Nat × Nat) :=
    (199, 0), (17, 0), (296, 0), (44, 0), (9, 7), (12, 0), (17, 0), (53, 0), (68, 0), (22, 0), (29, 0), (70, 0),
    (40, 0), (10, 0)]
 
+/-- The kernel's check that every right half of at most six cells is in the family at the step and depth its list
+gives, for each word and phase. -/
+theorem check0001_0 : smallCheck w0001 A0001 0 6 entries0001_0 = true := by decide +kernel
+
+theorem check0001_1 : smallCheck w0001 A0001 1 6 entries0001_1 = true := by decide +kernel
+
+theorem check0001_2 : smallCheck w0001 A0001 2 6 entries0001_2 = true := by decide +kernel
+
+theorem check0001_3 : smallCheck w0001 A0001 3 6 entries0001_3 = true := by decide +kernel
+
+theorem check0011_0 : smallCheck w0011 A0011 0 6 entries0011_0 = true := by decide +kernel
+
+theorem check0011_1 : smallCheck w0011 A0011 1 6 entries0011_1 = true := by decide +kernel
+
+theorem check0011_2 : smallCheck w0011 A0011 2 6 entries0011_2 = true := by decide +kernel
+
+theorem check0011_3 : smallCheck w0011 A0011 3 6 entries0011_3 = true := by decide +kernel
+
+theorem check0111_0 : smallCheck w0111 A0111 0 6 entries0111_0 = true := by decide +kernel
+
+theorem check0111_1 : smallCheck w0111 A0111 1 6 entries0111_1 = true := by decide +kernel
+
+theorem check0111_2 : smallCheck w0111 A0111 2 6 entries0111_2 = true := by decide +kernel
+
+theorem check0111_3 : smallCheck w0111 A0111 3 6 entries0111_3 = true := by decide +kernel
+
 /-- **No finite configuration whose right half has at most six cells has a center column that repeats `0001`**, in
 any phase and whatever its left half. -/
 theorem smallRight_0001 (φ : Nat) : SmallRight w0001 6 φ := by
   refine smallRight_mod ?_
   rcases (show φ % 4 = 0 ∨ φ % 4 = 1 ∨ φ % 4 = 2 ∨ φ % 4 = 3 by omega) with h | h | h | h <;> rw [h]
-  · exact smallRight_of_check (entries := entries0001_0) A0001_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0001_1) A0001_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0001_2) A0001_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0001_3) A0001_ok ⟨3, rfl⟩ (by decide +kernel)
+  · exact smallRight_of_check A0001_ok ⟨3, rfl⟩ check0001_0
+  · exact smallRight_of_check A0001_ok ⟨3, rfl⟩ check0001_1
+  · exact smallRight_of_check A0001_ok ⟨3, rfl⟩ check0001_2
+  · exact smallRight_of_check A0001_ok ⟨3, rfl⟩ check0001_3
 
 /-- **No finite configuration whose right half has at most six cells has a center column that repeats `0011`.** -/
 theorem smallRight_0011 (φ : Nat) : SmallRight w0011 6 φ := by
   refine smallRight_mod ?_
   rcases (show φ % 4 = 0 ∨ φ % 4 = 1 ∨ φ % 4 = 2 ∨ φ % 4 = 3 by omega) with h | h | h | h <;> rw [h]
-  · exact smallRight_of_check (entries := entries0011_0) A0011_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0011_1) A0011_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0011_2) A0011_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0011_3) A0011_ok ⟨3, rfl⟩ (by decide +kernel)
+  · exact smallRight_of_check A0011_ok ⟨3, rfl⟩ check0011_0
+  · exact smallRight_of_check A0011_ok ⟨3, rfl⟩ check0011_1
+  · exact smallRight_of_check A0011_ok ⟨3, rfl⟩ check0011_2
+  · exact smallRight_of_check A0011_ok ⟨3, rfl⟩ check0011_3
 
 /-- **No finite configuration whose right half has at most six cells has a center column that repeats `0111`.** -/
 theorem smallRight_0111 (φ : Nat) : SmallRight w0111 6 φ := by
   refine smallRight_mod ?_
   rcases (show φ % 4 = 0 ∨ φ % 4 = 1 ∨ φ % 4 = 2 ∨ φ % 4 = 3 by omega) with h | h | h | h <;> rw [h]
-  · exact smallRight_of_check (entries := entries0111_0) A0111_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0111_1) A0111_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0111_2) A0111_ok ⟨3, rfl⟩ (by decide +kernel)
-  · exact smallRight_of_check (entries := entries0111_3) A0111_ok ⟨3, rfl⟩ (by decide +kernel)
+  · exact smallRight_of_check A0111_ok ⟨3, rfl⟩ check0111_0
+  · exact smallRight_of_check A0111_ok ⟨3, rfl⟩ check0111_1
+  · exact smallRight_of_check A0111_ok ⟨3, rfl⟩ check0111_2
+  · exact smallRight_of_check A0111_ok ⟨3, rfl⟩ check0111_3
 
 /-! ### The white right half -/
 

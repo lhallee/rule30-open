@@ -26,11 +26,13 @@ kit's commit 932cf8d.
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); a single black cell, and every half
-  white on columns 1 to 30, enter (the kit); halves of up to six cells enter in Lean
-  ([EmptyRight](Rule30Open/Columns/EmptyRight.md)); a window of 16 columns has a certificate
+  white on columns 1 to 30, enter (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three
+  words); halves of up to six cells enter in Lean ([EmptyRight](Rule30Open/Columns/EmptyRight.md)), and so does every
+  half white on columns 7 to $B$, whatever lies beyond, with $B$ = 316, 535 and 310
+  ([WhiteGap](Rule30Open/Columns/WhiteGap.md)); a window of 16 columns has a certificate
   ([the certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few
   hundred values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)). Open: attraction for
-  halves with black cells near the center and support beyond 20 cells. *Assessment:* the most direct route to a full
+  halves with black cells both near the center and among columns 7 to $B$, beyond the census's 20 cells. *Assessment:* the most direct route to a full
   case of Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a
   statement of the same kind as the problem.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz

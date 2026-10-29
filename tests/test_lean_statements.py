@@ -360,3 +360,34 @@ def test_left_window() -> None:
     single[3] = True
     assert centers(single[None, :], 3)[0, ::-1].tolist() == [True, False, True]
     assert "centerWindow single [false, false, false] = [true, false, true]" in module("RandomRows/LeftWindow")
+
+
+def test_white_gap() -> None:
+    """Right halves with random first six cells, white on cells 7 to B and random beyond, driven as cells, enter the
+    kit's family no later than the step the entry lists of `EmptyRight` give their first six cells (`gap_0001`,
+    `gap_0011`, `gap_0111`), and halves white on cells 1 to 30 with random tails no later than the white half
+    (`high_0001`, `high_0011`, `high_0111`). Every listed step plus depth plus 13 is at most B, as `bound0001` and the
+    others state, and the white half's is at most 30."""
+    from computations import absorption
+    wall = absorption.kit_wall()  # (4, 2^13)
+    entries = {(word, int(phase)): [(int(t), int(k)) for t, k in re.findall(r"\((\d+), (\d+)\)", body)]
+               for word, phase, body in re.findall(r"def entries(\d{4})_(\d) : List \(Nat × Nat\) :=\s*\[([^\]]*)\]",
+                                                   module("Columns/EmptyRight"))}
+    gaps = {"0001": 316, "0011": 535, "0111": 310}
+    for word, gap in gaps.items():
+        assert f"p ≤ {gap} → x p = false" in module("Columns/WhiteGap")
+    rng = np.random.default_rng(30)
+    for (word, phase), pairs in entries.items():
+        gap = gaps[word]
+        assert len(pairs) == 64 and max(t + k + 13 for t, k in pairs) <= gap and sum(pairs[0]) + 13 <= 30
+        prefixes = rng.integers(0, 64, 40)  # (40,)
+        cells = np.zeros((40, gap + 200 + 700), dtype=np.uint8)  # (40, n), column j + 1 at index j
+        cells[:, :6] = (prefixes[:, None] >> np.arange(6)[None, :]) & 1
+        cells[:, gap:gap + 200] = rng.integers(0, 2, (40, 200))
+        times = absorption.absorb(word, absorption.packed(cells), phase, 700, wall, gap + 200)  # (40,)
+        listed = np.array([pairs[r][0] for r in prefixes.tolist()])  # (40,)
+        assert ((times >= 0) & (times <= listed)).all(), (word, phase)
+        tails = np.zeros((20, 30 + 200 + 700), dtype=np.uint8)  # (20, n)
+        tails[:, 30:230] = rng.integers(0, 2, (20, 200))
+        times = absorption.absorb(word, absorption.packed(tails), phase, 700, wall, 230)  # (20,)
+        assert ((times >= 0) & (times <= pairs[0][0])).all(), (word, phase)

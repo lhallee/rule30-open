@@ -12,6 +12,7 @@ public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.EtherDomain
 public import Rule30Open.Columns.EmptyRight
+public import Rule30Open.Columns.WhiteGap
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.Diagonals.LeftMemory
