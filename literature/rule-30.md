@@ -114,6 +114,13 @@ None of the following is refereed, and the prize site lists no winner.
   theorem](../Rule30Open/Columns/AdjacentColumns.md), `no_constant_column`), and the kit proves it for every
   configuration with a leftmost black cell (`Rule30FiniteConfigs.no_column_eventually_constant`). The same unique left
   half is the object of [the white right half](../findings/period-two/white-right-half.md) for the alternating center.
+- **Adler (2026).** [rule30-constant-column-lean](https://github.com/keithadler/rule30-constant-column-lean). A Lean 4
+  proof, in core Lean with the standard axioms, that no nonzero configuration supported on $[-A, A]$ keeps its center
+  column constant at every time $t \le A + 2$ (`no_const_column`). The README reports that a SAT search finds $A + 2$
+  to be the first impossible horizon for every $A \le 24$, and presents the proof as an independent formalization of
+  the horizon bound of Condrey (2026). *Here:* that bound concerns constancy from time 0; [the adjacent-column
+  theorem](../Rule30Open/Columns/AdjacentColumns.md) (`no_constant_column`) excludes constancy from any time on, for
+  every row with a leftmost black cell, as the kit's `Rule30FiniteConfigs.no_column_eventually_constant` does.
 - **Agents on the prize kit (2026).** [Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit), its main
   branch and [pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls). After the agents' invitation,
   the kit's catalog grew from 128 modules on October 26, 2026 to 141 on October 28, with contributed modules that are
