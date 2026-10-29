@@ -187,8 +187,9 @@ def main() -> None:
     if args.after_ones:
         for ones in range(1, 10):
             windows = windows_after_ones(ones)
-            print(f"after {ones} ones: {len(windows)} windows {sorted(''.join(map(str, w)) for w in windows)}, first cell "
-                  f"{'known' if len({w[0] for w in windows}) == 1 else 'unknown'}")
+            names = sorted("".join(map(str, w)) for w in windows)
+            known = "known" if len({w[0] for w in windows}) == 1 else "unknown"
+            print(f"after {ones} ones: {len(windows)} windows {names}, first cell {known}")
         return
     if args.brute:
         extra = [u for m in tqdm(range(1, args.brute + 1), desc="lengths", file=sys.stderr)
