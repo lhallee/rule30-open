@@ -55,10 +55,11 @@ kit's commit 932cf8d.
   ([the kit's pull requests](literature/kit-pull-requests.md#period-two)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains: every right half white on its first 1,317 cells
-  enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), but the kit's study finds halves that
-  enter only after about $2 \cdot 10^5$ steps, so a census in Lean is out of reach. For $011$ the right half never
-  settles next to the center, so no trap of that kind appears ([the word
-  011](negative-results/columns/period-three-011.md)), and the route is the kit's left-only statement `C3w`.
+  enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half of up to eight cells
+  enters, but a median of about 17,000 steps in and the latest at step 172,529 ([the
+  census](findings/columns/t001-census.md)), so a census in Lean is out of reach. For $011$ the right half never settles
+  next to the center, so no trap of that kind appears ([the word 011](negative-results/columns/period-three-011.md)),
+  and the route is the kit's left-only statement `C3w`.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).

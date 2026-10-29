@@ -927,14 +927,17 @@ def test_period_three() -> None:
 
 def test_t001_entries() -> None:
     """Entry into the kit's trap t001, read from its source: the white half enters at step 1,270, 1,269 or 1,268 by
-    phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state; integer rows stepped one at a time stay
-    in the trap for 300 steps after entry with random cells beyond column 47, as the trap's closure requires; and
-    `periodic_extent` agrees with the same rows, covering the trap's 38 periodic columns once the white half is in."""
+    phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state, while the half with column 2 black
+    enters only at step 35,536 from phase 0; integer rows stepped one at a time stay in the trap for 300 steps after
+    entry with random cells beyond column 47, as the trap's closure requires; and `periodic_extent` agrees with the
+    same rows, covering the trap's 38 periodic columns once the white half is in."""
     keys = set(period_three.trap_keys().tolist())
     assert len(keys) == 815
     assert period_three.trap_entries([0], 0, 2000, period_three.trap_keys()).tolist() == [1270]
     assert period_three.trap_entries([0, 0], 1, 2000, period_three.trap_keys()).tolist() == [1269, 1269]
     assert period_three.trap_entries([0], 2, 2000, period_three.trap_keys()).tolist() == [1268]
+    assert period_three.trap_entries([0, 1, 2, 3], 0, 40000, period_three.trap_keys()).tolist() == [1270, 1267, 35536,
+                                                                                                      1267]
     rng = np.random.default_rng(42)
     mask = (1 << period_three.TRAP_WIDTH) - 1
     row = 0

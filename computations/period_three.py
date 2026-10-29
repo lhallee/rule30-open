@@ -168,6 +168,8 @@ def main() -> None:
             print(f"001 phase {phase}: {len(done)} of {1 << args.cells} halves enter t001 within {args.steps} steps"
                   + (f", the latest at step {done.max()}" if len(done) else "")
                   + (f"; not entered: {np.flatnonzero(entry < 0).tolist()}" if len(done) < len(entry) else ""))
+            print("  by step " + ", ".join(f"{bound:,}: {int((done <= bound).sum())}" for bound in (1300, 10000, 50000, 100000))
+                  + (f"; median {int(np.median(done)):,}" if len(done) else ""))
             print("  entry steps (count): " + ", ".join(f"{t} ({c})" for t, c in zip(times.tolist(), counts.tolist())))
         print(f"({time.perf_counter() - started:.0f} s)")
         return
