@@ -78,8 +78,14 @@ The search found these but could not confirm the record or read the text. Check 
 - Bobenko, Bordemann, Gunn and Pinkall (1993), *On two integrable cellular automata*, *Communications in Mathematical
   Physics* 158(1), 127 to 134; the record is in the authors' publication list, the text was not read.
 - Deva (2026), an SSRN preprint reported in public issue threads to claim an $\Omega(n)$ decision-tree lower bound
-  for the center cell; the record was not reached. A lower bound for the cell as a function of a variable row is not a
-  bound for the fixed function of Problem 3 ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
+  for the center cell; the record was not reached. The kit's equivalent forms prove such a bound in Lean, depth at
+  least $2t - 1$ (`QueryComplexity.le_depth_of_eval_eq`). A lower bound for the cell as a function of a variable row is
+  not a bound for the fixed function of Problem 3 ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
+- Chang (2026), *Exploring Collatz Dynamics with Human-LLM Collaboration*, arXiv:2603.11066, seen only in search
+  results; reported as a reduction of the Collatz conjecture to a conjecture about carries, not a proof, along two
+  routes that each end at a gap between distributional and pointwise statements, written with an LLM. That gap is the
+  one of [the random-row barrier](../negative-results/random-rows/almost-every-row.md), and period two reduces here to
+  a map with the shape of a Collatz problem ([the held column](../Rule30Open/PeriodTwo/HeldColumn.md)).
 - Goux (2026), prize submission R30-20261025-0554f7, credited in the kit's pull request #46 with the black-run slope
   $3/5$; the submission was not reached.
 
