@@ -89,11 +89,14 @@ roadmap](../ROADMAP.md).
 
 ## Other claims
 
-- **Anthropic (2026).** [A 2^o(n) time algorithm for 3-SAT](https://github.com/anthropics/formal-math/pull/31).
-  Paper and Lean 4 formalization in the repository anthropics/formal-math, merged October 27, 2026. Claims one
-  deterministic machine counting the satisfying assignments of $k$-CNF formulas on $n$ variables in time $2^{o(n)}$,
-  for every $k$. Also in [complexity.md](complexity.md#satisfiability-and-unique-games).
-  *Here:* [the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md).
+- **Anthropic (2026).** [A 2^o(n) time algorithm for 3-SAT](https://github.com/anthropics/formal-math/pull/31). Paper
+  and Lean 4 formalization in the repository anthropics/formal-math, merged October 27, 2026. Claims one deterministic
+  machine counting the satisfying assignments of $k$-CNF formulas on $n$ variables in time $2^{o(n)}$, for every $k$:
+  $2^{O(\min\{k^2 n \log\log n / \sqrt{\log n},\ k m / \sqrt{\log m}\})}$ steps for $m$ clauses, as the repository's
+  index states it. Also in [complexity.md](complexity.md#satisfiability-and-unique-games). The same repository holds
+  Lean formalizations of two human results, on simple zeros of the Riemann zeta function on the critical line and on
+  faster 3SUM and all-pairs shortest paths on a word RAM; neither bears on the problems. *Here:* [the hardness
+  hypotheses](../negative-results/complexity/hardness-hypotheses.md).
 
 ## Checked records, texts not read
 

@@ -546,3 +546,33 @@ def test_long_window() -> None:
         bits |= ((row >> n) & 1) << t
         row = (row << 1) ^ (row | (row >> 1))
     assert big == bits
+
+
+def test_left_half_0001() -> None:
+    """The checks of `LeftHalf0001`, read from its source: for each phase, the chunks cover every choice of the free
+    readings before depth 88, counted here directly from the pattern, at one depth, number of levels and lane count;
+    the headline statements carry that depth and number of levels; and at depth 20 the least number of levels that
+    passes the kernel check, from `sharp20_<φ>`, is one more than the latest first failure that the tree search of
+    `held_map` finds over the halves of at most 20 cells."""
+    from computations import held_map
+    source = module("Columns/LeftHalf0001")
+    chunks = re.findall(r"theorem chunk(\d)_(\d+) : checkC (\d+) (\d+) (\d) (\d+) (\d+) = true := by decide \+kernel",
+                        source)
+    assert {(w, k, n) for _, _, w, k, _, n, _ in chunks} == {("88", "114", "18")}
+    for phase in range(4):
+        free = sum(1 for t in range(88) if (t + phase) % 4 == 1)  # free readings at times t with t + 1 <= 88
+        assert free == 22
+        found = sorted(int(c) for p, i, _, _, q, _, c in chunks if int(p) == phase and int(q) == phase and i == c)
+        assert found == list(range(2 ** (free - 18))), phase
+    assert ("theorem c3_0001_depth (φ : Nat) (hφ : φ < 4) (x : Nat → Bool) (hx : ∀ d, 88 < d → x d = false) :\n"
+            "    ∃ t, t < 114 ∧ ¬ KeepsC3 φ (fun t => zrow x t 1) t") in source
+    assert "∃ d : Nat, 88 < d ∧ Rule30DrivenLeft.L (fun k => wordAt (effWord w0001) k) s K (-(d : Int)) = true" in source
+    assert "(hMK : M + K ≤ 88)" in source
+    sharp = re.findall(r"theorem sharp20_(\d) : checkC 20 (\d+) (\d) 5 0 = true ∧ checkC 20 (\d+) (\d) 5 0 = false",
+                       source)
+    assert len(sharp) == 4
+    for name, passes, p1, fails, p2 in sharp:
+        phase = int(name)
+        assert int(p1) == int(p2) == phase
+        latest, _ = held_map.tree_failures("0001", 20, phase, False)
+        assert int(passes) == int(fails) + 1 == max(latest) + 1, phase

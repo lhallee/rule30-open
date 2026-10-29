@@ -45,6 +45,13 @@ kit's commit 932cf8d.
   one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
   Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the
   same kind as the problem.
+- **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite
+  left half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left
+  half of up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)),
+  and for $0001$ Lean checks every half that lies within depth 88 at the time it starts to keep the pattern
+  ([LeftHalf0001](Rule30Open/Columns/LeftHalf0001.md), with the kit's lane checker). *Assessment:* the latest failure
+  outlasts the half's length by about a third of it, and the work of a check doubles with every four cells, so checks
+  settle bounded cases only; a proof needs an argument that uses the finiteness of the half.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,
@@ -55,8 +62,8 @@ kit's commit 932cf8d.
   ([the kit's pull requests](literature/kit-pull-requests.md#period-two)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains: every right half white on its first 1,317 cells
-  enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half of up to eight cells
-  enters, but a median of about 17,000 steps in and the latest at step 172,529 ([the
+  enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half of up to ten cells
+  enters, but a median of about 16,000 steps in and the latest at step 186,490 ([the
   census](findings/columns/t001-census.md)), so a census in Lean is out of reach. For $011$ the right half never settles
   next to the center, so no trap of that kind appears ([the word 011](negative-results/columns/period-three-011.md)),
   and the route is the kit's left-only statement `C3w`.

@@ -10,7 +10,7 @@ black phases), and how many have column 1 at the white times periodic over the l
     python -m computations.period_three --cells 12 --steps 6000   # every right half of up to 12 cells, both words
     python -m computations.period_three --long 100000             # the white half and 11 random halves of 24 cells
     python -m computations.period_three --follow 2351:0 3682:2 4033:2 --steps 200000   # when given 001 halves settle
-    python -m computations.period_three --trap --cells 8 --steps 300000   # exact entry into t001, every small half
+    python -m computations.period_three --trap --cells 10 --steps 400000   # exact entry into t001, every small half
 
 `--trap` reads the kit's trap `t001` from its source, 815 states of 47 columns with labels modulo 21, and finds the
 first step at which each right half, driven by 001, has its columns 1 .. 47 equal to a state whose label agrees with
@@ -129,6 +129,14 @@ def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) ->
     return entry  # (n,)
 
 
+def constant_rate(done: np.ndarray, start: int = 1260, at: int = 100000) -> tuple[float, float]:
+    """Compare entry steps `done` (shape (n,)) with entry at a constant rate per step after `start`: the ratio of the
+    mean excess over `start` to the median excess, 1 / ln 2 for exponential entry, and the fraction a constant rate
+    fitted to the mean leaves outside at step `at`."""
+    excess = done.astype(np.float64) - start  # (n,)
+    return float(excess.mean() / np.median(excess)), float(np.exp(-(at - start) / excess.mean()))
+
+
 def periodic_extent(half: int, phase: int, steps: int, times: list[int], width: int = 128) -> list[int]:
     """At each of `times`, how many columns from column 1 have repeated with the trap's period 21 over the last 105
     steps, for the right half driven by 001 from `phase`."""
@@ -169,7 +177,11 @@ def main() -> None:
                   + (f", the latest at step {done.max()}" if len(done) else "")
                   + (f"; not entered: {np.flatnonzero(entry < 0).tolist()}" if len(done) < len(entry) else ""))
             print("  by step " + ", ".join(f"{bound:,}: {int((done <= bound).sum())}" for bound in (1300, 10000, 50000, 100000))
-                  + (f"; median {int(np.median(done)):,}" if len(done) else ""))
+                  + (f"; median {int(np.median(done)):,}, mean {int(done.mean()):,}" if len(done) else ""))
+            if len(done) == len(entry):
+                ratio, left = constant_rate(done)
+                print(f"  constant rate after step 1,260: mean excess / median excess {ratio:.2f} (1 / ln 2 = 1.44); "
+                      f"out at step 100,000: {100 * left:.1f}% fitted, {100 * (done > 100000).mean():.1f}% observed")
             print("  entry steps (count): " + ", ".join(f"{t} ({c})" for t, c in zip(times.tolist(), counts.tolist())))
         print(f"({time.perf_counter() - started:.0f} s)")
         return

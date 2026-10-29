@@ -20,6 +20,7 @@ phases: the left half, with the center replaced by the kit's effective boundary,
     python -m computations.held_map 22 --word 0001   # the same for the condition of 0001
     python -m computations.held_map 100 --tree check   # the condition of 0001 below 2^100, in seconds
     python -m computations.held_map 56 --tree c3   # C3 for the three words, every left half of up to 56 cells
+    python -m computations.held_map 88 --tree c3 --word 0001   # C3 for 0001 alone, the latest failure by phase
 """
 
 from __future__ import annotations
@@ -154,7 +155,8 @@ def tree_failures(word: str, max_support: int, phase: int, check: bool,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("max_support", type=int)
-    parser.add_argument("--word", choices=["01", "0001"], default="01")
+    parser.add_argument("--word", choices=["01", "0001", "0011", "0111"],
+                        help="the condition: 01 (default) or 0001; with --tree c3, one period-four word instead of all three")
     parser.add_argument("--tree", choices=["check", "c3"],
                         help="along the tree of readings: 0001 with the check at phase 0, or C3 for the three words")
     args = parser.parse_args()
@@ -167,7 +169,9 @@ def main() -> None:
                   f"condition through step {support - 1}")
         return
     if args.tree == "c3":
-        for word in PATTERN:
+        if args.word == "01":
+            parser.error("--tree c3 takes a period-four word")
+        for word in [args.word] if args.word else list(PATTERN):
             runs = [tree_failures(word, args.max_support, phase, False)
                     for phase in tqdm(range(4), desc=word, file=sys.stderr, leave=False)]
             margin = [max(run[0][m - 1] for run in runs) - m for m in range(1, args.max_support + 1)]  # (supports,)
@@ -175,10 +179,13 @@ def main() -> None:
             print(f"C3 {word}: every left half of at most {args.max_support} cells fails in all four phases; the "
                   f"latest first failure is M + {margin[widest]} at most, at M = {widest + 1}; margins at M = 10, 20, "
                   f"...: {margin[9::10]}; {[run[1][-1] for run in runs]} halves keep it through step "
-                  f"{args.max_support - 1}, by phase")
+                  f"{args.max_support - 1}, by phase; the latest first failure by phase is at step "
+                  f"{[max(run[0]) for run in runs]}")
         return
+    if args.word not in (None, "01", "0001"):
+        parser.error("without --tree c3 the word is 01 or 0001")
     for support in tqdm(range(1, args.max_support + 1), desc="supports", file=sys.stderr):
-        if args.word == "01":
+        if args.word in (None, "01"):
             latest = [int(first_failures(support, phase).max()) for phase in (0, 1)]
             print(f"support {support}: latest first failure at step {latest[0]} (odd checks), {latest[1]} (even "
                   f"checks); 2M = {2 * support}")

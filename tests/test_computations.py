@@ -925,6 +925,18 @@ def test_period_three() -> None:
     assert periods.tolist() == [14]
 
 
+def test_constant_rate() -> None:
+    """`constant_rate` against values computed by hand on three entry steps, and against the exponential law on a
+    large sample of exponential entry times."""
+    ratio, left = period_three.constant_rate(np.array([1261, 1262, 1266]), start=1260, at=1264)
+    assert abs(ratio - 3 / 2) < 1e-12 and abs(left - np.exp(-4 / 3)) < 1e-12
+    rng = np.random.default_rng(43)
+    done = 1260 + rng.exponential(20000.0, 200000)  # (200000,)
+    ratio, left = period_three.constant_rate(done)
+    assert abs(ratio - 1 / np.log(2)) < 0.02
+    assert abs(left / np.exp(-(100000 - 1260) / 20000.0) - 1) < 0.05
+
+
 def test_t001_entries() -> None:
     """Entry into the kit's trap t001, read from its source: the white half enters at step 1,270, 1,269 or 1,268 by
     phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state, while the half with column 2 black
