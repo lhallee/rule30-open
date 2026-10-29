@@ -3,7 +3,7 @@ title: The center cell has degree exactly 2t - 1 over GF(2)
 category: structure
 problems: [3]
 status: paper
-formalization: wanted
+formalization: kit
 evidence: [computations/algebra.py]
 ---
 
@@ -47,6 +47,13 @@ $d_{2k+2}(s) = d_{2k}(s+1) + d_{2k+1}(s) + d_{2k}(s) + d_{2k+1}(s)d_{2k}(s)$; co
 first term lacks $u_s$, the second is balanced in $u_{s+k}$ and the third lacks $u_{s+k}$, so each has even weight,
 while the product is 1 for exactly one value of $u_{s+k}$ wherever $d_{2k}(s) = 1$. So the weights of $d_{2k+2}(s)$
 and $d_{2k}(s)$ have the same parity, and from $d_2(s) = u_s$ every $d_{2k}(s)$ has odd weight.
+
+## In the kit
+
+The kit's equivalent forms prove this in Lean, by the same two steps: the leftmost cone variable enters linearly, and
+the top coefficient is the parity of the rows with a white diagonal left of the right edge
+([`AlgebraicDegree`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/AlgebraicDegree.lean): `isGreatest_card_coef_center` for the degree $2t - 1$ at $t \ge 2$,
+`eq_Icc_of_coef_ne_zero` for the single top monomial at $t \ge 3$).
 
 ## Computation
 

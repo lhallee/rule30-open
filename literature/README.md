@@ -18,26 +18,29 @@ entry says where the source bears on this repository. The search covers sources 
 ## Where the problems stand
 
 **Problem 1.** No two columns of the single cell's pattern are both eventually periodic (Jen 1986, proved in the kit),
-and no column is eventually constant, for the single cell (the kit) and for every row with a leftmost black cell (here;
-claimed for finite rows in a 2026 preprint). Specific eventual periods are excluded by certificates: between the kit
-and this repository, 75 of the 2,538 primitive blocks of period at most 14 are excluded in Lean and 2 more by
-computation, and the kit also excludes families of padded words and shows that an eventual period $P$ after a
-transient $T$ needs $T + P \ge 16{,}359$. The general theory of single columns reaches pairs of columns and special
-classes of automata, not one column of one orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are
-never eventually periodic and states the one-cell center column as open, and Rule 90, in the same class, has an
-eventually periodic center column, so a proof has to use more than the properties that define the class. One preprint
-claims a solution; none is refereed, and the prize is unclaimed.
+and no column is eventually constant, for every row with a leftmost black cell (the kit, and independently here; claimed
+for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 catalogued restatements of Problem 1 in
+Lean, none of which has led to a proof. Specific eventual periods are excluded by certificates: between the kit and this
+repository, 75 of the 2,538 primitive blocks of period at most 14 are excluded in Lean and 2 more by computation, and
+the kit also excludes families of padded words and shows that an eventual period $P$ after a transient $T$ needs
+$T + P \ge 16{,}359$. The general theory of single columns reaches pairs of columns and special classes of automata, not
+one column of one orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic
+and states the one-cell center column as open, and Rule 90, in the same class, has an eventually periodic center column,
+so a proof has to use more than the properties that define the class. One preprint claims a solution; none is refereed,
+and the prize is unclaimed.
 
-**Problem 2.** For a uniformly random initial row each center cell is black with probability exactly 1/2, because
-Rule 30 is onto; the single cell has measure zero, so this says nothing about it. Here the center cells of a random
-left half are proved independent and fair, and the step from almost every row to the single cell is recorded as a
-barrier ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)). Theorems that drive
-measures to the uniform one exist only for linear rules, whose single-cell center columns are periodic. The evidence
-for density 1/2 is statistical: the first million cells counted in *A New Kind of Science*, a billion published, and
-test batteries that find no deviation.
+**Problem 2.** For a uniformly random initial row each center cell is black with probability exactly 1/2, because Rule
+30 is onto; the single cell has measure zero, so this says nothing about it. The kit's equivalent forms prove in Lean
+that the center column of a random row is normal and of density 1/2 almost surely, here the center cells of a random
+left half are proved independent and fair for every fixed rest of the row, and the step from almost every row to the
+single cell is recorded as a barrier ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
+Theorems that drive measures to the uniform one exist only for linear rules, whose single-cell center columns are
+periodic. The evidence for density 1/2 is statistical: the first million cells counted in *A New Kind of Science*, a
+billion published, and test batteries that find no deviation.
 
 **Problem 3.** Only upper bounds are known: about $n^2$ cell updates by direct simulation, $O(n^2/\log n)$ for whole
-rows, and $O(n)$ operations on a random-access machine with bitwise operations. No lower bound is known for Rule 30 or
+rows, and $O(n)$ operations on a random-access machine with bitwise operations. Problem 3 implies Problem 1, proved in
+Lean in the kit's equivalent forms. No lower bound is known for Rule 30 or
 for any comparable explicit function. Predicting Rule 110 is P-complete; natural proofs bar many circuit techniques if
 Rule 30 behaves as a pseudorandom generator; and Rule 30's orbits compute every Boolean function of up to five
 variables, short of the universality a reduction would need. The October 2026 claims of a proof of the Unique Games

@@ -29,6 +29,9 @@ $c(2t)$ and $c(t)$, or $c(t)$ and another column, that could give a shortcut (Pr
   integer square roots and digit statistics correlate with $c$ only at the random scale.
 - **Right diagonals.** No exact relation $R(aj + b, cs + d) = R(j + e, s + f)$ among the right edge's diagonals.
 
-**What it means.** Nothing ties cells of the column together except the rule itself.
+**What it means.** Nothing ties cells of the column together except the rule itself. The kit's equivalent forms prove
+in Lean that Problem 1 itself is the absence of linear relations of one kind, over any field: no nonzero polynomial
+times the generating function is a polynomial, and no linear recurrence holds
+([`LinearRelations`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/LinearRelations.lean)).
 
 **Evidence.** Quoted from code that is not in this repository.

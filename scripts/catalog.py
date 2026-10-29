@@ -47,7 +47,9 @@ KIT_LABELS = {
     "bridge": "connects to the kit",
 }
 NEGATIVE_KINDS = ("no-signal", "refuted", "dead-end", "barrier")
-FORMALIZATIONS = ("wanted", "partial", "not-applicable")
+FORMALIZATIONS = ("wanted", "partial", "kit", "not-applicable")
+FORMALIZATION_LABELS = {"wanted": "wanted", "partial": "partial", "kit": "proved in the kit",
+                        "not-applicable": "not applicable"}
 COMMON_FIELDS = ("title", "category", "problems", "status")
 # The fields each kind of entry may carry beyond COMMON_FIELDS. Git history records who wrote what, and when.
 ENTRY_FIELDS = {
@@ -285,7 +287,7 @@ def render_catalog(categories: list[Category], entries: list[Entry]) -> str:
             for entry in findings:
                 lines.append(
                     f"| {link(entry)} | {STATUS_LABELS[entry.text('status')]} | {problems_label(entry)} "
-                    f"| {entry.text('formalization').replace('-', ' ')} |"
+                    f"| {FORMALIZATION_LABELS[entry.text('formalization')]} |"
                 )
         if negatives:
             lines += ["", "**Negative results**", "", "| Result | Kind | Problems |", "|---|---|---|"]

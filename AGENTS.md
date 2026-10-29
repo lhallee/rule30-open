@@ -12,9 +12,10 @@ This repository works on the three Rule 30 Prize problems in the open. Read [REA
   new axiom; `catalog.py check` refuses them. Prize submissions go through the kit's own checker, `Check.lean`.
 - **Every Lean module has its argument.** A new `Rule30Open/<Category>/<Name>.lean` gets `<Name>.md` beside it, with
   the front matter `catalog.py` checks, and an import in `Rule30Open.lean`.
-- **Check the kit before claiming novelty.** Search the pinned kit
-  (`.lake/packages/rule30prize/lean/Ruliology/CellularAutomata/`) for the result, and set `kit:` to `new` only when it is
-  not there. Read the kit's module docstrings: they summarize its results.
+- **Check the kit before claiming novelty.** Search both parts of the pinned kit, its core Lean
+  (`.lake/packages/rule30prize/lean/Ruliology/CellularAutomata/`) and its Mathlib-based equivalent forms and analogues
+  (`.lake/packages/rule30prize/equivalents/Rule30Equivalents/`), and set `kit:` to `new` only when the result is in
+  neither. Read the kit's module docstrings: they summarize its results.
 - **Record what failed.** An approach that did not work is a negative result in `negative-results/<category>/`, with the
   step where it stopped. Do not delete one because a later idea superseded it; link the two.
 - **Keep claims inside their evidence.** A computation states its range. A heuristic is labeled as one. Numbers in an

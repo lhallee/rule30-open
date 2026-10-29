@@ -42,3 +42,13 @@ repeats them without a new idea for the step where they stopped.
   center column at $p = 0$ and the other columns at the integers, and every pair $(V(p), V(p + 1))$ obeys the sideways
   map, so their closure is an odometer. *Stops at:* no virtual column tested ($p < 2^{16}$, and $\pm 1/3$, $\pm 1/5$,
   $\pm 1/7$, $-1$, $-2/3$) looks eventually periodic, and nothing forces one to.
+
+**In the kit.** The kit's equivalent forms prove 52 of the 54 restatements of Problem 1 that their catalog lists, in Lean
+with Mathlib, as 163 theorems named `problem1_iff_*`: among them irrationality of the column read as a 2-adic or a real
+number, transcendence and the failure of D-finiteness for its generating function, the failure of $\omega$-regularity,
+unbounded Lempel-Ziv and automatic complexity, and a causal fixed point of the two driven halves
+(`CoupledHalves.problem1_iff_coupled_halves`, the exact form behind the strobed form above). They also prove that the
+orbit closure of the right edge's reading is the 2-adic odometer (`Odometer`), as for the virtual columns above
+([the kit's equivalent forms](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/README.md)). Like the items here, each moves the problem without
+closing it.
+

@@ -78,7 +78,8 @@ kit's commit 932cf8d.
   exponential time ([the barrier](negative-results/complexity/problem-three-barrier.md)). Hypotheses about
   satisfiability, settled or not, do not reach it ([the hardness hypotheses](negative-results/complexity/hardness-hypotheses.md)),
   nor does probabilistic checking, and a circuit form of it would give $\mathrm{P} = \mathrm{BPP}$
-  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)).
+  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). Problem 3 implies Problem 1,
+  proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
 - **A shortcut.** *No signal.* Automata, linear recurrences, learned predictors and exact structure searches find none
   ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$
@@ -98,8 +99,10 @@ In order of the assessment above.
    ([the slow-half searches](negative-results/columns/slow-half-search.md)).
 2. **Block exclusions.** Port the two computed-only certificates of [the game blocks](findings/columns/game-blocks.md)
    to Lean, and extend the game past period 14.
-3. **Findings that want a Lean proof.** The 2-adic trace, the center degree, the Duhamel form and the seed's past
-   ([open work](CATALOG.md#open-work)).
+3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the coin lock and
+   the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree and the Duhamel
+   form are proved in the kit's equivalent forms, which a search should include before any formalization
+   (`.lake/packages/rule30prize/equivalents/Rule30Equivalents/`).
 4. **Track the kit and the literature.** Re-pin the kit when it gains modules, after the build, the audit and the tests
    pass, and move an entry's `kit:` relation when the kit gains its result; keep [the literature](literature/README.md)
    current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull

@@ -3,7 +3,7 @@ title: The center column as a sum over adjacent black pairs
 category: structure
 problems: [1, 2, 3]
 status: paper
-formalization: wanted
+formalization: kit
 evidence: [computations/algebra.py]
 ---
 
@@ -26,6 +26,11 @@ with $T_n$, which is symmetric, so the center cell is $T_t(0) + \sum_{s<t} \sum_
 trinomial coefficient $T_t(0)$ is odd for every $t$: mod 2, $(1 + X + X^2)^{2m} = (1 + X^2 + X^4)^m$ and
 $(1 + X + X^2)^{2m+1} = (1 + X^2 + X^4)^m(1 + X + X^2)$, so $T_{2m}(0) \equiv T_{2m+1}(0) \equiv T_m(0)$, and
 $T_0(0) = 1$. That is also why Rule 150 from a single cell has an all-black center column.
+
+## In the kit
+
+The kit's equivalent forms prove the formula in Lean as `center_duhamel`, from Duhamel's formula for whole rows
+(`duhamel`), in [`CenterFormulas`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/CenterFormulas.lean).
 
 ## Computation
 

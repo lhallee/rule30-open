@@ -3,7 +3,7 @@ title: Every right half of up to 20 cells enters the kit's ether-and-wall family
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/absorption.py]
 ---
 

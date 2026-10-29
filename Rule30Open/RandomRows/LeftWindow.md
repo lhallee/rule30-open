@@ -6,7 +6,7 @@ status: proved
 lean: Rule30Open.RandomRows.LeftWindow
 headline: [cone_left_xor, count_centerWindow, centerWindow_unique, count_adapted, count_periodic, seed_window]
 kit: refines
-kit_modules: [Rule30Realization]
+kit_modules: [Rule30Realization, Rule30Equivalents.RandomConfigurations, Rule30Equivalents.AlgebraicDegree]
 ---
 
 # A random left window gives a fair center window, for every row
@@ -96,6 +96,13 @@ The kit's
 proves that for every right half and every column there is exactly one configuration with that right half and that
 column 0 (`column_realizable_unique`), and that a configuration agreeing with the single cell from $-n$ rightward can
 have a center column constant from time $n$ on (`seed_perturbation`). Statement 2 is the finite, counted form of the
-first, for every row rather than every right half; statements 3 and 4, on partial randomization, are not in the kit.
+first, for every row rather than every right half. The kit's equivalent forms prove the measure forms of statements 2
+to 4 for fair coins on every cell: the center column of a random configuration is a sequence of fair coins, also with
+the right half fixed (`measurePreserving_trace`, `measurePreserving_trace_of_flipsLeft`), events $g_0, \dots, g_{m-1}$
+such that flipping one coin flips $g_j$ and no earlier event take any given values with probability $2^{-m}$
+(`measure_triangular`), and the column is almost surely not eventually periodic (`ae_not_eventuallyPeriodic_trace`), in
+[`RandomConfigurations`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/RandomConfigurations.lean); [`AlgebraicDegree`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/AlgebraicDegree.lean) counts the
+rows on $[-n, n]$ with a given center column (`card_trace`). The statements here are the finite counts behind them,
+with every cell outside the freed ones fixed, in core Lean.
 The literature's form of the same fact is that Rule 30, being onto, keeps the uniform measure
 ([measure-and-analogs.md](../../literature/measure-and-analogs.md)).

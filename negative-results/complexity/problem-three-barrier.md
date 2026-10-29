@@ -33,7 +33,9 @@ to find: [automata](automaton-lower-bounds.md), [linear recurrences](linear-comp
 
 **Problem 3 contains Problem 1.** If $c$ were eventually periodic with period $P$, a machine could read the digits of
 $n$ once, compute $n \bmod P$ with a finite automaton, and look up the answer, in $O(\log n)$ steps. That violates every
-version of Problem 3. So Problem 3 is at least as hard as Problem 1.
+version of Problem 3. So Problem 3 is at least as hard as Problem 1. The kit's equivalent forms prove this in Lean,
+for one-tape machines reading the digits of $n$ and for the kit's model-independent statement, through "$c$ is not
+2-automatic" ([`ProblemThree`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/ProblemThree.lean): `problem1_of_problem3Verbal`, `problem1_of_problem3Robust`).
 
 **What would help.** A reduction showing that computing $c$ is hard for exponential time, or a proof that Rule 30's
 center column can simulate arbitrary computation, would turn the question into known separations; neither is in

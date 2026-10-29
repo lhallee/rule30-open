@@ -6,7 +6,7 @@ status: proved
 lean: Rule30Open.Columns.AdjacentColumns
 headline: [adjacent_columns, no_constant_column, center_not_eventually_constant]
 kit: independent
-kit_modules: [Rule30Jen, Rule30Prize]
+kit_modules: [Rule30Jen, Rule30Prize, Rule30FiniteConfigs]
 ---
 
 # No two adjacent columns are eventually periodic
@@ -51,7 +51,9 @@ single-cell form for every column.
 
 The kit proves Jen's theorem for the single cell (`Rule30Jen.not_adjacent`, in
 [`Rule30Jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Jen.lean))
-and that its center column is not eventually constant (`Rule30Prize.center_not_eventually_constant`). These proofs
-are independent and hold in the orbit of every row with a leftmost 1, at every column. The theorem goes back to Jen;
+and that its center column is not eventually constant (`Rule30Prize.center_not_eventually_constant`), and
+[`Rule30FiniteConfigs`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30FiniteConfigs.lean)
+proves both for every configuration with a leftmost black cell (`jen`, `no_column_eventually_constant`). The proofs
+here are independent. The theorem goes back to Jen;
 Kopra (2023, Theorem 3.5) credits it to Jen (1990, Proposition 3), and the kit cites E. Jen, *Global properties of
 cellular automata*, J. Stat. Phys. 43 (1986) 219 to 242.

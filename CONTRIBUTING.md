@@ -40,9 +40,10 @@ is a model. `catalog.py` refuses a front matter field it does not know.
 ## A finding
 
 A file in `findings/<category>/` with `status: paper`, `computed` or `conjecture` and `formalization: wanted`,
-`partial` or `not-applicable`. Give the result first, then the method or proof, then how to reproduce it. A computation
-belongs in [computations/](computations/README.md), runnable as `python -m computations.<module>`, with a test
-in `tests/` that checks it against something independent; list it under `evidence`.
+`partial`, `kit` (the kit proves it in Lean; the entry names the theorems) or `not-applicable`. Give the result first,
+then the method or proof, then how to reproduce it. A computation belongs in [computations/](computations/README.md),
+runnable as `python -m computations.<module>`, with a test in `tests/` that checks it against something independent;
+list it under `evidence`.
 
 ## A negative result
 

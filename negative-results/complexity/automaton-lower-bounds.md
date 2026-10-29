@@ -33,6 +33,9 @@ Cobham's theorem predicts. The 2-kernel of the column also has full rank over GF
 
 **What it means.** Every automaton that computes the first $2^{22}$ cells has at least as many states as the data can
 reveal, exactly as for a cryptographic keystream. It excludes automatic structure, not other fast algorithms: two
-linear feedback shift registers with $O(\log t)$ algorithms give the same maximal bounds.
+linear feedback shift registers with $O(\log t)$ algorithms give the same maximal bounds. The kit's equivalent forms
+prove in Lean that Problem 3 implies that $c$ is not 2-automatic ([`ProblemThree`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/ProblemThree.lean)), and that
+Problem 1 holds exactly when the automatic complexity of the column's prefixes tends to infinity
+([`Automatic`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/Automatic.lean)).
 
 **Evidence.** Quoted from code that is not in this repository.

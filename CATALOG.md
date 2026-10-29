@@ -35,20 +35,17 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
-- [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
-- [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
-- [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md): problem 3
-- [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md): problems 1, 2, 3
 
 **Findings proved in Lean in part**
 
+- [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
 - [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md): problem 1
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
@@ -75,7 +72,7 @@ Initial rows that give exactly the center column of the single black cell.
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
-| [Infinitely many seeds share the center column](Rule30Open/Seeds/SeedExtensions.md) | [`Seeds.SeedExtensions`](Rule30Open/Seeds/SeedExtensions.lean) | `center_sigma`, `center_tau`, `sigma_difference`, `tau_difference`, `center_column` | 1, 2, 3 | not in the kit |
+| [Infinitely many seeds share the center column](Rule30Open/Seeds/SeedExtensions.md) | [`Seeds.SeedExtensions`](Rule30Open/Seeds/SeedExtensions.lean) | `center_sigma`, `center_tau`, `sigma_difference`, `tau_difference`, `center_column` | 1, 2, 3 | independent proof of a kit result |
 
 **Findings**
 
@@ -106,7 +103,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
-| [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | wanted |
+| [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | wanted |
 | [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | wanted |
@@ -175,7 +172,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 |---|---|---|---|
 | [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md) | computed | 1 | wanted |
 | [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md) | proved on paper | 1 | wanted |
-| [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md) | proved on paper | 1 | wanted |
+| [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md) | proved on paper | 1 | proved in the kit |
 
 **Negative results**
 
@@ -226,8 +223,8 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
-| [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md) | proved on paper | 3 | wanted |
-| [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md) | proved on paper | 1, 2, 3 | wanted |
+| [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md) | proved on paper | 3 | proved in the kit |
+| [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md) | proved on paper | 1, 2, 3 | proved in the kit |
 
 **Negative results**
 

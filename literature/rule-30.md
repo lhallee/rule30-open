@@ -24,9 +24,12 @@ source, what it establishes, and where it bears on this repository.
   human-verified.
 - **Wolfram Institute.** [Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit).
   The reference Lean environment for submissions: the official `Problem1` and `Problem2`, three versions of Problem 3
-  for a fixed one-tape machine model, and a library of partial results.
+  for a fixed one-tape machine model, and a library of partial results in core Lean (`lean/`). A second part,
+  `equivalents/`, proves in Lean with Mathlib 52 of 54 catalogued equivalent forms of Problem 1, as 163 theorems named
+  `problem1_iff_*`, equivalent forms of Problem 2, the implication from Problem 3 to Problem 1, and results on random
+  configurations, the algebraic degree of the center cell, Duhamel's formula and the 2-adic frame.
   *Here:* the repository depends on the kit at a pinned commit, and every Lean entry says whether its result is new to
-  the kit.
+  the kit; every finding the kit proves says so (`formalization: kit`).
 - **Google DeepMind.**
   [formal-conjectures: `FormalConjectures/Other/Rule30.lean`](https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Other/Rule30.lean).
   Problems 1 and 2 as open Lean statements, with the first center cells checked by computation; Problem 3 is left out
@@ -104,14 +107,13 @@ None of the following is refereed, and the prize site lists no winner.
   Proves a closed form over $\mathbb{F}_2$ for the single-seed rows of Rule 22 and uses Rule 22 as a symmetric reference
   for Rule 30: the difference in row support sizes is compared with a power law empirically, and a mechanism for the
   apparent randomness of Rule 30's center column is proposed. It claims no result on non-periodicity.
-- **Condrey (2026).** [Finite configurations cannot generate a constant trace in Rule 30](https://arxiv.org/abs/2609.09431).
-  arXiv:2609.09431.
-  For each right half, finds the unique left half that keeps the center column constant, and concludes that no column of
-  a nonzero finite Rule 30 orbit is eventually constant.
-  *Here:* that conclusion is proved in Lean for every row with a leftmost black cell
-  ([the adjacent-column theorem](../Rule30Open/Columns/AdjacentColumns.md), `no_constant_column`), and the kit proves it
-  for the single cell. The same unique left half is the object of [the white right half](../findings/period-two/white-right-half.md)
-  for the alternating center.
+- **Condrey (2026).** [Finite configurations cannot generate a constant trace in Rule
+  30](https://arxiv.org/abs/2609.09431). arXiv:2609.09431. For each right half, finds the unique left half that keeps
+  the center column constant, and concludes that no column of a nonzero finite Rule 30 orbit is eventually constant.
+  *Here:* that conclusion is proved in Lean for every row with a leftmost black cell ([the adjacent-column
+  theorem](../Rule30Open/Columns/AdjacentColumns.md), `no_constant_column`), and the kit proves it for every
+  configuration with a leftmost black cell (`Rule30FiniteConfigs.no_column_eventually_constant`). The same unique left
+  half is the object of [the white right half](../findings/period-two/white-right-half.md) for the alternating center.
 - **Agents on the prize kit (2026).** [Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit), its main
   branch and [pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls).
   After the agents' invitation, the kit's catalog grew from 128 modules on October 26, 2026 to 141 on October 28, with

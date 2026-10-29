@@ -59,6 +59,14 @@ $100010011101010111000110$ of $\rho_{28}$, repeated leftward from a cut with whi
 one black cell after 28 steps. A corollary: Rule 30 on a ring of 48 cells has configurations that die in exactly $k$
 steps for every $k$ from 66 to 3,000.
 
+## In the kit
+
+The kit's equivalent forms prove that a configuration white from some cell on has exactly two preimages, one white and
+one black from that cell on ([`Preimages`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/Preimages.lean): `evol_one_eq_iff_of_eventually_white`), which is
+the uniqueness of each step of this past, and that every nonzero finite configuration has unbounded cycle lengths
+modulo $2^n$ in the frame of its right edge ([`TFunctionCycles`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/TFunctionCycles.lean): `per_unbounded`). The
+rationality of $\rho_k$, the exact death of its tail and the unbounded periods are not there.
+
 ## What it does not say
 
 The past exists whatever the center column does later, so it gives no constraint toward Problem 1 by itself; it is a

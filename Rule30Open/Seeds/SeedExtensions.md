@@ -5,7 +5,8 @@ problems: [1, 2, 3]
 status: proved
 lean: Rule30Open.Seeds.SeedExtensions
 headline: [center_sigma, center_tau, sigma_difference, tau_difference, center_column]
-kit: new
+kit: independent
+kit_modules: [Rule30Equivalents.TransformsSeeds]
 ---
 
 # Infinitely many seeds share the center column
@@ -66,3 +67,12 @@ there and nowhere else. The kit's open statement `EdgeObservable`
 ([`Rule30TraceEdge`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30TraceEdge.lean))
 asks that finite rows with equal center columns have equal left edges; these seeds all share the left edge at 0, as it
 requires.
+
+## Relation to the kit
+
+The kit's equivalent forms prove the same families as its stripe seeds $s_n$, black at the even cells of $[0, n)$ and
+at $n$, so that $s_{2k} = \sigma_k$ and $s_{2k+1} = \tau_k$: their center column is the single cell's
+(`stripeSeed_center`), with the whole pattern drawn explicitly (`evol_stripeSeed`), in
+[`TransformsSeeds`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/TransformsSeeds.lean). That proof uses Mathlib; the one here is independent, in core Lean,
+and also locates every cell where the rows differ from the single cell's.
+

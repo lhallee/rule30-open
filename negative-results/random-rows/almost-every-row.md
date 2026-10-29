@@ -61,6 +61,13 @@ So none of these models yields a counterexample: the events a counterexample nee
 results secure the prize statements for typical rows and leave the single cell where it was. A proof has to use a
 property that the single cell has and that the rows accumulating at it lack: its left edge, as in Jen's theorem
 ([AdjacentColumns.md](../../Rule30Open/Columns/AdjacentColumns.md)), or a structure such as the ether family on the
-right. The finite counts are proved in Lean; the limits and the decision-tree bound are the standard arguments written
-out above. For the related route through hypotheses about satisfiability, see
-[the complexity entry](../complexity/hardness-hypotheses.md).
+right. The finite counts are proved in Lean here. The kit's equivalent forms prove the limits in Lean for fair coins on
+every cell, or on every cell left of the center beside a fixed right half: the center column is then normal, of density
+1/2 and not eventually periodic, almost surely
+([`RandomConfigurations`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/RandomConfigurations.lean):
+`ae_isNormal_trace`, `ae_not_eventuallyPeriodic_trace`, `ae_isNormal_trace_glue`), and they prove the decision-tree
+bound
+([`QueryComplexity`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/QueryComplexity.lean):
+`le_depth_of_eval_eq`). The case of a sparse infinite set of free depths, the other cells fixed, is the standard
+argument written out above. For the related route through hypotheses about satisfiability, see [the complexity
+entry](../complexity/hardness-hypotheses.md).

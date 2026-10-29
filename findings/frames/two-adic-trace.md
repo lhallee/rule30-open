@@ -3,7 +3,7 @@ title: The center column is the image of 1 under a 2-adic isometry
 category: frames
 problems: [1]
 status: paper
-formalization: wanted
+formalization: kit
 evidence: [computations/frames.py]
 ---
 
@@ -33,6 +33,16 @@ Problem 1 says that $\Psi(1)$ is irrational, that is, its bits are not eventuall
 - For a finite row, a positive integer $a$ in this frame, $\Psi(a)$ is the column at the frame's position, which lies
   at or right of its rightmost black cell. So "no column of a finite row at or right of its rightmost black cell is
   eventually periodic" is "$\Psi$ maps no positive integer to a rational number".
+
+## In the kit
+
+The kit's equivalent forms prove the statement at every finite level, which is its content. For an invertible
+T-function such as $\Phi$, two seeds that first differ at bit $m$ have readouts, bit $t$ of $\Phi^t$ of the seed, that
+first differ at time $m$, and every readout prefix of length $m$ comes from a seed below $2^m$
+([`TFunctionCycles`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/TFunctionCycles.lean): `eq_of_diagonal_eq` and `exists_diagonal_prefix`, with offset $d = 0$).
+$\Phi$ itself is a bijective isometry of the 2-adic sequences ([`Odometer`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/Odometer.lean): `G_bijective`,
+`agree_G_iff`), and Problem 1 says that the center column, read as a 2-adic integer, is no fraction with odd
+denominator ([`TwoAdic`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/TwoAdic.lean): `problem1_iff_no_odd_fraction`).
 
 ## Checks
 
