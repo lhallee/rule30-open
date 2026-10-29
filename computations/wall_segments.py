@@ -155,6 +155,42 @@ def windows_after_ones(ones: int, width: int = 3) -> frozenset[Window]:
     return frozenset(out)
 
 
+def shield_known_steps(j: int) -> int:
+    """The first step at which three-valued Rule 30, started from the shield (0 1)^j that 9 j 1s leave with every
+    cell beyond unknown, can lose the cell right of the column, over every column it may read (Lean: `shield_agree`
+    proves that it does not before step 4 j)."""
+    start = tuple([i % 2 for i in range(2 * j)] + [None] * 2)
+    frontier = {start}
+    for s in range(1, 8 * j + 4):
+        nxt = set()
+        for cells in frontier:
+            for col in (0, 1):
+                nxt.add(tuple(t_xor(col if i == 0 else cells[i - 1],
+                                    t_or(cells[i], cells[i + 1] if i + 1 < len(cells) else None))
+                              for i in range(len(cells))))
+        frontier = nxt
+        if any(cells[0] is None for cells in frontier):
+            return s
+    return -1
+
+
+def shield_brute(j: int, steps: int) -> bool:
+    """Whether the true cell right of the column at each step below `steps` is the same for every choice of the cells
+    beyond the shield (0 1)^j, for every column of `steps` values: brute force, independent of the three values."""
+    beyond = steps + 1
+    for col in itertools.product((0, 1), repeat=steps):
+        seen: list[set[int]] = [set() for _ in range(steps)]
+        for bits in itertools.product((0, 1), repeat=beyond):
+            cells = [i % 2 for i in range(2 * j)] + list(bits)
+            for s in range(steps):
+                seen[s].add(cells[0])
+                ext = [col[s]] + cells + [0]
+                cells = [ext[i - 1] ^ (ext[i] | ext[i + 1]) for i in range(1, len(ext) - 1)]
+        if any(len(values) > 1 for values in seen):
+            return False
+    return True
+
+
 def necklaces(period: int) -> list[str]:
     """The primitive binary necklaces of length `period`, each as its least rotation."""
     out = []

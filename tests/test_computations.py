@@ -1143,3 +1143,14 @@ def test_windows_after_ones() -> None:
     assert wall_segments.windows_after_ones(9) == wall_segments.wall_windows(3)
     assert wall_segments.windows_after_ones(8) == frozenset({(0, 1, 0), (0, 1, 1), (1, 0, 0)})
     assert all(len({w[0] for w in wall_segments.windows_after_ones(ones)}) == 2 for ones in range(1, 9))
+
+
+def test_shield() -> None:
+    """The shield of `WideWall`: brute force over every column and every cell beyond the shield (0 1)^j finds the cell
+    right of the column the same for 4 j steps, for j = 1 and 2, and the three-valued run first loses it at step 4 j
+    for j up to 6."""
+    from computations import wall_segments
+    for j in (1, 2):
+        assert wall_segments.shield_brute(j, 4 * j)
+    for j in range(1, 7):
+        assert wall_segments.shield_known_steps(j) == 4 * j
