@@ -432,3 +432,40 @@ def test_sparse_right() -> None:
         times = absorption.absorb(word, absorption.packed(cells), phase, 1400, wall, g + 300)  # (n,)
         assert ((times >= 0) & (times <= np.array(listed))).all(), (word, phase)
 
+
+def test_ether_prefix_data() -> None:
+    """The certificates in `EtherPrefix`, read from its source: 16 tail words for each word, alignment and phase, each
+    with B + 7 <= 64. Sampled truncations, driven as integer rows one step at a time, are in the family at the listed
+    step: a short one at the listed depth through some alignment, one of 100 to 400 cells through its own alignment at
+    the base's depth plus the ether columns added in front, checked column by column (`etherPrefix_0001` and the
+    others)."""
+    from computations import absorption, ether_prefix
+    wall = absorption.kit_wall()  # (4, 2^13)
+    source = module("Columns/EtherPrefix")
+    data = {(word, int(j0), int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+            for word, j0, phase, body in re.findall(r"def tails(\d{4})_(\d)_(\d) : List Nat := \[([^\]]*)\]", source)}
+    assert len(data) == 24
+
+    def in_family(word: str, alignments: list[tuple[int, int]], row: int, phase: int, k: int) -> bool:
+        return any((j0 + k) % 7 == 2 and wall[(phase + shift) % 4][(row >> k) & 0x1FFF]
+                   and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, phase + shift) for p in range(1, k + 1))
+                   for j0, shift in alignments)
+
+    rng = np.random.default_rng(34)
+    for (word, j0, phase), numbers in data.items():
+        shift = dict(absorption.ALIGNMENTS[word])[j0]
+        psi = (phase + shift) % 4
+        assert len(numbers) == 16
+        for tail in rng.choice(16, size=2, replace=False).tolist():
+            b, direct, bases = ether_prefix.decode(numbers[tail])
+            assert b + 7 <= 64
+            samples = [(length, *direct[length], absorption.ALIGNMENTS[word])
+                       for length in rng.choice(max(b, 1), size=min(2, b), replace=False).tolist()]
+            for length in rng.integers(100, 400, 2).tolist():
+                t, k = bases[(length - b) % 7]
+                samples.append((length, t, k + length - b - (length - b) % 7, [(j0, shift)]))
+            for length, t, k, alignments in samples:
+                row = ether_prefix.prefix_half(j0, psi, length, tail)
+                for s in range(t):
+                    row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
+                assert in_family(word, alignments, row, (t + phase) % 4, k), (word, j0, phase, tail, length)

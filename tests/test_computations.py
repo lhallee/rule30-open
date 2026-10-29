@@ -10,7 +10,7 @@ from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
                           left_diagonals, linear_complexity, lock_certificate, periodic_columns, right_half,
-                          sensitivity, slow_halves, sparse_halves)
+                          sensitivity, slow_halves, sparse_halves, ether_prefix)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -780,6 +780,42 @@ def test_sparse_halves() -> None:
             row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
         assert least_depth_slow(word, row, (t + phase) % 4, wall) == k
     assert sparse_halves.bound(certs) == 623
+
+
+def test_ether_prefix() -> None:
+    """The truncated-ether certificates: packing round-trips; for sampled alignments, phases and tails, each direct entry
+    is the first step at which integer rows stepped one at a time meet the family, at the least depth there, checked
+    column by column; each base meets it through its own alignment with column 1 the ether's before; and seven more
+    ether columns in front give the same step at seven columns more depth, for two more blocks."""
+    rng = np.random.default_rng(33)
+    entries = [(int(t), int(k)) for t, k in zip(rng.integers(0, 2000, 20), rng.integers(0, 64, 20))]
+    assert ether_prefix.decode(ether_prefix.encode(13, entries[:13], entries[13:])) == (13, entries[:13], entries[13:])
+    wall = absorption.kit_wall()  # (4, 2^13)
+
+    def stepped(word: str, phase: int, row: int, t: int) -> int:
+        for s in range(t):
+            row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
+        return row
+
+    def own_depth(word: str, j0: int, shift: int, row: int, phase: int) -> int:
+        psi = (phase + shift) % 4
+        ks = [k for k in range(200) if (j0 + k) % 7 == 2 and wall[psi][(row >> k) & 0x1FFF]
+              and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, psi) for p in range(1, k + 1))]
+        return min(ks, default=-1)
+
+    for word, j0, shift, phase, tail in (("0001", 5, 0, 3, 0), ("0011", 1, 3, 0, 5), ("0111", 2, 2, 1, 11)):
+        psi = (phase + shift) % 4
+        b, direct, bases = ether_prefix.certificate(word, j0, shift, phase, tail)
+        for length, (t, k) in enumerate(direct):
+            row = ether_prefix.prefix_half(j0, psi, length, tail)
+            assert all(least_depth_slow(word, stepped(word, phase, row, s), (s + phase) % 4, wall) < 0 for s in range(t))
+            assert least_depth_slow(word, stepped(word, phase, row, t), (t + phase) % 4, wall) == k
+        for i, (t, k) in enumerate(bases):
+            for extra in range(3):
+                row = ether_prefix.prefix_half(j0, psi, b + i + 7 * extra, tail)
+                for s in range(t):
+                    assert (stepped(word, phase, row, s) & 1) == absorption.ether(j0 + 1, (s + psi) % 4)
+                assert own_depth(word, j0, shift, stepped(word, phase, row, t), (t + phase) % 4) == k + 7 * extra
 
 
 def lean_states(name: str) -> set[tuple[int, int]]:

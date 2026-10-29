@@ -63,10 +63,11 @@ from phase $\varphi$.
 
 A finite right half that never enters the family, if one exists, has at least three black cells among cells
 $1, \dots, G$ (statement 4), a black cell among cells $7, \dots, B$ and one among cells $1, \dots, 30$
-([WhiteGap](WhiteGap.md)). The case split proves more than statement 4: a half whose first two black cells are $p_1$ and
-$p_2$ enters whenever its third lies beyond $t' + k' + 13$ for that pair, and the bound $G$ is the largest of these.
-Three black cells by the same route would need a kernel check of each triple whose third cell lies below the bound
-of its pair: 186,395 halves for $0001$ at phase 0, 476,314 for $0011$ at phase 1 and 32,219 for $0111$ at phase 2,
+([WhiteGap](WhiteGap.md)), and is no truncation of the aligned ether followed by at most four cells
+([EtherPrefix](EtherPrefix.md)). The case split proves more than statement 4: a half whose first two black cells are
+$p_1$ and $p_2$ enters whenever its third lies beyond $t' + k' + 13$ for that pair, and the bound $G$ is the largest of
+these. Three black cells by the same route would need a kernel check of each triple whose third cell lies below the
+bound of its pair: 186,395 halves for $0001$ at phase 0, 476,314 for $0011$ at phase 1 and 32,219 for $0111$ at phase 2,
 against 23,509 pairs for all twelve words and phases together.
 
 ## Relation to the kit

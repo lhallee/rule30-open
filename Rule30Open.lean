@@ -14,6 +14,7 @@ public import Rule30Open.Columns.EtherDomain
 public import Rule30Open.Columns.EmptyRight
 public import Rule30Open.Columns.WhiteGap
 public import Rule30Open.Columns.SparseRight
+public import Rule30Open.Columns.EtherPrefix
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.Diagonals.LeftMemory
