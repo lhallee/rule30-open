@@ -69,3 +69,7 @@ would refute. Nothing found here suggests such a speedup exists.
 **What would change this.** A reduction to $c$, with input size linear in $m$, from a problem hard for exponential
 time (Problem 3 follows), or a reduction of $c(n)$ to a formula with $O(\log n)$ variables (with a $2^{o(N)}$
 algorithm, Problem 3 fails).
+
+The recent complexity results that do apply to the center column directly are the space simulations: tree evaluation
+computes $c(n)$ in space $O(\sqrt{n} \log n)$, and by Paterson's theorem a space lower bound larger than order
+$\sqrt{n}$ would give the kit's Problem 3 ([the space ladder](../../findings/complexity/space-ladder.md)).

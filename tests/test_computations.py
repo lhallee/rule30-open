@@ -883,6 +883,36 @@ def test_period_three() -> None:
     assert periods.tolist() == [14]
 
 
+def test_t001_entries() -> None:
+    """Entry into the kit's trap t001, read from its source: the white half enters at step 1,270, 1,269 or 1,268 by
+    phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state; integer rows stepped one at a time stay
+    in the trap for 300 steps after entry with random cells beyond column 47, as the trap's closure requires; and
+    `periodic_extent` agrees with the same rows, covering the trap's 38 periodic columns once the white half is in."""
+    keys = set(period_three.trap_keys().tolist())
+    assert len(keys) == 815
+    assert period_three.trap_entries([0], 0, 2000, period_three.trap_keys()).tolist() == [1270]
+    assert period_three.trap_entries([0, 0], 1, 2000, period_three.trap_keys()).tolist() == [1269, 1269]
+    assert period_three.trap_entries([0], 2, 2000, period_three.trap_keys()).tolist() == [1268]
+    rng = np.random.default_rng(42)
+    mask = (1 << period_three.TRAP_WIDTH) - 1
+    row = 0
+    for t in range(1270):
+        row = ((row << 1) | int("001"[t % 3])) ^ (row | (row >> 1))
+    for trial in range(3):
+        noisy = (row & mask) | (int(rng.integers(0, 1 << 62)) << period_three.TRAP_WIDTH)
+        for t in range(1270, 1570):
+            assert ((noisy & mask) * 4 + t % 3) in keys, (trial, t)
+            noisy = ((noisy << 1) | int("001"[t % 3])) ^ (noisy | (noisy >> 1))
+    history = [0]
+    for t in range(2000):
+        history.append(((history[-1] << 1) | int("001"[t % 3])) ^ (history[-1] | (history[-1] >> 1)))
+    for t in (500, 2000):
+        repeats = [all((history[t] >> p) & 1 == (history[t - 21 * k] >> p) & 1 for k in range(1, 6)) for p in range(128)]
+        extent = repeats.index(False) if False in repeats else 128
+        assert period_three.periodic_extent(0, 0, t + 1, [t]) == [extent]
+    assert extent >= 38  # the trap's 38 columns of period 21
+
+
 def lean_states(name: str) -> set[tuple[int, int]]:
     """The (phase, strip) pairs of the list `name` in the kit's `Rule30Ether.lean`, the strip's first cell at bit 0."""
     source = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30Ether.lean"
