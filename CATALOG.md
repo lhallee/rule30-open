@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-23 Lean modules with 107 headline theorems, 18 findings (proved on paper,
+23 Lean modules with 107 headline theorems, 19 findings (proved on paper,
 computed or conjectured) and 26 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 2 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 0 | 0 | 5 |
+| [Complexity](#complexity) | 0 | 1 | 5 |
 
 ## Open work
 
@@ -38,6 +38,7 @@ approach stopped.
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
+- [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
@@ -280,6 +281,12 @@ Whether trained predictors find a shortcut for the center column.
 ## Complexity
 
 Prize Problem 3, and what an answer either way would imply.
+
+**Findings**
+
+| Result | Status | Problems | Formalization |
+|---|---|---|---|
+| [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | wanted |
 
 **Negative results**
 

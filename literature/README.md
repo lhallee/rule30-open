@@ -39,12 +39,13 @@ periodic. The evidence for density 1/2 is statistical: the first million cells c
 billion published, and test batteries that find no deviation.
 
 **Problem 3.** Only upper bounds are known: about $n^2$ cell updates by direct simulation, $O(n^2/\log n)$ for whole
-rows, and $O(n)$ operations on a random-access machine with bitwise operations. Problem 3 implies Problem 1, proved in
-Lean in the kit's equivalent forms. No lower bound is known for Rule 30 or
-for any comparable explicit function. Predicting Rule 110 is P-complete; natural proofs bar many circuit techniques if
-Rule 30 behaves as a pseudorandom generator; and Rule 30's orbits compute every Boolean function of up to five
-variables, short of the universality a reduction would need. The October 2026 claims of a proof of the Unique Games
-Conjecture and of 3-SAT in time $2^{o(n)}$ would change none of this
+rows, $O(n)$ operations on a random-access machine with bitwise operations, and space $O(\sqrt{n} \log n)$ by tree
+evaluation (Cook and Mertz 2024, on the kit's block tree). By Paterson's theorem (1972), a space lower bound larger than
+order $\sqrt{n}$ would give the kit's formal Problem 3. Problem 3 implies Problem 1, proved in Lean in the kit's
+equivalent forms. No lower bound is known for Rule 30 or for any comparable explicit function. Predicting Rule 110 is
+P-complete; natural proofs bar many circuit techniques if Rule 30 behaves as a pseudorandom generator; and Rule 30's
+orbits compute every Boolean function of up to five variables, short of the universality a reduction would need. The
+October 2026 claims of a proof of the Unique Games Conjecture and of 3-SAT in time $2^{o(n)}$ would change none of this
 ([the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md)).
 
 ## Leads not yet checked

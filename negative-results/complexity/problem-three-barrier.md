@@ -27,6 +27,11 @@ $n^{o(1)}$ (`Problem3Robust`, the only model-independent one).
   on one tape, gives only $\sqrt{n}$ on several tapes. A random-access machine with unit-cost bitwise operations
   computes $c(n)$ in $O(n)$ operations, as bit $n$ of $\Phi^n(1)$ with $\Phi(x) = x \oplus (2x \lor 4x)$.
 
+**In space it is the same question.** By Paterson's theorem a one-tape machine that runs in time $C(n + 1)$ can be
+replaced by one that uses space $O(\sqrt{n})$, so `Problem3` follows if $c$ needs more space than that, and tree
+evaluation computes $c$ in space $O(\sqrt{n} \log n)$ ([the space ladder](../../findings/complexity/space-ladder.md)).
+No space lower bound beyond a constant is known for $c$; even that one would say that $c$ is not 2-automatic.
+
 **Why a negative answer needs hidden structure.** It needs an explicit fast algorithm, which every search here failed
 to find: [automata](automaton-lower-bounds.md), [linear recurrences](linear-complexity.md),
 [learned predictors](../learned-models/digits-to-cell.md) and [exact structure searches](../structure/linear-relations.md).

@@ -71,13 +71,27 @@ any natural function in exponential time (see the barrier entry).
   arXiv:1601.02771.
   Answers the Hartmanis-Stearns question for restricted machines: multistack machines, deterministic pushdown automata,
   which cannot produce such expansions, and tag machines.
+- **Paterson (1972).** [Tape bounds for time-bounded Turing machines](https://doi.org/10.1016/S0022-0000(72)80017-5).
+  *Journal of Computer and System Sciences* 6(2), 116 to 124; the record and abstract were checked through catalog
+  entries, the text was not read.
+  A language recognized by a one-tape machine, even a nondeterministic one, in time $T(n) \ge n^2$ is recognized by a
+  deterministic machine in space $T(n)^{1/2}$. One tape is the kit's model for Problem 3.
+  *Here:* [the space ladder](../findings/complexity/space-ladder.md): the kit's `Problem3` follows if the center
+  column needs space larger than order $\sqrt{n}$.
 - **Hopcroft, Paul and Valiant (1977).** [On time versus space](https://doi.org/10.1145/322003.322015).
   *Journal of the ACM* 24(2), 332 to 337.
   Multitape time $t$ can be simulated in space about $t / \log t$.
+- **Cook and Mertz (2024).** [Tree evaluation is in space O(log n · log log n)](https://doi.org/10.1145/3618260.3649664).
+  STOC 2024, 1268 to 1278; ECCC TR23-174.
+  Evaluates a tree of fixed fan-in, height $h$ and $b$-bit nodes in space about $(h + b) \log b$, below the
+  $h \cdot b$ of storing a path of values.
+  *Here:* the kit's `Rule30LightCone` cuts the spacetime diagram into a tree of this shape, which puts the center
+  cell at time $n$ in space $O(\sqrt{n} \log n)$ ([the space ladder](../findings/complexity/space-ladder.md)).
 - **Williams (2025).** [Simulating time with square-root space](https://arxiv.org/abs/2502.17779). arXiv:2502.17779,
   STOC 2025.
-  Improves the simulation to space about $\sqrt{t \log t}$, the current frame for any time-space argument about the
-  center column.
+  Improves the simulation to space about $\sqrt{t \log t}$, through Cook and Mertz's algorithm. For the center
+  column the direct tree is better: simulation takes multitape time of order $n^2$, which this turns into space of
+  order $n \sqrt{\log n}$.
 - **Razborov and Rudich (1997).** [Natural proofs](https://doi.org/10.1006/jcss.1997.1494).
   *Journal of Computer and System Sciences* 55(1), 24 to 35.
   Most known circuit lower-bound proofs are natural, and natural proofs cannot give superpolynomial circuit lower bounds
