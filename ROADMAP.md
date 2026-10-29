@@ -21,7 +21,9 @@ kit's commit 932cf8d.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
   specific repeating blocks: 76 of the 2,538 blocks of period at most 14 ([game blocks](findings/columns/game-blocks.md)),
   every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially many white cells (the kit). Any eventual
-  period needs $T + P \ge 16{,}359$ (the kit). Each block needs its own certificate, and most blocks do not lock the
+  period needs $T + P \ge 16{,}359$ (the kit). Open pull requests to the kit claim every eventual period whose white
+  runs are all at least 17, and four more families of blocks with long white runs
+  ([the kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Each block needs its own certificate, and most blocks do not lock the
   right half ([locking](findings/columns/period-four-locking.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
@@ -39,6 +41,10 @@ kit's commit 932cf8d.
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,
   and no finite certificate exists in the forms tried ([no certificate](negative-results/period-two/no-finite-certificate.md)).
+  The ether-and-wall family cannot give period two: the white right half never enters it, by computation here
+  ([the absorption route](negative-results/period-two/absorption-route.md)) and by a Lean proof claimed in the kit's
+  pull request #39. Other pull requests work on the gate, from which the kit reconstructs the one candidate left row
+  ([the kit's pull requests](literature/kit-pull-requests.md#period-two)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
@@ -92,4 +98,5 @@ In order of the assessment above.
    ([open work](CATALOG.md#open-work)).
 4. **Track the kit and the literature.** Re-pin the kit when it gains modules, after the build, the audit and the tests
    pass, and move an entry's `kit:` relation when the kit gains its result; keep [the literature](literature/README.md)
-   current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)).
+   current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull
+   requests ([kit-pull-requests.md](literature/kit-pull-requests.md)) until each is merged or closed.

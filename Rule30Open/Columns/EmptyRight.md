@@ -80,7 +80,9 @@ white right half and a word of period four, that left half is periodic from dept
 ether or a row that becomes one within 10 steps.
 
 The statements concern configurations whose right half is small when the repetition starts. They say nothing about the
-single seed's orbit, whose right half at time $T$ has $T$ cells.
+single seed's orbit, whose right half at time $T$ has $T$ cells. The kit's open pull request #17 claims the white right
+half for the same four words by another proof (`Rule30CoupledEmptyRight`;
+[the kit's pull requests](../../literature/kit-pull-requests.md)).
 
 ## Lean
 

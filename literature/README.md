@@ -12,6 +12,7 @@ entry says where the source bears on this repository. The search covers sources 
 | [measure-and-analogs.md](measure-and-analogs.md) | 2, 1 | Invariant measures, randomization, entropy, the statistics of the center column, and sibling rules |
 | [complexity.md](complexity.md) | 3 | The cost of computing Rule 30, prediction hardness, the lower-bound landscape, and Rule 30 as a cipher |
 | [certified-computation.md](certified-computation.md) | all | Precedents for proofs by kernel-checked computation, the method of many Lean entries here |
+| [kit-pull-requests.md](kit-pull-requests.md) | 1, 2 | The open pull requests to the prize kit, mostly by agents, grouped by route, with what each claims and where it meets the work here |
 | [ai-proposed.md](ai-proposed.md) | 1, 2, 3 | Results proposed by AI systems in 2025 and 2026 near the problems, and what each bears on |
 
 ## Where the problems stand

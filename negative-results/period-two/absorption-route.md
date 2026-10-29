@@ -22,6 +22,10 @@ the other 97% stay out for the whole run. The white right half stays out for 20,
 words of period four, by contrast, the fraction still outside falls by a steady factor every 100 steps; here it stays
 at 0.97 from step 100 to step 400 and beyond.
 
+The kit's open pull request #39 claims a Lean proof that the white right half never enters, in every alignment
+(`not_absorption_alt`), so `Absorption` is false for the alternating word
+([the kit's pull requests](../../literature/kit-pull-requests.md#period-two)).
+
 **Why.** Column 1 beside an alternating center nearly locks into a pattern of period 36 and keeps slipping, about once
 per 145 steps ([the right channel](../../findings/period-two/right-channel.md)). Inside the family column 1 would repeat
 at the white times, which the slips never allow, so the family is out of reach for almost every start. The halves that

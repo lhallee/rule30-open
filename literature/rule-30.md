@@ -120,11 +120,11 @@ None of the following is refereed, and the prize site lists no winner.
   every window width), `Rule30ArbitraryWhitePadding` and `Rule30WhitePaddingMixtures` (a center column cannot
   eventually repeat a block followed by enough white cells, with a threshold exponential in the block's length),
   `Rule30AgedLeftDiagonals`, `Rule30FrozenRuler` and `Rule30EdgeStaircases` (structure near the two edges of the
-  pattern), `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. Open pull requests claim more; for example
-  #46 bounds runs of the center column starting at time $a$ by $5L + 18\,\ell(a) \le 3a + 51$ for black runs and
-  $L + 6\,\ell(a) \le a + 17$ for white ones, with $\ell(a) = \lfloor \log_2 \log_2 a \rfloor$, and attributes the
-  black slope $3/5$ to an earlier prize submission. The kit's own status table puts least period 4 at its open
-  `Absorption`, period 2 at the open Q01, and any eventual period at $T + P \ge 16{,}359$.
+  pattern), `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. Its 21 open pull requests claim more,
+  among them a Lean proof that the ether-and-wall family cannot give period two (#39), exclusions of every eventual
+  period whose white runs are all long (#36, #43), and $\log\log$ margins for runs of the center column (#46); they
+  are summarized, by route, in [kit-pull-requests.md](kit-pull-requests.md). The kit's own status table puts least
+  period 4 at its open `Absorption`, period 2 at the open Q01, and any eventual period at $T + P \ge 16{,}359$.
   *Here:* the repository is pinned at the kit's commit 932cf8d, so the merged modules count as kit results; an open
   pull request counts as a claim. [The roadmap](../ROADMAP.md) tracks where they meet the routes here.
 - Faster simulation of the whole pattern, and Boolean functions computed by Rule 30's orbits, are in
