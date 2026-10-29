@@ -58,6 +58,13 @@ $T^{2/5}$ up to logarithmic factors is correct ([family
 137](../../literature/ai-proposed.md#openais-manuscript-collection), unrefereed), a lower bound of $n^{2/5}$ times a
 power of $\log n$ would already give `Problem3`, a polynomial factor below the upper bound.
 
+The gap between $\sqrt{n}$ and $\sqrt{n} \log n$ is the gap in tree evaluation itself. Whether tree evaluation runs in
+logarithmic space, which for these trees means space $O(h + b)$, is open, and Cook and Mertz's algorithm is within a
+factor $\log b$ of it. If it does, the center column is computed in space $O(n / b + b) = O(\sqrt{n})$, and this route
+to Problem 3 cannot work. Conversely, a proof that the center column needs space larger than order $\sqrt{n}$ would show
+that tree evaluation on the trees of Rule 30's spacetime diagram needs more than logarithmic space, a lower bound that is
+not known for any explicit family of trees outside restricted models.
+
 This is a reformulation, not progress toward either problem. Even the weakest space lower bound, that $c$ needs more
 than constant space, says that $c$ is not 2-automatic, which is open and implies Problem 1 by the kit. No technique
 gives a space lower bound of this kind for an explicit function, for the reasons that block time lower bounds ([the
