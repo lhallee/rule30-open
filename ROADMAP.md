@@ -63,7 +63,9 @@ kit's commit 932cf8d.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
   problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
   ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,
-  and no finite certificate exists in the forms tried ([no certificate](negative-results/period-two/no-finite-certificate.md)).
+  against the white right half no left half within depth 32,754 keeps the center alternating, in Lean
+  ([WhiteRightHalf](Rule30Open/PeriodTwo/WhiteRightHalf.md), the kit's milestone `CQ01Empty` for those widths), and no
+  finite certificate exists in the forms tried ([no certificate](negative-results/period-two/no-finite-certificate.md)).
   The ether-and-wall family cannot give period two: the white right half never enters it, by computation here
   ([the absorption route](negative-results/period-two/absorption-route.md)) and by a Lean proof claimed in the kit's
   pull request #39. Other pull requests work on the gate, from which the kit reconstructs the one candidate left row

@@ -3,7 +3,7 @@ title: Against a white right half, no left half of fewer than a million cells ke
 category: period-two
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/coupled.py]
 ---
 
@@ -16,6 +16,10 @@ Exactly one left half, finite or not, does so, and computing it to depth $2^{20}
 than 1,048,573 cells loses the alternation within 21 steps past its width. That left half has density 1/2 and white
 runs no longer than a random sequence has, so this is evidence for the milestone, not a proof. For every right half of
 at most 14 cells the same holds for left halves of fewer than 4,079 cells, within 26 steps.
+
+In Lean, [WhiteRightHalf](../../Rule30Open/PeriodTwo/WhiteRightHalf.md) computes $\Psi(\emptyset)$ to depth 32,768
+in the kernel: every configuration with a white right half and a left half within depth 32,754 leaves the alternation
+$1, 0, 1, \dots$ within 13 steps past its width.
 
 ## The one candidate
 

@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-29 Lean modules with 139 headline theorems, 20 findings (proved on paper,
+30 Lean modules with 143 headline theorems, 20 findings (proved on paper,
 computed or conjectured) and 27 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -13,7 +13,7 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 19 | 7 | 4 |
-| [Period two](#period-two) | 2 | 4 | 3 |
+| [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
@@ -40,7 +40,6 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
-- [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
 
 **Findings proved in Lean in part**
 
@@ -52,6 +51,7 @@ approach stopped.
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
 - [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md): problem 1
+- [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
 - [No other right extension up to 40 cells keeps the center column](findings/seeds/no-other-extensions.md): problems 1, 2, 3
 
 ## Foundations
@@ -141,6 +141,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 |---|---|---|---|---|
 | [The alternating domains time the period-two condition](Rule30Open/PeriodTwo/Domains.md) | [`PeriodTwo.Domains`](Rule30Open/PeriodTwo/Domains.lean) | `held_domains_odd`, `held_countdown`, `held_disagree`, `held_agree_stepB` | 1 | independent proof of a kit result |
 | [Period two reduces to an integer map](Rule30Open/PeriodTwo/HeldColumn.md) | [`PeriodTwo.HeldColumn`](Rule30Open/PeriodTwo/HeldColumn.lean) | `period_two_held`, `period_two_integer`, `center_period_two_integer`, `heldNat_testBit` | 1 | independent proof of a kit result |
+| [Against a white right half, no left half within depth 32,755 keeps the center alternating](Rule30Open/PeriodTwo/WhiteRightHalf.md) | [`PeriodTwo.WhiteRightHalf`](Rule30Open/PeriodTwo/WhiteRightHalf.lean) | `white_right_leaves`, `psi_empty_gaps`, `leaves_by_gap`, `psiBits_spec` | 1 | extends a kit result |
 
 **Findings**
 
@@ -149,7 +150,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md) | computed | 1 | wanted |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
-| [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | wanted |
+| [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | partial |
 
 **Negative results**
 

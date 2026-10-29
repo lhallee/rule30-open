@@ -645,3 +645,18 @@ def test_wall_sets_lean() -> None:
     for a, b in ((0, 136), (136, 34), (34, 168), (168, 34)):
         name = "wall0" if a == 0 else str(a)
         assert f"theorem sstep_{name} : sstep false {a if a else 'wall3'} = {b} := by decide" in source
+
+
+def test_white_right_half() -> None:
+    """The literals of `WhiteRightHalf`, read from its source: `yBits` and `psiBitsLit` are `coupled.white_literals`,
+    and `psiBitsLit` is `Psi empty` as `coupled.psi` rebuilds it beside the alternating center rather than the white
+    wall; its white runs at depths up to 32,768 are at most 12, so every window of 13 depths beyond W < 32,755 holds a
+    black cell, as `gaps_eq` checks."""
+    from computations import coupled
+    source = module("PeriodTwo/WhiteRightHalf")
+    y = int(re.search(r"def yBits : Nat :=\n  0x([0-9a-f]+)\n", source).group(1), 16)
+    p = int(re.search(r"def psiBitsLit : Nat :=\n  0x([0-9a-f]+)\n", source).group(1), 16)
+    assert (y, p) == coupled.white_literals(32768)
+    assert p >> 1 == coupled.psi("10", 0, 0, 32768)
+    assert "theorem gaps_eq : gapsCheck psiBitsLit 32768 13 32755 = true := by decide +kernel" in source
+    assert max(length for length, _ in coupled.white_runs(p >> 1, 32768)) == 12

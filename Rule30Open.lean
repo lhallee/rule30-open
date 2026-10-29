@@ -25,6 +25,7 @@ public import Rule30Open.Columns.LeftHalf0001
 public import Rule30Open.Columns.LeftHalfDriven
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
+public import Rule30Open.PeriodTwo.WhiteRightHalf
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent

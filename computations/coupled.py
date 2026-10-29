@@ -58,6 +58,19 @@ def psi(word: str, phase: int, right: int, depth: int) -> int:
     return row
 
 
+def white_literals(depth: int) -> tuple[int, int]:
+    """The numbers that `Rule30Open.PeriodTwo.WhiteRightHalf` checks: column -1 of the row that keeps the center
+    alternating against the white right half at times 0 .. depth - 1 (`yLoop`), and that row at depths 1 .. depth as
+    bits 1 .. depth (`psiLoop`), rebuilt column by column beside a white wall."""
+    column = drive_column("10", 0, 0, depth)  # column 1, bit t being time t
+    y = sum(1 << t for t in range(depth) if t % 2 == 0 or not (column >> t) & 1)
+    prev, cur, bits = 0, y, 0
+    for k in range(1, depth + 1):
+        bits |= (cur & 1) << k
+        prev, cur = cur, (cur >> 1) ^ (cur | prev)
+    return y, bits
+
+
 def white_runs(row: int, depth: int) -> list[tuple[int, int]]:
     """The record white runs of a row read from depth 1 outward, as (length, first depth), among the runs that end in
     a black cell at depth at most `depth`."""
