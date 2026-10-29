@@ -133,8 +133,13 @@ In order of the assessment above.
    find ([the slow-half searches](negative-results/columns/slow-half-search.md)). *Assessment:* each class is thin; a
    proof for every finite half needs an argument that the chaotic part near the center delivers a wall, which none of
    these gives.
-2. **Block exclusions.** Port the seven computed-only certificates of [the game blocks](findings/columns/game-blocks.md)
-   to Lean, which needs a denser form for games of 12 to 14 cells, and extend the game past period 16.
+2. **Block exclusions.** Blocks with nine 1s in a row now have a uniform argument
+   ([WallSets](Rule30Open/Columns/WallSets.md)), which matches the game on every such block to period 16. The open
+   cases are blocks without a long run of 1s: port the seven computed-only certificates of [the game
+   blocks](findings/columns/game-blocks.md), none of which has nine 1s in a row, to Lean, which needs a denser form
+   for games of 12 to 14 cells; extend the game past period 16; and look for a wall after other runs, since a long run
+   of 0s fixes nothing near the column by itself. *Assessment:* every family found so far rests on long runs, and a
+   typical block of large period has only short ones, so these exclusions stay thin.
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the coin lock and
    the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree and the Duhamel
    form are proved in the kit's equivalent forms, which a search should include before any formalization
