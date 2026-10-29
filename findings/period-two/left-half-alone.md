@@ -42,6 +42,6 @@ bit-sliced search.
 ## Relation to the kit
 
 The kit proves the same statement in Lean for every start of width at most 52, as its statement Q01
-([`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)).
+([`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)).
 The new information here is the location of the latest failure, which grows linearly with the width: every finite
 search moves the bound, and none reaches every integer.

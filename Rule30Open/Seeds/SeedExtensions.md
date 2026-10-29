@@ -63,6 +63,6 @@ These seeds are the only right extensions of the single cell up to 40 cells that
 [the extension search](../../findings/seeds/no-other-extensions.md)). They also bound what a proof can use: any argument
 that reconstructs the row from its center column has to lose everything right of the center, since these seeds differ
 there and nowhere else. The kit's open statement `EdgeObservable`
-([`Rule30TraceEdge`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30TraceEdge.lean))
+([`Rule30TraceEdge`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30TraceEdge.lean))
 asks that finite rows with equal center columns have equal left edges; these seeds all share the left edge at 0, as it
 requires.

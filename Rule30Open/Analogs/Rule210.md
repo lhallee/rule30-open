@@ -52,6 +52,6 @@ steps from the single 1 by `decide`.
 ## Relation to the kit
 
 The kit's
-[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
+[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
 shows a related barrier from the single cell: under Rules 90, 150 and 210 its center column is eventually constant.
 Both results say that the properties Rule 30 shares with these rules cannot prove Problem 1 alone.

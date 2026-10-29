@@ -6,7 +6,7 @@ defaultTargets = ["Rule30Open"]
 [[require]]
 name = "rule30prize"
 git = "https://github.com/WolframInstitute/Rule30PrizeKit"
-rev = "7d665044b904117af9e82328aeb90a30692b2b85"
+rev = "932cf8dde039b89b1dcbe9636867bb1b2057fef0"
 subDir = "lean"
 
 [[lean_lib]]

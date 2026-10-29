@@ -33,7 +33,7 @@ invariance is then checked again by enumeration: $2^W$ windows, 4 phases, 2 beyo
 - **Jen**: column 1 takes a fixed value at each white phase (where $w$ reads 0), nothing else. The certificate is the
   union over all such assignments; a union of invariant families is invariant, and a run that enters one assignment's
   family stays in it. This is exactly what masked Jen
-  ([`Rule30MaskedJen.masked_jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean))
+  ([`Rule30MaskedJen.masked_jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean))
   needs: `cell (t + P) 1 = cell t 1` at every white time $t \ge T$, whatever the values.
 
 ## The certificates
@@ -133,7 +133,7 @@ window with a free beyond cell does not force entry, so attraction needs informa
 ## What the kit has
 
 The kit's
-[`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Ether.lean)
+[`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Ether.lean)
 holds certificates of this kind for all three words, as one family: ether columns ending in a $B_3$ column, followed
 by one of 109 states of a 13-cell wall that is closed under every beyond cell. The core certificate of $0001$ at
 $W = 16$ above is the family's member with three ether columns, $B_1 B_2 B_3$, and a larger wall, the greatest closed
@@ -144,10 +144,10 @@ allows an ether prefix of any length. The kit states entry for every finite righ
 enters.
 
 The kit's bitmask strip certificates
-([`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean))
+([`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean))
 run the strip forward from all states with a free beyond cell and ask column 1 to be constant at the white phases on
 the closure, which is entry and invariance together. For the period-four words,
-[`Rule30PeriodFourSkeleton`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean)
+[`Rule30PeriodFourSkeleton`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean)
 proves, if the center is eventually $w^\infty$, that the strip eventually stays in an exempt class where column 1 at
 the white times is not periodic, and reduces least period 4 to open statements `C3 w` about the left half. The sets
 here are the complementary object: windows from which the lock is certain. If every finite right half entered one, the

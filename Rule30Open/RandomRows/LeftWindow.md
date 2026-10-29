@@ -92,7 +92,7 @@ counts after statement 2 are counts of words, stated in the text and not in Lean
 ## Relation to the kit
 
 The kit's
-[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
+[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
 proves that for every right half and every column there is exactly one configuration with that right half and that
 column 0 (`column_realizable_unique`), and that a configuration agreeing with the single cell from $-n$ rightward can
 have a center column constant from time $n$ on (`seed_perturbation`). Statement 2 is the finite, counted form of the

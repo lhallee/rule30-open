@@ -55,5 +55,5 @@ next to the column reads 0 at steps 2, 3, 10 and 11.
 ## Relation to the kit
 
 Not in the kit. The kit's
-[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
+[`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
 treats Rule 150 from the single cell, where the center column is constant.

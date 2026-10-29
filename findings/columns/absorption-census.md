@@ -10,7 +10,7 @@ evidence: [computations/absorption.py]
 # Every right half of up to 20 cells enters the kit's ether-and-wall family
 
 The kit reduces least period 4 for the center column to one open statement per word,
-[`Rule30Ether.Absorption`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Ether.lean):
+[`Rule30Ether.Absorption`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Ether.lean):
 every finitely supported right half, driven by a center that repeats $0001$, $0011$ or $0111$ from any phase,
 eventually enters the ether-and-wall family, a set of states that the driven rule never leaves and on which masked Jen
 gives a contradiction (`least_period_four_of_absorption`). For each of the three words and each of the four phases,
@@ -87,7 +87,7 @@ sees. The first column off the ether moves toward the center by 10 to 14 columns
 stops at the wall: a disturbance on the right does not eat into the ether. For the ether of period three the kit
 proves the opposite, that a finite perturbation always eats into it, at an average speed of at least 2/5 column per
 step once in its wake
-([`Rule30EtherThreeErosion`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30EtherThreeErosion.lean)),
+([`Rule30EtherThreeErosion`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30EtherThreeErosion.lean)),
 which is why no wall exists there. So for period four, absorption comes down to an ether segment forming next to the
 center at all; holding it is quick.
 

@@ -53,7 +53,7 @@ the lock from its own states. What it does not certify is that every right half 
 ## Why it would matter
 
 The kit's masked form of Jen's theorem
-([`Rule30MaskedJen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean),
+([`Rule30MaskedJen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean),
 `masked_jen`) says that if the center column has period $P$ from some time, column 1 does not have period $P$ at the
 white times of the center. The single cell's right half at any time is finite. So a proof that every finite right half
 locks under $w$ excludes $w$ as the center's eventual period, and doing so for the three words above excludes least

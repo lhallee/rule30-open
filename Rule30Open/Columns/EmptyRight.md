@@ -16,7 +16,7 @@ No configuration with finitely many black cells whose cells right of column 6 ar
 repeats $0001$, $0011$ or $0111$ from time 0, in any phase and whatever its left half holds (`smallRight_0001`,
 `smallRight_0011`, `smallRight_0111`). With a white right half the same holds for $001$ (`emptyRight_001`). The white
 right half is the first case of the coupled question for a word, and for period two it is the kit's milestone
-[`Rule30PeriodTwoSideways.CQ01Empty`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodTwoSideways.lean),
+[`Rule30PeriodTwoSideways.CQ01Empty`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodTwoSideways.lean),
 which is open; for these four words it is settled here, and for the words of period four so are the 63 other right
 halves of at most six cells.
 

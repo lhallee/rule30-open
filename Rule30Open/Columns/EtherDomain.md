@@ -105,9 +105,9 @@ $T_1$ and the check's bound $T_2$. `held_etherLeft_small` checks the ether's `he
 ## Relation to the kit
 
 The kit reduces least period 4 to the open statements `C3 w` about the left half driven by the effective boundary
-([`Rule30PeriodFourSkeleton`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean),
+([`Rule30PeriodFourSkeleton`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean),
 `least_period_four_of_C3`), and to the open absorption of the right half into its ether-and-wall traps
-([`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Ether.lean)).
+([`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Ether.lean)).
 This module restates `C3 0001`, with the kit's check on the free bit added, as a condition on the integer map of
 period 2, and shows that the ether that the kit uses on the right half is also the infinite solution on the left. The
 kit has the reduction and the ether; the integer form, the ether's left half as a `held` orbit, the countdown and the

@@ -10,7 +10,7 @@ evidence: [computations/coupled.py]
 # Against a white right half, no left half of fewer than a million cells keeps the center alternating
 
 The kit's open milestone for period two,
-[`Rule30PeriodTwoSideways.CQ01Empty`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodTwoSideways.lean),
+[`Rule30PeriodTwoSideways.CQ01Empty`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodTwoSideways.lean),
 asks that no finite configuration whose cells right of the center are white keeps its center alternating from time 0.
 Exactly one left half, finite or not, does so, and computing it to depth $2^{20}$ shows that every left half of fewer
 than 1,048,573 cells loses the alternation within 21 steps past its width. That left half has density 1/2 and white

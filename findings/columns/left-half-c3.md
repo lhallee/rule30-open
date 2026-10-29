@@ -10,7 +10,7 @@ evidence: [computations/held_map.py]
 # No left half of up to 80 cells meets the kit's C3 for a period-four word
 
 The kit reduces least period 4 to three open statements about the left half alone,
-[`Rule30PeriodFourSkeleton.C3`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean)
+[`Rule30PeriodFourSkeleton.C3`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodFourSkeleton.lean)
 for $w = 0001$, $0011$ and $0111$ (`least_period_four_of_C3`). For each word and each of the four phases, no left half
 of at most 80 cells keeps the kit's pattern from time 0. For $0001$ with the right half's check, the integer condition
 of [EtherDomain.md](../../Rule30Open/Columns/EtherDomain.md), no positive integer below $2^{140}$ meets it. The search

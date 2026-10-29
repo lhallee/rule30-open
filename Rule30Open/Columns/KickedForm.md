@@ -57,8 +57,8 @@ cells after rewriting with the definition of `evolve`.
 ## Relation to the kit
 
 For the single cell's center column the kit has the same identity as `Rule30MaskedJen.effective_step` in
-[`Rule30MaskedJen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean):
+[`Rule30MaskedJen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30MaskedJen.lean):
 the left half sees the center only through $c_t \land c_{t+1}$. The golden condition is the kit's
 `Rule30PeriodTwo.golden`
-([`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)).
+([`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)).
 This module extends both to every column of every row.

@@ -65,7 +65,7 @@ analysis on a few Boolean values; the inductions run over the time offset from $
 ## Relation to the kit
 
 The kit's
-[`Rule30Diagonals`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Diagonals.lean)
+[`Rule30Diagonals`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Diagonals.lean)
 proves that every left diagonal is eventually periodic with period dividing $2^j$ (`D_periodic`). This module explains
 where the periods grow. Where the white diagonals actually fall below depth 100,000 is computed in
 [the left records finding](../../findings/diagonals/left-records.md). Wolfram's depths are in

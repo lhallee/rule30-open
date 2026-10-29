@@ -28,6 +28,13 @@ at unit variance of $g$, read against coin-flip rows and fitted on the earlier h
   left side, and fitted on the earlier half they rise about 20-fold on the later half: cancellations fitted to the
   sample, not laws.
 
-**What it means.** Problem 2 cannot come from an additive invariant of this kind.
+**What it means.** Problem 2 cannot come from an additive invariant of this kind. The kit now proves the
+four-step form for every window width:
+[`Rule30LocalConservation`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30LocalConservation.lean)
+shows that every integer density conserved over four steps is a constant plus a shift coboundary, and
+[`Rule30ProductParity`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30ProductParity.lean)
+the same for parities of products of cells. A law conserved at every step is conserved over four, so the laws the
+searches over all rows looked for are now excluded in Lean at every window width; the searches along the single cell's
+orbit and the near-invariants remain computations.
 
 **Evidence.** Quoted from code that is not in this repository.

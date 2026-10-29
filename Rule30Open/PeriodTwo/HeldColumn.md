@@ -54,7 +54,7 @@ of 1 begins $1, 3, 6, 13, 25, 55, 100, 222$, odd at steps 1, 3 and 5 and even at
 ## Relation to the kit
 
 The kit's
-[`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)
+[`Rule30PeriodTwo`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30PeriodTwo.lean)
 reaches the same question for the single cell, as its statement Q01 on the zero-driven left half, and proves it for
 every start of width at most 52. This reduction is independent and holds at every column of every row with a leftmost
 1. What is known about the map is in [Domains.md](Domains.md) and in

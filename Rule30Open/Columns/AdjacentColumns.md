@@ -50,7 +50,7 @@ single-cell form for every column.
 ## Relation to the kit
 
 The kit proves Jen's theorem for the single cell (`Rule30Jen.not_adjacent`, in
-[`Rule30Jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Jen.lean))
+[`Rule30Jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Jen.lean))
 and that its center column is not eventually constant (`Rule30Prize.center_not_eventually_constant`). These proofs
 are independent and hold in the orbit of every row with a leftmost 1, at every column. The theorem goes back to Jen;
 Kopra (2023, Theorem 3.5) credits it to Jen (1990, Proposition 3), and the kit cites E. Jen, *Global properties of

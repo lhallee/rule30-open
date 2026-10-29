@@ -59,7 +59,7 @@ cannot is the open problem; computation finds that it never does for small halve
 ## Relation to the kit
 
 The kit's
-[`Rule30ZeroBoundaryStripe`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30ZeroBoundaryStripe.lean)
+[`Rule30ZeroBoundaryStripe`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30ZeroBoundaryStripe.lean)
 proves that the stripe $A$ is a fixed point of the zero-boundary dynamics and that the first deviation from it moves
 one depth toward the wall per step. Those facts are proved here independently; the domain $B$, the valuation reading
 and the two-step erosion of $B$ are additions.

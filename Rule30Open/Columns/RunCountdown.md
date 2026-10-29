@@ -61,7 +61,7 @@ time 3 the cells left of it read $0\,1$ and then not 0. `single_no_ones` is the 
 ## Relation to the kit
 
 The kit's
-[`Rule30CenterRuns`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30CenterRuns.lean)
+[`Rule30CenterRuns`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30CenterRuns.lean)
 bounds a black run of the single cell's center column that starts at time $a$ by $a$. For the center of the single
 cell, $d = s$, so `run_bound` gives the same bound for runs of odd length and one 2 weaker for runs of even length;
 what it adds is the exact countdown and its validity at every column of every row.

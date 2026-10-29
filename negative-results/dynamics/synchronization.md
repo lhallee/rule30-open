@@ -23,7 +23,7 @@ next to a periodic center a function of the drive alone, a finite-state object a
   ([the locking finding](../../findings/columns/period-four-locking.md)).
 - **Near misses.** Long coincidences between two left halves under one center (agreeing for 144 and 202 steps) always
   separate again; none is a counterexample to the kit's open statement `EdgeObservable`
-  ([`Rule30TraceEdge`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30TraceEdge.lean)).
+  ([`Rule30TraceEdge`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30TraceEdge.lean)).
 
 **What it means.** The half next to a periodic center keeps information about its start indefinitely, so no reduction
 to one universal system per word is available.

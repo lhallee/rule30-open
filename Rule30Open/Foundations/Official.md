@@ -40,4 +40,4 @@ that has a headline result about the center column restates it with `Rule30Prize
 ## Relation to the kit
 
 This module only connects the two vocabularies. The official statements live in the kit's
-[`Rule30Prize`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Prize.lean).
+[`Rule30Prize`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Prize.lean).

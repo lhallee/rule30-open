@@ -9,7 +9,7 @@ kind: barrier
 # Problem 3 asks for a lower bound beyond current complexity theory
 
 **The statement.** The kit's
-[`Rule30Problem3`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Problem3.lean)
+[`Rule30Problem3`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Problem3.lean)
 gives three versions, each implying the next, for a one-tape machine that reads the binary digits of $n$: no machine
 computes $c(n)$ within $C(n + 1)$ steps (`Problem3`), none in time $o(n)$ (`Problem3Verbal`), and none in time
 $n^{o(1)}$ (`Problem3Robust`, the only model-independent one).

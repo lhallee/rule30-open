@@ -54,7 +54,7 @@ cells involved and, for the edge, induction on $t$.
 ## Relation to the kit
 
 The kit's
-[`Rule30Jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Jen.lean)
+[`Rule30Jen`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Jen.lean)
 defines Rule 30 for the single black cell only and uses left permutivity inside its proof of Jen's theorem. This
 module states the same one-step facts for every starting row. [Official.md](Official.md) proves that the two
 definitions agree on the single cell.

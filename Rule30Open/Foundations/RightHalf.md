@@ -46,6 +46,6 @@ at times $t, \dots, t + m - 1$. The window statements compare these lists with `
 ## Relation to the kit
 
 The kit's
-[`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean)
+[`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean)
 proves the same light-cone fact for strips of cells encoded as bit masks (`enc_step`), for its strip certificates. This
 module proves it independently, on lists.

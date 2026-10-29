@@ -53,7 +53,7 @@ transfers it to real rows with `drive_cells`. `single_long_runs` is the single-c
 ## Relation to the kit
 
 The kit's
-[`Rule30BlackRuns`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30BlackRuns.lean)
+[`Rule30BlackRuns`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30BlackRuns.lean)
 proves the same nine-black shield for the single cell's center column, with consequences such as
 `not_eventually_zero_ones` ($01^k$, $k \ge 9$) and `no_white_run_11`. This proof is independent and covers every
 column of every row with a leftmost 1.

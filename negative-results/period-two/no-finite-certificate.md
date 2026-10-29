@@ -22,7 +22,7 @@ something uniform: an invariant, a finite certificate, or a descent. Each kind t
 - **Linear parity checks.** Over 14 free cells the only GF(2) parity checks every constrained half satisfies are
   $y_1 = 1$ and $y_2 + y_3 = 1$; no window of 10 cells beyond them carries one.
 - **Renormalization.** The kit's eight-column identity
-  ([`Rule30SpacingRenormalization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30SpacingRenormalization.lean))
+  ([`Rule30SpacingRenormalization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30SpacingRenormalization.lean))
   turns a solution of width $W$ with a spaced gate into one of width $W - 8$ with the gate $G'(r) = G(r + 2) \oplus
   G(r + 4)$. It holds for the gates the right half actually produces, but $G'$ is never spaced again, so the descent
   stops after one step; and no second renormalization column exists up to depth 300 in either phase, or for any

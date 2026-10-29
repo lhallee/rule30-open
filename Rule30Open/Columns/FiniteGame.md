@@ -65,7 +65,7 @@ every column of the single cell's orbit.
 ## Relation to the kit
 
 The kit excludes both blocks with certificates of its own:
-[`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean)
+[`Rule30StripCertificates`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30StripCertificates.lean)
 has `not_eventually_01111111` (a bit-mask strip certificate of width 5) and `not_eventually_00000011` (a rank
 certificate of width 6 with 379 ranks). The kit reads column 1 at the white times of the center and applies masked
 Jen; this game reads column $k - 1$ at every time and applies the adjacent-column theorem, and it covers every column

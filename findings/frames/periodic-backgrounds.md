@@ -26,7 +26,7 @@ Over 2,048 steps, with the column's second half tested for periods up to 64:
 | $0000111$, $0011111$ | 8 |
 
 The five period-7 words are the ether family. The kit's
-[`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/7d665044b904117af9e82328aeb90a30692b2b85/lean/Ruliology/CellularAutomata/Rule30Ether.lean)
+[`Rule30Ether`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Ether.lean)
 studies this background; next to the center its boundary layer, columns 1 to 8, has period 8 and absorbs the chaos to
 its right.
 
