@@ -1,5 +1,5 @@
 ---
-title: After nine 1s the next cell stays known through five kinds of segment, which excludes infinite families of periods
+title: After nine 1s the next cell stays known through five kinds of segment, excluding infinite families of periods
 category: columns
 problems: [1]
 status: proved
@@ -10,7 +10,7 @@ kit_modules: [Rule30BlackRuns, Rule30BlackRunBlocks]
 evidence: [computations/wall_segments.py]
 ---
 
-# After nine 1s the next cell stays known through five kinds of segment, which excludes infinite families of periods
+# After nine 1s the next cell stays known through five kinds of segment, excluding infinite families of periods
 
 [The long-runs theorem](LongRuns.md) excludes every eventual period whose runs of 1s all last at least nine steps:
 nine 1s in a column fix the two cells right of it at 0 1, and a run of 0s then keeps the first of them at 1. This

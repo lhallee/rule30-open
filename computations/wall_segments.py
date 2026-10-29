@@ -76,8 +76,8 @@ def brute_segment(segment: str) -> bool:
 
 
 def in_family(block: str) -> bool:
-    """Whether some phase of `block`, read cyclically, follows nine 1s, and from there the state, reset to the wall after
-    every nine 1s, knows the cell right of the column at every 0 of one period (Lean: `wallGood`)."""
+    """Whether some phase of `block`, read cyclically, follows nine 1s, and from there the state, reset to the wall
+    after every nine 1s, knows the cell right of the column at every 0 of one period (Lean: `wallGood`)."""
     period = len(block)
     col = [int(c) for c in block]
     resets = [i for i in range(period) if all(col[(i - 1 - j) % period] for j in range(9))]  # nine 1s before phase i
@@ -125,7 +125,8 @@ def main() -> None:
         family = [b for b in blocks if in_family(b)]
         kit = [b for b in family if long_runs(b)]
         total, runs = total + len(family), runs + len(kit)
-        print(f"period {period}: {len(family)} blocks in the family, {len(kit)} with every run of 1s at least nine long")
+        print(f"period {period}: {len(family)} blocks in the family, {len(kit)} with every run of 1s at least nine "
+              f"long")
     print(f"up to period {args.max_period}: {total} blocks, {total - runs} beyond the black-runs family")
     if args.game:
         from computations import game
