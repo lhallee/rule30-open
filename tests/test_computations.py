@@ -399,6 +399,27 @@ def test_game_masks() -> None:
         assert all(game.bad_pairs(pattern, width) == 0 for width in range(least, 12))
 
 
+def test_game_masks_long() -> None:
+    """The 97 certificates in GameBlocksLong.lean are `lean_mask` at the least width, at most 9, of blocks of period 15
+    or 16 that the kit does not exclude, `gameBlocks16` lists the same blocks, and sampled certificates pass the check in
+    plain Python and fail it with their values cleared."""
+    lean = (ROOT / "Rule30Open" / "Columns" / "GameBlocksLong.lean").read_text(encoding="utf-8")
+    masks = re.findall(r"def mask([01]+) : GameMask where\n  block := wordOf (\d+) 0b\1\n  width := (\d+)", lean)
+    listed = re.findall(r"\((\d+), 0b([01]+)\)", lean.split("def gameBlocks16", 1)[1].split("\n\n", 1)[0])
+    assert len(masks) == 97 and [(n, p) for p, n, _ in masks] == listed
+    kit = game.kit_blocks(16)
+    rng = np.random.default_rng(45)
+    sampled = set(rng.choice(len(masks), size=10, replace=False).tolist())
+    for i, (pattern, n, width) in enumerate(masks):
+        width = int(width)
+        assert int(n) == len(pattern) in (15, 16) and pattern == game.least_rotation(pattern) and pattern not in kit
+        assert game.least_width(pattern) == width <= 9
+        assert game.lean_mask(pattern, width) in lean, pattern
+        if i in sampled:
+            mask = game.game_mask(pattern, width)
+            assert mask_ok(pattern, width, mask) and not mask_ok(pattern, width, {**mask, "values": 0}), pattern
+
+
 def test_step_is_rule_30() -> None:
     """The integer step is Wolfram's code 30 on every neighborhood: neighborhood 4l + 2c + r maps to bit 4l + 2c + r
     of 30."""

@@ -19,7 +19,7 @@ kit's commit 932cf8d.
   ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). The kit proves that Rules 90, 150 and 210 share every
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
-  specific repeating blocks: 76 of the 2,538 blocks of period at most 14 ([game
+  specific repeating blocks: 197 of the 8,800 blocks of period at most 16, 129 of the 136 beyond the kit in Lean ([game
   blocks](findings/columns/game-blocks.md)), every $1\,0^q$ with $q \ge 9$, and every block followed by exponentially
   many white cells (the kit). Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536
   cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every

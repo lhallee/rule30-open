@@ -48,13 +48,13 @@ Let column $k$ follow $w$ of length $P$ from time $T$, so $a_t(k) = w_{(t + s) \
 ## How the certificates are found
 
 [computations/game.py](../../computations/game.py) builds the game graph and its strongly connected components. A play
-ends inside one component, and only components with an internal move can hold a play forever. If in each of those
-column $k - 1$ is a function of the phase, ranking nodes by their component's depth in the condensation, with the
-components that can hold a play kept apart, gives a certificate. The block $01111111$ has one at $K = 5$ and
-$00000011$ at $K = 6$. The construction fails for $01$ at every width tried: some component that can hold a play
-shows column $k - 1$ taking both values at one phase. Over every primitive block of period up to 14 the game excludes
-76 of 2,538 (see [the game blocks finding](../../findings/columns/game-blocks.md)), and
-[the game in bit masks](GameBlocks.md) checks 32 of them that the kit does not exclude.
+ends inside one component, and only components with an internal move can hold a play forever. If in each of those column
+$k - 1$ is a function of the phase, ranking nodes by their component's depth in the condensation, with the components
+that can hold a play kept apart, gives a certificate. The block $01111111$ has one at $K = 5$ and $00000011$ at $K = 6$.
+The construction fails for $01$ at every width tried: some component that can hold a play shows column $k - 1$ taking
+both values at one phase. Over every primitive block of period up to 16 the game excludes 197 of 8,800 (see [the game
+blocks finding](../../findings/columns/game-blocks.md)), and [the game in bit masks](GameBlocks.md) and [its
+sequel](GameBlocksLong.md) check 129 of them that the kit does not exclude.
 
 ## In Lean
 

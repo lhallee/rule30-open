@@ -7,7 +7,7 @@ and tqdm, and run on a laptop.
 | Module | Reproduces | Command | Time |
 |---|---|---|---|
 | [rule30.py](rule30.py) | The center column and small spacetime diagrams | (library) | |
-| [game.py](game.py) | [The finite game](../Rule30Open/Columns/FiniteGame.md)'s certificates and [their bit-mask form](../Rule30Open/Columns/GameBlocks.md), [the 76 excluded blocks](../findings/columns/game-blocks.md) with the 34 the kit lacks, and [Jen's theorem on farther columns](../negative-results/columns/jen-farther-columns.md) | `python -m computations.game --max-period 14` | 2.5 min |
+| [game.py](game.py) | [The finite game](../Rule30Open/Columns/FiniteGame.md)'s certificates and [their bit-mask form](../Rule30Open/Columns/GameBlocks.md) ([to period 16](../Rule30Open/Columns/GameBlocksLong.md)), [the 197 excluded blocks](../findings/columns/game-blocks.md) with the 136 the kit lacks, and [Jen's theorem on farther columns](../negative-results/columns/jen-farther-columns.md) | `python -m computations.game --max-period 16` | 20 min |
 | [right_half.py](right_half.py) | [Period-four locking](../findings/columns/period-four-locking.md) and [the right channel](../findings/period-two/right-channel.md) | `python -m computations.right_half 12000 30 --max-period 7` | 15 s |
 | [lock_certificate.py](lock_certificate.py) | [The period-four certificate](../findings/columns/period-four-certificate.md) | `python -m computations.lock_certificate 0001 --widths 14 16 --steps 20000` | 5 s |
 | [coin_lock.py](coin_lock.py) | [A fair coin beyond the period-four certificate](../findings/columns/coin-lock.md) | `python -m computations.coin_lock 0001 0011 0111 --widths 14 16 18` | 17 s |

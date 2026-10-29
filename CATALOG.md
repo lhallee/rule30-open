@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-24 Lean modules with 117 headline theorems, 19 findings (proved on paper,
+25 Lean modules with 119 headline theorems, 19 findings (proved on paper,
 computed or conjectured) and 27 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 14 | 6 | 4 |
+| [Columns](#columns) | 15 | 6 | 4 |
 | [Period two](#period-two) | 2 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -46,7 +46,7 @@ approach stopped.
 **Findings proved in Lean in part**
 
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
-- [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md): problem 1
+- [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md): problem 1
 - [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
@@ -95,6 +95,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Every truncation of the aligned ether, followed by a short word, enters the ether-and-wall family](Rule30Open/Columns/EtherPrefix.md) | [`Columns.EtherPrefix`](Rule30Open/Columns/EtherPrefix.lean) | `shift7_drv`, `shift7_family`, `prefix_absorption`, `etherPrefix_0001`, `etherPrefix_0011`, `etherPrefix_0111`, `prefixRight_0001`, `prefixRight_0011`, `prefixRight_0111` | 1 | extends a kit result |
 | [A finite game rules out repeating blocks](Rule30Open/Columns/FiniteGame.md) | [`Columns.FiniteGame`](Rule30Open/Columns/FiniteGame.lean) | `game_column`, `center_not_01111111`, `center_not_00000011` | 1 | independent proof of a kit result |
 | [The finite game, checked in bit masks, excludes 32 more blocks of period at most 14](Rule30Open/Columns/GameBlocks.md) | [`Columns.GameBlocks`](Rule30Open/Columns/GameBlocks.lean) | `mask_column`, `center_not_gameBlocks`, `not_eventually_gameBlocks` | 1 | not in the kit |
+| [The finite game, checked in bit masks, excludes 97 more blocks of period 15 and 16](Rule30Open/Columns/GameBlocksLong.md) | [`Columns.GameBlocksLong`](Rule30Open/Columns/GameBlocksLong.lean) | `center_not_gameBlocks16`, `not_eventually_gameBlocks16` | 1 | not in the kit |
 | [A right half white on its first 1,317 cells enters the kit's trap for 001](Rule30Open/Columns/HighThree.md) | [`Columns.HighThree`](Rule30Open/Columns/HighThree.lean) | `highRight3_of_entry`, `highRight_001` | 1 | extends a kit result |
 | [The kicked form of the left half](Rule30Open/Columns/KickedForm.md) | [`Columns.KickedForm`](Rule30Open/Columns/KickedForm.lean) | `left_kicked_zero`, `left_kicked_succ`, `left_kicked_check`, `period_two_golden` | 1 | extends a kit result |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
@@ -110,7 +111,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|---|
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | wanted |
-| [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md) | computed | 1 | partial |
+| [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | wanted |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |

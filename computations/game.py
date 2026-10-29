@@ -17,6 +17,7 @@ game needs and with the number of nodes there; `lean_mask` writes the certificat
     python -m computations.game --max-period 14 --widths 6,10,14   # which primitive blocks the game excludes
     python -m computations.game --max-period 12 --widths 6,10 --jen   # what Jen's theorem on farther columns adds
     python -m computations.game --max-period 14 --widths 6,10,14 --kit   # which of those are new to the kit
+    python -m computations.game --max-period 16 --widths 6,10,14 --kit   # the same to period 16, about 20 minutes
 """
 
 from __future__ import annotations

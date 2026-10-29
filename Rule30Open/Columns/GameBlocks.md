@@ -12,10 +12,11 @@ evidence: [computations/game.py]
 
 # The finite game, checked in bit masks, excludes 32 more blocks of period at most 14
 
-The center column of the single cell does not eventually repeat any of the 32 blocks below, from any time on and in
-any rotation (`center_not_gameBlocks`). More generally, no column of the orbit of a row with a leftmost 1 does
-(`mask_column`). The kit excludes none of these blocks. They are 32 of the 34 blocks of period at most 14 that
-[the finite game](FiniteGame.md) excludes beyond the kit; the other two need certificates too large for the build.
+The center column of the single cell does not eventually repeat any of the 32 blocks below, from any time on and in any
+rotation (`center_not_gameBlocks`). More generally, no column of the orbit of a row with a leftmost 1 does
+(`mask_column`). The kit excludes none of these blocks. They are 32 of the 34 blocks of period at most 14 that [the
+finite game](FiniteGame.md) excludes beyond the kit; the other two need certificates too large for the build.
+[GameBlocksLong](GameBlocksLong.md) adds 97 blocks of period 15 and 16.
 
 ## Statement
 

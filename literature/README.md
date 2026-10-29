@@ -21,7 +21,7 @@ entry says where the source bears on this repository. The search covers sources 
 and no column is eventually constant, for every row with a leftmost black cell (the kit, and independently here; claimed
 for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 catalogued restatements of Problem 1 in
 Lean, none of which has led to a proof. Specific eventual periods are excluded by certificates: between the kit and this
-repository, 75 of the 2,538 primitive blocks of period at most 14 are excluded in Lean and 2 more by computation, and
+repository, 191 of the 8,800 primitive blocks of period at most 16 are excluded in Lean and 7 more by computation, and
 the kit also excludes families of padded words and shows that an eventual period $P$ after a transient $T$ needs
 $T + P \ge 16{,}359$, which a window of 65,536 cells raises to 65,518 here. The general theory of single columns reaches
 pairs of columns and special classes of automata, not one column of one orbit: Kopra (2023) puts Rule 30 in a class

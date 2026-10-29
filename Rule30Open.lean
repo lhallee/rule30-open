@@ -8,6 +8,7 @@ public import Rule30Open.Columns.AdjacentColumns
 public import Rule30Open.Columns.LongRuns
 public import Rule30Open.Columns.FiniteGame
 public import Rule30Open.Columns.GameBlocks
+public import Rule30Open.Columns.GameBlocksLong
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.EtherDomain
