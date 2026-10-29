@@ -9,8 +9,8 @@ import pytest
 from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
-                          left_diagonals, linear_complexity, lock_certificate, long_window, periodic_columns,
-                          right_half, sensitivity, slow_halves, sparse_halves, ether_prefix)
+                          left_diagonals, linear_complexity, lock_certificate, long_window, period_three,
+                          periodic_columns, right_half, sensitivity, slow_halves, sparse_halves, ether_prefix)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -851,6 +851,36 @@ def test_long_window() -> None:
         earlier = {cells[j:j + size] for j in range(start)}
         assert (cells[start:] not in earlier) == new, size
     assert length == 19
+
+
+def test_period_three() -> None:
+    """Column 1 of driven right halves against cell arrays stepped with the center as column 0, for both words and
+    every phase; `settled_periods` on sequences with a known transient and period; and the counts the negative result
+    quotes, at small sizes: under 011 no right half of up to 6 cells has column 1 at the white times settled after 3,000
+    steps, while under 001 the white half has settled with period 14 samples, the 21 steps of the kit's trap."""
+    rng = np.random.default_rng(41)
+    halves = [0, 1, 5, 0b1011, int(rng.integers(0, 1 << 20))]
+    steps = 300
+    for word in period_three.WORDS:
+        for phase in range(3):
+            column = period_three.column_one(word, halves, phase, steps)  # (steps, n)
+            for i, half in enumerate(halves):
+                cells = np.zeros(21 + steps + 2, dtype=bool)  # (m,), column j + 1 at index j + 1, the center at 0
+                cells[1:21] = [(half >> j) & 1 for j in range(20)]
+                for t in range(steps):
+                    assert column[t, i] == cells[1]
+                    cells[0] = word[(t + phase) % 3] == "1"
+                    left = np.concatenate([[False], cells[:-1]])  # (m,)
+                    right = np.concatenate([cells[1:], [False]])  # (m,)
+                    cells = left ^ (cells | right)
+    block = np.array([1, 0, 0, 1, 1, 0, 1], dtype=np.uint8)  # (7,), primitive
+    seqs = np.stack([np.concatenate([rng.integers(0, 2, 100).astype(np.uint8), np.tile(block, 43)]),
+                     rng.integers(0, 2, 401).astype(np.uint8)], axis=1)  # (401, 2)
+    assert period_three.settled_periods(seqs, 100).tolist() == [7, 0]
+    _, periods = period_three.report("011", list(range(64)), 0, 3000)
+    assert (periods == 0).all()
+    _, periods = period_three.report("001", [0], 0, 6000)
+    assert periods.tolist() == [14]
 
 
 def lean_states(name: str) -> set[tuple[int, int]]:
