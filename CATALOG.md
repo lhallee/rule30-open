@@ -38,7 +38,6 @@ approach stopped.
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
-- [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
@@ -48,6 +47,7 @@ approach stopped.
 
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
 - [The finite game excludes 76 of the 2,538 blocks up to period 14](findings/columns/game-blocks.md): problem 1
+- [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
 - [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md): problem 1
@@ -287,7 +287,7 @@ Prize Problem 3, and what an answer either way would imply.
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
-| [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | wanted |
+| [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | partial |
 
 **Negative results**
 

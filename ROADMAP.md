@@ -87,11 +87,12 @@ kit's commit 932cf8d.
   ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). Problem 3 implies Problem 1,
   proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
 - **A space lower bound.** *Open, as hard.* By Paterson's theorem the kit's Problem 3 follows if the center column needs
-  space larger than order $\sqrt{n}$, and Problem 1 follows if it needs any space that grows; tree evaluation on the
-  kit's block tree computes it in space $O(\sqrt{n} \log n)$ ([the space ladder](findings/complexity/space-ladder.md)).
-  *Assessment:* a reformulation, and likely a closed one: if tree evaluation runs in logarithmic space, which Cook and
-  Mertz's algorithm misses by a factor $\log b$, the center column takes space $O(\sqrt{n})$ and the threshold is out
-  of reach. The claimed one-tape simulation in space $T^{2/5}$ would lower the threshold to $n^{2/5}$.
+  space larger than order $\sqrt{n}$, and by the kit Problem 1 follows if it needs any space that grows; tree evaluation
+  on the kit's block tree computes it in space $O(\sqrt{n} \log n)$ ([the space
+  ladder](findings/complexity/space-ladder.md)). *Assessment:* a reformulation, and likely a closed one: if tree
+  evaluation runs in logarithmic space, which Cook and Mertz's algorithm misses by a factor $\log b$, the center column
+  takes space $O(\sqrt{n})$ and the threshold is out of reach. The claimed one-tape simulation in space $T^{2/5}$ would
+  lower the threshold to $n^{2/5}$.
 - **A shortcut.** *No signal.* Automata, linear recurrences, learned predictors and exact structure searches find none
   ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$

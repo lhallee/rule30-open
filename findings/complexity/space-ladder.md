@@ -3,7 +3,7 @@ title: Problems 1 and 3 follow from space lower bounds for the center column, an
 category: complexity
 problems: [3, 1]
 status: paper
-formalization: wanted
+formalization: partial
 ---
 
 # Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices
@@ -19,8 +19,10 @@ $\sqrt{n}$, and space of order $\sqrt{n} \log n$ is known to suffice. No space l
 2. **Problem 3 from space.** If a one-tape machine in the kit's model computes $c(n)$ within $C(n + 1)$ steps for
    every $n$, then a deterministic machine computes $c(n)$ in space $O(\sqrt{n})$. So the kit's `Problem3` holds if no
    machine computes $c$ in space $O(\sqrt{n})$, and `Problem3Verbal` holds if none computes it in space $o(\sqrt{n})$.
-3. **Problem 1 from space.** If a machine computes $c(n)$ in space $o(\log \log n)$, then $c$ is 2-automatic. So if
-   the space needed to compute $c$ grows without bound, $c$ is not 2-automatic, and Problem 1 holds.
+3. **Problem 1 from space, in the kit.** If a machine computes $c(n)$ in space $o(\log \log n)$, then $c$ is
+   2-automatic. So if the space needed to compute $c$ grows without bound, $c$ is not 2-automatic, and Problem 1 holds.
+   The kit proves the sharper equivalence in Lean: Problem 1 holds if and only if no machines decide $c(n)$ from the
+   base-2 and from the base-3 digits of $n$ in space $o(\log \log n)$.
 
 ## Proof
 
@@ -39,13 +41,13 @@ $\sqrt{n}$, and space of order $\sqrt{n} \log n$ is known to suffice. No space l
    $T(m) = 2C \cdot 2^m + m^2$, and the space is $O(2^{m/2}) = O(\sqrt{n})$. A machine that halts with the answer
    decides $\{n : c(n) = 1\}$, and conversely. For time $o(n)$ the same count gives space $o(\sqrt{n})$.
 3. A machine with a read-only input tape that decides a language in space $o(\log m)$ on inputs of length $m$ decides
-   a regular language (Stearns, Hartmanis and Lewis; the kit's
-   [`OfflineGap`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/OfflineGap.lean),
-   `isRegular_iff_exists_small_space_decider`). Here $o(\log m)$ is $o(\log \log n)$. A sequence whose set of binary
-   numerals for the 1s is regular is 2-automatic (Eilenberg's criterion, the kit's `IsAutomatic`), and an eventually
-   periodic sequence is 2-automatic (the kit's
-   [`Automatic`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/Automatic.lean),
-   `problem1_of_not_automatic`).
+   a regular language (Stearns, Hartmanis and Lewis), and here $o(\log m)$ is $o(\log \log n)$. The digits of the
+   black times form a regular language exactly when $c$ is automatic in that base, an eventually periodic sequence is
+   automatic in every base, and a sequence automatic in bases 2 and 3 is eventually periodic (Cobham). All of this is in
+   the kit's equivalent forms:
+   [`OfflineGap`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/equivalents/Rule30Equivalents/OfflineGap.lean)
+   (`isRegular_iff_exists_small_space_decider`, `problem1_iff_no_small_space_digit_deciders`), `OneTapeRegular`
+   (`isRegular_digitLang_iff`), `Automatic` (`problem1_of_not_automatic`) and `Cobham`.
 
 ## What it means
 
@@ -73,8 +75,8 @@ digits, so order $\sqrt{n}$ is exponential in the input length. Williams's simul
 $O(\sqrt{t \log t})$ is weaker here: simulating Rule 30 row by row takes multitape time of order $n^2$, which gives
 space of order $n \sqrt{\log n}$, more than the simulation itself uses.
 
-A Lean proof would need Paterson's simulation, which can build on the crossing sequences of the kit's `OneTapeGap`,
-and Cook and Mertz's algorithm; the kit has the block tree and the small-space theorem.
+Statement 3 is proved in Lean in the kit. A Lean proof of statements 1 and 2 would need Cook and Mertz's algorithm and
+Paterson's simulation, which can build on the crossing sequences of the kit's `OneTapeGap`; the kit has the block tree.
 
 ## Sources
 
