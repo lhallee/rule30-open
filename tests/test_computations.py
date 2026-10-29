@@ -9,7 +9,8 @@ import pytest
 from pathlib import Path
 
 from computations import (absorption, algebra, coin_lock, coupled, deformation, frames, game, held_map,
-                          left_diagonals, linear_complexity, lock_certificate, right_half, sensitivity, slow_halves)
+                          left_diagonals, linear_complexity, lock_certificate, periodic_columns, right_half,
+                          sensitivity, slow_halves)
 from computations.rule30 import center_column, spacetime, step
 
 
@@ -650,6 +651,27 @@ def test_slow_halves() -> None:
     assert slow_halves.entry_times("0001", half[None, :], 4000, wall)[0] == best[10][0]
     for word, latest in (("0001", 544), ("0011", 980), ("0111", 416)):
         assert slow_halves.beam_search(word, 512, 12, 12, 4000, wall)[12][0] == latest
+
+
+def test_periodic_columns() -> None:
+    """The bit-sliced search against direct evolution: under Rule 150 the single cell's center column survives with
+    period 1 and under Rule 90 the row 101 keeps column 1 white; under Rule 30 no triple survives for 12 cells, and the
+    nearest miss at 8 cells, simulated as a bool array, repeats exactly 15 times with its period and then fails."""
+    found, _, _ = periodic_columns.search(8, 32, 256, 150)
+    assert (1, 0, 1) in found
+    found, _, _ = periodic_columns.search(8, 32, 256, 90)
+    assert (0b101, 1, 1) in found
+    found, longest, witness = periodic_columns.search(12, 32, 256, 30)
+    assert found == [] and longest == 17
+    found, longest, (row, column, period) = periodic_columns.search(8, 32, 256, 30)
+    assert found == [] and longest == 15
+    cells = np.zeros(8 + 2 * 300, dtype=bool)  # (608,), cell j of the row at index 300 + j
+    cells[300:308] = [(row >> j) & 1 for j in range(8)]
+    col = spacetime(cells, 299)[:, 300 + column]  # (300,)
+    repeats = 0
+    while col[period + repeats] == col[repeats]:
+        repeats += 1
+    assert repeats == longest
 
 
 def test_deformation() -> None:

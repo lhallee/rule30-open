@@ -46,6 +46,9 @@ kit's commit 932cf8d.
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
 - **Random rows and probabilistic arguments.** *Closed.* The problems hold for random rows, provably, and no amount of
   randomness reaches the single cell ([random rows](negative-results/random-rows/almost-every-row.md)).
+- **Counterexamples.** *No signal.* No row of up to 24 cells has a column that repeats from time 0, at periods up to
+  32 over 256 steps ([periodic from time 0](negative-results/columns/periodic-from-start.md)), and no right half
+  that the searches reach escapes the period-four lock ([slow halves](negative-results/columns/slow-half-search.md)).
 
 ## Problem 2: does each color occur with density 1/2?
 
