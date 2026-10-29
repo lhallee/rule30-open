@@ -1133,3 +1133,13 @@ def test_window_sets() -> None:
     nine = [b for p in range(2, 14) for b in wall_segments.necklaces(p) if "1" * 9 in b + b]
     excluded = [b for b in nine if game.least_width(b, 12) is not None]
     assert sorted(b for b in family if b != "1") == sorted(excluded)
+
+
+def test_windows_after_ones() -> None:
+    """The windows that runs of 1s leave, against the kit's wall: nine 1s leave exactly the windows 0 1 0 and 0 1 1,
+    which `wall_windows` uses, and eight leave a window with first cell 1 besides, as the kit's
+    `eight_black_not_enough` says."""
+    from computations import wall_segments
+    assert wall_segments.windows_after_ones(9) == wall_segments.wall_windows(3)
+    assert wall_segments.windows_after_ones(8) == frozenset({(0, 1, 0), (0, 1, 1), (1, 0, 0)})
+    assert all(len({w[0] for w in wall_segments.windows_after_ones(ones)}) == 2 for ones in range(1, 9))

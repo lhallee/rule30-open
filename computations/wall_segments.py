@@ -142,6 +142,19 @@ def in_set_family(block: str, width: int = 3) -> bool:
     return True
 
 
+def windows_after_ones(ones: int, width: int = 3) -> frozenset[Window]:
+    """The windows of `width` cells right of a column after it reads 1 for `ones` steps, over every start of the cells
+    that can reach them: nine 1s leave the wall, fewer leave both values of the first cell."""
+    out = set()
+    for bits in itertools.product((0, 1), repeat=width + ones + 1):
+        cells = list(bits)  # cells right of the column, the first at index 0
+        for _ in range(ones):
+            ext = [1] + cells + [0]
+            cells = [ext[i - 1] ^ (ext[i] | ext[i + 1]) for i in range(1, len(ext) - 1)]
+        out.add(tuple(cells[:width]))
+    return frozenset(out)
+
+
 def necklaces(period: int) -> list[str]:
     """The primitive binary necklaces of length `period`, each as its least rotation."""
     out = []
@@ -165,10 +178,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=20)
     parser.add_argument("--game", action="store_true", help="also run the finite game on the blocks with nine 1s")
+    parser.add_argument("--after-ones", action="store_true",
+                        help="instead, the windows that runs of 1 to 9 ones leave")
     parser.add_argument("--brute", type=int, default=0,
                         help="instead, the segments up to this length that brute force accepts and the run does not")
     args = parser.parse_args()
 
+    if args.after_ones:
+        for ones in range(1, 10):
+            windows = windows_after_ones(ones)
+            print(f"after {ones} ones: {len(windows)} windows {sorted(''.join(map(str, w)) for w in windows)}, first cell "
+                  f"{'known' if len({w[0] for w in windows}) == 1 else 'unknown'}")
+        return
     if args.brute:
         extra = [u for m in tqdm(range(1, args.brute + 1), desc="lengths", file=sys.stderr)
                  for u in ("".join(bits) for bits in itertools.product("01", repeat=m))

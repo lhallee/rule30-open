@@ -61,6 +61,13 @@ with one argument. Up to period 22 it has 616 blocks, against 275 for the three 
 (`python -m computations.wall_segments --max-period 22`). Up to 12 cells, the sets accept 123 of the 124 segments that
 brute force over the light cone accepts, and windows of eight cells accept all of them, so wider windows add little.
 
+## Why nine
+
+Nine is the least run that leaves the first cell known. Over every start of the cells that can reach them, $r$ 1s
+leave the windows 0 1 0 and 0 1 1 for $r = 9$, and for $r \le 8$ windows with both values of the first cell; eight
+leave 0 1 0, 0 1 1 and 1 0 0 (`python -m computations.wall_segments --after-ones`). So after eight 1s the first 0 of
+the column already fails the check, as the kit's `eight_black_not_enough` says of its own argument.
+
 ## Relation to the kit
 
 As for [WallSegments](WallSegments.md): the kit's
