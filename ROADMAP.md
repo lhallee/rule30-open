@@ -50,7 +50,9 @@ kit's commit 932cf8d.
   pull request #39. Other pull requests work on the gate, from which the kit reconstructs the one candidate left row
   ([the kit's pull requests](literature/kit-pull-requests.md#period-two)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
-  route for period three.
+  route for period three. For $001$ its period-21 trap `t001` remains: every right half white on its first 1,317 cells
+  enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), but the kit's study finds halves that
+  enter only after about $2 \cdot 10^5$ steps, so a census in Lean is out of reach.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).

@@ -469,3 +469,30 @@ def test_ether_prefix_data() -> None:
                 for s in range(t):
                     row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
                 assert in_family(word, alignments, row, (t + phase) % 4, k), (word, j0, phase, tail, length)
+
+
+def test_high_three() -> None:
+    """`highRight_001`: right halves white on cells 1 to 1,317 with random cells beyond, driven by 001 from phase 0, 1 or
+    2 and stepped as cells, have columns 1 .. 47 equal to state 597 of the kit's trap `t001` at step 1270, 1269 or 1268,
+    as the white half does; the state is unpacked from the kit's source."""
+    kit = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata"
+    packed = dict(re.findall(r"def t001_(\w+) : Nat := (\d+)", (kit / "Rule30EtherThreeTrap.lean").read_text("utf-8")))
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)  # the packed table has thousands of digits
+    try:
+        states = int(packed["R"])
+    finally:
+        sys.set_int_max_str_digits(digits)
+    width = 47
+    state = [(((states >> (width * 597)) % (1 << width)) >> i) & 1 for i in range(width)]
+    assert "theorem highRight_001 (φ : Nat) : HighRight3 Rule30EtherThree.w001 1317 φ" in module("Columns/HighThree")
+    rng = np.random.default_rng(35)
+    for phase, steps in ((0, 1270), (1, 1269), (2, 1268)):
+        rows = np.zeros((8, 1317 + 400), dtype=bool)  # (8, n), column j + 1 at index j
+        rows[:, 1317:] = rng.integers(0, 2, (8, 400)).astype(bool)
+        for t in range(steps):
+            left = np.concatenate([np.full((8, 1), "001"[(t + phase) % 3] == "1"), rows[:, :-1]], axis=1)  # (8, n)
+            right = np.concatenate([rows[:, 1:], np.zeros((8, 1), dtype=bool)], axis=1)  # (8, n)
+            rows = left ^ (rows | right)
+        assert (rows[:, :width].astype(int) == np.array(state)[None, :]).all(), phase
+
