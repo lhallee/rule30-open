@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-45 Lean modules with 208 headline theorems, 23 findings (proved on paper,
+46 Lean modules with 212 headline theorems, 24 findings (proved on paper,
 computed or conjectured) and 30 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 34 | 10 | 7 |
+| [Columns](#columns) | 35 | 11 | 7 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -48,6 +48,7 @@ approach stopped.
 - [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
 - [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
+- [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
 - [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
@@ -112,6 +113,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The kicked form of the left half](Rule30Open/Columns/KickedForm.md) | [`Columns.KickedForm`](Rule30Open/Columns/KickedForm.lean) | `left_kicked_zero`, `left_kicked_succ`, `left_kicked_check`, `period_two_golden` | 1 | extends a kit result |
 | [No left half within depth 88 keeps the kit's left-half pattern for 0001](Rule30Open/Columns/LeftHalf0001.md) | [`Columns.LeftHalf0001`](Rule30Open/Columns/LeftHalf0001.lean) | `c3_0001_bounded`, `c3_0001_small`, `c3_0001_depth`, `c3_0001_of_checks` | 1 | extends a kit result |
 | [No left half within depth 88 keeps the kit's left-half pattern for 0011 or 0111](Rule30Open/Columns/LeftHalfDriven.md) | [`Columns.LeftHalfDriven`](Rule30Open/Columns/LeftHalfDriven.lean) | `c3_0011_bounded`, `c3_0111_bounded`, `c3_0011_small`, `c3_0111_small`, `c3G_of_checks`, `history_eq_reconB` | 1 | extends a kit result |
+| [Every eventual period comes down to one statement about the left half](Rule30Open/Columns/LeftLatch.md) | [`Columns.LeftLatch`](Rule30Open/Columns/LeftLatch.lean) | `column_not_eventually_of_leftLatch`, `not_eventually_of_leftLatch`, `kickOrbit_eq`, `leftLatch_one` | 1 | extends a kit result |
 | [One sequence in one column forces a lock of the finite game, for a block of any period](Rule30Open/Columns/LockBlocks.md) | [`Columns.LockBlocks`](Rule30Open/Columns/LockBlocks.lean) | `lockBlock_column`, `center_lockBlock`, `center_lock_steered`, `not_eventually_steered` | 1 | not in the kit |
 | [Once the center repeats one of 26 blocks of period 4 to 11, column 14 never reads that block's steering sequence](Rule30Open/Columns/LockBlocks11.md) | [`Columns.LockBlocks11`](Rule30Open/Columns/LockBlocks11.lean) | `steered11_check`, `center_lock_steered11`, `not_eventually_steered11` | 1 | not in the kit |
 | [Once the center repeats one of 23 blocks of period 12, column 14 never reads that block's steering sequence](Rule30Open/Columns/LockBlocks12.md) | [`Columns.LockBlocks12`](Rule30Open/Columns/LockBlocks12.lean) | `steered12_check`, `center_lock_steered12`, `not_eventually_steered12` | 1 | not in the kit |
@@ -138,6 +140,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
 | [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
+| [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |

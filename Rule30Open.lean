@@ -27,6 +27,7 @@ public import Rule30Open.Columns.LockBlocks12
 public import Rule30Open.Columns.LockWhite
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
+public import Rule30Open.Columns.LeftLatch
 public import Rule30Open.Columns.EtherDomain
 public import Rule30Open.Columns.EmptyRight
 public import Rule30Open.Columns.WhiteGap

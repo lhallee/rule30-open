@@ -42,7 +42,7 @@ kit's commit 932cf8d.
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
     to 18 cells, so no method of this kind reaches those periods ([window
-    locks](negative-results/columns/window-locks.md)).
+    locks](negative-results/columns/window-locks.md)); the left half reaches them, as statements only (below).
   - *Conditional.* For 49 blocks of period 4 to 12 that nothing excludes, 16 of them without a run of more than four,
     one sequence of values in column 14 leads every window of 13 cells into a lock, so once the center repeats the
     block, column 14 never reads that sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block
@@ -79,6 +79,14 @@ kit's commit 932cf8d.
   *Assessment:* the latest failure outlasts the half's length by about a third of it, and the work of a check doubles
   with every four cells, so checks settle bounded cases only; a proof needs an argument that uses the finiteness of the
   half.
+- **Every period through the left half.** *Open.* One statement for each block of each period, `LeftLatch b`, rules the
+  block out in the orbit of every row with a leftmost 1: no finite left half, kicked where the block reads 1 twice in a
+  row, meets the check at each 1 with a cell right of the column that latches
+  ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). It reaches the periods 3, 5, 6, 7 and 9 that no window lock reaches,
+  and for each of their 91 blocks no left half of at most 37 to 100 cells meets it ([every
+  block](findings/columns/left-half-every-block.md)). *Assessment:* each statement is of the kind of period two and of
+  `C3`; past the half's length the readings fail at the rate of fair coins, so computation settles bounded cases only,
+  and only the black block is proved.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz problem
   ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails ([left half
   alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52, against the
@@ -174,7 +182,9 @@ In order of the assessment above.
    runs, and a typical block of large period has only short ones, so these exclusions stay thin. An open question with a
    concrete form: why no window of up to 18 cells locks at periods 2, 3, 5, 6, 7 and 9, while periods 1, 4 and 8 and
    every period from 10 to 20 have blocks with locked windows of at most 14 cells; in three families the locks appear at
-   period 8 and at every period from 10, but not at 9 ([window locks](negative-results/columns/window-locks.md)).
+   period 8 and at every period from 10, but not at 9 ([window locks](negative-results/columns/window-locks.md)). At
+   those periods the route is the left half: one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)),
+   which no small half meets ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the period-four
    certificate and the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree
    and the Duhamel form are proved in the kit's equivalent forms, which a search should include before any formalization
