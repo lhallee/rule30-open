@@ -38,3 +38,14 @@ precedents for this method and for its trade-off between the size of a certifica
 
 The repository allows `decide +kernel`, in which the kernel itself evaluates the computation, and refuses
 `native_decide`, which trusts compiled code (see [CONTRIBUTING.md](../CONTRIBUTING.md)).
+
+- **Lean kernel issue #14576 (2026).** [Checked-kernel soundness: projections of a mismatched
+  structure](https://github.com/leanprover/lean4/issues/14576), fixed by [pull request
+  #14577](https://github.com/leanprover/lean4/pull/14577), merged into `master` on July 28, 2026. The report shows a
+  metaprogram that adds a nested inductive declaration whose parameters escape type checking, after which ordinary code
+  proves `False` with no axioms; `#print axioms` shows nothing. A follow-up, pull request #14582, checks the uniformity
+  of nested occurrences. Press coverage, seen only through a search, reports that a claimed AI-assisted disproof of the
+  Collatz conjecture used this bug. *Here:* the repository builds with Lean 4.35.0 (commit `eb6cafb`, released October
+  12, 2026, eleven weeks after the fix's merge commit `a39eab6`), and no module here adds declarations by metaprogram,
+  which the exploit needs. The episode is a reason to keep the audit of axioms in `scripts/catalog.py` and to build
+  only from source.
