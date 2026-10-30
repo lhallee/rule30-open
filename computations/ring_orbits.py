@@ -11,6 +11,7 @@ so the game does not exclude b at any width. Jen's theorem does not apply, since
 neighbor breaks the period.
 
     python -m computations.ring_orbits --max-cells 20 --max-block 16   # about 10 s
+    python -m computations.ring_orbits --alternating   # the game on (01)^m, about 1 s
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import sys
 import numpy as np
 from tqdm.auto import tqdm
 
-from computations.game import least_rotation
+from computations.game import bad_pairs, least_rotation
 
 
 def ring_step(states: np.ndarray, cells: int) -> np.ndarray:
@@ -82,11 +83,23 @@ def witnessed(max_cells: int, max_block: int) -> tuple[dict[str, int], list[int]
     return found, counts
 
 
+def alternating_pairs(repeats: list[int], widths: list[int]) -> dict[int, list[int]]:
+    """The game's bad pairs (`game.bad_pairs`) for the block (01)^m, which asks the column left of the repeating one
+    only for period 2m, at each width."""
+    return {m: [bad_pairs("01" * m, width) for width in widths] for m in repeats}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-cells", type=int, default=20)
     parser.add_argument("--max-block", type=int, default=16)
+    parser.add_argument("--alternating", action="store_true", help="instead, the game on (01)^m for m up to 18")
     args = parser.parse_args()
+    if args.alternating:
+        widths = [4, 6, 8, 10]
+        for m, pairs in alternating_pairs([1, 2, 3, 4, 6, 9, 18], widths).items():
+            print(f"(01)^{m}: bad pairs at widths {widths}: {pairs}")
+        return
     found, counts = witnessed(args.max_cells, args.max_block)
     print(f"periodic orbits up to rotation on rings of 1 to {args.max_cells} cells: {counts} ({sum(counts)} in all)")
     print(f"blocks of period at most {args.max_block} witnessed: "

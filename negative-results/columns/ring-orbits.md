@@ -27,17 +27,21 @@ does not apply to the lifted row, since it has no leftmost 1. The question is wh
   the ether's alternating column $B_4 = 0101$, on the ring of 7 cells (the ether of the kit's `Rule30Ether`) and its
   double on 14: its left neighbor $B_3 = 1101$ has period 4. So the game fails at every width for $01$, and for no
   other block of period at most 16 do rings of up to 25 cells show why.
+- **Relaxing the period does not help.** A column that repeats $01$ also repeats $(01)^m$, and the game on $(01)^m$
+  asks the column on the left only for period $2m$, which the ether's left column, of period 4, meets for every even
+  $m$. The game still fails for $(01)^m$ for $m = 1, 2, 3, 4, 6, 9$ and 18 at widths 4 to 10, with one bad pair at each phase where
+  the block reads 0 (`--alternating`). So for period two its failure does not come from the ether alone.
 
-**What it means.** For the other blocks the walks that defeat the game do not come from a ring of at most 25 cells,
-and their lengths may grow with $K$. A barrier for the game has to come from right halves that are not spatially
-periodic, or from rings larger than those searched, and the ring orbits, being few and long, say almost nothing about
-them. For $01$ the
-witness is the ether itself, which carries an alternating column (the kit's `aligned_0101_3`).
+**What it means.** For the other blocks the walks that defeat the game do not come from a ring of at most 25 cells, and
+their lengths may grow with $K$. A barrier for the game has to come from right halves that are not spatially periodic,
+or from rings larger than those searched, and the ring orbits, being few and long, say almost nothing about them. For
+$01$ the witness is the ether itself, which carries an alternating column (the kit's `aligned_0101_3`).
 
 ## Reproduce
 
 ```bash
 python -m computations.ring_orbits --max-cells 25 --max-block 16
+python -m computations.ring_orbits --alternating
 ```
 
 [computations/ring_orbits.py](../../computations/ring_orbits.py) takes about 2 minutes to 25 cells and 2 seconds to
