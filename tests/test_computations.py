@@ -1939,6 +1939,36 @@ def test_period_four_certificate_traps() -> None:
         sys.set_int_max_str_digits(digits)
 
 
+def test_ten_traps() -> None:
+    """The wall of period 10: its chain repeats with period 155 from the start, its columns at distances 20 to 28 are
+    the nine blocks of period 10 with a locked window of 13 cells (`locks.has_lock`), and its trap carried to the 25
+    distances of `ten_distances` is a lock by `is_lock`, a direct check with the rule, for each block; the least
+    natural trap of 0001110011 is the carried one at distance 7; and `lean_ten` is the text of TenTraps.lean.
+    `parse_natural` and `natural_summary` read back a saved scan line."""
+    from computations import lock_chain, locks
+    t = lock_chain.tables("trap0000010001")
+    full = t["word"] * (t["modulus"] // len(t["word"]))
+    values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(t["modulus"]))
+    start, cycle = lock_chain.chain_cycle(full, values)
+    assert (start, len(cycle)) == (0, 155)
+    columns = lock_chain.chain(full, values, 28)
+    near = {lock_chain.necklace(c[:lock_chain.least_period(c)]) for c in columns[20:29]}
+    assert near == {b for b in game.necklaces(10) if locks.has_lock(b, 13)}
+    distances = lock_chain.ten_distances()
+    assert len(distances) == 25 and distances[:4] == [0, 1, 2, 3]
+    for d in distances:
+        carried = lock_chain.carried("trap0000010001", d)
+        assert len(carried["states"]) == 100 and lock_chain.is_lock(carried["word"], carried["states"], 16 + d)
+    natural = lock_chain.natural_tables("0001110011", 0, 12000, 23, 10)
+    assert natural["states"] == lock_chain.carried("trap0000010001", 7)["states"]
+    lean = (ROOT / "Rule30Open" / "Columns" / "TenTraps.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_ten() in lean
+    line = "0000010001: column 1 locks for 31 of 31 starts; natural traps [(0, 12000, 16, 10, 100)]"
+    rows = lock_chain.parse_natural(line)
+    assert rows == {10: [("0000010001", 31, [(0, 12000, 16, 10, 100)])]}
+    assert lock_chain.natural_summary(10, rows[10], 1).startswith("period 10: 99 words, 1 lock for some start, 1 have")
+
+
 def test_second_nine_wall() -> None:
     """The second wall of period 9: from the random start that `NATURAL` names, a run of 001010011 is inside a closed
     set of 5,710 windows of 41 cells, with the phase modulo 27, that fixes column 1 at the white phases, by `is_lock`;

@@ -19,7 +19,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
-| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9 come down to entry into traps that driven right halves enter, from two walls of period nine, in Lean, and for two of them every right half white on its first $10^5$ cells or so enters from most phases, in Lean; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
+| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9 and 25 of the 99 of period 10 come down to entry into traps that driven right halves enter, in Lean, from two walls of period nine and one background of period ten whose edge every right half of up to eight cells enters within 3,042 steps; for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases, in Lean; at periods 10 to 12 about a quarter of the blocks have traps that random halves enter, and one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
@@ -47,25 +47,24 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   and the share of blocks covered falls with the period.
   - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at most
     16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
-    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18 and 508 of the 79,971 of period
-    19 and 20, all in Lean, those that need 13 or 14 cells one phase at a time ([periods 17 and
+    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18 and 508 of the 79,971 of period 19
+    and 20, all in Lean, those that need 13 or 14 cells one phase at a time ([periods 17 and
     18](findings/columns/game-blocks-18.md), [periods 19 and 20](findings/columns/game-blocks-20.md),
-    [BitPhases](Rule30Open/Columns/BitPhases.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every
-    block followed by exponentially many white cells. After nine 1s, following the cells beside the column extends the
-    kit's long black runs to every period whose runs of nine or more 1s are separated by segments that the possible
-    windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game
-    excludes, 616 blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$
-    for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md),
-    [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r \ge 9$ 1s rules out every tail of at most
-    $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most $4 \lfloor (b - 1)/9 \rfloor + 2$
-    steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 262{,}125$ ([a window of
-    262,144 cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells in
-    [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October 30
-    and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at least
-    17, and four more families with long white runs ([the kit's pull
-    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
-  - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
-    every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
+    [BitPhases](Rule30Open/Columns/BitPhases.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every block
+    followed by exponentially many white cells. After nine 1s, following the cells beside the column extends the kit's
+    long black runs to every period whose runs of nine or more 1s are separated by segments that the possible windows of
+    three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game excludes, 616
+    blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a
+    \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md), [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r
+    \ge 9$ 1s rules out every tail of at most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of
+    at most $4 \lfloor (b - 1)/9 \rfloor + 2$ steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period
+    needs $T + P \ge 262{,}125$ ([a window of 262,144 cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells
+    in [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October
+    30 and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at
+    least 17, and four more families with long white runs ([the kit's pull
+    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). - *Where it stops.*
+    The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and every exclusion rests
+    on a run of five or more equal values; most blocks do not lock the right half
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
@@ -75,8 +74,12 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
     its own, a lock of 43 cells of $001011111$ that right halves it drives enter, and carried leftward it gives traps to
     21 of the 56 blocks of period 9, and a second wall, of 41 cells with the phase counted modulo 27, gives one to
-    $001010011$ ([NineTraps](Rule30Open/Columns/NineTraps.md)); the left half reaches every block, as statements only
-    (below).
+    $001010011$ ([NineTraps](Rule30Open/Columns/NineTraps.md)). Period 10 has a background of spatial period 155 whose
+    edge, a lock of 16 cells of $0000010001$, every right half of up to eight cells enters within 3,042 steps; its
+    columns give traps to 25 blocks of period 10 that the kit does not exclude
+    ([TenTraps](Rule30Open/Columns/TenTraps.md)), and at periods 10 to 12 about a quarter of the blocks have traps that
+    random halves enter ([natural traps](findings/columns/natural-traps.md)); the left half reaches every block, as
+    statements only (below).
   - *Conditional.* For 49 blocks of period 4 to 12 that nothing excludes, 16 of them without a run of more than four,
     one sequence of values in column 14 leads every window of 13 cells into a lock, so once the center repeats the
     block, column 14 never reads that sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block
@@ -239,10 +242,17 @@ In order of the assessment above.
    9 at steady rates, about $2.2 \cdot 10^{-6}$ and $1.4 \cdot 10^{-6}$ per step: two thirds and one half of a sample by
    the end. In Lean, every right half white on its first 91,129 to 201,172 cells enters them from the phases where the
    white half does, 4 of the 9 phases of $001011111$ and 6 of $001010011$
-   ([NineWhite](Rule30Open/Columns/NineWhite.md)). Next: other classes of halves for these walls, as for period four;
-   walls of other periods, found as the closure of a driven half's window, the search that found these, and at periods
-   5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one
-   statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
+   ([NineWhite](Rule30Open/Columns/NineWhite.md)). From period 10 on driven halves settle often: about a quarter of the
+   blocks of period 10, 11 and 12 have traps that random halves enter, often every one of 31 within 12,000 steps
+   ([natural traps](findings/columns/natural-traps.md)), and at period 10 one background of spatial period 155, whose
+   edge every right half of up to eight cells and the white half enter within 3,042 and 74 steps, gives traps to 25
+   blocks that the kit does not exclude, the nine blocks with locked windows of 13 cells among its columns
+   ([TenTraps](Rule30Open/Columns/TenTraps.md)). Next: the classes of halves that enter the edge of period 10 in Lean,
+   as [NineWhite](Rule30Open/Columns/NineWhite.md) and [FourteenCells](Rule30Open/Columns/FourteenCells.md) do for other
+   traps, which its fast entry makes cheap; the walls behind the traps of 313, 103 and 138 states at period 11 and 119,
+   116 and 150 at period 12; other classes of halves for the walls of period 9; at periods 5, 6 and 7 traps that the
+   coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one statement per block
+   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
    block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
    period-four certificate, the periodic backgrounds and the period-two computations ([open
