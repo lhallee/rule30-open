@@ -734,6 +734,31 @@ def natural_summary(period: int, rows: list[tuple[str, int, list[tuple[int, int,
             f"inside a trap, the commonest sizes " + ", ".join(f"{size} states ({count})" for size, count in common))
 
 
+def wall_chains(period: int, rows: list[tuple[str, int, list[tuple[int, int, int, int, int]]]], count: int = 3,
+                starts: int = 30) -> list[tuple[int, str, int, int, int, set[str]]]:
+    """For the `count` commonest trap sizes among the rows of `natural_scan` for one period: the size, the block whose
+    trap of that size is narrowest, its width, and where the chain of that trap becomes periodic in the distance, with
+    its spatial period and the blocks of the period among its columns up to one period past that point."""
+    from computations import right_half
+    halves = right_half.random_starts(starts, 64)
+    sizes: dict[int, int] = {}
+    for _, _, traps in rows:
+        for trap in traps:
+            sizes[trap[4]] = sizes.get(trap[4], 0) + 1
+    found = []
+    for size, _ in sorted(sizes.items(), key=lambda item: -item[1])[:count]:
+        word, k, cells, modulus = min(((word, trap[0], trap[2], trap[3]) for word, _, traps in rows for trap in traps
+                                       if trap[4] == size), key=lambda item: (item[2], item[0]))
+        t = natural_tables(word, halves[k], 12000, cells, modulus)
+        full = t["word"] * (t["modulus"] // len(t["word"]))
+        values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(len(full)))
+        start, cycle = chain_cycle(full, values)
+        blocks = {necklace(c[:least_period(c)]) for c in chain(full, values, start + len(cycle))
+                  if least_period(c) == period}
+        found.append((size, word, cells, start, len(cycle), blocks))
+    return found
+
+
 def parse_natural(text: str) -> dict[int, list[tuple[str, int, list[tuple[int, int, int, int, int]]]]]:
     """The rows of a saved `--natural` output, by period."""
     import ast
@@ -1054,6 +1079,14 @@ def main() -> None:
         with open(args.natural_from, encoding="utf-8") as saved:
             for period, rows in sorted(parse_natural(saved.read()).items()):
                 print(natural_summary(period, rows, args.starts + 1), flush=True)
+                walls = wall_chains(period, rows, starts=args.starts)
+                for size, word, cells, start, spatial, blocks in walls:
+                    print(f"  traps of {size} states: the wall of {word}, {cells} cells; its chain repeats from distance "
+                          f"{start} with spatial period {spatial} and holds {len(blocks)} blocks of period {period}",
+                          flush=True)
+                reached = set().union(*(blocks for *_, blocks in walls))
+                print(f"  together {len(reached)} blocks of period {period}, "
+                      f"{len(reached - set(game.KIT_WORDS))} that the kit does not exclude", flush=True)
     if args.edges:
         backgrounds = [("the kit's ether, the chain of 0 1^7", chain("01111111", "0" * 8, args.steps + 300), 8, 7, 8)]
         t = tables("trap001011111")

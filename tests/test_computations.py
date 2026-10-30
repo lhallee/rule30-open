@@ -1970,7 +1970,7 @@ def test_ten_traps() -> None:
     the nine blocks of period 10 with a locked window of 13 cells (`locks.has_lock`), and its trap carried to the 25
     distances of `ten_distances` is a lock by `is_lock`, a direct check with the rule, for each block; the least
     natural trap of 0001110011 is the carried one at distance 7; and `lean_ten` is the text of TenTraps.lean.
-    `parse_natural` and `natural_summary` read back a saved scan line."""
+    `parse_natural`, `natural_summary` and `wall_chains` read back a saved scan line."""
     from computations import lock_chain, locks
     t = lock_chain.tables("trap0000010001")
     full = t["word"] * (t["modulus"] // len(t["word"]))
@@ -1993,6 +1993,10 @@ def test_ten_traps() -> None:
     rows = lock_chain.parse_natural(line)
     assert rows == {10: [("0000010001", 31, [(0, 12000, 16, 10, 100)])]}
     assert lock_chain.natural_summary(10, rows[10], 1).startswith("period 10: 99 words, 1 lock for some start, 1 have")
+    [(size, word, cells, start, spatial, blocks)] = lock_chain.wall_chains(10, rows[10], count=1)
+    assert (size, word, cells, start, spatial) == (100, "0000010001", 16, 0, 155)
+    assert blocks == {lock_chain.carried("trap0000010001", d)["word"] for d in range(31)
+                      if len(lock_chain.carried("trap0000010001", d)["word"]) == 10}
 
 
 def test_second_nine_wall() -> None:
