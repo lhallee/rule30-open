@@ -1,23 +1,25 @@
 ---
-title: Traps for 21 of the 56 blocks of period 9, from a wall of period nine that driven right halves enter
+title: Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter
 category: columns
 problems: [1]
 status: proved
 lean: Rule30Open.Columns.NineTraps
-headline: [nineTraps_check, nineTraps_blocks, nine_absorption_excludes]
+headline: [nineTraps_check, nineTraps_blocks, nine_absorption_excludes, trap001010011_check,
+  not_eventually_001010011_of_absorption]
 kit: new
 kit_modules: [Rule30EtherThreeTrap, Rule30Ether]
 evidence: [computations/lock_chain.py]
 ---
 
-# Traps for 21 of the 56 blocks of period 9, from a wall of period nine that driven right halves enter
+# Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter
 
 No window of up to 18 cells locks for a block of period 9 ([window
 locks](../../negative-results/columns/window-locks.md)). Wider ones do. The right half that a column repeating
 $001011111$ drives can enter a trap of 43 cells, with the phase counted modulo 9: the closure of its true window under
 both values of the cell beyond is a set of 233 states that the rule never leaves, on which the cell beside the column is
 fixed at the white phases (`trap001011111`, in [WordTraps](WordTraps.md)). This module carries that trap leftward and
-checks a trap for each of the 21 blocks of period 9 that the carrying reaches.
+checks a trap for each of the 21 blocks of period 9 that the carrying reaches, and a second wall, for $001010011$, a
+block that the carrying does not reach.
 
 ## Statement
 
@@ -31,6 +33,8 @@ checks a trap for each of the 21 blocks of period 9 that the carrying reaches.
 3. **The reduction** (`nine_absorption_excludes`). For each of them, if every finitely supported right half driven by
    the block enters its trap (`WTrap.Absorption`, the kit's `AbsorptionT` for any period), the center column does not
    eventually repeat the block.
+4. **A second wall** (`trap001010011`, `trap001010011_check`, `not_eventually_001010011_of_absorption`). A trap of 41
+   cells with labels modulo 27 and 5,710 states for $001010011$, the 22nd block, with the same reduction.
 
 ## Argument
 
@@ -52,20 +56,25 @@ checks a trap for each of the 21 blocks of period 9 that the carrying reaches.
    0 to 9 lie between the wall and the background. Beyond distance 21 the chain holds no block of period 9 that is not
    already in the list.
 4. **The reduction** is [WordTraps](WordTraps.md)'s `absorption_excludes` for each member of the list.
+5. **The second wall.** A right half driven by $001010011$ locks column 1 with period 27, three times the block's. The
+   closure of its true window at step 12,000, with labels modulo 27, is a trap from width 41 on; at widths 16 to 40
+   column 1 takes two values at one white phase. The half enters it at step 7,622. A trap at one width gives one at
+   every larger width, so the least width is the one to search for. Carried leftward, the second wall gives columns of
+   period 27 only: its chain holds no other block of period 9 up to distance 79.
 
 ## What it covers
 
 Each trap reduces its block to entry, the route of the kit's `t001` for $001$, and unlike the traps of
-[WordTraps](WordTraps.md) for other periods, this one is entered. Of the right halves with support in cells 1 to 8,
+[WordTraps](WordTraps.md) for other periods, these are entered. Of the right halves with support in cells 1 to 8,
 driven from each of the 9 phases, 247 of 2,304 enter `trap001011111` within 50,000 steps, a median of 17,403 steps in
-and the latest at 49,425, so entries are still coming at the end; of 31 random halves of 64 cells, the traps at
-distances 0 to 6 and 16 are each entered by one or two within 20,000 steps ([trap
-entry](../../negative-results/columns/trap-entry.md)). The white right half does not enter within 100,000 steps from any
-phase, and its column 1 does not repeat at the white times over steps 30,000 to 60,000, so entry for every finite half
-has only partial support. Entry under $001$ into the kit's `t001` is faster: about 91% of the halves of up to ten cells
-by step 50,000 ([the census for 001](../../findings/columns/t001-census.md)). The other 35 blocks of period 9 have no
-trap from this wall; $001010011$ locks column 1 from one of 31 random starts, but the closure of its window at widths up
-to 160 is not a trap. Entry for every finite right half stays open, as for the kit's traps.
+and the latest at 49,425, and 167 enter `trap001010011`, a median of 33,653 steps in and the latest at 49,797, so for
+both walls entries are still coming at the end; of 31 random halves of 64 cells, the traps at distances 0 to 6 and 16
+are each entered by one or two within 20,000 steps ([trap entry](../../negative-results/columns/trap-entry.md)). The
+white right half does not enter `trap001011111` within 100,000 steps from any phase, and its column 1 does not repeat
+at the white times over steps 30,000 to 60,000, so entry for every finite half has only partial support. Entry under
+$001$ into the kit's `t001` is faster: about 91% of the halves of up to ten cells by step 50,000 ([the census for
+001](../../findings/columns/t001-census.md)). The other 34 blocks of period 9 have no trap found. Entry for every
+finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

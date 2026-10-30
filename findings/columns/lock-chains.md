@@ -140,10 +140,14 @@ phase. A bottom component of a block's game is a strongly connected set of locke
    $0\,1^8$ enters from distance 8. So period 9 has an ether and a wall, as period four has, the wall 43 cells wide
    where the census of window locks stopped at 18. Run for 20,000 steps from 31 starts, six words of period 9 lock
    column 1 from one start each, and five of them, at distances 0, 1, 2, 5 and 16 of this chain, are then inside its
-   traps (`natural_scan`). Of the right halves with support in cells 1 to 8, from every phase, 247 of 2,304 enter the
-   trap of $001011111$ within 50,000 steps ([trap entry](../../negative-results/columns/trap-entry.md)).
-   [NineTraps](../../Rule30Open/Columns/NineTraps.md) checks all 21 traps in Lean. Of the
-   words of period 5, 6 and 7 only $01111$ locks column 1, from 2 of the 31 starts, and neither closes into a trap.
+   traps (`natural_scan`). The sixth, $001010011$, locks with period 27 inside a second wall: the closure of its window
+   is a trap from 41 cells on, with the phase counted modulo 27 and 5,710 states, and its chain holds columns of period
+   27 only, periodic in the distance from distance 7,105 with spatial period 15,663, so no small background. Of the
+   right halves with support in cells 1 to 8, from every phase, 247 of 2,304 enter the trap of $001011111$ within
+   50,000 steps ([trap entry](../../negative-results/columns/trap-entry.md)).
+   [NineTraps](../../Rule30Open/Columns/NineTraps.md) checks all 22 traps in Lean. Of the
+   words of period 5, 6 and 7 only $01111$ locks column 1, from 2 of the 31 starts, and both locks break near step
+   20,500, so neither half is in a trap.
 
 ## What it means
 

@@ -42,11 +42,11 @@ $0\,1^8$, whose chain holds the period-9 members of the families that lock at pe
 window. Five blocks of period 9 do have locked windows, of 30 cells and more with the phase counted modulo 18, from
 seeds of period 18 ([lock chains](lock-chains.md)), and at 43 cells $001011111$ has a lock of its own with the phase
 counted modulo 9: run for 20,000 steps, six words of period 9 lock from one of the 31 starts, and five of them,
-$001011111$ among them, are inside the traps that this lock gives, carried leftward
-([NineTraps](../../Rule30Open/Columns/NineTraps.md)). The finite game at width 13 shows the same gap: 71 of the 109
-words that lock for every start, and one word that locks for none, have a lock that every window of 13 cells can be
-steered into, and no word of period 9 does ([steerable locks](steerable-locks.md)).
-
+$001011111$ among them, are inside the traps that this lock gives, carried leftward, and the sixth, $001010011$, inside
+a second wall of 41 cells with the phase counted modulo 27 ([NineTraps](../../Rule30Open/Columns/NineTraps.md)). The
+finite game at width 13 shows the same gap: 71 of the 109 words that lock for every start, and one word that locks for
+none, have a lock that every window of 13 cells can be steered into, and no word of period 9 does ([steerable
+locks](steerable-locks.md)).
 
 ## A finite certificate
 

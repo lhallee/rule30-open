@@ -14,10 +14,10 @@ $0011101$, the first for blocks of period 5, 6 and 7, and one for $001011101$ of
 18: once a column repeating the block has one of the trap's windows beside it, Jen's theorem on adjacent columns is
 contradicted. Each reduces its block to entry, the statement that every finitely supported right half driven by the
 block enters the trap, as the kit reduces $001$ to entry into `t001` and the words of period four to entry into its
-ether-and-wall family. For those, computation supports entry: every right half of up to 20 cells enters the
-period-four family within 1,959 steps ([the absorption census](../../findings/columns/absorption-census.md)), and every
-half of up to ten cells enters `t001`, a median of about 16,000 steps in ([the census for
-001](../../findings/columns/t001-census.md)). So does the wall of period 9 of
+ether-and-wall family. For those, computation supports entry: every right half of up to 20 cells enters the period-four
+family within 1,959 steps ([the absorption census](../../findings/columns/absorption-census.md)), and every half of up
+to ten cells enters `t001`, a median of about 16,000 steps in ([the census for
+001](../../findings/columns/t001-census.md)). Some small halves enter the two walls of period 9 of
 [NineTraps](../../Rule30Open/Columns/NineTraps.md). Do right halves driven by the new blocks enter their traps, or any
 trap?
 
@@ -29,12 +29,13 @@ trap?
 - *Any trap* (`natural_scan`). The empty right half and 30 random halves of 64 cells (`right_half.random_starts`) are
   driven by every primitive word of period 2, 3, 5, 6, 7 and 9 for 20,000 steps. A half inside any trap has column 1
   periodic at the word's white times, so the scan first asks whether it is, over the second half of the run
-  (`right_half.locked_period`). For each half that passes, it closes the true window at steps 12,000, 16,000 and
-  19,999 under both values of the cell beyond (`closure`), at widths 16 to 64 and with the phase counted modulo the
-  lock's period or twice it, and asks whether the closure fixes column 1 at the white phases (`natural_trap`). This is
-  how the kit built `t001`, and the scan rebuilds it: for $001$, six of the 31 halves lock and each is inside a trap of
-  1,363 states of 48 cells modulo 21 at step 12,000 (`test_natural_trap` checks that the closure at 47 cells is
-  `t001`).
+  (`right_half.locked_period`). For each half that passes, it closes the true window at steps 12,000, 16,000
+  and 19,999 under both values of the cell beyond (`closure`), at each width from 16 to 64 and with the phase counted
+  modulo the lock's period or twice it, and returns the least width at which the closure has at most 100,000 states and
+  fixes column 1 at the white phases (`natural_trap`). A trap at one width gives one at every larger width, the windows
+  that extend its states, so the least width is the one to search for; at larger widths the closure grows. This is how
+  the kit built `t001`, and the scan rebuilds it: for $001$, six of the 31 halves lock, and at step 12,000 each is
+  inside `t001` itself, 815 states of 47 cells modulo 21 (`test_natural_trap` checks this for the empty half).
 
 **Outcome.**
 
@@ -49,6 +50,7 @@ trap?
 | `trap0011101` | $0011101$ | 7, 14 | 1,792 | 10 | steps 8,856 to 8,859 |
 | `trap001011101` | $001011101$ | 9, 18 | 2,304 | 16 | steps 42,751 to 46,470 |
 | `trap001011111` | $001011111$ | 9, 9 | 2,304 | 247 | median 17,403, latest 49,425 |
+| `trap001010011` | $001010011$ | 9, 27 | 2,304 | 167 | median 33,653, latest 49,797 |
 
 The entries by step 20 are halves that start next to the trap. The ten into the trap of $0011101$ come from four phases
 and distinct halves but land within four steps of each other, as one late event would. The white right half, which the
@@ -56,27 +58,27 @@ census includes, enters none of these traps; under $001011111$ it enters no trap
 and its column 1 does not repeat over steps 30,000 to 60,000.
 
 *Any trap.* Column 1 locks for none of the 31 halves driven by any word of period 2, 5, 6 or 7, nor by $011$, except
-$01111$, for 2 halves, whose windows close into no trap. For $001$ it locks for 6, all inside the kit's family of
-`t001`. At period 9 six words lock for one half each, and five of them are then inside the traps of the wall of
-[NineTraps](../../Rule30Open/Columns/NineTraps.md); the sixth, $001010011$, locks with period 27 but its window closes
-into no trap up to 160 cells.
+$01111$, for 2 halves, whose locks break near step 20,500, so that neither half is in a trap. For $001$ it locks for 6,
+each inside `t001`. At period 9 six words lock for one half each, and each half is then inside a trap: five inside the
+traps of the wall of [NineTraps](../../Rule30Open/Columns/NineTraps.md), and the half driven by $001010011$ inside a
+second wall, of 41 cells with the phase counted modulo 27.
 
 **What it means.** The traps of [lock chains](../../findings/columns/lock-chains.md) show that what keeps windows of up
 to 18 cells from locking at periods 5, 6 and 7 is not the absence of a trap: wider ones exist for a block of each
 period. The obstruction is dynamical. Driven by these blocks, the right half next to the center almost never settles:
 column 1 does not repeat at the white times for any random half, and the small halves enter the Lean traps only from
 next to them or in one late event, so for these blocks the reduction to entry has almost no computational support; its
-hypothesis may well be false. Period 9 shows that this is not a matter of the period alone: there a wall exists that
-about one small half in nine enters within 50,000 steps, with entries still coming at the end, as under $001$. The runs
-cover only small halves and 50,000 steps: entry later, or by larger halves, is not excluded, and `t001` shows that entry
-can take $10^5$ steps.
+hypothesis may well be false. Period 9 shows that this is not a matter of the period alone: there two walls exist that
+about one small half in nine and one in fourteen enter within 50,000 steps, with entries still coming at the end, as
+under $001$. The runs cover only small halves and 50,000 steps: entry later, or by larger halves, is not excluded, and
+`t001` shows that entry can take $10^5$ steps.
 
 **Reproduce.**
 
 ```bash
 python -m computations.lock_chain --entry trap01,trap001fifteen,trap01111,trap001011,trap0011101,trap001011101 --cells 8 --steps 50000
-python -m computations.lock_chain --entry trap001011111 --cells 8 --steps 50000
+python -m computations.lock_chain --entry trap001011111,trap001010011 --cells 8 --steps 50000
 python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000
 ```
 
-The first takes about 40 minutes with one process per trap, the second about 15 and the third about 5.
+The first takes about 40 minutes with one process per trap, the second about 15 per trap and the third about 3.

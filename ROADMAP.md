@@ -71,8 +71,9 @@ kit's commit 932cf8d.
     ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
     its own, a lock of 43 cells of $001011111$ that right halves it drives enter, and carried leftward it gives traps to
-    21 of the 56 blocks of period 9 ([NineTraps](Rule30Open/Columns/NineTraps.md)); the left half reaches every block,
-    as statements only (below).
+    21 of the 56 blocks of period 9, and a second wall, of 41 cells with the phase counted modulo 27, gives one to
+    $001010011$ ([NineTraps](Rule30Open/Columns/NineTraps.md)); the left half reaches every block, as statements only
+    (below).
   - *Conditional.* For 49 blocks of period 4 to 12 that nothing excludes, 16 of them without a run of more than four,
     one sequence of values in column 14 leads every window of 13 cells into a lock, so once the center repeats the
     block, column 14 never reads that sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block
@@ -223,12 +224,13 @@ In order of the assessment above.
    for $001$ are chains too. Wider chain locks reach one block or more of each period from 2 to 9, and six are traps in
    Lean ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has an ether and a wall like period four's: the lock of
    $001011111$, 43 cells wide, whose chain enters a background of spatial period 135, gives traps to 21 blocks of period
-   9 that driven right halves enter ([NineTraps](Rule30Open/Columns/NineTraps.md)); at periods 5, 6 and 7 driven halves
-   almost never settle next to the center ([trap entry](negative-results/columns/trap-entry.md)). Next: entry into the
-   traps of period 9 for every small half, as [the census for 001](findings/columns/t001-census.md) does for the kit's,
-   and their Lean proofs for classes of halves as for period four; walls of other periods, found as the closure of a
-   driven half's window, the search that found this one; and for the blocks no trap reaches, the left half, one
-   statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
+   9 that driven right halves enter, and a second wall, for $001010011$, a 22nd
+   ([NineTraps](Rule30Open/Columns/NineTraps.md)); at periods 5, 6 and 7 driven halves almost never settle next to the
+   center ([trap entry](negative-results/columns/trap-entry.md)). Next: entry into the traps of period 9 for every small
+   half, as [the census for 001](findings/columns/t001-census.md) does for the kit's, and their Lean proofs for classes
+   of halves as for period four; walls of other periods, found as the closure of a driven half's window, the search that
+   found this one; and for the blocks no trap reaches, the left half, one statement per block
+   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
    block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
    periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the

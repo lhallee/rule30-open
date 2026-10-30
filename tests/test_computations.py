@@ -1651,12 +1651,13 @@ def test_word_traps() -> None:
     digits = sys.get_int_max_str_digits()
     sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
     try:
-        names = [entry[0] for entry in lock_chain.TRAPS + lock_chain.NATURAL]
+        names = [entry[0] for entry in lock_chain.TRAPS + lock_chain.NATURAL[:1]]
         for name in names:
             assert lock_chain.lean_trap(name) in word_traps
-        assert lock_chain.lean_nine() in nine_traps
+        assert lock_chain.lean_nine() in nine_traps and lock_chain.lean_trap("trap001010011") in nine_traps
         sources = [(name, word_traps) for name in names]
         sources += [(f"nine{d}", nine_traps) for d in lock_chain.nine_distances() if d]
+        sources += [("trap001010011", nine_traps)]
         for name, lean in sources:
             body = lean.split(f"def {name} : WTrap :=", 1)[1].split("}", 1)[0]
             fields = dict(re.findall(r"(\w+) := (\[[^\]]*\]|\d+)", body))
@@ -1745,3 +1746,25 @@ def test_period_nine_wall() -> None:
     assert (begin, len(cycle), begin8, len(cycle8)) == (10, 135, 8, 135) and set(cycle) == set(cycle8)
     t16 = lock_chain.carried(name, 16)
     assert t16["word"] == "000101011" and lock_chain.is_lock(t16["word"], t16["states"], t16["cells"])
+
+
+def test_second_nine_wall() -> None:
+    """The second wall of period 9: from the random start that `NATURAL` names, a run of 001010011 is inside a closed
+    set of 5,710 windows of 41 cells, with the phase modulo 27, that fixes column 1 at the white phases, by `is_lock`;
+    no width from 16 to 40 gives a trap at that step; and the run enters the set at step 7,622 by a direct run with
+    `step`."""
+    from computations import lock_chain, right_half
+    name, word, start, time, cells, modulus = lock_chain.NATURAL[1]
+    assert start == right_half.random_starts(30, 64)[2]
+    assert lock_chain.natural_trap(word, start, [time], list(range(16, cells + 1)), [modulus]) == (time, cells, 27, 5710)
+    t = lock_chain.tables(name)
+    assert t["word"] == word and lock_chain.is_lock(word * 3, t["states"], cells)
+    _, _, states = lock_chain.trap_states(name)
+    row, entered = start << 1, -1
+    for t in range(time):
+        row = (row & ~1) | int(word[t % 9])
+        if (t % 9, (row >> 1) & ((1 << cells) - 1)) in states:
+            entered = t
+            break
+        row = step(row)
+    assert entered == 7622

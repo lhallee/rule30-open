@@ -345,9 +345,11 @@ def carried(name: str, distance: int) -> dict:
     return relabeled_tables(columns[distance], distance + cells, nodes)
 
 
-# Natural traps that `Rule30Open.Columns.WordTraps` checks: name, word, a right half that a run of the word drives into
-# the trap (bit i is column i + 1; `right_half.random_starts(30, 64)[13]`), the time, the width and the modulus.
-NATURAL = [("trap001011111", "001011111", 18202347099481127113, 12000, 43, 9)]
+# Natural traps that `Rule30Open.Columns.WordTraps` and `Rule30Open.Columns.NineTraps` check: name, word, a right half
+# that a run of the word drives into the trap (bit i is column i + 1; `right_half.random_starts(30, 64)[13]` and
+# `[2]`), the time, the width and the modulus.
+NATURAL = [("trap001011111", "001011111", 18202347099481127113, 12000, 43, 9),
+           ("trap001010011", "001010011", 12828593127923856452, 12000, 41, 27)]
 
 
 def tables(name: str) -> dict:
@@ -397,7 +399,8 @@ def nine_distances() -> list[int]:
 
 def lean_nine() -> str:
     """The trap definitions of `Rule30Open.Columns.NineTraps`: the wall of period 9 carried to each distance of
-    `nine_distances` but 0, whose trap is `trap001011111` of `WordTraps`."""
+    `nine_distances` but 0, whose trap is `trap001011111` of `WordTraps`. The module's second wall is
+    `lean_trap("trap001010011")`."""
     return "\n".join(lean_entry(carried("trap001011111", d), f"nine{d}") for d in nine_distances() if d)
 
 
@@ -447,12 +450,14 @@ def entry_steps(name: str | dict, halves: list[int], phase: int, steps: int) -> 
     return entry  # (n,)
 
 
-def closure(word: str, modulus: int, cells: int, phase: int, window: int, cap: int) -> set[tuple[int, int]] | None:
+def closure(word: str, modulus: int, cells: int, phase: int, window: int, cap: int,
+            locked: bool = False) -> set[tuple[int, int]] | None:
     """The nodes (phase modulo `modulus`, window of `cells` cells) that the game of `word` reaches from one node under
-    both values of the cell beyond, or None once they pass `cap`."""
+    both values of the cell beyond, or None once they pass `cap`; with `locked`, also None once column 1 takes two
+    values at one white phase (`fixes_left`)."""
     period, mask = len(word), (1 << cells) - 1
     start = (phase % modulus, window)
-    seen, frontier = {start}, [start]
+    seen, frontier, value = {start}, [start], {start[0]: window & 1}
     while frontier:
         reached = []
         for ph, w in frontier:
@@ -460,12 +465,32 @@ def closure(word: str, modulus: int, cells: int, phase: int, window: int, cap: i
             for free in (0, 1):
                 node = (after, (left ^ (core | (free << (cells - 1)))) & mask)
                 if node not in seen:
+                    if locked and word[after % period] == "0" and value.setdefault(after, node[1] & 1) != node[1] & 1:
+                        return None
                     seen.add(node)
                     reached.append(node)
                     if len(seen) > cap:
                         return None
         frontier = reached
     return seen
+
+
+def escapes(word: str, modulus: int, cells: int, phase: int, window: int, walks: int = 64, seed: int = 30) -> bool:
+    """Whether one of `walks` random runs of 4 * `cells` steps from the node, with random values of the cell beyond,
+    shows column 1 with two values at one white phase. If so the node's closure is no trap; this rules out most widths
+    at once, where `closure` would have to grow to its cap."""
+    rng = np.random.default_rng(seed)
+    period, mask = len(word), (1 << cells) - 1
+    value: dict[int, int] = {}
+    for _ in range(walks):
+        ph, w = phase % modulus, window
+        frees = rng.integers(0, 2, 4 * cells)  # (4 * cells,)
+        for free in frees.tolist():
+            if word[ph % period] == "0" and value.setdefault(ph, w & 1) != w & 1:
+                return True
+            left, core = (w << 1) | int(word[ph % period]), w | (w >> 1)
+            ph, w = (ph + 1) % modulus, (left ^ (core | (free << (cells - 1)))) & mask
+    return False
 
 
 def fixes_left(word: str, nodes: set[tuple[int, int]]) -> bool:
@@ -475,17 +500,21 @@ def fixes_left(word: str, nodes: set[tuple[int, int]]) -> bool:
 
 
 def natural_trap(word: str, start: int, checkpoints: list[int], widths: list[int], moduli: list[int],
-                 cap: int = 20000) -> tuple[int, int, int, int] | None:
+                 cap: int = 100000) -> tuple[int, int, int, int] | None:
     """The first checkpoint at which the true window of the right half `start` (bit i is column i + 1), driven by
     `word` from phase 0, has a closure of at most `cap` nodes on which column 1 is fixed at the white phases: a trap
-    that this half has entered. Returns the time, width, modulus and size, or None."""
+    that this half has entered. Returns the time, the least such width, the modulus and the size, or None. A trap at
+    one width gives one at every larger width, the windows that extend its states, but with more states."""
     row, period, last = start, len(word), max(checkpoints)
     wanted = set(checkpoints)
     for t in range(last + 1):
         if t in wanted:
             for cells in widths:
                 for modulus in moduli:
-                    nodes = closure(word, modulus, cells, t, row & ((1 << cells) - 1), cap)
+                    window = row & ((1 << cells) - 1)
+                    if escapes(word, modulus, cells, t, window):
+                        continue
+                    nodes = closure(word, modulus, cells, t, window, cap, locked=True)
                     if nodes is not None and fixes_left(word, nodes):
                         return t, cells, modulus, len(nodes)
         row = ((row << 1) | int(word[t % period])) ^ (row | (row >> 1))
@@ -495,8 +524,8 @@ def natural_trap(word: str, start: int, checkpoints: list[int], widths: list[int
 def natural_scan(word: str, steps: int, starts: int = 30) -> tuple[int, list[tuple[int, int, int, int, int]]]:
     """For the empty right half and `starts` random ones (`right_half.random_starts`), driven by `word`: how many lock
     column 1 over the second half of `steps` steps (`right_half.locked_period`), and for those the natural traps
-    found at three late checkpoints, at widths 16 to 64 and with the phase modulo the lock's period or twice it, each
-    as (start, time, width, modulus, size)."""
+    found at three late checkpoints, at the least width from 16 to 64 and with the phase modulo the lock's period or
+    twice it, each as (start, time, width, modulus, size)."""
     from computations import right_half
     locks, found = 0, []
     for k, start in enumerate(right_half.random_starts(starts, 64)):
@@ -505,7 +534,7 @@ def natural_scan(word: str, steps: int, starts: int = 30) -> tuple[int, list[tup
             continue
         locks += 1
         late = [steps * 3 // 5, steps * 4 // 5, steps - 1]
-        hit = natural_trap(word, start, late, list(range(16, 65, 8)), [period, 2 * period])
+        hit = natural_trap(word, start, late, list(range(16, 65)), [period, 2 * period])
         if hit is not None:
             found.append((k, *hit))
     return locks, found
@@ -623,6 +652,8 @@ def main() -> None:
     parser.add_argument("--cells", type=int, default=8, help="with --entry, every half with support in these cells")
     parser.add_argument("--steps", type=int, default=50000)
     parser.add_argument("--natural", type=str, default="", help="periods whose words to search for natural traps")
+    parser.add_argument("--starts", type=int, default=30, help="with --natural, random right halves besides the empty "
+                        "one")
     parser.add_argument("--nine", action="store_true", help="entry of the 31 starts into each trap of period 9")
     parser.add_argument("--width", type=int, default=13)
     parser.add_argument("--workers", type=int, default=1)
@@ -689,10 +720,15 @@ def main() -> None:
         print(f"{name} ({word}, {cells} cells): {done.size} of {times.size} halves and phases with support in cells "
               f"1 .. {args.cells} enter by step {args.steps}{summary}", flush=True)
     for period in [int(p) for p in args.natural.split(",") if p]:
-        for word in tqdm(game.necklaces(period), desc=f"period {period}", file=sys.stderr, mininterval=10):
-            locks_found, traps = natural_scan(word, args.steps)
-            if locks_found:
-                print(f"{word}: column 1 locks for {locks_found} of 31 starts; natural traps {traps}", flush=True)
+        words = game.necklaces(period)
+        scan = functools.partial(natural_scan, steps=args.steps, starts=args.starts)
+        with multiprocessing.Pool(args.workers) as pool:
+            results = tqdm(pool.imap(scan, words), total=len(words), desc=f"period {period}", file=sys.stderr,
+                           mininterval=10)
+            for word, (locks_found, traps) in zip(words, results):
+                if locks_found:
+                    print(f"{word}: column 1 locks for {locks_found} of {args.starts + 1} starts; natural traps "
+                          f"{traps}", flush=True)
         print(f"period {period}: done", flush=True)
     if args.nine:
         from computations import right_half
@@ -704,8 +740,9 @@ def main() -> None:
             print(f"{t['word']} (distance {distance}, {t['cells']} cells): {len(done)} of 31 starts enter by step "
                   f"{args.steps}" + (f", at steps {done}" if done else ""), flush=True)
     if args.lean:
-        print("\n".join(lean_trap(entry[0]) for entry in TRAPS + NATURAL))
+        print("\n".join(lean_trap(entry[0]) for entry in TRAPS + NATURAL[:1]))
         print(lean_nine())
+        print(lean_trap(NATURAL[1][0]))
     if args.verify:
         for seed, width, distance, want in VERIFIED:
             block, nodes = chain_lock(seed, width, distance, want)
