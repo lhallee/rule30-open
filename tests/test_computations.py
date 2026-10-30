@@ -1195,7 +1195,7 @@ def test_windows_after_ones() -> None:
 def test_bit_phases() -> None:
     """`bit_game.phase_rounds` against the game: up to period 10 at width 6 every phase empties a side exactly when
     `game.bad_pairs` finds no component showing both values at a phase. For two blocks of `WIDE`, `lean_block` is the
-    text of their checks in BitPhases.lean, and the lists of the three modules hold exactly the 40 blocks of `WIDE`."""
+    text of their checks in BitPhases.lean, and the lists of the four modules hold exactly the 75 blocks of `WIDE`."""
     from computations import bit_game
     for period in range(2, 11):
         for pattern in game.necklaces(period):
@@ -1206,7 +1206,7 @@ def test_bit_phases() -> None:
                 decided = False
             assert decided == (game.bad_pairs(pattern, 6) == 0), pattern
     lean = {name: (ROOT / "Rule30Open" / "Columns" / f"{name}.lean").read_text(encoding="utf-8")
-            for name in ("BitPhases", "BitPhases19", "BitPhases20")}
+            for name in ("BitPhases", "BitPhases19", "BitPhases20", "BitPhases21")}
     for block in ("00000000000101101", "000000000010000101"):
         assert bit_game.lean_block(block, bit_game.WIDE[block]) in lean["BitPhases"]
     listed = {}
@@ -1215,6 +1215,31 @@ def test_bit_phases() -> None:
             listed[bits] = int(width)
             assert len(bits) == int(n)
     assert listed == bit_game.WIDE
+
+
+def test_bit_blocks() -> None:
+    """The BitBlocks modules of period 19 to 21: `lean_bit_blocks`, given the entries of each module's lists, is the
+    text of its checks and exclusions; the first and the last entry of each list pass `criterion` with the listed
+    images and rounds, and the game, by `bad_pairs`, excludes the block at the listed width; and the period-21 modules
+    hold the 268 new blocks of width at most 12 and the 111 of WallSets."""
+    from computations import bit_game, wall_segments
+    found: dict[str, list[str]] = {}
+    for name, period in (("19", 19), ("19Wide", 19), ("20", 20), ("20Mid", 20), ("20Wide", 20), ("21", 21),
+                         ("21Mid", 21), ("21Wide", 21)):
+        text = (ROOT / "Rule30Open" / "Columns" / f"BitBlocks{name}.lean").read_text(encoding="utf-8")
+        rows = [(block, int(width), int(steps), int(rounds)) for block, width, steps, rounds
+                in re.findall(r"\(\(\d+, 0b([01]+)\), \((\d+), (\d+), (\d+), 300\)\)", text)]
+        listed = re.search(r"def wallBlocks\d+ : List Nat := \[(.*?)\]", text, re.S)
+        walls = re.findall(r"0b([01]+)", listed.group(1)) if listed else []
+        assert bit_game.lean_bit_blocks(period, name, rows, walls) in text
+        for block, width, steps, rounds in (rows[0], rows[-1]):
+            assert len(block) == period
+            assert bit_game.criterion(block, width, steps)[:3] == (True, steps, rounds)
+            assert game.bad_pairs(block, width) == 0
+        assert all(wall_segments.in_set_family(block) for block in walls[:3])
+        found.setdefault(f"rows{period}", []).extend(block for block, *_ in rows)
+        found.setdefault(f"walls{period}", []).extend(walls)
+    assert (len(found["rows21"]), len(set(found["rows21"])), len(found["walls21"])) == (268, 268, 111)
 
 
 def test_bit_game() -> None:

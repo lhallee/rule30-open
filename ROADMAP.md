@@ -18,7 +18,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | Problem | Route | Status | Where it stands |
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
-| 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
+| 1 | Excluding eventual periods block by block | open | the finite game excludes 1,400 blocks of period at most 21, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
 | 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9, 28 of the 99 of period 10, 71 of the 186 of period 11 and 101 of the 335 of period 12 come down to entry into traps, in Lean, from walls at the edges of backgrounds periodic in time and space and from the closed sets that driven right halves settle into, every block of periods 10 to 12 that a sampled half settles into a trap for; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
@@ -49,21 +49,22 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   to 7 one block each is reached, and from period 9 a quarter to two fifths have traps.
   - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at most
     16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
-    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18 and 508 of the 79,971 of period 19
-    and 20, all in Lean, those that need 13 or 14 cells one phase at a time ([periods 17 and
-    18](findings/columns/game-blocks-18.md), [periods 19 and 20](findings/columns/game-blocks-20.md),
-    [BitPhases](Rule30Open/Columns/BitPhases.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every block
-    followed by exponentially many white cells. After nine 1s, following the cells beside the column extends the kit's
-    long black runs to every period whose runs of nine or more 1s are separated by segments that the possible windows of
-    three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game excludes, 616
-    blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a
-    \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md), [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r
-    \ge 9$ 1s rules out every tail of at most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of
-    at most $4 \lfloor (b - 1)/9 \rfloor + 2$ steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period
-    needs $T + P \ge 262{,}125$ ([a window of 262,144 cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells
-    in [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October
-    30 and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at
-    least 17, and four more families with long white runs ([the kit's pull
+    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and
+    20 and 434 of the 99,858 of period 21, all in Lean, those that need 13 or 14 cells one phase at a time ([periods 17
+    and 18](findings/columns/game-blocks-18.md), [periods 19 and 20](findings/columns/game-blocks-20.md), [period
+    21](findings/columns/game-blocks-21.md), [BitPhases](Rule30Open/Columns/BitPhases.md)); the kit excludes every
+    $1\,0^q$ with $q \ge 9$ and every block followed by exponentially many white cells. After nine 1s, following the
+    cells beside the column extends the kit's long black runs to every period whose runs of nine or more 1s are
+    separated by segments that the possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row
+    of period at most 16 that the game excludes, 616 blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0
+    1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$ for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md),
+    [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r \ge 9$ 1s rules out every tail of at most $4 \lfloor r/9
+    \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most $4 \lfloor (b - 1)/9 \rfloor + 2$ steps
+    ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 262{,}125$ ([a window of 262,144
+    cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells in
+    [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October 30
+    and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at least
+    17, and four more families with long white runs ([the kit's pull
     requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
   - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
     every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
@@ -227,9 +228,10 @@ In order of the assessment above.
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
    equal values ([periods 17 and 18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's
    failure only for $01$ ([ring orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508
-   more, 327 of them new ([periods 19 and 20](findings/columns/game-blocks-20.md)). Lean checks every one of these 966
-   blocks; the 40 that need 13 or 14 cells, whose check as one declaration takes the kernel up to 12 GB or more, are
-   checked one phase at a time ([BitPhases](Rule30Open/Columns/BitPhases.md)). Next: steering ([steerable
+   more, 327 of them new ([periods 19 and 20](findings/columns/game-blocks-20.md)), and at period 21 it excludes 434,
+   303 of them new, 0.43% of the period ([period 21](findings/columns/game-blocks-21.md)). Lean checks every one of
+   these 1,400 blocks; the 75 that need 13 or 14 cells, whose check as one declaration takes the kernel up to 12 GB or
+   more, are checked one phase at a time ([BitPhases](Rule30Open/Columns/BitPhases.md)). Next: steering ([steerable
    locks](findings/columns/steerable-locks.md)) at wider windows and longer periods, the one tool here that reaches
    blocks without long runs, though only to a condition on a farther column. Column words without long runs also fix the
    cell beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses

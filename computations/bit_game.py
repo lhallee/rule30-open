@@ -11,6 +11,7 @@ bits, and computes images and preimages with the shifts and masks of the Lean mo
     python -m computations.bit_game --phases 17,18   # the phase checks of BitPhases.lean, under a minute
     python -m computations.bit_game --phases 19   # those of BitPhases19.lean
     python -m computations.bit_game --phases 20   # those of BitPhases20.lean
+    python -m computations.bit_game --phases 21   # those of BitPhases21.lean, about two and a half minutes
 
 `phase_rounds` gives, for `BitPhases.phaseCheck`, the rounds each phase needs with no images at all; one kernel check
 per phase keeps the kernel's tables of one phase at a time.
@@ -32,8 +33,8 @@ SEVEN = {"00000001001111": 13, "00000000010001": 14, "000000000101101": 14, "000
          "0000001011111011": 12, "0000101111111011": 13, "0001011111111001": 14}
 
 
-# The 40 blocks of period 17 to 20 that the game excludes, that neither the kit nor WallSets excludes, and that need 13
-# or 14 cells, with that least width (findings/columns/game-blocks-18.md and game-blocks-20.md).
+# The 75 blocks of period 17 to 21 that the game excludes, that neither the kit nor WallSets excludes, and that need 13
+# or 14 cells, with that least width (findings/columns/game-blocks-18.md, game-blocks-20.md and game-blocks-21.md).
 WIDE = {"00000000000101101": 13, "00000000000111011": 14, "00000000011011111": 13, "00000000101110101": 13,
         "00000000110110111": 13, "00000001011111001": 14, "00000010111101111": 13, "00111001111111101": 13,
         "000000000000000111": 14, "000000000010000101": 13, "000000000010010001": 14, "000001011111111001": 14,
@@ -43,7 +44,19 @@ WIDE = {"00000000000101101": 13, "00000000000111011": 14, "00000000011011111": 1
         "0010011011111111111": 13, "00000000000000110001": 14, "00000000000001000001": 13, "00000000000001010001": 14,
         "00000000000011000101": 14, "00000000001100101111": 14, "00000000110001111011": 13, "00000001011111100011": 13,
         "00000001101111111011": 14, "00000101111111001001": 14, "00000101111111110111": 14, "00001011111111001001": 14,
-        "00010111111111110111": 13, "00100101110011111111": 13, "00101001111111111101": 14, "01111011111111111111": 14}
+        "00010111111111110111": 13, "00100101110011111111": 13, "00101001111111111101": 14, "01111011111111111111": 14,
+        "000000000000001000001": 13, "000000000000001010001": 14, "000000000000001111111": 14,
+        "000000000000010010001": 14, "000000000000011000101": 13, "000000000000100001111": 13,
+        "000000000000100100111": 14, "000000000000101000001": 13, "000000000000110010111": 13,
+        "000000000000110100111": 13, "000000000001100100011": 14, "000000000001101100111": 14,
+        "000000000011001001011": 14, "000000000100101111011": 14, "000000000111100111111": 14,
+        "000000000111110000001": 13, "000000001001011111011": 13, "000000001011100111011": 14,
+        "000000001101100111011": 14, "000000010111111100111": 14, "000000101110011111011": 14,
+        "000001101111111111001": 14, "000011111100111111111": 14, "000011111110011111111": 14,
+        "000101111111110110011": 13, "000101111111111011001": 13, "000111110101111111111": 13,
+        "000111111001111111111": 13, "000111111111100111111": 14, "000111111111110110011": 13,
+        "001011111111111110111": 13, "001101001111111111011": 13, "001111010011111111111": 14,
+        "001111111111101111111": 14, "010111110111111111111": 14}
 
 
 def criterion(block: str, width: int, steps: int | None = None) -> tuple[bool, int, int, int]:
@@ -166,6 +179,67 @@ def lean_phases(blocks: dict[str, int], name: str) -> str:
                f"  intro e he\n  simp only [{name}, List.mem_cons, List.not_mem_nil, or_false] at he\n"
                f"  rcases he with {alternatives}\n{names}")
     return "\n".join(out)
+
+
+def wrap_items(items: list[str], indent: str = "    ", width: int = 120) -> str:
+    """Comma-separated items wrapped at `width`, closed by a bracket, as the lists of the Lean modules are."""
+    lines, line = [], indent
+    for k, item in enumerate(items):
+        piece = item + (", " if k + 1 < len(items) else "]")
+        if len(line) + len(piece.rstrip()) > width:
+            lines.append(line.rstrip())
+            line = indent
+        line += piece
+    lines.append(line)
+    return "\n".join(lines)
+
+
+def lean_bit_blocks(period: int, name: str, rows: list[tuple[str, int, int, int]], walls: list[str]) -> str:
+    """The body of a BitBlocks module: the list `blocks<name>` of the rows (block, width, images D, rounds) with fuel
+    300, one kernel check of `gameCheck` per block, the theorem that gathers them and the exclusions, and, when `walls`
+    is not empty, the list `wallBlocks<period>` of blocks that `WallSets.wallSet` accepts, with its exclusion."""
+    lst, n = f"blocks{name}", len(rows)
+    entries = [f"(({period}, 0b{block}), ({width}, {steps}, {rounds}, 300))" for block, width, steps, rounds in rows]
+    text = (f"def {lst} : List ((Nat × Nat) × (Nat × Nat × Nat × Nat)) := [\n{wrap_items(entries)}\n\n"
+            "set_option Elab.async false\n")
+    for block, width, steps, rounds in rows:
+        text += (f"\nset_option maxHeartbeats 0 in\ntheorem check_{block} :\n    gameCheck (Rule30StripCertificateTable.wordOf "
+                 f"{period} 0b{block}) {width} {steps} {rounds} 300 = true := by decide +kernel\n")
+    lines, line = [], "    "
+    for k in range(n):
+        piece = "rfl" + (" | " if k + 1 < n else "")
+        if len(line) + len(piece.rstrip()) > 118:
+            lines.append(line.rstrip())
+            line = "    "
+        line += piece
+    lines.append(line)
+    patterns = "\n".join(lines)
+    text += (f"\ntheorem {lst}_check : ∀ e ∈ {lst},\n    gameCheck (Rule30StripCertificateTable.wordOf e.1.1 e.1.2) "
+             f"e.2.1 e.2.2.1 e.2.2.2.1 e.2.2.2.2 = true := by\n  intro e he\n  simp only [{lst}, List.mem_cons, "
+             f"List.mem_nil_iff, or_false] at he\n  rcases he with\n{patterns}\n"
+             + "".join(f"  · exact check_{block}\n" for block, *_ in rows))
+    if walls:
+        text += (f"\n/-- The blocks of period {period} that the game excludes and the kit does not, and that `WallSets` "
+                 f"excludes, each as its least\nrotation `wordOf {period} bits`. -/\ndef wallBlocks{period} : List Nat := [\n"
+                 + wrap_items([f"0b{block}" for block in walls]) + "\n\n"
+                 f"theorem wallBlocks{period}_all : wallBlocks{period}.all (fun bits => wallSet "
+                 f"(Rule30StripCertificateTable.wordOf {period} bits)) = true := by\n  decide +kernel\n\n"
+                 f"/-- **The blocks of `WallSets`**: for each entry of `wallBlocks{period}`, the center column does not "
+                 f"repeat the block from any\ntime `T` on. -/\ntheorem center_not_wallBlocks{period} (bits : Nat) "
+                 f"(hb : bits ∈ wallBlocks{period}) (T : Nat)\n    (hcol : ∀ t : Nat, T ≤ t → Rule30Prize.center t = "
+                 f"cyc (Rule30StripCertificateTable.wordOf {period} bits) (t - T)) :\n    False :=\n  "
+                 f"center_wall_set_block T _ (List.all_eq_true.1 wallBlocks{period}_all bits hb) hcol\n")
+    text += (f"\n/-- **The {n} blocks**: for each entry of `{lst}`, the center column is not, from any time `T` on, the "
+             f"block\n`wordOf {period} bits`, read from any phase. -/\ntheorem center_not_{lst} (e : (Nat × Nat) × "
+             f"(Nat × Nat × Nat × Nat)) (he : e ∈ {lst}) (T shift : Nat)\n    (h : ∀ t : Nat, T ≤ t → "
+             f"Rule30Prize.center t =\n      (Rule30StripCertificateTable.wordOf e.1.1 e.1.2).getD ((t + shift) % "
+             f"e.1.1) false) : False :=\n  center_not_bitGame _ _ _ _ _ ({lst}_check e he) T shift fun t ht => by\n"
+             f"    rw [h t ht, Rule30StripCertificateTable.wordOf_length]\n\n/-- The same in the kit's form: none of "
+             f"the {n} blocks is an `EventuallyWord` of the center column. -/\ntheorem not_eventually_{lst} (e : "
+             f"(Nat × Nat) × (Nat × Nat × Nat × Nat)) (he : e ∈ {lst}) :\n    ¬ Rule30StripCertificates.EventuallyWord "
+             f"(Rule30StripCertificateTable.wordOf e.1.1 e.1.2) :=\n  bitGame_not_eventuallyWord _ _ _ _ _ "
+             f"({lst}_check e he)\n")
+    return text
 
 
 class BitTables:

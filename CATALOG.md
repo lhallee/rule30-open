@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-65 Lean modules with 305 headline theorems, 27 findings (proved on paper,
+69 Lean modules with 314 headline theorems, 28 findings (proved on paper,
 computed or conjectured) and 31 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 52 | 14 | 8 |
+| [Columns](#columns) | 56 | 15 | 8 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -44,6 +44,7 @@ approach stopped.
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md): problem 1
 - [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
+- [The finite game excludes 434 of the 99,858 blocks of period 21](findings/columns/game-blocks-21.md): problem 1
 - [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md): problem 1
@@ -104,10 +105,14 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game decided in the kernel and the window-set check exclude 160 more blocks of period 20](Rule30Open/Columns/BitBlocks20.md) | [`Columns.BitBlocks20`](Rule30Open/Columns/BitBlocks20.lean) | `center_not_blocks20`, `not_eventually_blocks20`, `center_not_wallBlocks20` | 1 | not in the kit |
 | [The game decided in the kernel excludes 55 more blocks of period 20 that need 7 or 8 cells](Rule30Open/Columns/BitBlocks20Mid.md) | [`Columns.BitBlocks20Mid`](Rule30Open/Columns/BitBlocks20Mid.lean) | `center_not_blocks20Mid`, `not_eventually_blocks20Mid` | 1 | not in the kit |
 | [The game decided in the kernel excludes 44 more blocks of period 20 that need 9 to 12 cells](Rule30Open/Columns/BitBlocks20Wide.md) | [`Columns.BitBlocks20Wide`](Rule30Open/Columns/BitBlocks20Wide.lean) | `center_not_blocks20Wide`, `not_eventually_blocks20Wide` | 1 | not in the kit |
+| [The game decided in the kernel and the window-set check exclude 220 more blocks of period 21](Rule30Open/Columns/BitBlocks21.md) | [`Columns.BitBlocks21`](Rule30Open/Columns/BitBlocks21.lean) | `center_not_blocks21`, `not_eventually_blocks21`, `center_not_wallBlocks21` | 1 | not in the kit |
+| [The game decided in the kernel excludes 97 more blocks of period 21 that need 7 to 8 cells](Rule30Open/Columns/BitBlocks21Mid.md) | [`Columns.BitBlocks21Mid`](Rule30Open/Columns/BitBlocks21Mid.lean) | `center_not_blocks21Mid`, `not_eventually_blocks21Mid` | 1 | not in the kit |
+| [The game decided in the kernel excludes 62 more blocks of period 21 that need 9 to 12 cells](Rule30Open/Columns/BitBlocks21Wide.md) | [`Columns.BitBlocks21Wide`](Rule30Open/Columns/BitBlocks21Wide.lean) | `center_not_blocks21Wide`, `not_eventually_blocks21Wide` | 1 | not in the kit |
 | [The finite game, decided in the kernel without a certificate, excludes seven blocks of period 14 to 16 that need 12 to 14 cells](Rule30Open/Columns/BitGame.md) | [`Columns.BitGame`](Rule30Open/Columns/BitGame.lean) | `bitGame_column`, `center_not_bitGame`, `bitGame_not_eventuallyWord`, `center_not_restBlocks`, `not_eventually_restBlocks` | 1 | not in the kit |
 | [The game decided phase by phase in the kernel excludes the 14 blocks of period 17 and 18 that need 13 or 14 cells](Rule30Open/Columns/BitPhases.md) | [`Columns.BitPhases`](Rule30Open/Columns/BitPhases.lean) | `phases_column`, `center_not_phases`, `phases_not_eventuallyWord`, `center_not_blocksPhases18`, `not_eventually_blocksPhases18` | 1 | not in the kit |
 | [The game decided phase by phase in the kernel excludes the 11 blocks of period 19 that need 13 or 14 cells](Rule30Open/Columns/BitPhases19.md) | [`Columns.BitPhases19`](Rule30Open/Columns/BitPhases19.lean) | `center_not_blocksPhases19`, `not_eventually_blocksPhases19` | 1 | not in the kit |
 | [The game decided phase by phase in the kernel excludes the 15 blocks of period 20 that need 13 or 14 cells](Rule30Open/Columns/BitPhases20.md) | [`Columns.BitPhases20`](Rule30Open/Columns/BitPhases20.lean) | `center_not_blocksPhases20`, `not_eventually_blocksPhases20` | 1 | not in the kit |
+| [The game decided phase by phase in the kernel excludes the 35 blocks of period 21 that need 13 or 14 cells](Rule30Open/Columns/BitPhases21.md) | [`Columns.BitPhases21`](Rule30Open/Columns/BitPhases21.lean) | `center_not_blocksPhases21`, `not_eventually_blocksPhases21` | 1 | not in the kit |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
 | [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
 | [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |
@@ -158,6 +163,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Up to period 12, what the exclusions and reductions in Lean reach, period by period](findings/columns/coverage.md) | computed | 1 | not applicable |
 | [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md) | computed | 1 | partial |
 | [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
+| [The finite game excludes 434 of the 99,858 blocks of period 21](findings/columns/game-blocks-21.md) | computed | 1 | partial |
 | [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
