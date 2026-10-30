@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-38 Lean modules with 182 headline theorems, 23 findings (proved on paper,
-computed or conjectured) and 29 negative results. Prize problem 1 asks whether the center column
+45 Lean modules with 208 headline theorems, 23 findings (proved on paper,
+computed or conjectured) and 30 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 27 | 10 | 6 |
+| [Columns](#columns) | 34 | 10 | 7 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 0 | 3 | 1 |
@@ -35,7 +35,6 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
-- [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
@@ -46,6 +45,7 @@ approach stopped.
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md): problem 1
+- [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
 - [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
@@ -96,6 +96,11 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No two adjacent columns are eventually periodic](Rule30Open/Columns/AdjacentColumns.md) | [`Columns.AdjacentColumns`](Rule30Open/Columns/AdjacentColumns.lean) | `adjacent_columns`, `no_constant_column`, `center_not_eventually_constant` | 1 | independent proof of a kit result |
 | [The game decided in the kernel and the window-set check exclude 99 more blocks of period 17](Rule30Open/Columns/BitBlocks17.md) | [`Columns.BitBlocks17`](Rule30Open/Columns/BitBlocks17.lean) | `center_not_blocks17`, `not_eventually_blocks17`, `center_not_wallBlocks17` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 122 more blocks of period 18](Rule30Open/Columns/BitBlocks18.md) | [`Columns.BitBlocks18`](Rule30Open/Columns/BitBlocks18.lean) | `center_not_blocks18`, `not_eventually_blocks18`, `center_not_wallBlocks18` | 1 | not in the kit |
+| [The game decided in the kernel and the window-set check exclude 133 more blocks of period 19](Rule30Open/Columns/BitBlocks19.md) | [`Columns.BitBlocks19`](Rule30Open/Columns/BitBlocks19.lean) | `center_not_blocks19`, `not_eventually_blocks19`, `center_not_wallBlocks19` | 1 | not in the kit |
+| [The game decided in the kernel excludes 57 more blocks of period 19 that need 7 to 12 cells](Rule30Open/Columns/BitBlocks19Wide.md) | [`Columns.BitBlocks19Wide`](Rule30Open/Columns/BitBlocks19Wide.lean) | `center_not_blocks19Wide`, `not_eventually_blocks19Wide` | 1 | not in the kit |
+| [The game decided in the kernel and the window-set check exclude 160 more blocks of period 20](Rule30Open/Columns/BitBlocks20.md) | [`Columns.BitBlocks20`](Rule30Open/Columns/BitBlocks20.lean) | `center_not_blocks20`, `not_eventually_blocks20`, `center_not_wallBlocks20` | 1 | not in the kit |
+| [The game decided in the kernel excludes 55 more blocks of period 20 that need 7 or 8 cells](Rule30Open/Columns/BitBlocks20Mid.md) | [`Columns.BitBlocks20Mid`](Rule30Open/Columns/BitBlocks20Mid.lean) | `center_not_blocks20Mid`, `not_eventually_blocks20Mid` | 1 | not in the kit |
+| [The game decided in the kernel excludes 44 more blocks of period 20 that need 9 to 12 cells](Rule30Open/Columns/BitBlocks20Wide.md) | [`Columns.BitBlocks20Wide`](Rule30Open/Columns/BitBlocks20Wide.lean) | `center_not_blocks20Wide`, `not_eventually_blocks20Wide` | 1 | not in the kit |
 | [The finite game, decided in the kernel without a certificate, excludes seven blocks of period 14 to 16 that need 12 to 14 cells](Rule30Open/Columns/BitGame.md) | [`Columns.BitGame`](Rule30Open/Columns/BitGame.lean) | `bitGame_column`, `center_not_bitGame`, `bitGame_not_eventuallyWord`, `center_not_restBlocks`, `not_eventually_restBlocks` | 1 | not in the kit |
 | [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
 | [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |
@@ -110,12 +115,14 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [One sequence in one column forces a lock of the finite game, for a block of any period](Rule30Open/Columns/LockBlocks.md) | [`Columns.LockBlocks`](Rule30Open/Columns/LockBlocks.lean) | `lockBlock_column`, `center_lockBlock`, `center_lock_steered`, `not_eventually_steered` | 1 | not in the kit |
 | [Once the center repeats one of 26 blocks of period 4 to 11, column 14 never reads that block's steering sequence](Rule30Open/Columns/LockBlocks11.md) | [`Columns.LockBlocks11`](Rule30Open/Columns/LockBlocks11.lean) | `steered11_check`, `center_lock_steered11`, `not_eventually_steered11` | 1 | not in the kit |
 | [Once the center repeats one of 23 blocks of period 12, column 14 never reads that block's steering sequence](Rule30Open/Columns/LockBlocks12.md) | [`Columns.LockBlocks12`](Rule30Open/Columns/LockBlocks12.lean) | `steered12_check`, `center_lock_steered12`, `not_eventually_steered12` | 1 | not in the kit |
+| [Once the center repeats one of 22 blocks, a column near it is never white for long](Rule30Open/Columns/LockWhite.md) | [`Columns.LockWhite`](Rule30Open/Columns/LockWhite.lean) | `center_white_run`, `whiteRuns_check`, `center_white_runs`, `not_eventually_white_runs` | 1 | not in the kit |
 | [One word in a column beside the center forces the period-four lock, for each of the three words](Rule30Open/Columns/LockWord.md) | [`Columns.LockWord`](Rule30Open/Columns/LockWord.lean) | `lockWord_column`, `family_contra`, `lock_0001`, `lock_0011`, `lock_0111`, `center_lock_0001`, `center_lock_0011`, `center_lock_0111`, `center_not_0001_of_word`, `center_not_0011_of_word`, `center_not_0111_of_word` | 1 | not in the kit |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
 | [An eventual period of the center column needs T + P of at least 65,518](Rule30Open/Columns/LongWindow.md) | [`Columns.LongWindow`](Rule30Open/Columns/LongWindow.lean) | `center_eq_big`, `factor_new`, `transient_add_period_ge_65518` | 1 | extends a kit result |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |
 | [A right half with at most two black cells among its first cells enters the ether-and-wall family](Rule30Open/Columns/SparseRight.md) | [`Columns.SparseRight`](Rule30Open/Columns/SparseRight.lean) | `inFamily_of_fast`, `stateAt_eq`, `two_absorption`, `sparse_0001`, `sparse_0011`, `sparse_0111`, `oneCell_0011`, `oneCell_0111`, `sparseRight_0001`, `sparseRight_0011`, `sparseRight_0111` | 1 | extends a kit result |
 | [A right half white past its first ten cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TenCells.md) | [`Columns.TenCells`](Rule30Open/Columns/TenCells.lean) | `ten_absorption`, `ten_0001`, `ten_0011`, `ten_0111`, `tenRight_0001`, `tenRight_0011`, `tenRight_0111`, `smallTen_0001`, `smallTen_0011`, `smallTen_0111` | 1 | extends a kit result |
+| [A right half white past its first twelve cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TwelveCells.md) | [`Columns.TwelveCells`](Rule30Open/Columns/TwelveCells.lean) | `twelve_absorption`, `twelve_0001`, `twelve_0011`, `twelve_0111`, `twelveRight_0001`, `twelveRight_0011`, `twelveRight_0111`, `smallTwelve_0001`, `smallTwelve_0011`, `smallTwelve_0111` | 1 | extends a kit result |
 | [After nine 1s the next cell stays known through five kinds of segment, excluding infinite families of periods](Rule30Open/Columns/WallSegments.md) | [`Columns.WallSegments`](Rule30Open/Columns/WallSegments.lean) | `center_run_family`, `center_wall_block`, `center_run_segment`, `wall_segments_column`, `run_family_column` | 1 | extends a kit result |
 | [After nine 1s, the set of possible three-cell windows excludes every block with nine 1s that the game excludes](Rule30Open/Columns/WallSets.md) | [`Columns.WallSets`](Rule30Open/Columns/WallSets.lean) | `center_wall_set_block`, `center_runs_odd_100`, `center_runs_odd_110`, `center_runs_even_1010`, `wall_sets_column` | 1 | extends a kit result |
 | [A right half white past its first six cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/WhiteGap.md) | [`Columns.WhiteGap`](Rule30Open/Columns/WhiteGap.lean) | `drv_cone`, `inFamily_of_check_cone`, `gap_absorption`, `gap_0001`, `gap_0011`, `gap_0111`, `gapRight_0001`, `gapRight_0011`, `gapRight_0111`, `high_0011`, `high_0111` | 1 | extends a kit result |
@@ -128,7 +135,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
 | [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md) | computed | 1 | partial |
-| [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | wanted |
+| [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
 | [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
@@ -146,6 +153,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |
 | [Periodic orbits on rings explain the finite game's failure only for the alternating block](negative-results/columns/ring-orbits.md) | no signal | 1 |
 | [A search for slow right halves finds no counterexample and misses the slowest halves](negative-results/columns/slow-half-search.md) | no signal | 1 |
+| [No window of up to 18 cells locks for any block of period 2, 3, 5, 6, 7 or 9](negative-results/columns/window-locks.md) | no signal | 1 |
 
 ## Period two
 

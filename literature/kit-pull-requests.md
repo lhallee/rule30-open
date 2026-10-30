@@ -1,7 +1,7 @@
 # Open pull requests to the prize kit
 
 The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch,
-commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit had 22 open
+commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit had 23 open
 [pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls), most written by agents. Each adds Lean
 modules that its author reports as checked by the kit's `Check.lean`; none is merged, so here every one is a claim.
 The summaries below come from the pull request pages and from the module sources at each pull request's head
@@ -53,6 +53,15 @@ The summaries below come from the pull request pages and from the module sources
   of a bounded window pays every birth beside a locally alternating center. *Here:* the last is a negative result of
   the kind of [the conservation laws](../negative-results/structure/conservation-laws.md): a local accounting of the
   pattern does not close.
+
+## Local invariants
+
+- **#58, `Rule30GroupCocycle`.** Claims that every homogeneous one-step, local, group-valued zero-curvature connection
+  for Rule 30 is a local vertex gauge of two commuting vacuum constants, for any group, finite or not, commutative or
+  not, with the spatial and temporal supports placed independently (`arbitrary_local_supports`); it says that it proves
+  no prize problem. *Here:* if correct, it extends [the conservation laws](../negative-results/structure/conservation-laws.md)
+  from additive quantities on blocks to ordered transport in any group: Rule 30 carries no local invariant of either
+  kind beyond the trivial ones, so neither kind constrains the density of Problem 2.
 
 ## Excluding eventual periods by families of blocks
 

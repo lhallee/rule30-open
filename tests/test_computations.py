@@ -1423,3 +1423,52 @@ def test_locks() -> None:
         assert set(np.unique(windows).tolist()) <= set(finals[final])
         assert locked[(final << width) + windows].all()
     assert locks.longest_run("0111") == 3 and locks.longest_run("01010101011") == 2 and locks.longest_run("1000001") == 5
+    # no locked node for 01 at width 8: from every node a forward search meets both values of the left column at a phase
+    source, target, _, _, column = game.game_graph("01", 8)  # (2 p n,), (2 p n,), _, _, (p n,)
+    phase = np.arange(column.size) >> 8  # (p n,)
+    for node in range(column.size):
+        seen = np.zeros(column.size, dtype=bool)  # (p n,)
+        seen[node] = True
+        frontier = seen.copy()  # (p n,)
+        while frontier.any():
+            after = np.zeros(column.size, dtype=bool)  # (p n,)
+            after[target[frontier[source]]] = True
+            frontier = after & ~seen
+            seen |= frontier
+        assert any(column[seen & (phase == ph)].any() and (~column[seen & (phase == ph)]).any() for ph in range(2))
+    assert not locks.has_lock("01", 8) and locks.has_lock("0111", 13)
+    assert locks.family("0^k 11101", 3) == "00011101" and locks.family("00 1^k 01", 4) == "00111101"
+    assert locks.fewest_mixed("0111", 13) == 0 and locks.fewest_mixed("01", 8) == 1
+    assert locks.lock_census([2, 4], [13]) == {(2, 13): [], (4, 13): ["0111"]}
+    # white alone: 27 white values in column 8 lock every window of 7 cells beside 000011111111, and 26 do not
+    block, width = "000011111111", 7
+    assert locks.constant_steering(block, width, 0) == 27 and locks.white_run(block, [6, 7, 8]) == (7, 27)
+    locked, _ = locks.lock_info(block, width)  # (p n,)
+    mask, period, ends = (1 << width) - 1, len(block), {}
+    for start in range(period):
+        windows = np.arange(1 << width, dtype=np.int64)  # (2^W,)
+        for step in range(27):
+            left = ((windows << 1) | int(block[(start + step) % period])) & mask  # (2^W,)
+            windows = left ^ (windows | (windows >> 1))  # (2^W,), the free cell white
+            ends[(start, step + 1)] = locked[(((start + step + 1) % period) << width) + windows].all()
+    assert all(ends[(start, 27)] for start in range(period))
+    assert not all(ends[(start, 26)] for start in range(period))
+
+
+def test_lock_breaks() -> None:
+    """`right_half.lock_breaks` against the right half stepped as 64-bit words by `absorption.step_rows`: driven by
+    01111, start 2 holds column 1 with period 10 at the white times from step 6,000 until step 13,000."""
+    from computations import absorption, right_half
+    start = right_half.random_starts(30, 64)[2]
+    steps = 14000
+    _, count, first = right_half.lock_breaks("01111", start, steps, 10, 6000)
+    rows = np.zeros((1, (64 + steps) // 64 + 2), dtype=np.uint64)  # (1, words)
+    rows[0, 0] = np.uint64(start)
+    column = np.zeros(steps, dtype=np.uint8)  # (steps,)
+    for t in range(steps):
+        column[t] = int(rows[0, 0]) & 1
+        rows = absorption.step_rows(rows, int("01111"[t % 5]))  # (1, words)
+    white = np.array(["01111"[t % 5] == "0" for t in range(steps - 10)])  # (steps - 10,)
+    breaks = np.flatnonzero((column[:-10] != column[10:]) & white)  # (b,)
+    late = breaks[breaks > 6000]  # (c,)
+    assert first == 13000 == int(late[0]) and count == late.size

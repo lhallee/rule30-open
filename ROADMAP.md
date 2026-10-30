@@ -22,7 +22,7 @@ kit's commit 932cf8d.
   specific repeating blocks: 197 of the 8,800 blocks of period at most 16, all 136 beyond the kit in Lean ([game
   blocks](findings/columns/game-blocks.md), [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period
   17 and 18, all but 14 in Lean ([periods 17 and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of
-  period 19 and 20, by computation ([periods 19 and 20](findings/columns/game-blocks-20.md)), every $1\,0^q$ with
+  period 19 and 20, all but 26 in Lean ([periods 19 and 20](findings/columns/game-blocks-20.md)), every $1\,0^q$ with
   $q \ge 9$, and every block followed by exponentially many white cells (the kit). Following the cells beside the column
   after nine 1s extends the kit's long black runs to every period whose runs of nine or more 1s are separated by
   segments that the possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at
@@ -43,15 +43,19 @@ kit's commit 932cf8d.
   of period 4 to 12 that nothing excludes, 16 of them without a run of more than four, one sequence of values in column
   14 leads every window of 13 cells into a lock, so once the center repeats the block, column 14 never reads that
   sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block and its instances) and, by
-  computation, has entropy below one bit per step ([steerable locks](findings/columns/steerable-locks.md)).
+  computation, has entropy below one bit per step ([steerable locks](findings/columns/steerable-locks.md)); for 22 of
+  them a white run in one column suffices, as short as 27 cells in column 8
+  ([LockWhite](Rule30Open/Columns/LockWhite.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up to 18
+  cells, so no method of this kind reaches those periods ([window locks](negative-results/columns/window-locks.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
   enters (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three words); in Lean, halves of up to
-  ten cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md) for six, [TenCells](Rule30Open/Columns/TenCells.md)
-  for ten), so does every half white on columns 7 to $B$, whatever lies beyond, with $B$ = 316, 535 and 310
-  ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), and every half white on columns 11 to $G'$, with $G'$ = 562, 654 and 371
-  ([TenCells](Rule30Open/Columns/TenCells.md)), and so does every half with at most two black cells among columns 1 to
+  twelve cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md) for six, [TenCells](Rule30Open/Columns/TenCells.md)
+  for ten, [TwelveCells](Rule30Open/Columns/TwelveCells.md) for twelve), so does every half white on columns 7 to $B$,
+  whatever lies beyond, with $B$ = 316, 535 and 310 ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), every half white on
+  columns 11 to $G'$, with $G'$ = 562, 654 and 371 ([TenCells](Rule30Open/Columns/TenCells.md)), and every half white on
+  columns 13 to 750, 995 and 560 ([TwelveCells](Rule30Open/Columns/TwelveCells.md)), and so does every half with at most two black cells among columns 1 to
   $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell anywhere
   ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every truncation of
   the aligned ether, the only infinite half seen to stay out, followed by at most four cells
@@ -139,14 +143,15 @@ kit's commit 932cf8d.
 
 In order of the assessment above.
 
-1. **Attraction for period four.** The Lean classes so far are halves of at most ten cells, a white gap after the sixth
-   or the tenth cell, at most two black cells among the first $G$, the aligned ether cut anywhere with at most four
+1. **Attraction for period four.** The Lean classes so far are halves of at most twelve cells, a white gap after the
+   sixth, the tenth or the twelfth cell, at most two black cells among the first $G$, the aligned ether cut anywhere with at most four
    cells after it, and every half whose column 17, 15 or 14 reads one fixed sequence
    ([LockWord](Rule30Open/Columns/LockWord.md)). Next: the shift lemma of
    [EtherPrefix](Rule30Open/Columns/EtherPrefix.md) applies to any half whose column 1 stays the ether's until it
    enters, so ether prefixes in front of the census halves, or of longer tails, need only base checks; three black cells
    by [SparseRight](Rule30Open/Columns/SparseRight.md)'s route need 32,219 to 476,314 kernel checks per word and phase;
-   halves of 12 cells by [TenCells](Rule30Open/Columns/TenCells.md)'s route need a few minutes of kernel time; and the
+   halves of 14 cells by [TwelveCells](Rule30Open/Columns/TwelveCells.md)'s route would take about four times its three
+   minutes of kernel time; and the
    slowest halves, which are rare and which local and beam searches do not find ([the slow-half
    searches](negative-results/columns/slow-half-search.md)). *Assessment:* each class is thin; a proof for every finite
    half needs an argument that the chaotic part near the center delivers a wall, which none of these gives.
@@ -157,9 +162,9 @@ In order of the assessment above.
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
    equal values, and Lean checks all but 14, which need 13 or 14 cells ([periods 17 and
    18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's failure only for $01$ ([ring
-   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, by
-   computation ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next: a cheaper kernel form of the check for
-   13 and 14 cells, the 327 blocks in Lean, and steering ([steerable locks](findings/columns/steerable-locks.md)) at
+   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, and Lean
+   checks all but the 26 that need 13 or 14 cells ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next: a
+   cheaper kernel form of the check for 13 and 14 cells, and steering ([steerable locks](findings/columns/steerable-locks.md)) at
    wider windows and longer periods, the one tool here that reaches blocks without long runs, though only to a
    condition on a farther column. Column words without long runs also fix the cell beside the column, the shortest
    being $0110000$, but up to period 20 they exclude no block the game misses ([forcing

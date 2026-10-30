@@ -15,10 +15,16 @@ public import Rule30Open.Columns.WideWall
 public import Rule30Open.Columns.BitGame
 public import Rule30Open.Columns.BitBlocks17
 public import Rule30Open.Columns.BitBlocks18
+public import Rule30Open.Columns.BitBlocks19
+public import Rule30Open.Columns.BitBlocks19Wide
+public import Rule30Open.Columns.BitBlocks20
+public import Rule30Open.Columns.BitBlocks20Mid
+public import Rule30Open.Columns.BitBlocks20Wide
 public import Rule30Open.Columns.LockWord
 public import Rule30Open.Columns.LockBlocks
 public import Rule30Open.Columns.LockBlocks11
 public import Rule30Open.Columns.LockBlocks12
+public import Rule30Open.Columns.LockWhite
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.EtherDomain
@@ -29,6 +35,7 @@ public import Rule30Open.Columns.EtherPrefix
 public import Rule30Open.Columns.HighThree
 public import Rule30Open.Columns.LongWindow
 public import Rule30Open.Columns.TenCells
+public import Rule30Open.Columns.TwelveCells
 public import Rule30Open.Columns.LeftHalf0001
 public import Rule30Open.Columns.LeftHalfDriven
 public import Rule30Open.PeriodTwo.HeldColumn

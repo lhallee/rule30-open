@@ -3,8 +3,8 @@ title: The finite game excludes 508 of the 79,971 blocks of period 19 and 20
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
-evidence: [computations/game.py, computations/wall_segments.py]
+formalization: partial
+evidence: [computations/game.py, computations/bit_game.py, computations/wall_segments.py]
 ---
 
 # The finite game excludes 508 of the 79,971 blocks of period 19 and 20
@@ -13,17 +13,23 @@ evidence: [computations/game.py, computations/wall_segments.py]
 6, 10 and 14 in turn, excludes 508 of the 79,971 blocks as the eventual period of any column of any row with a leftmost
 1: 217 of the 27,594 of period 19 and 291 of the 52,377 of period 20. The kit excludes 33 of them, all 33 that it
 excludes at these periods, [WallSets](../../Rule30Open/Columns/WallSets.md) 148 more, and 327 are new. Lean checks
-none of the 327 yet.
+the 148 by WallSets' check and 301 of the 327 by the game decided in the kernel
+([BitBlocks19](../../Rule30Open/Columns/BitBlocks19.md), [BitBlocks19Wide](../../Rule30Open/Columns/BitBlocks19Wide.md),
+[BitBlocks20](../../Rule30Open/Columns/BitBlocks20.md), [BitBlocks20Mid](../../Rule30Open/Columns/BitBlocks20Mid.md),
+[BitBlocks20Wide](../../Rule30Open/Columns/BitBlocks20Wide.md)); the other 26 need 13 or 14 cells.
 
 ## Result
 
-| Period | Blocks | Excluded | By the kit | By WallSets | New |
-|---:|---:|---:|---:|---:|---:|
-| 19 | 27,594 | 217 | 16 | 67 | 134 |
-| 20 | 52,377 | 291 | 17 | 81 | 193 |
+| Period | Blocks | Excluded | By the kit | By WallSets | New | New, in Lean |
+|---:|---:|---:|---:|---:|---:|---:|
+| 19 | 27,594 | 217 | 16 | 67 | 134 | 123 |
+| 20 | 52,377 | 291 | 17 | 81 | 193 | 178 |
 
 - **Widths.** Of the 508, the game excludes 324 at width 6, 133 at width 10 and 51 at width 14; of the 327 new blocks,
-  145, 131 and 51.
+  145, 131 and 51. At the least width the 327 need 5 to 14 cells: 3 need 5, 142 need 6, 29 need 7, 58 need 8, 25 need
+  9, 19 need 10, 17 need 11, 8 need 12, 12 need 13 and 14 need 14.
+- **The bit check.** `criterion` in [computations/bit_game.py](../../computations/bit_game.py) decides each of the 327
+  at its least width, with at most 183 images, 3 rounds and closures of 123 steps.
 - **Runs.** As at periods 17 and 18 ([the game blocks of period 17 and 18](game-blocks-18.md)), every excluded block has
   a run of at least six equal values. The least are $0000001010011111011$, $0000001011011000011$,
   $0000001011110000011$, $0000001011111100011$ and $0001011100111111011$ of period 19 and $00000010100111111011$,

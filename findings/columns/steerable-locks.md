@@ -89,6 +89,12 @@ logarithm.
   $000100111101$, $000101101011$, $000111001101$, $001001101111$, $001110111101$ and $010101010111$. Every block other
   than the constant ones that the game excludes up to period 20 has a run of at least five ([the game
   blocks](game-blocks.md), [period 19 and 20](game-blocks-20.md)).
+- **White runs.** For 29 of the 49 blocks the all-white sequence steers at some width from 4 to 16: a run of white
+  cells in one column forces the lock, the shortest being 27 cells in column 8 for $000011111111$. Lean checks the 22
+  whose shortest run comes at a width of at most 13 ([LockWhite](../../Rule30Open/Columns/LockWhite.md)).
+- **Locks are always reachable.** At width 13 the blocks of period at most 12 with any locked node are exactly the 72
+  steerable ones; no block of period 2, 3, 5, 6, 7 or 9 has a locked node up to width 18 ([window
+  locks](../../negative-results/columns/window-locks.md)).
 - **Period four.** Of the three primitive words of period four only $0111$ is steerable at width 13;
   [LockWord](../../Rule30Open/Columns/LockWord.md) steers $0011$ at width 14 and $0001$ at width 16 into the kit's
   family.

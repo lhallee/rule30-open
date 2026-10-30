@@ -21,7 +21,10 @@ From the empty right half and from 30 random right halves of 64 cells, over 12,0
 the white times repeats over the second half with some multiple of the word's period:
 
 - $0001$, $0011$, $0111$: column 1 locks for all 31 starts, with period 4.
-- $001$ locks for 3 starts (period 21) and $01111$ for 9 (period 10).
+- $001$ locks for 3 starts (period 21) and $01111$ for 9 (period 10). Followed to step 200,000, the three $001$ starts
+  stay locked after step 487, while every $01111$ start breaks its lock, first between steps 12,385 and 20,905, and
+  then more than a thousand times: those locks are long-lived, not permanent ([window
+  locks](../../negative-results/columns/window-locks.md)).
 - The other 34 primitive words of period 2 to 7, $01$ and $011$ among them: it locks for none.
 
 The same test at longer periods counts the primitive words that lock for all 31 starts:
@@ -77,6 +80,7 @@ alternating center about half the windows cannot be steered into it at all
 ```bash
 python -m computations.right_half 12000 30 --max-period 7
 python -m computations.right_half 12000 30 --min-period 8 --max-period 12
+python -m computations.right_half 200000 30 --follow 01111:10
 ```
 
 [computations/right_half.py](../../computations/right_half.py) runs the first in about 15 s and the second in about
