@@ -47,6 +47,7 @@ public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Frames.SeedPast
+public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.RandomRows.LeftWindow

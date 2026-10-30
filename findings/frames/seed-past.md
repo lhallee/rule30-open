@@ -62,8 +62,10 @@ steps for every $k$ from 66 to 3,000.
 ## In Lean
 
 [SeedPast](../../Rule30Open/Frames/SeedPast.md) proves the frame, the bijection, the uniqueness of $\rho_k$ and its
-eventual periodicity, for every $k$ (`rho_evPer`, `past_evPer`). The exact death of the tail and the unbounded periods
-are not formalized.
+eventual periodicity, for every $k$ (`rho_evPer`, `past_evPer`), and
+[SeedPastPeriods](../../Rule30Open/Frames/SeedPastPeriods.md) the other two facts: for $k \ge 1$ the tail of $\rho_k$ is
+not white (`rho_not_evZero`), a period of $p$ cells forces $k \le 2^p$ (`rho_period_bound`), and so the periods are
+unbounded (`rho_no_short_period`). The table of periods stays a computation.
 
 ## In the kit
 
