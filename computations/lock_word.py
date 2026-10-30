@@ -18,6 +18,7 @@ k = 1) and 13 for 0111 ((2, 2), k = 0). At those widths
     python -m computations.lock_word --lean   # the words as Lean literals
     python -m computations.lock_word --reach 19 20 21   # windows that no sequence brings in, about 3 min
     python -m computations.lock_word --entropy   # how fast the sequences that keep a window out grow, about 20 s
+    python -m computations.lock_word --entropy 13 14 15 16   # the same at wider windows, about 1 min
 
 `unreachable` marks the windows from which no values of column W + 1 lead into the trap. Under the three words of
 period four there are none up to width 20; beside an alternating center, 0101, about half the windows at widths 19 and
@@ -151,14 +152,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--lean", action="store_true", help="print the words as Lean literals")
     parser.add_argument("--reach", type=int, nargs="*", help="instead, the windows that can never enter, at these widths")
-    parser.add_argument("--entropy", action="store_true", help="instead, the growth of the sequences that keep out")
+    parser.add_argument("--entropy", type=int, nargs="*",
+                        help="instead, the growth of the sequences that keep out, at the least widths or these")
     args = parser.parse_args()
     wall = kit_wall()  # (4, 2^13)
-    if args.entropy:
-        for word, (width, _, _, _) in LEAST.items():
-            growth = avoid_growth(word, trap(word, width, wall))
-            print(f"{word}: sequences of column {width + 1} that keep a window out grow by {growth:.6f} per step, "
-                  f"so at most {np.log2(growth):.5f} bits per step")
+    if args.entropy is not None:
+        for word, (least, _, _, _) in LEAST.items():
+            for width in [w for w in args.entropy if w >= least] if args.entropy else [least]:
+                growth = avoid_growth(word, trap(word, width, wall))
+                print(f"{word}: sequences of column {width + 1} that keep a window out grow by {growth:.6f} per step, "
+                      f"so at most {np.log2(growth):.5f} bits per step")
         return
     if args.reach:
         for word in ("0001", "0011", "0111", "0101"):

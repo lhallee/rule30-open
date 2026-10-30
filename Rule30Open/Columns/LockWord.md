@@ -88,7 +88,9 @@ $\mu$ = 1.998025, 1.998950 and 1.969279 for $0001$, $0011$ and $0111$: twice the
 staying out decays, computed in floating point (`python -m computations.lock_word --entropy`). So a center that
 repeats the word leaves column $K + 1$ an entropy of at most 0.9986, 0.9992 and 0.9777 bits per step, where a column
 with every word, as a normal one, has 1. The constraint is slight: a column above these bounds would exclude the word,
-and nothing is known about the entropy of these columns.
+and nothing is known about the entropy of these columns. Wider windows do not tighten it: under $0111$ the rate is
+1.964, 1.963 and 1.965 for columns 15, 16 and 17, and under $0011$ 1.993 and 1.996 for columns 16 and 17
+(`--entropy 13 14 15 16`).
 
 ## Relation to the kit
 
