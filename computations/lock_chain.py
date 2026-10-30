@@ -44,6 +44,7 @@ whether the white right half settles.
     python -m computations.lock_chain --lean-census 13   # the traps of CensusTraps13; 14 for CensusTraps14
     python -m computations.lock_chain --census-entry 13 --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --lean-census-large   # the traps of CensusTrapsLarge, in parts
+    python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
@@ -915,11 +916,20 @@ LONG_TRAPS = [("0000000010001", 0, 16, 13), ("0000000110011", 0, 16, 13), ("0000
               ("00101011110101", 0, 16, 14), ("00101101010011", 0, 16, 14), ("00101101011101", 0, 16, 14),
               ("00101101111111", 0, 16, 14), ("00110111111011", 0, 16, 14), ("00111010110111", 0, 16, 14),
               ("00111110111101", 0, 16, 14), ("01010101011111", 0, 16, 14), ("01101111110111", 0, 16, 14)]
+# The natural traps of periods 13 and 14 of more than 3,000 states that `LONG_TRAPS` leaves out and that the census of
+# locked windows does not already hold as a component (`CENSUS_LARGE` holds the other 22): every sampled half is
+# inside each at step 12,000. Checked in parts in `Rule30Open.Columns.NaturalTrapsLongLarge`.
+LONG_LARGE = [("0000001011011", 0, 16, 13), ("0000001101001", 0, 16, 13), ("0000010111011", 0, 16, 13),
+              ("0000010111111", 0, 16, 13), ("0000110111001", 0, 16, 13), ("0010100101111", 0, 16, 13),
+              ("0101011111111", 0, 16, 13), ("0110110111111", 0, 16, 13), ("00000001111111", 0, 16, 14),
+              ("00000011110111", 0, 16, 14), ("00011111110101", 0, 16, 14), ("01011111111011", 0, 16, 14)]
 
 
 def extra_tables(word: str) -> dict:
-    """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS` or `LONG_TRAPS` for the block, as tables (`natural_tables`)."""
-    _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS + LONG_TRAPS if entry[0] == word)
+    """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS`, `LONG_TRAPS` or `LONG_LARGE` for the block, as tables
+    (`natural_tables`)."""
+    _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS + LONG_TRAPS + LONG_LARGE
+                                    if entry[0] == word)
     return natural_tables(word, start, 12000, cells, modulus)
 
 
@@ -1049,6 +1059,12 @@ def lean_census(period: int, piece: int = 1 << 16) -> str:
         out.append(lean_entry(census_tables(entry), label, piece)
                    + f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n")
     return "\n".join(out)
+
+
+def lean_long_large(part: int = 1024, piece: int = 1 << 16) -> str:
+    """The traps of `Rule30Open.Columns.NaturalTrapsLongLarge`: each entry of `LONG_LARGE`, named by its block, checked
+    in parts (`lean_parts`)."""
+    return "\n".join(lean_parts(extra_tables(word), f"nat{word}", part, piece) for word, *_ in LONG_LARGE)
 
 
 def lean_census_large(part: int = 1024, piece: int = 1 << 16) -> str:
@@ -1562,6 +1578,7 @@ def main() -> None:
     parser.add_argument("--census-entry", type=int, default=0, choices=[0, 13, 14],
                         help="entry into each trap of CensusTraps13 or CensusTraps14")
     parser.add_argument("--lean-census-large", action="store_true", help="print the traps of CensusTrapsLarge.lean")
+    parser.add_argument("--lean-long-large", action="store_true", help="print the traps of NaturalTrapsLongLarge.lean")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
     parser.add_argument("--lean-long", action="store_true", help="print the trap entries of NaturalTrapsLong.lean")
     parser.add_argument("--long-entry", action="store_true",
@@ -1782,6 +1799,8 @@ def main() -> None:
         print(lean_census(args.lean_census))
     if args.lean_census_large:
         print(lean_census_large())
+    if args.lean_long_large:
+        print(lean_long_large())
     if args.lean_wall_gaps:
         for name, trap, bound, prefix in WALL_GAPS:
             print(lean_gap(name, trap, bound, prefix))

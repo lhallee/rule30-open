@@ -44,7 +44,9 @@ order.
   [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md),
   [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
   [NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md),
-  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md), [FarWalls](../../Rule30Open/Columns/FarWalls.md),
+  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md),
+  [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md),
+  [FarWalls](../../Rule30Open/Columns/FarWalls.md),
   [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
   [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md),
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md) and

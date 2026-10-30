@@ -31,13 +31,15 @@ block that the chains of the locked windows of 16 cells hold at periods 13 and 1
 
 ## Argument
 
-Each trap is a bottom component of the block's locked windows of 16 cells, a closed set of windows on which column 1
-is fixed at the white phases, as in [CensusTraps13](CensusTraps13.md), here not carried (`component_tables` at
-distance 0 in [computations/lock_chain.py](../../computations/lock_chain.py)). The packed numbers of each have up to
-about 370,000 bits, so they are written in pieces of 65,536 bits, and the check runs over ranges of 1,024 states, one
-kernel check each, which `allRange_cover` and `allBelowT_of_forall` of [NaturalTrapsLarge](NaturalTrapsLarge.md)
-gather into the check of [WordTraps](WordTraps.md) (`lean_parts`). The kernel checks every part, so the census is not
-trusted, and `absorption_excludes` gives each reduction.
+Each trap is a bottom component of the block's locked windows of 16 cells, a closed set of windows on which column 1 is
+fixed at the white phases, as in [CensusTraps13](CensusTraps13.md), here not carried (`component_tables` at distance 0
+in [computations/lock_chain.py](../../computations/lock_chain.py)). Each is also the natural trap of its block, the one
+that [NaturalTrapsLong](NaturalTrapsLong.md) leaves out for its size: every one of the 31 sampled halves of the natural
+scan is inside it at step 12,000. The packed numbers of each have up to about 370,000 bits, so they are written in
+pieces of 65,536 bits, and the check runs over ranges of 1,024 states, one kernel check each, which `allRange_cover` and
+`allBelowT_of_forall` of [NaturalTrapsLarge](NaturalTrapsLarge.md) gather into the check of [WordTraps](WordTraps.md)
+(`lean_parts`). The kernel checks every part, so the census is not trusted, and `absorption_excludes` gives each
+reduction.
 
 ## What it covers
 

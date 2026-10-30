@@ -51,10 +51,12 @@ parts.
 
 ## What it covers
 
-Each trap reduces its block to entry. Small halves enter the traps carried a short way: of the 208 pairs of a right
-half with support in cells 1 to 4 and a phase, every pair enters 9 of the traps, carried 1 to 4 columns, within 20,000
-steps, the latest at step 17,918; some pairs enter 38 more, carried up to 31 columns; and no pair enters the other 78,
-carried 4 to 92 columns (`census_entry`). Entry for every finite right half stays open, as for the kit's traps.
+Each trap reduces its block to entry. Small halves enter the traps carried a short way: of the 208 pairs of a right half
+with support in cells 1 to 4 and a phase, every pair enters 9 of the traps, carried 1 to 4 columns, within 20,000 steps,
+the latest at step 17,918; some pairs enter 38 more, carried up to 31 columns; and no pair enters the other 78, carried
+4 to 92 columns (`census_entry`). For eight of the blocks every sampled half of the natural scan is inside a larger trap
+of 16 cells, which [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) checks. Entry for every finite right half stays
+open, as for the kit's traps.
 
 ## Relation to the kit
 

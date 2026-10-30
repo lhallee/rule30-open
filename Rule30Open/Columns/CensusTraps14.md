@@ -47,7 +47,12 @@ chains repeat. The other 12 blocks are reached only by their own components, of 
 
 ## What it covers
 
-Each trap reduces its block to entry. Entry for every finite right half stays open, as for the kit's traps.
+Each trap reduces its block to entry. Small halves enter the traps carried a short way: of the 224 pairs of a right
+half with support in cells 1 to 4 and a phase, every pair enters 11 of the traps, carried 1 to 6 columns, within
+20,000 steps, the latest at step 17,233; some pairs enter 49 more, carried 2 to 20 columns; and no pair enters the
+other 172, carried 5 to 88 columns (`census_entry`). For four of the blocks every sampled half of the natural scan is
+inside a larger trap of 16 cells, which [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) checks. Entry for every
+finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 
@@ -68,4 +73,5 @@ python -m computations.lock_chain --lock-backgrounds 14 --width 16 --workers 3
 python -m computations.lock_chain --census-entry 14 --cells 4 --steps 20000
 ```
 
-The first, the census at period 14, takes about half an hour with three processes.
+The first, the census at period 14, takes about half an hour with three processes; the second, entry into each trap
+here, about an hour.

@@ -2129,9 +2129,9 @@ def test_coverage() -> None:
     """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
     the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
     Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
-    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of FarWalls, 125 of CensusTraps13, 232 of
-    CensusTraps14 and 22 of CensusTrapsLarge, each of its period, and the steered blocks are the 49 entries of the
-    LockBlocks modules."""
+    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of NaturalTrapsLongLarge, 12 of FarWalls, and of
+    CensusTraps13, CensusTraps14 and CensusTrapsLarge the 117, 228 and 22 that no earlier module holds, each of its
+    period, and the steered blocks are the 49 entries of the LockBlocks modules."""
     from collections import Counter
     from computations import coverage
     assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
@@ -2141,8 +2141,9 @@ def test_coverage() -> None:
     assert (modules["ThirteenTraps"], modules["FourteenTraps"]) == (53, 101)
     assert (modules["NaturalTraps"], modules["NaturalTrapsLarge"], modules["NaturalTrapsLong"]) == (34, 1, 74)
     assert modules["FarWalls"] == 12 and all(len(b) == 12 for b, m in traps.items() if m == "FarWalls")
-    assert modules["CensusTraps13"] == 125 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
-    assert modules["CensusTraps14"] == 232 and all(len(b) == 14 for b, m in traps.items() if m == "CensusTraps14")
+    assert modules["CensusTraps13"] == 117 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
+    assert modules["CensusTraps14"] == 228 and all(len(b) == 14 for b, m in traps.items() if m == "CensusTraps14")
+    assert modules["NaturalTrapsLongLarge"] == 12
     assert modules["CensusTrapsLarge"] == 22 and all(len(b) in (13, 14) for b, m in traps.items()
                                                      if m == "CensusTrapsLarge")
     assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12, "ThirteenTraps": 13,
@@ -2294,7 +2295,8 @@ def test_census_traps() -> None:
     another trap module; those of more than 3,000 states are the large ones; and `lean_census` and
     `lean_census_large` are the text of the three modules."""
     from computations import coverage, lock_chain
-    others = {block for block, module in coverage.trap_blocks().items() if not module.startswith("CensusTraps")}
+    others = {block for block, module in coverage.trap_blocks().items()
+              if not module.startswith("CensusTraps") and module != "NaturalTrapsLongLarge"}
     groups = [(13, lock_chain.CENSUS_TRAPS[13]), (14, lock_chain.CENSUS_TRAPS[14]), (0, lock_chain.CENSUS_LARGE)]
     words = [block for _, entries in groups for block, *_ in entries]
     assert len(words) == len(set(words)) == 125 + 232 + 22
@@ -2313,11 +2315,12 @@ def test_census_traps() -> None:
 
 
 def test_natural_traps() -> None:
-    """The traps of NaturalTraps, NaturalTrapsLarge and NaturalTrapsLong: each is a lock by `is_lock`, a direct check
-    with the rule, for its block; its half, driven by the block with `step`, has its window in the trap at step 12,000;
-    the 35 blocks of periods 10 to 12 and the 74 of periods 13 and 14 are distinct, and neither the kit's nor a block of
-    another trap module; `lean_extra` and `lean_large` are the text of the three modules; and `lean_number` writes
-    numbers in pieces that sum back to them."""
+    """The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLong and NaturalTrapsLongLarge: each is a lock by
+    `is_lock`, a direct check with the rule, for its block; for the first three, its half, driven by the block with
+    `step`, has its window in the trap at step 12,000; the 35 blocks of periods 10 to 12 and the 74 of periods 13 and 14
+    are distinct, and neither the kit's nor a block of another trap module; the 12 large ones of periods 13 and 14 have
+    census traps too; `lean_extra`, `lean_large` and `lean_long_large` are the text of the modules; and `lean_number`
+    writes numbers in pieces that sum back to them."""
     from computations import coverage, lock_chain
     sizes = {}
     for word, start, cells, modulus in lock_chain.EXTRA_TRAPS + lock_chain.LARGE_TRAPS:
@@ -2352,6 +2355,16 @@ def test_natural_traps() -> None:
     assert sorted(len(word) for word in long_blocks) == [13] * 34 + [14] * 40 and len(set(long_blocks)) == 74
     others = {word for word, module in coverage.trap_blocks().items() if module != "NaturalTrapsLong"}
     assert not set(long_blocks) & (others | set(game.kit_blocks(14)))
+    # the large natural traps of periods 13 and 14: every sampled half's trap, checked in parts; each block has a
+    # smaller census trap as well, and the 22 other large ones are census components themselves
+    census = {word for word, *_ in lock_chain.CENSUS_TRAPS[13] + lock_chain.CENSUS_TRAPS[14]}
+    for word, start, cells, modulus in lock_chain.LONG_LARGE:
+        t = lock_chain.extra_tables(word)
+        assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus) and len(t["states"]) > 3000
+        assert lock_chain.is_lock(word, t["states"], cells) and word in census
+    assert {word for word, *_ in lock_chain.LONG_LARGE}.isdisjoint(set(long_blocks))
+    assert lock_chain.lean_long_large() in (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsLongLarge.lean").read_text(
+        encoding="utf-8")
     for x in (0, 5, (7 << 40) + 3, 3 ** 200):
         terms = lock_chain.lean_number(x, 16).split("+")
         assert sum(int(a) << (int(b) if b else 0) for a, _, b in (term.strip().partition(" <<< ") for term in terms)) == x

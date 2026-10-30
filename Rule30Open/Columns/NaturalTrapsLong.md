@@ -44,7 +44,8 @@ time](../../findings/columns/space-time-backgrounds.md)). Small halves enter the
 support in cells 1 to 4, driven from every phase, enters 61 of them within 8,255 steps, 52 within 2,500, and some of
 those halves enter each of the other 13 (`extra_entry` with `--long-entry`). Entry for every finite right half stays
 open, as for the kit's traps. The blocks whose traps have more than 3,000 states, 18 of period 13 and 16 of period 14,
-are left out.
+are left out here and checked in parts: 22 in [CensusTrapsLarge](CensusTrapsLarge.md), where the trap is a component of
+the census of locked windows, and 12 in [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md).
 
 ## Relation to the kit
 
