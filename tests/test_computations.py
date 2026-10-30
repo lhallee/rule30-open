@@ -1358,3 +1358,25 @@ def test_lock_unreachable() -> None:
         assert not meets_trap(window)
     for window in rng.choice(good, 2, replace=False).tolist():
         assert meets_trap(window)
+
+
+def test_lock_avoid_growth() -> None:
+    """`lock_word.avoid_growth` against a direct count: under 0111 at width 13, the number of sequences of column 14 that
+    keep the worst window out for L steps, counted step by step, grows by the same factor per step between L = 600 and
+    L = 800."""
+    from computations import lock_word
+    wall = absorption.kit_wall()  # (4, 2^13)
+    member = lock_word.trap("0111", 13, wall)  # (4, 2^13)
+    successors = lock_certificate.successor_table("0111", 13)  # (4, 2, 2^13)
+    counts = np.where(member, 0.0, 1.0)  # (4, 2^13), sequences of length 0 that keep each window out
+    worst = []
+    for length in range(1, 801):
+        nxt = np.empty_like(counts)  # (4, 2^13)
+        for ph in range(4):
+            later = counts[(ph + 1) % 4]  # (2^13,)
+            nxt[ph] = (later[successors[ph, 0]] + later[successors[ph, 1]]) * ~member[ph]
+        scale = nxt.max()
+        counts = nxt / scale
+        worst.append(np.log(scale))
+    rate = np.exp(np.mean(worst[600:]))
+    assert abs(rate - lock_word.avoid_growth("0111", member)) < 1e-3

@@ -17,6 +17,7 @@ k = 1) and 13 for 0111 ((2, 2), k = 0). At those widths
     python -m computations.lock_word   # the three words at the least widths, about 10 s
     python -m computations.lock_word --lean   # the words as Lean literals
     python -m computations.lock_word --reach 19 20 21   # windows that no sequence brings in, about 3 min
+    python -m computations.lock_word --entropy   # how fast the sequences that keep a window out grow, about 20 s
 
 `unreachable` marks the windows from which no values of column W + 1 lead into the trap. Under the three words of
 period four there are none up to width 20; beside an alternating center, 0101, about half the windows at widths 19 and
@@ -30,7 +31,7 @@ import argparse
 import numpy as np
 
 from computations.absorption import ALIGNMENTS, WALL_CELLS, ether, kit_wall
-from computations.coin_lock import UNREACHED, entry_paths
+from computations.coin_lock import UNREACHED, decay_rate, entry_paths
 from computations.lock_certificate import successor_table
 
 # The least window width at which the kit's family fits, with the alignment (j0, shift) and depth k used there.
@@ -61,6 +62,13 @@ def unreachable(word: str, width: int, wall: np.ndarray) -> np.ndarray:
     # wall: (4, 2^13)
     dist, _ = entry_paths(word, trap(word, width, wall))  # (4, 2^W)
     return dist >= UNREACHED  # (4, 2^W)
+
+
+def avoid_growth(word: str, member: np.ndarray) -> float:
+    """The growth rate per step of the number of sequences of column W + 1 that keep a window out of the trap: twice
+    the factor by which a fair coin's chance of staying out decays (`coin_lock.decay_rate`), in floating point."""
+    # member: (4, 2^W)
+    return 2 * decay_rate(word, member)
 
 
 def universal_word(word: str, member: np.ndarray) -> list[int]:
@@ -143,8 +151,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--lean", action="store_true", help="print the words as Lean literals")
     parser.add_argument("--reach", type=int, nargs="*", help="instead, the windows that can never enter, at these widths")
+    parser.add_argument("--entropy", action="store_true", help="instead, the growth of the sequences that keep out")
     args = parser.parse_args()
     wall = kit_wall()  # (4, 2^13)
+    if args.entropy:
+        for word, (width, _, _, _) in LEAST.items():
+            growth = avoid_growth(word, trap(word, width, wall))
+            print(f"{word}: sequences of column {width + 1} that keep a window out grow by {growth:.6f} per step, "
+                  f"so at most {np.log2(growth):.5f} bits per step")
+        return
     if args.reach:
         for word in ("0001", "0011", "0111", "0101"):
             for width in args.reach:

@@ -80,6 +80,16 @@ at any depth, and this result reads only the first $K$ columns. Beside an altern
 can never enter it, whatever the next column does ([the absorption route for period
 two](../../negative-results/period-two/absorption-route.md)).
 
+## How much the hypothesis constrains the column
+
+Once the center repeats the word, every stretch of column $K + 1$ after $T$ is a sequence that keeps the window out of
+the family for as long. Those sequences number about $\mu^L$ for length $L$, from the worst window, with
+$\mu$ = 1.998025, 1.998950 and 1.969279 for $0001$, $0011$ and $0111$: twice the rate at which a fair coin's chance of
+staying out decays, computed in floating point (`python -m computations.lock_word --entropy`). So a center that
+repeats the word leaves column $K + 1$ an entropy of at most 0.9986, 0.9992 and 0.9777 bits per step, where a column
+with every word, as a normal one, has 1. The constraint is slight: a column above these bounds would exclude the word,
+and nothing is known about the entropy of these columns.
+
 ## Relation to the kit
 
 The family, its invariance and the alignments are the kit's (`Rule30Ether`); masked Jen for rows with a leftmost 1 is
