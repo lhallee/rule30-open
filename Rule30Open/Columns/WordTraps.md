@@ -95,10 +95,11 @@ period: the other blocks of period 5, 6, 7 and 9 have no trap found.
 with the period 3 replaced by the block's length, the same packed tables and the kit's `allBelowT`; its absorption
 statement is the kit's `AbsorptionT` with the kit's driven half `Rule30Ether.drv` and strip encoding
 `Rule30EtherThree.EncF`. The kit proves soundness for the center column through masked Jen; `wtrap_column` holds for
-every column of every row with a leftmost 1, through the adjacent-column form of Jen's theorem. The kit's only traps
-are for $001$ and for the words of period four, and its table of strip certificates has no block of period 5, 6, 7 or
-9. Its period-two route goes through the left half (`Q01`); `trap01` gives $01$ a reduction of the kind the kit has for
-period four.
+every column of every row with a leftmost 1, through the adjacent-column form of Jen's theorem. The kit's traps are
+`t001` for $001$ and its ether-and-wall family, whose `absorption_excludes` holds for any aligned word: the words of
+period four and, through `aligned_0101_3`, $0101$, so the kit already reduces $01$ to entry into its family, and
+`trap01` is that reduction with one trap of 19 cells. Its table of strip certificates has no block of period 5, 6, 7 or
+9.
 
 ## Lean
 

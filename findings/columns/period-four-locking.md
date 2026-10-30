@@ -40,9 +40,12 @@ chains](lock-chains.md)). No word of period 9 locks for more than one start, alt
 the locks of up to 13 cells are those of a few seeds carried leftward, and no block of period 9 is a seed; in particular
 $0\,1^8$, whose chain holds the period-9 members of the families that lock at period 8 and from 10, has no locked
 window. Five blocks of period 9 do have locked windows, of 30 cells and more with the phase counted modulo 18, from
-seeds of period 18 ([lock chains](lock-chains.md)). The finite game at width 13 shows the same gap: 71 of the 109 words
-that lock for every start, and one word that locks for none, have a lock that every window of 13 cells can be steered
-into, and no word of period 9 does ([steerable locks](steerable-locks.md)).
+seeds of period 18 ([lock chains](lock-chains.md)), and at 43 cells $001011111$ has a lock of its own with the phase
+counted modulo 9: run for 20,000 steps, six words of period 9 lock from one of the 31 starts, and five of them,
+$001011111$ among them, are inside the traps that this lock gives, carried leftward
+([NineTraps](../../Rule30Open/Columns/NineTraps.md)). The finite game at width 13 shows the same gap: 71 of the 109
+words that lock for every start, and one word that locks for none, have a lock that every window of 13 cells can be
+steered into, and no word of period 9 does ([steerable locks](steerable-locks.md)).
 
 
 ## A finite certificate

@@ -73,11 +73,13 @@ determines, and such chains give locked windows to $01111$ of period 5 (107 cell
 6 (29 cells, modulo 12), $0011101$ and $0000011$ of period 7 (35 and 43 cells, modulo 14), five blocks of period 9, the
 first $001011101$ (30 cells, modulo 18), and a second one to $001$ (52 cells, modulo 15, beside the kit's trap of 47
 cells modulo 21) ([lock chains](../../findings/columns/lock-chains.md));
-[WordTraps](../../Rule30Open/Columns/WordTraps.md) proves six of them in Lean as traps. The kit's period-four family is
-the chain of $0\,1^7$, whose period 8 fits periods 4 and 8, and the locks of periods 10 to 12 are chains of seeds with
-long runs of 1s; no block of period 2, 3, 5, 6, 7 or 9 is a seed at the widths above. The negative result stands as
-stated: no window of up to 18 cells, with the phase counted modulo the period, and none of the multiples tried at the
-widths tried.
+[WordTraps](../../Rule30Open/Columns/WordTraps.md) proves six of them in Lean as traps. Period 9 has more: the block
+$001011111$ has a trap of 43 cells with the phase counted modulo 9 itself, which right halves that it drives enter, and
+carried leftward it gives traps to 21 of the 56 blocks of period 9 ([NineTraps](../../Rule30Open/Columns/NineTraps.md)).
+The kit's period-four family is the chain of $0\,1^7$, whose period 8 fits periods 4 and 8, and the locks of periods 10
+to 12 are chains of seeds with long runs of 1s; no block of period 2, 3, 5, 6, 7 or 9 is a seed at the widths above. The
+negative result stands as stated: no window of up to 18 cells, with the phase counted modulo the period, and none of the
+multiples tried at the widths tried.
 
 
 **Reproduce.**

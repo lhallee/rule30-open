@@ -35,8 +35,9 @@ continuation, whatever the cell beyond the window does, the column left of the r
 phase. A bottom component of a block's game is a strongly connected set of locked nodes that no move leaves.
 
 1. **Seven seeds.** In each bottom component of the 72 blocks with a locked window of 13 cells, columns $1, \dots, d$
-   are functions of the phase for some $d \ge 0$, and they are the chain of a seed read back from the block's distance
-   $d$. A seed is a block with a bottom component in which column 1 is not a function of the phase. There are seven:
+   are functions of the phase for some $d \ge 0$, and the chain of one of seven seeds holds the block and, $d$ columns
+   nearer the seed, the block of column $d$. A seed is a block with a bottom component in which column 1 is not a
+   function of the phase. The seven are:
 
    | seed | period | longest run of 1s | lock value at its white phases | blocks in its chain | distances |
    |---|---|---|---|---|---|
@@ -97,7 +98,8 @@ phase. A bottom component of a block's game is a strongly connected set of locke
 7. **Locked windows for a block of every period from 2 to 9.** A chain can hold a column whose least period is a
    proper divisor of the seed's; that block then has a locked window with the phase counted modulo the seed's period.
    The scan took as seeds every block of period 10, 12, 14 and 15 with a locked window of 5 cells and every block of
-   period 16, 18 and 20 with one of 9 cells, and followed each chain to distance 3,000. The shortest lock found for each
+   period 16, 18, 20 and 21 with one of 9 cells, and followed each chain to distance 3,000. At period 21 it finds the
+   kit's `t001` again, $001$ at distance 38 of $0^5\,1\,0\,1^{12}\,0\,1$ (item 6). The shortest lock found for each
    block of period at most 9, each checked directly by the rule on whole windows:
 
    | block | period | seed | phase modulo | distance | width | states |
@@ -117,7 +119,8 @@ phase. A bottom component of a block's game is a strongly connected set of locke
    The first is the kit's family for $01$ (item 4). The others are new: the census of window locks found none for these
    blocks because it stopped at 16 and 18 cells and counted the phase modulo the period or a small multiple of it.
    Every seed but $0\,1^7$ has a run of at least nine 1s. The scan found columns of a shorter period of periods 2, 3, 5,
-   6, 7, 8, 9 and 10, none of period 4, so no second wall for the ether of period four, and none holding $011$.
+   6, 7, 8, 9 and 10, none of period 4, so no second wall for the ether of period four, and none holding $011$; the
+   locks for a block of period 9 here count the phase modulo 18, and item 10 gives the wall of period 9 itself.
    [WordTraps](../../Rule30Open/Columns/WordTraps.md) checks in Lean the traps for $01$, $001$, $01111$, $001011$,
    $0011101$ and $001011101$.
 8. **The kit's strip certificates.** The kit's strip-certificate table has 15 words of length 8 to 12 and its two rank
@@ -129,6 +132,19 @@ phase. A bottom component of a block's game is a strongly connected set of locke
    long spatial periods (155 for $0\,1^9$, 275 for $0\,1^{10}$, 143 for $0\,1\,0\,1^8$, 138 for $0\,1^{11}$ and for
    $0^7\,1\,0\,1^3$, 60 for $0\,1\,0\,1^9$), mixing columns of the seed's period with columns of a divisor of it.
 
+10. **A wall of period 9.** At 43 cells, with the phase counted modulo 9, the block $001011111$ is a seed. The closure
+   of the window of a right half that it drives, at step 12,000, under both values of the cell beyond, is a lock of 233
+   states with no column fixed by the phase (`natural_trap`); the half enters it at step 6,084. Its chain, from the
+   lock's values at its white phases, white, black and white, holds 21 blocks of period 9 within distance 21, and from
+   distance 10 repeats with spatial period 135 in a background of 13 blocks of period 9, the one that the chain of
+   $0\,1^8$ enters from distance 8. So period 9 has an ether and a wall, as period four has, the wall 43 cells wide
+   where the census of window locks stopped at 18. Run for 20,000 steps from 31 starts, six words of period 9 lock
+   column 1 from one start each, and five of them, at distances 0, 1, 2, 5 and 16 of this chain, are then inside its
+   traps (`natural_scan`). Of the right halves with support in cells 1 to 8, from every phase, 247 of 2,304 enter the
+   trap of $001011111$ within 50,000 steps ([trap entry](../../negative-results/columns/trap-entry.md)).
+   [NineTraps](../../Rule30Open/Columns/NineTraps.md) checks all 21 traps in Lean. Of the
+   words of period 5, 6 and 7 only $01111$ locks column 1, from 2 of the 31 starts, and neither closes into a trap.
+
 ## What it means
 
 The locks that the finite game finds are a few seeds, each a lock with no column fixed by the phase, carried leftward
@@ -137,7 +153,8 @@ way, from seeds with a run of at least seven 1s. So the question of [window
 locks](../../negative-results/columns/window-locks.md), why no window locks at periods 2, 3, 5, 6, 7 and 9, is a
 question about seeds; for the three families it is the single fact that $0\,1^8$ does not lock, and item 3 shows how it
 fails. The gap is one of width: with wider windows and the phase counted modulo a multiple of the period, a block of
-every period from 2 to 9 locks (item 7), five blocks of period 9 among them.
+every period from 2 to 9 locks (item 7), and period 9 has a wall of its own at 43 cells that driven right halves
+enter (item 10).
 
 Each lock of item 7 is a trap in the kit's sense, so the route the kit takes for period three and four, a trap and the
 statement that every finite right half enters it, now reaches one block of each period 5, 6, 7 and 9, with a second
@@ -166,7 +183,9 @@ python -m computations.lock_chain --wall 4,5,6,7,8,9,10,11,12,13,14 --width 11  
 python -m computations.lock_chain --ether   # items 4 and 5, about 1 min
 python -m computations.lock_chain --t001 --verify   # items 6 and 7, about 1 min
 python -m computations.lock_chain --short 10,12,14,15 --width 5 --depth 3000 --workers 4   # item 7, about 3 min
-python -m computations.lock_chain --short 16,18,20 --width 9 --depth 3000 --workers 4   # item 7, about 15 min
+python -m computations.lock_chain --short 16,18,20,21 --width 9 --depth 3000 --workers 4   # item 7, about 40 min
+python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000   # item 10, about 5 min
+python -m computations.lock_chain --nine --steps 20000   # item 10, entry into each trap of period 9, about 5 min
 ```
 
 `tests/test_computations.py::test_lock_chain` checks `left_column` against a step of the rule, the chain of

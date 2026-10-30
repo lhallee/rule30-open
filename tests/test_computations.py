@@ -1640,18 +1640,24 @@ def test_lock_chain() -> None:
 
 
 def test_word_traps() -> None:
-    """The traps of `WordTraps.lean` are the entries that `lock_chain.lean_trap` prints, and their packed tables, read
-    back from the Lean source, pass the module's check by `step`: each listed successor is the window one step of the
-    rule later, beside the block at the label's phase, with the label one more, and at a white phase the first cell is
-    the label's bit of `u`."""
+    """The traps of `WordTraps.lean` and `NineTraps.lean` are the entries that `lock_chain.lean_trap` and
+    `lock_chain.lean_nine` print, and their packed tables, read back from the Lean sources, pass the modules' check by
+    `step`: each listed successor is the window one step of the rule later, beside the block at the label's phase, with
+    the label one more, and at a white phase the first cell is the label's bit of `u`."""
     import sys
     from computations import lock_chain
-    lean = (ROOT / "Rule30Open" / "Columns" / "WordTraps.lean").read_text(encoding="utf-8")
+    word_traps = (ROOT / "Rule30Open" / "Columns" / "WordTraps.lean").read_text(encoding="utf-8")
+    nine_traps = (ROOT / "Rule30Open" / "Columns" / "NineTraps.lean").read_text(encoding="utf-8")
     digits = sys.get_int_max_str_digits()
     sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
     try:
-        for name, seed, width, distance, want in lock_chain.TRAPS:
-            assert lock_chain.lean_trap(name, seed, width, distance, want) in lean
+        names = [entry[0] for entry in lock_chain.TRAPS + lock_chain.NATURAL]
+        for name in names:
+            assert lock_chain.lean_trap(name) in word_traps
+        assert lock_chain.lean_nine() in nine_traps
+        sources = [(name, word_traps) for name in names]
+        sources += [(f"nine{d}", nine_traps) for d in lock_chain.nine_distances() if d]
+        for name, lean in sources:
             body = lean.split(f"def {name} : WTrap :=", 1)[1].split("}", 1)[0]
             fields = dict(re.findall(r"(\w+) := (\[[^\]]*\]|\d+)", body))
             block = [cell.strip() == "true" for cell in fields["b"].strip("[]").split(",")]
@@ -1670,3 +1676,72 @@ def test_word_traps() -> None:
                     assert (labels >> (lb * j)) % (1 << lb) == (label + 1) % modulus
     finally:
         sys.set_int_max_str_digits(digits)
+
+
+def test_trap_entry() -> None:
+    """`lock_chain.entry_steps`, which steps packed rows, against a direct run of each half with `step` on one integer,
+    checked against the trap's states at every step, for the traps of 01, 001011 and 01111 (whose 107 cells span two
+    words) and the halves of up to four cells, from every phase."""
+    from computations import lock_chain
+    for name in ("trap01", "trap001011", "trap01111"):
+        word, cells, states = lock_chain.trap_states(name)
+        period, mask = len(word), (1 << cells) - 1
+        halves = list(range(16))
+        for phase in range(period):
+            got = lock_chain.entry_steps(name, halves, phase, 400)  # (16,)
+            for half, first in zip(halves, got.tolist()):
+                row, found = half << 1, -1  # bit 0 is the driven column, bit x cell x
+                for t in range(400):
+                    row = (row & ~1) | int(word[(t + phase) % period])
+                    if ((t + phase) % period, (row >> 1) & mask) in states:
+                        found = t
+                        break
+                    row = step(row)
+                assert first == found
+
+
+def test_natural_trap() -> None:
+    """`lock_chain.natural_trap` rebuilds the kit's trap for 001: from the empty right half, the closure of the true
+    window of 47 cells with the phase counted modulo 21 is, at step 1,500, exactly the states of `t001`, read from the
+    kit's source, as pairs of the phase modulo 21 and the window; and two values of column 1 at one white phase are
+    rejected, while at a black phase they are not."""
+    from computations import lock_chain
+    found = lock_chain.natural_trap("001", 0, [1500], [47], [21])
+    assert found is not None and found[1:] == (47, 21, 815)
+    row = 0
+    for t in range(1500):
+        row = ((row << 1) | int("001"[t % 3])) ^ (row | (row >> 1))
+    nodes = lock_chain.closure("001", 21, 47, 1500, row & ((1 << 47) - 1), 20000)
+    kit = {(label % 21, strip) for strip, label in lock_chain.t001_states()}
+    shifts = [d for d in range(0, 21, 3) if {((ph + d) % 21, w) for ph, w in nodes} == kit]
+    assert len(shifts) == 1
+    assert not lock_chain.fixes_left("001", {(3, 0), (3, 1)}) and lock_chain.fixes_left("001", {(2, 0), (2, 1)})
+
+
+def test_period_nine_wall() -> None:
+    """The wall of period 9: from the random start that `NATURAL` names, a run of 001011111 is inside a closed set of
+    233 windows of 43 cells, with the phase modulo 9, that fixes column 1 at the white phases, and enters it at step
+    6,084 by a direct run with `step`; its chain holds 21 blocks of period 9 at the distances `nine_distances` gives and
+    repeats from distance 10 with spatial period 135 in the background that the chain of 0 1^8 enters, columns of the
+    two cycles agreeing as sets; and the trap carried to distance 16 is a lock by `is_lock`."""
+    from computations import lock_chain, right_half
+    name, word, start, time, cells, modulus = lock_chain.NATURAL[0]
+    assert start == right_half.random_starts(30, 64)[13]
+    assert lock_chain.natural_trap(word, start, [time], [cells], [modulus]) == (time, cells, modulus, 233)
+    _, _, states = lock_chain.trap_states(name)
+    row, entered = start << 1, -1
+    for t in range(time):
+        row = (row & ~1) | int(word[t % 9])
+        if (t % 9, (row >> 1) & ((1 << cells) - 1)) in states:
+            entered = t
+            break
+        row = step(row)
+    assert entered == 6084
+    assert lock_chain.nine_distances() == list(range(19)) + [20, 21]
+    values = "".join(str((lock_chain.tables(name)["first"] >> ph) & 1) if word[ph] == "0" else "0" for ph in range(9))
+    assert values == "010000000"
+    begin, cycle = lock_chain.chain_cycle(word, values)
+    begin8, cycle8 = lock_chain.chain_cycle("011111111", "0" * 9)
+    assert (begin, len(cycle), begin8, len(cycle8)) == (10, 135, 8, 135) and set(cycle) == set(cycle8)
+    t16 = lock_chain.carried(name, 16)
+    assert t16["word"] == "000101011" and lock_chain.is_lock(t16["word"], t16["states"], t16["cells"])
