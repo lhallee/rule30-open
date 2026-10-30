@@ -16,7 +16,9 @@ beside the column at each white phase. `short_scan` follows the chains of many s
 writes it as a trap of `Rule30Open.Columns.WordTraps`. `natural_trap` finds the trap a driven right half has entered,
 as the closure of its true window at the least width that works; `entry_steps` measures entry into a trap by the
 rule's own halves, `coin_entry` with a fair coin in place of the cells beyond the window, and `white_lock` asks
-whether the white right half settles.
+whether the white right half settles. `lock_backgrounds` sorts the locks of a `survey` by the background their chains
+end in, `background_row` gives a row of that background to run on its ring, and `component_tables` carries one bottom
+component leftward as a trap, as the census traps (`CENSUS_TRAPS`, `CENSUS_LARGE`) are.
 
     python -m computations.lock_chain --chain 8,9,10,11,12,13 --depth 12   # the chains of 0 1^(P-1), 15 s
     python -m computations.lock_chain --classify 4,8,10,11,12 --width 13 --workers 3   # every lock's seed, about 2 min

@@ -284,9 +284,10 @@ In order of the assessment above.
    entry, though small halves enter few of the traps carried far. At period 15 the same census finds six backgrounds
    with walls, of 64 to 2,145 cells, and its chains hold 648 of the 2,182 blocks, every block excluded there and 595
    more, all now with traps in Lean ([CensusTraps15](Rule30Open/Columns/CensusTraps15.md),
-   [CensusTrapsLarge15](Rule30Open/Columns/CensusTrapsLarge15.md)). Next: the census at wider windows, where the walls
-   of period 9 (43 cells) suggest the backgrounds without a wall of 16 cells may have wider ones, and at period 16;
-   wider classes of halves for that edge, such as every half of twelve cells, as
+   [CensusTrapsLarge15](Rule30Open/Columns/CensusTrapsLarge15.md)). With windows of 18 cells, periods 10 to 12 have more
+   locks but their chains hold the same blocks, and the backgrounds without a wall of 16 cells still have none. Next:
+   the census at period 16, and at widths well past 18 for the backgrounds without walls, as the walls of period 9 are
+   43 cells wide; wider classes of halves for that edge, such as every half of twelve cells, as
    [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569 values of column 17
    that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md) does for period four; the walls of
    periods 11 and 12 are carried in Lean too ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md),

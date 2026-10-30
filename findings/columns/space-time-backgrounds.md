@@ -72,11 +72,13 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   | 15 | 197 | 64 (17), 85 (16), 105 (12), 540 (22), 795 (24), 2,145 (107) | 648 |
 
   So the backgrounds of 30 and 90 cells at period 10, of 100 at 12, of 117 and 130 at 13, and of 14, 28 and 84 at 14
-  have no wall of 16 cells. Those of 533, 644 and 1,316 cells have walls too, which the traps of
-  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 16, 14 and 15 of its 74. Period 15
-  is past the list above, since its map has $4^{15}$ states; the census finds six backgrounds of that period, each
-  confirmed by running one of its rows on its ring. The chains hold every block of these periods that the game or the
-  kit excludes; every block that a trap module reached before the census, except eight whose natural traps count the
+  have no wall of 16 cells. A wider window does not change this at periods 10 to 12: with 18 cells, 14, 36 and 47 blocks
+  have a lock, against 12, 30 and 41, but their chains end in the same backgrounds and hold the same 28, 73 and 121
+  blocks, so the wider locks lie along the same chains. Those of 533, 644 and 1,316 cells have walls too, which the
+  traps of [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 16, 14 and 15 of its 74.
+  Period 15 is past the list above, since its map has $4^{15}$ states; the census finds six backgrounds of that period,
+  each confirmed by running one of its rows on its ring. The chains hold every block of these periods that the game or
+  the kit excludes; every block that a trap module reached before the census, except eight whose natural traps count the
   phase modulo twice or three times the period; and 12, 135, 244 and 595 blocks of periods 12 to 15 that nothing
   reached. [FarWalls](../../Rule30Open/Columns/FarWalls.md), [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
   [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md) and
@@ -140,12 +142,13 @@ python -m computations.space_time_periodic 4,8,10,12,14 --witnesses
 python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16
 python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10 --counts
 python -m computations.lock_chain --lock-backgrounds 10,11,12,13,14,15 --width 16 --workers 3
+python -m computations.lock_chain --lock-backgrounds 10,11,12 --width 18 --workers 3
 ```
 
 Each lists the backgrounds by squaring the map on $4^P$ pairs: under a minute to period 13, and period 14 in about two
 minutes with a peak of about 6 GB. The census of locked windows takes about two hours with three processes, half of it
-at period 15, and prints, for each background, after how many steps one of its rows returns on its ring. The chains of
-the traps come from `chain_cycle` in [computations/lock_chain.py](../../computations/lock_chain.py), on the traps of
-`natural_tables`, `tables` and `carried`. The test compares the backgrounds of periods up to 6 with every ring of up to
-16 cells run directly, runs every background of period up to 10 on its ring and counts its rows, and runs the witness
-for $0001$ on its ring.
+at period 15, and prints, for each background, after how many steps one of its rows returns on its ring; at width 18 it
+takes about an hour for periods 10 to 12. The chains of the traps come from `chain_cycle` in
+[computations/lock_chain.py](../../computations/lock_chain.py), on the traps of `natural_tables`, `tables` and
+`carried`. The test compares the backgrounds of periods up to 6 with every ring of up to 16 cells run directly, runs
+every background of period up to 10 on its ring and counts its rows, and runs the witness for $0001$ on its ring.
