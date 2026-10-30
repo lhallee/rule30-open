@@ -1,5 +1,5 @@
 ---
-title: Periodic orbits on rings explain the finite game's failure only for the alternating block
+title: Periodic orbits on rings of up to 25 cells explain the finite game's failure only for the alternating block
 category: columns
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: no-signal
 evidence: [computations/ring_orbits.py, computations/game.py]
 ---
 
-# Periodic orbits on rings explain the finite game's failure only for the alternating block
+# Periodic orbits on rings of up to 25 cells explain the finite game's failure only for the alternating block
 
 **Idea.** [The finite game](../../Rule30Open/Columns/FiniteGame.md) fails for most blocks at every width tried, all
 blocks with only short runs among them ([the game blocks](../../findings/columns/game-blocks.md)). A proof that it fails
@@ -36,6 +36,13 @@ does not apply to the lifted row, since it has no leftmost 1. The question is wh
 their lengths may grow with $K$. A barrier for the game has to come from right halves that are not spatially periodic,
 or from rings larger than those searched, and the ring orbits, being few and long, say almost nothing about them. For
 $01$ the witness is the ether itself, which carries an alternating column (the kit's `aligned_0101_3`).
+
+**Larger rings.** Classified by temporal period instead of ring size, every background of period up to 14 is known
+([backgrounds periodic in time](../../findings/columns/space-time-backgrounds.md)), on rings of up to 1,316 cells.
+Rings larger than 25 cells witness eight more blocks the same way: $0001$ on a ring of 80 cells with period 8,
+$00101$ on 90, $000101$ on 100 and $001011$ on 138, and $0000011$, $0010011$, $0011101$ and $0011111$ on 644 and 728
+cells with period 14. So the game fails at every width for these blocks too, $0001$ among them; for the other blocks of
+period up to 7 no background of period up to 14 witnesses a failure.
 
 ## Reproduce
 

@@ -50,6 +50,12 @@ them, but one, of period $2P$, which sits beside a component of period $P$ that 
 game leaves open has a component of period $P$ where both values meet in one class, and there the classes are the
 phases.
 
+For $0001$ the failure holds at every width: a background of period 8 on a ring of 80 cells has a column that repeats
+$0001$ beside one that does not repeat with period 4, and its right side is a closed walk of the game on which that
+neighbor takes both values at one phase ([backgrounds periodic in
+time](../../findings/columns/space-time-backgrounds.md)). The background has no leftmost 1, so it is no counterexample
+to Jen's theorem.
+
 **What it means.** The failure of the game for period 4 is not a periodic plug that Jen's theorem could exclude from
 inside the window. It is a component where the free cell drives the window chaotically, the same obstruction that
 keeps the window from forcing entry into the lock

@@ -1242,6 +1242,55 @@ def test_bit_blocks() -> None:
     assert (len(found["rows21"]), len(set(found["rows21"])), len(found["walls21"])) == (268, 268, 111)
 
 
+def test_space_time_periodic() -> None:
+    """The backgrounds of `space_time_periodic` against brute force: for every ring of up to 16 cells, every row whose
+    orbit under Rule 30 returns within 6 steps has a temporal period P <= 6, and its least spatial period is the length
+    of a cycle of `column_map` for P; conversely each cycle of length up to 16 is such a row, by a direct run of the
+    ring (`ring_period`). The backgrounds of period 4 are the white row, the stripe and the kit's ether, of spatial
+    period 7, and the walls of periods 9 to 12 lie on cycles of the lengths their chains repeat with."""
+    import itertools
+    from computations import space_time_periodic as stp
+
+    def least_spatial(cells: tuple[int, ...]) -> int:
+        return min(d for d in range(1, len(cells) + 1) if len(cells) % d == 0 and cells == cells[d:] + cells[:d])
+
+    lengths = {period: {length for length, _, _ in stp.backgrounds(period)} for period in range(1, 7)}
+    for size in range(1, 17):
+        for cells in itertools.product((0, 1), repeat=size):
+            period = stp.ring_period(list(cells), 6)
+            if period is not None:
+                assert least_spatial(cells) in lengths[period], (cells, period)
+    for period in range(1, 7):
+        nodes, label = stp.cycles(period)  # (c,), (c,)
+        for lab in set(label.tolist()):
+            states = [int(lab)]
+            while (nxt := int(stp.column_map(period)[states[-1]])) != states[0]:
+                states.append(nxt)
+            row = [(state >> period) & 1 for state in reversed(states)]  # left to right, at step 0
+            ring = stp.ring_period(row, period)
+            assert ring is not None and period % ring == 0
+    assert [(length, count) for length, count, _ in stp.backgrounds(4)] == [(1, 1), (2, 1), (7, 4)]
+    found = {period: {length for length, _, _ in stp.backgrounds(period)} for period in (9, 10, 11, 12)}
+    assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11] and {60, 138} <= found[12]
+    assert stp.witnesses(8) == {("01", 2), ("0001", 4)} and stp.witnesses(12) == {("01", 2), ("000101", 6), ("001011", 6)}
+    # the witness for 0001, run directly: on the ring of the background, a column repeats 0001 with period 4 while the
+    # column left of it takes both values at one phase of it
+    nodes, label = stp.cycles(8)  # (c,), (c,)
+    f = stp.column_map(8)  # (4^8,)
+    start = next(int(n) for n in nodes.tolist() if stp.necklace(stp.word_of(n >> 8, 8)) == "00010001"
+                 and stp.least_period(stp.word_of(int(f[n]) >> 8, 8)) == 8)
+    states = [start]
+    while (nxt := int(f[states[-1]])) != start:
+        states.append(nxt)
+    row = np.array([(state >> 8) & 1 for state in reversed(states)], dtype=np.uint8)  # (S,), the column of start last
+    history = []
+    for _ in range(16):
+        history.append(row.copy())
+        row = np.roll(row, 1) ^ (row | np.roll(row, -1))
+    column, left = [int(r[-1]) for r in history], [int(r[-2]) for r in history]
+    assert column[:4] * 4 == column and any(left[ph] != left[ph + 4] for ph in range(12))
+
+
 def test_bit_game() -> None:
     """The check of `BitGame` against the finite game: on every primitive block of period at most 9, at widths 5 and 6,
     it decides exactly the blocks the game excludes; and the bit tables' images and preimages agree with the game
@@ -1972,6 +2021,35 @@ def test_ten_coin() -> None:
     values = coin_lock.universal_word(word, member)
     end = coin_lock.run_word(word, member, values, 0)  # (2^16,)
     assert member[len(values) % 10][end].all()
+
+
+def test_natural_coin() -> None:
+    """Natural traps with a fair coin in column 17, for a trap of period 11 with labels modulo 11 and one with labels
+    modulo 22: `trap_member` holds each state at its phase; `coin_lock.stay_out` over 11 steps, for sampled windows at
+    phase 0, is the share of the 2,048 values of column 17 over those steps that keep the window outside, counted
+    directly with `successor_table`; and the word of `universal_word` brings every window at phase 0 inside by
+    `run_word`."""
+    from computations import coin_lock, lock_chain
+    from computations.lock_certificate import successor_table
+    for word in ("00000010001", "00000110101"):
+        t = lock_chain.extra_tables(word)
+        member = lock_chain.trap_member(t)  # (11, 2^16)
+        assert member.sum() == len({(label % 11, window) for label, window in t["states"]})
+        successors = successor_table(word, 16)  # (11, 2, 2^16)
+        out = coin_lock.stay_out(word, member, 11)  # (11, 2^16)
+        for window in np.flatnonzero(~member[0])[::9973][:4].tolist():
+            kept = 0
+            for values in range(1 << 11):
+                w, inside = window, False
+                for step_ in range(11):
+                    w = int(successors[step_ % 11, (values >> step_) & 1, w])
+                    if member[(step_ + 1) % 11, w]:
+                        inside = True
+                        break
+                kept += not inside
+            assert abs(out[0, window] - kept / 2048) < 1e-12, (word, window)
+        values = coin_lock.universal_word(word, member)
+        assert member[len(values) % 11][coin_lock.run_word(word, member, values, 0)].all()
 
 
 def test_wall_gaps() -> None:

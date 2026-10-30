@@ -41,8 +41,10 @@ whether the white right half settles.
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --extra-entry --cells 4 --steps 20000   # entry into each of them
+    python -m computations.lock_chain --natural-coin   # those of 16 cells against a fair coin in column 17
     python -m computations.lock_chain --walls-entry 11 --cells 6 --steps 20000   # entry into each trap of ElevenTraps
     python -m computations.lock_chain --natural 10,11,12 --steps 20000 --workers 4   # periods 10 to 12
+    python -m computations.lock_chain --natural 13,14 --steps 20000 --max-width 16 --workers 4   # traps of 16 cells
     python -m computations.lock_chain --natural-from saved.txt   # the per-period summary of a saved --natural run
 """
 
@@ -467,37 +469,60 @@ def ten_entry(cells: int, steps: int) -> list[tuple[int, str, int, np.ndarray]]:
     return found
 
 
-def ten_member() -> np.ndarray:
-    """The states of the period-10 wall `ten0` as membership masks by phase, for `coin_lock`."""
-    # out: (10, 2^16)
-    t = carried("trap0000010001", 0)
-    member = np.zeros((len(t["word"]), 1 << t["cells"]), dtype=bool)  # (10, 2^16)
+def trap_member(t: dict) -> np.ndarray:
+    """The states of a labelled trap as membership masks by phase of its block, for `coin_lock`: a label counts by its
+    phase, as entry (`WTrap.Absorption`) does."""
+    # out: (period, 2^cells)
+    member = np.zeros((len(t["word"]), 1 << t["cells"]), dtype=bool)  # (period, 2^cells)
     for label, window in t["states"]:
         member[label % len(t["word"]), window] = True
     return member
 
 
-def ten_coin(steps: int = 12000) -> dict:
-    """The period-10 wall against a fair coin in column 17 (`coin_lock`): the longest of the shortest entry paths, the
-    largest and the mean (at phase 0) expected entry time, the decay factor per step, the largest chance of staying out
-    after `steps` steps, the length of a word of column 17 that brings every window at phase 0 in, and for each value
-    the number of windows that a constant column 17 leaves outside after 3,000 steps from phase 0."""
+def ten_member() -> np.ndarray:
+    """The states of the period-10 wall `ten0` as membership masks by phase, for `coin_lock`."""
+    # out: (10, 2^16)
+    return trap_member(carried("trap0000010001", 0))
+
+
+def trap_coin(word: str, member: np.ndarray, steps: int = 12000) -> dict:
+    """A trap against a fair coin in the column beyond its window (`coin_lock`): the longest of the shortest entry
+    paths, the largest and the mean (at phase 0) expected entry time, the decay factor per step, the largest chance of
+    staying out after `steps` steps, the length of a word of the column beyond that brings every window at phase 0 in,
+    and for each value the number of windows that a constant column beyond leaves outside after 3,000 steps from phase
+    0. When some window cannot enter, the expected entry, the decay and the word are left out (None)."""
     from computations import coin_lock
     from computations.lock_certificate import successor_table
-    word, member = "0000010001", ten_member()  # (10, 2^16)
-    dist, _ = coin_lock.entry_paths(word, member)  # (10, 2^16)
-    expected = coin_lock.expected_entry(word, member)  # (10, 2^16)
-    successors = successor_table(word, 16)  # (10, 2, 2^16)
+    # member: (period, 2^W)
+    width = member.shape[1].bit_length() - 1
+    dist, _ = coin_lock.entry_paths(word, member)  # (period, 2^W)
+    reachable = bool((dist < coin_lock.UNREACHED).all())
+    successors = successor_table(word, width)  # (period, 2, 2^W)
     constant = []
     for value in (0, 1):
-        windows = np.arange(1 << 16)  # (2^16,)
+        windows = np.arange(1 << width)  # (2^W,)
         for t in range(3000):
-            windows = successors[t % 10, value][windows]
-        constant.append(int((~member[0][windows]).sum()))
-    return {"reachable": bool((dist < coin_lock.UNREACHED).all()), "longest_path": int(dist.max()),
-            "expected_max": float(expected.max()), "expected_mean": float(expected[0].mean()),
-            "decay": coin_lock.decay_rate(word, member), "stay_out": float(coin_lock.stay_out(word, member, steps).max()),
-            "word": len(coin_lock.universal_word(word, member)), "constant": constant}
+            windows = successors[t % len(word), value][windows]
+        constant.append(int((~member[3000 % len(word)][windows]).sum()))
+    found = {"reachable": reachable, "longest_path": int(dist[dist < coin_lock.UNREACHED].max()),
+             "stay_out": float(coin_lock.stay_out(word, member, steps).max()), "constant": constant,
+             "expected_max": None, "expected_mean": None, "decay": None, "word": None}
+    if reachable:
+        expected = coin_lock.expected_entry(word, member)  # (period, 2^W)
+        found.update(expected_max=float(expected.max()), expected_mean=float(expected[0].mean()),
+                     decay=coin_lock.decay_rate(word, member), word=len(coin_lock.universal_word(word, member)))
+    return found
+
+
+def ten_coin(steps: int = 12000) -> dict:
+    """The period-10 wall against a fair coin in column 17 (`trap_coin`)."""
+    return trap_coin("0000010001", ten_member(), steps)
+
+
+def natural_coin(steps: int = 12000) -> list[tuple[str, dict]]:
+    """`trap_coin` for each trap of 16 cells of `EXTRA_TRAPS`, with a fair coin in column 17."""
+    return [(word, trap_coin(word, trap_member(extra_tables(word)), steps))
+            for word, _, cells, _ in tqdm(EXTRA_TRAPS, desc="natural traps", file=sys.stderr) if cells == 16]
 
 
 def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> list[tuple[int, np.ndarray]]:
@@ -961,11 +986,11 @@ def parse_natural(text: str) -> dict[int, list[tuple[str, int, list[tuple[int, i
     return found
 
 
-def natural_scan(word: str, steps: int, starts: int = 30) -> tuple[int, list[tuple[int, int, int, int, int]]]:
+def natural_scan(word: str, steps: int, starts: int = 30, max_width: int = 64) -> tuple[int, list[tuple[int, int, int, int, int]]]:
     """For the empty right half and `starts` random ones (`right_half.random_starts`), driven by `word`: how many lock
     column 1 over the second half of `steps` steps (`right_half.locked_period`), and for those the natural traps
-    found at three late checkpoints, at the least width from 16 to 64 and with the phase modulo the lock's period or
-    twice it, each as (start, time, width, modulus, size)."""
+    found at three late checkpoints, at the least width from 16 to `max_width` and with the phase modulo the lock's
+    period or twice it, each as (start, time, width, modulus, size)."""
     from computations import right_half
     locks, found = 0, []
     for k, start in enumerate(right_half.random_starts(starts, 64)):
@@ -977,7 +1002,7 @@ def natural_scan(word: str, steps: int, starts: int = 30) -> tuple[int, list[tup
         # before it
         last, _, _ = right_half.lock_breaks(word, start, 3 * steps, 2 * period, 0)
         late = [t for t in (steps * 3 // 5, steps * 4 // 5, steps - 1) if t > last]
-        hit = natural_trap(word, start, late, list(range(16, 65)), [period, 2 * period]) if late else None
+        hit = natural_trap(word, start, late, list(range(16, max_width + 1)), [period, 2 * period]) if late else None
         if hit is not None:
             found.append((k, *hit))
     return locks, found
@@ -1167,6 +1192,8 @@ def main() -> None:
     parser.add_argument("--extra-entry", action="store_true",
                         help="entry of the halves with support in cells 1 .. --cells into each trap of NaturalTraps and "
                         "NaturalTrapsLarge")
+    parser.add_argument("--natural-coin", action="store_true",
+                        help="each trap of 16 cells of NaturalTraps against a fair coin in column 17")
     parser.add_argument("--ten-coin", action="store_true",
                         help="the period-10 wall against a fair coin beyond, and random halves of growing length")
     parser.add_argument("--ten-entry", action="store_true",
@@ -1178,6 +1205,7 @@ def main() -> None:
                         "phase instead of all")
     parser.add_argument("--natural", type=str, default="", help="periods whose words to search for natural traps")
     parser.add_argument("--natural-from", type=str, default="", help="summarize a saved --natural output by period")
+    parser.add_argument("--max-width", type=int, default=64, help="with --natural, the widest window closed")
     parser.add_argument("--starts", type=int, default=30, help="with --natural, random right halves besides the empty "
                         "one")
     parser.add_argument("--edges", action="store_true", help="backgrounds of the chains of 0 1^7 and of the first wall "
@@ -1267,7 +1295,7 @@ def main() -> None:
             print("  by phase: " + ", ".join(f"{phase}: {int(t)}" for phase, t in enumerate(times)), flush=True)
     for period in [int(p) for p in args.natural.split(",") if p]:
         words = game.necklaces(period)
-        scan = functools.partial(natural_scan, steps=args.steps, starts=args.starts)
+        scan = functools.partial(natural_scan, steps=args.steps, starts=args.starts, max_width=args.max_width)
         with multiprocessing.Pool(args.workers) as pool:
             results = tqdm(pool.imap(scan, words), total=len(words), desc=f"period {period}", file=sys.stderr,
                            mininterval=10)
@@ -1374,6 +1402,12 @@ def main() -> None:
             print(f"{word} ({cells} cells): {done.size} of {times.size} halves and phases enter by step {args.steps}"
                   + (f", median {int(np.median(done))}, latest {int(done.max())}" if done.size else ""), flush=True)
         print(f"{counts[0]} traps entered by every pair, {counts[1]} by some, {counts[2]} by none", flush=True)
+    if args.natural_coin:
+        for word, coin in natural_coin():
+            print(f"{word}: every window can enter: {coin['reachable']}, within {coin['longest_path']} steps; expected "
+                  f"entry at most {coin['expected_max']}, mean at phase 0 {coin['expected_mean']}; decay per step "
+                  f"{coin['decay']}; stay out after 12,000 steps at most {coin['stay_out']:.3g}; universal word "
+                  f"{coin['word']}; a constant column 17 leaves {coin['constant']} out", flush=True)
     if args.ten_coin:
         coin = ten_coin()
         print(f"every window can enter: {coin['reachable']}, within {coin['longest_path']} steps; with a fair coin the "

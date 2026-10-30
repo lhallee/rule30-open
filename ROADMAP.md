@@ -226,10 +226,12 @@ In order of the assessment above.
    are blocks without a long run of 1s. All 197 blocks [the game](findings/columns/game-blocks.md) excludes up to period
    16 are kernel-checked, seven of them by [BitGame](Rule30Open/Columns/BitGame.md), which decides the game from the
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
-   equal values ([periods 17 and 18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's
-   failure only for $01$ ([ring orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508
-   more, 327 of them new ([periods 19 and 20](findings/columns/game-blocks-20.md)), and at period 21 it excludes 434,
-   303 of them new, 0.43% of the period ([period 21](findings/columns/game-blocks-21.md)). Lean checks every one of
+   equal values ([periods 17 and 18](findings/columns/game-blocks-18.md)); periodic orbits on rings of up to 25 cells
+   explain the game's failure only for $01$ ([ring orbits](negative-results/columns/ring-orbits.md)), and the
+   backgrounds periodic in time of period up to 14, on rings of up to 728 cells, for eight more blocks, $0001$ among
+   them ([backgrounds periodic in time](findings/columns/space-time-backgrounds.md)). At periods 19 and 20 it excludes
+   508 more, 327 of them new ([periods 19 and 20](findings/columns/game-blocks-20.md)), and at period 21 it excludes
+   434, 303 of them new, 0.43% of the period ([period 21](findings/columns/game-blocks-21.md)). Lean checks every one of
    these 1,400 blocks; the 75 that need 13 or 14 cells, whose check as one declaration takes the kernel up to 12 GB or
    more, are checked one phase at a time ([BitPhases](Rule30Open/Columns/BitPhases.md)). Next: steering ([steerable
    locks](findings/columns/steerable-locks.md)) at wider windows and longer periods, the one tool here that reaches
@@ -262,16 +264,19 @@ In order of the assessment above.
    center repeating $0000010001$ ([TenGap](Rule30Open/Columns/TenGap.md)), and every block of periods 10 to 12 that a
    sampled half settles into a trap for, and that nothing excludes, has a trap there: carried from a wall, or the closed
    set itself for 35 blocks ([NaturalTraps](Rule30Open/Columns/NaturalTraps.md)), one of them of 61,857 windows checked
-   in parts ([NaturalTrapsLarge](Rule30Open/Columns/NaturalTrapsLarge.md)). Next: wider classes of halves for that edge,
-   such as every half of twelve cells, as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and
-   the word of 569 values of column 17 that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md)
-   does for period four; the walls of periods 11 and 12 are carried in Lean too
-   ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](Rule30Open/Columns/TwelveTraps.md)), and two of
-   them, with the wall of period 10, take every half white past its first eight cells
-   ([WallGaps](Rule30Open/Columns/WallGaps.md)); other classes of halves for the walls of period 9; at periods 5, 6 and
-   7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one
-   statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
-   block](findings/columns/left-half-every-block.md)).
+   in parts ([NaturalTrapsLarge](Rule30Open/Columns/NaturalTrapsLarge.md)). Every background periodic in time is known
+   up to period 14, at most nine per period, and each trap found by sampling at periods 8 to 12 that counts the phase
+   modulo the period is a wall of one of them: of the ether at period 8, of one or two backgrounds at each of periods 9
+   to 12 ([backgrounds periodic in time](findings/columns/space-time-backgrounds.md)). Next: walls at the edges of the
+   backgrounds of periods 13 and 14, which the table lists; wider classes of halves for that edge, such as every half of
+   twelve cells, as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569
+   values of column 17 that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md) does for period
+   four; the walls of periods 11 and 12 are carried in Lean too ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md),
+   [TwelveTraps](Rule30Open/Columns/TwelveTraps.md)), and two of them, with the wall of period 10, take every half white
+   past its first eight cells ([WallGaps](Rule30Open/Columns/WallGaps.md)); other classes of halves for the walls of
+   period 9; at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap
+   reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half
+   meets ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
    period-four certificate, the periodic backgrounds and the period-two computations ([open
    work](CATALOG.md#open-work)); the general facts of the seed's past are now in Lean
