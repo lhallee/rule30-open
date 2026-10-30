@@ -3,9 +3,9 @@
 For each period: the primitive blocks; those excluded outright, by the finite game at width 6, 10 or 14 or by the kit
 (`game.first_width`, `game.kit_blocks`), each of which is excluded in Lean up to period 20; those that a trap in Lean
 reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
-`FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge` and `PeriodFourCertificate`, and the kit's `t001` for 001); those
-that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14; and the rest, which no method
-here reaches.
+`FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge`, `NaturalTrapsLong` and `PeriodFourCertificate`, and the kit's
+`t001` for 001); those that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14; and
+the rest, which no method here reaches.
 
     python -m computations.coverage --max-period 14   # about four minutes
 """
@@ -42,6 +42,8 @@ def trap_blocks() -> dict[str, str]:
         found.setdefault(word, "NaturalTraps")
     for word, *_ in lock_chain.LARGE_TRAPS:
         found.setdefault(word, "NaturalTrapsLarge")
+    for word, *_ in lock_chain.LONG_TRAPS:
+        found.setdefault(word, "NaturalTrapsLong")
     for word in ("0001", "0011", "0111"):
         found.setdefault(word, "PeriodFourCertificate")
     return found

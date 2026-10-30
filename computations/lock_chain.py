@@ -40,6 +40,8 @@ whether the white right half settles.
     python -m computations.lock_chain --lean-wall-gaps   # the entries of WallGaps
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
+    python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
+    python -m computations.lock_chain --long-entry --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --extra-entry --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --natural-coin   # those of 16 cells against a fair coin in column 17
     python -m computations.lock_chain --walls-entry 11 --cells 6 --steps 20000   # entry into each trap of ElevenTraps
@@ -632,19 +634,50 @@ EXTRA_TRAPS = [("0001010101", 6991680298694716019, 31, 20), ("0010010101", 15376
                ("001011111011", 0, 16, 12), ("001110111101", 0, 16, 12), ("001111101111", 0, 16, 12),
                ("010101010111", 0, 16, 12), ("010111111011", 0, 16, 12)]
 LARGE_TRAPS = [("00010001011", 0, 30, 22)]
+# Natural traps of periods 13 and 14 for blocks that the kit and the game do not exclude and that the walls of
+# `ThirteenTraps` and `FourteenTraps` do not carry, for `Rule30Open.Columns.NaturalTrapsLong`: as `EXTRA_TRAPS`, from
+# the natural scan with windows of 16 cells, the smallest trap of each block, those of at most 3,000 states.
+LONG_TRAPS = [("0000000010001", 0, 16, 13), ("0000000110011", 0, 16, 13), ("0000001000101", 0, 16, 13),
+              ("0000001010111", 0, 16, 13), ("0000001101011", 0, 16, 13),
+              ("0000001101111", 6648364488764846871, 16, 13), ("0000011011001", 0, 16, 13),
+              ("0000100001111", 0, 16, 13), ("0000100101001", 0, 16, 13), ("0000110111011", 0, 16, 13),
+              ("0000111001101", 0, 16, 13), ("0000111011001", 0, 16, 13), ("0000111101001", 0, 16, 13),
+              ("0001001111101", 0, 16, 13), ("0001010111111", 0, 16, 13), ("0001011101111", 0, 16, 13),
+              ("0001011111011", 0, 16, 13), ("0001100011011", 0, 16, 13), ("0001101101011", 0, 16, 13),
+              ("0001101111001", 0, 16, 13), ("0001111110011", 0, 16, 13),
+              ("0010010010111", 6648364488764846871, 16, 13), ("0010010110101", 0, 16, 13),
+              ("0010011010111", 0, 16, 13), ("0010101011101", 0, 16, 13),
+              ("0010101111111", 6991680298694716019, 16, 13), ("0010110101111", 0, 16, 13),
+              ("0010111101111", 0, 16, 13), ("0011001110101", 0, 16, 13), ("0011001111011", 0, 16, 13),
+              ("0011001111111", 0, 16, 13), ("0011010110111", 0, 16, 13), ("0011011111011", 0, 16, 13),
+              ("0111011111111", 0, 16, 13), ("00000001001101", 0, 16, 14), ("00000001101011", 0, 16, 14),
+              ("00000010001101", 0, 16, 14), ("00000011011001", 0, 16, 14), ("00000100000101", 0, 16, 14),
+              ("00000101011011", 0, 16, 14), ("00000110001111", 0, 16, 14), ("00000111011011", 0, 16, 14),
+              ("00001000101111", 0, 16, 14), ("00001001011001", 0, 16, 14), ("00001010100111", 0, 16, 14),
+              ("00001011011001", 0, 16, 14), ("00001011100111", 0, 16, 14), ("00001011111011", 0, 16, 14),
+              ("00001101111001", 0, 16, 14), ("00001101111011", 0, 16, 14), ("00001111101001", 0, 16, 14),
+              ("00001111101111", 0, 16, 14), ("00010010010111", 0, 16, 14), ("00010110101011", 0, 16, 14),
+              ("00010110111111", 0, 16, 14), ("00010111101011", 0, 16, 14), ("00011010110011", 0, 16, 14),
+              ("00011011010111", 0, 16, 14), ("00011100111101", 0, 16, 14), ("00011110100111", 0, 16, 14),
+              ("00011110110011", 0, 16, 14), ("00011111001111", 6648364488764846871, 16, 14),
+              ("00100100101111", 0, 16, 14), ("00100110110111", 0, 16, 14), ("00101011101111", 0, 16, 14),
+              ("00101011110101", 0, 16, 14), ("00101101010011", 0, 16, 14), ("00101101011101", 0, 16, 14),
+              ("00101101111111", 0, 16, 14), ("00110111111011", 0, 16, 14), ("00111010110111", 0, 16, 14),
+              ("00111110111101", 0, 16, 14), ("01010101011111", 0, 16, 14), ("01101111110111", 0, 16, 14)]
 
 
 def extra_tables(word: str) -> dict:
-    """The trap of `EXTRA_TRAPS` or `LARGE_TRAPS` for the block, as tables (`natural_tables`)."""
-    _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS if entry[0] == word)
+    """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS` or `LONG_TRAPS` for the block, as tables (`natural_tables`)."""
+    _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS + LONG_TRAPS if entry[0] == word)
     return natural_tables(word, start, 12000, cells, modulus)
 
 
-def lean_extra() -> str:
-    """The traps of `Rule30Open.Columns.NaturalTraps`, one per entry of `EXTRA_TRAPS`, each with its kernel check."""
+def lean_extra(entries: list[tuple[str, int, int, int]] | None = None) -> str:
+    """The traps of `Rule30Open.Columns.NaturalTraps`, one per entry of `EXTRA_TRAPS`, or of `NaturalTrapsLong` with
+    `LONG_TRAPS`, each with its kernel check."""
     return "\n".join(lean_entry(extra_tables(word), f"nat{word}")
                      + f"\ntheorem nat{word}_check : nat{word}.check = true := by decide +kernel\n"
-                     for word, *_ in EXTRA_TRAPS)
+                     for word, *_ in (EXTRA_TRAPS if entries is None else entries))
 
 
 def lean_large(part: int = 1024, piece: int = 1 << 16) -> str:
@@ -668,12 +701,14 @@ def lean_large(part: int = 1024, piece: int = 1 << 16) -> str:
     return "\n".join(out)
 
 
-def extra_entry(cells: int, steps: int) -> list[tuple[str, int, np.ndarray]]:
-    """For each trap of `EXTRA_TRAPS` and `LARGE_TRAPS`: its block, its width, and the entry step (`entry_steps`) of
-    each right half with support in cells 1 .. `cells`, driven from each phase, or -1."""
+def extra_entry(cells: int, steps: int, entries: list[tuple[str, int, int, int]] | None = None) -> list[
+        tuple[str, int, np.ndarray]]:
+    """For each trap of `EXTRA_TRAPS` and `LARGE_TRAPS`, or of `entries`: its block, its width, and the entry step
+    (`entry_steps`) of each right half with support in cells 1 .. `cells`, driven from each phase, or -1."""
     halves = list(range(1 << cells))
     found = []
-    for word, *_ in tqdm(EXTRA_TRAPS + LARGE_TRAPS, desc="natural traps", file=sys.stderr):
+    for word, *_ in tqdm(EXTRA_TRAPS + LARGE_TRAPS if entries is None else entries, desc="natural traps",
+                         file=sys.stderr):
         t = extra_tables(word)
         times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(len(word))])  # (P 2^cells,)
         found.append((word, t["cells"], times))
@@ -1203,6 +1238,10 @@ def main() -> None:
     parser.add_argument("--lean-ten-gap", action="store_true", help="print the entry data of TenGap.lean")
     parser.add_argument("--lean-wall-gaps", action="store_true", help="print the entry data of WallGaps.lean")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
+    parser.add_argument("--lean-long", action="store_true", help="print the trap entries of NaturalTrapsLong.lean")
+    parser.add_argument("--long-entry", action="store_true",
+                        help="entry of the halves with support in cells 1 .. --cells into each trap of "
+                        "NaturalTrapsLong")
     parser.add_argument("--lean-large", action="store_true", help="print the trap and parts of NaturalTrapsLarge.lean")
     parser.add_argument("--lean-walls", type=int, default=0, choices=[0, 11, 12, 13, 14],
                         help="print the trap entries of ElevenTraps, TwelveTraps, ThirteenTraps or FourteenTraps")
@@ -1401,6 +1440,8 @@ def main() -> None:
         print(lean_walls(args.lean_walls, 40, "el" if args.lean_walls == 11 else "tw"))
     if args.lean_extra:
         print(lean_extra())
+    if args.lean_long:
+        print(lean_extra(LONG_TRAPS))
     if args.lean_large:
         print(lean_large())
     if args.lean_wall_gaps:
@@ -1417,9 +1458,9 @@ def main() -> None:
                                                    if done.size else ""), flush=True)
         print(f"period {args.walls_entry}: {counts[0]} traps entered by every pair, {counts[1]} by some, {counts[2]} by "
               f"none", flush=True)
-    if args.extra_entry:
+    if args.extra_entry or args.long_entry:
         counts = [0, 0, 0]  # traps that every pair, some pairs and no pair enter
-        for word, cells, times in extra_entry(args.cells, args.steps):
+        for word, cells, times in extra_entry(args.cells, args.steps, LONG_TRAPS if args.long_entry else None):
             done = times[times >= 0]  # (k,)
             counts[0 if done.size == times.size else 1 if done.size else 2] += 1
             print(f"{word} ({cells} cells): {done.size} of {times.size} halves and phases enter by step {args.steps}"

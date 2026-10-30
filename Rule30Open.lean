@@ -60,6 +60,7 @@ public import Rule30Open.Columns.FourteenTraps
 public import Rule30Open.Columns.WallGaps
 public import Rule30Open.Columns.NaturalTraps
 public import Rule30Open.Columns.NaturalTrapsLarge
+public import Rule30Open.Columns.NaturalTrapsLong
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn

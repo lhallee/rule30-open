@@ -86,11 +86,14 @@ or 7, and one start each for six blocks of period 9.
 - **Periods 13 and 14, windows of 16 cells.** Closing windows of 16 cells only (`--max-width 16`, since wider closures
   make the scan of these periods run for hours), the scan finds traps for 86 of the 630 blocks of period 13, every
   sampled start inside one for 76 of them, and for 109 of the 1,161 of period 14, every start for 105; at periods 10 to
-  12 the same width holds traps for 12, 31 and 41 blocks. The commonest traps are again walls of one background each,
-  of 689 cells at period 13 and of 728 at period 14 ([backgrounds periodic in
-  time](space-time-backgrounds.md)), and carried leftward the smallest wall of each gives traps to every block of the
-  period among that background's columns, 53 and 101 ([ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
-  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)).
+  12 the same width holds traps for 12, 31 and 41 blocks. The commonest traps are again walls of one background each, of
+  689 cells at period 13 and of 728 at period 14 ([backgrounds periodic in time](space-time-backgrounds.md)), and
+  carried leftward the smallest wall of each gives traps to every block of the period among that background's columns,
+  53 and 101 ([ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
+  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)). Of the other blocks with a trap that nothing excludes,
+  the 74 whose traps have at most 3,000 states have them checked as they are
+  ([NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md)); every right half of up to four cells enters 61 of
+  those from every phase.
 
 ## What it means
 
