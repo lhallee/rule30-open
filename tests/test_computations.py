@@ -1274,6 +1274,27 @@ def test_space_time_periodic() -> None:
     assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11] and {60, 138} <= found[12]
     assert stp.witnesses(8) == {("01", 2), ("0001", 4)} and stp.witnesses(12) == {("01", 2), ("000101", 6), ("001011", 6)}
     assert stp.background_walls(10, 16) == [(30, 30, 0), (90, 85, 0), (155, 150, 60)]
+    # every row that repeats with a period dividing P, from each cycle's row run directly and read in every rotation: as
+    # many as the states on cycles, against the list of A New Kind of Science, which the second count matches only at
+    # periods 1 to 4, 6 and 7
+    for period in range(1, 11):
+        nodes, label = stp.cycles(period)  # (c,), (c,)
+        f = stp.column_map(period)  # (4^P,)
+        rows: set[tuple[int, ...]] = set()
+        for lab in set(label.tolist()):
+            states = [int(lab)]
+            while (nxt := int(f[states[-1]])) != states[0]:
+                states.append(nxt)
+            row = np.array([(state >> period) & 1 for state in reversed(states)], dtype=np.uint8)  # (S,)
+            start = row.copy()  # (S,)
+            for _ in range(period):
+                rows.update(tuple(np.roll(row, k).tolist()) for k in range(row.size))
+                row = np.roll(row, 1) ^ (row | np.roll(row, -1))
+            assert np.array_equal(row, start)
+        assert len(rows) == stp.counts(period)[0]
+    found_counts = [stp.counts(period) for period in range(1, 11)]
+    assert [rows for rows, _ in found_counts] == [3, 3, 15, 31, 48, 99, 108, 119, 195, 598]
+    assert [cells for _, cells in found_counts] == [3, 3, 15, 10, 48, 99, 18, 94, 165, 323]
     # the witness for 0001, run directly: on the ring of the background, a column repeats 0001 with period 4 while the
     # column left of it takes both values at one phase of it
     nodes, label = stp.cycles(8)  # (c,), (c,)

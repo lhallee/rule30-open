@@ -52,8 +52,14 @@ source, what it establishes, and where it bears on this repository.
   a random sequence generator. The cryptographic proposal of the same period is in [complexity.md](complexity.md).
 - **Wolfram (2002).** [*A New Kind of Science*](https://www.wolframscience.com/nks/). Wolfram Media, ISBN 1-57955-008-8.
   Introduces Rule 30 from a single cell on page 27. Page 317 says Mathematica's `Random[Integer]` produces its bits from
-  Rule 30's center column. The notes to page 871 give the center column and the periods of the diagonals.
-  *Here:* [the left side's memory](../Rule30Open/Diagonals/LeftMemory.md) cites those notes.
+  Rule 30's center column. The notes to page 871 give the center column and the periods of the diagonals. Section 6.6
+  and its [note on repeating
+  blocks](https://www.wolframscience.com/nks/notes-6-6--repeating-blocks-in-cellular-automata/) say that every
+  configuration of Rule 30 that repeats in time is a sequence of identical blocks, of at most $2^{2p}$ cells for period
+  $p$, that none repeats with period exactly 2, and list how many repeat with periods dividing 1 to 10.
+  *Here:* [the left side's memory](../Rule30Open/Diagonals/LeftMemory.md) cites the notes to page 871;
+  [backgrounds periodic in time](../findings/columns/space-time-backgrounds.md) lists the repeating configurations to
+  period 14 and finds some at periods 5, 8, 9 and 10 that the note's list leaves out.
 
 ## Data
 

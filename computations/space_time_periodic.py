@@ -13,6 +13,7 @@ every cycle for a given period, by repeated squaring of the map, and the blocks 
     python -m computations.space_time_periodic 8,10,12,14 --witnesses   # blocks whose game fails at every width
     python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10,11,12,13,14 --table   # the finding's table
     python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16   # walls the backgrounds seed, a minute
+    python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10 --counts   # against the counts of NKS, seconds
 """
 
 from __future__ import annotations
@@ -126,6 +127,14 @@ def backgrounds(period: int) -> list[tuple[int, int, set[str]]]:
     return sorted(found, key=lambda item: (item[0], sorted(item[2])))
 
 
+def counts(period: int) -> tuple[int, int]:
+    """The configurations of the line whose evolution repeats with a period dividing `period`, counted two ways: every
+    row, the number of states on cycles of `column_map`; and each background up to a shift in time once per cell of its
+    spatial period, the count that *A New Kind of Science* lists at periods 1 to 4, 6 and 7."""
+    nodes, _ = cycles(period)  # (c,)
+    return int(nodes.size), sum(length for length, _, _ in backgrounds(period))
+
+
 def witnesses(period: int) -> set[tuple[str, int]]:
     """The blocks that a background of `period` shows the finite game cannot exclude: a column of least period p whose
     left neighbor's least period does not divide p, so that the left neighbor takes both values at one phase of the
@@ -198,7 +207,14 @@ def main() -> None:
     parser.add_argument("--witnesses", action="store_true", help="the blocks each period's backgrounds witness")
     parser.add_argument("--table", action="store_true", help="a markdown table of the backgrounds of each period")
     parser.add_argument("--walls", type=int, default=0, help="with a width, the walls seeded by each background")
+    parser.add_argument("--counts", action="store_true", help="the configurations that repeat, counted two ways")
     args = parser.parse_args()
+    if args.counts:
+        for period in [int(p) for p in args.periods.split(",")]:
+            rows, cells = counts(period)
+            print(f"period {period}: {rows} rows repeat with a period dividing it; {cells} by backgrounds up to a "
+                  f"shift in time, once per cell", flush=True)
+        return
     if args.walls:
         for period in [int(p) for p in args.periods.split(",")]:
             print(f"period {period}, width {args.walls}: (spatial period, columns of the period, walls) "

@@ -81,16 +81,34 @@ says where to look for traps at longer periods: at the edges of the backgrounds 
 sampling. Whether a background has a wall that every finite half enters is the open entry question again; the
 backgrounds of periods 5 to 7 show that having a background is not enough.
 
+## In *A New Kind of Science*
+
+The first part of the argument is in the book. Its [note on repeating blocks in cellular
+automata](https://www.wolframscience.com/nks/notes-6-6--repeating-blocks-in-cellular-automata/), to section 6.6, says
+that in Rule 30, as in the other rules additive on one side, every configuration that repeats is a sequence of identical
+blocks, of at most $2^{2p}$ cells for period $p$: the bound $4^P$ on the length of a cycle here. The section says no
+block gives period exactly 2 and blocks give every larger period up to at least 15, as the table shows to 14. The note's
+counts differ from the table. It lists 3, 3, 15, 10, 8, 99, 18, 14, 30 and 163 configurations that repeat with periods
+dividing 1 to 10. Counting every row of the line whose evolution repeats with such a period gives 3, 3, 15, 31, 48, 99,
+108, 119, 195 and 598, the states on the cycles; counting each background up to a shift in time once per cell of its
+spatial period gives 3, 3, 15, 10, 48, 99, 18, 94, 165 and 323 (`counts`). The list equals the second count at periods
+1 to 4, 6 and 7. At 5, 8 and 9 it falls short by exactly the backgrounds of 15 and 25 cells, of 80 cells and of 135
+cells, and at 10 by 160, the backgrounds of 15, 25, 30 and 90 cells (or of 5 and 155). Each of these returns on its ring
+after its period in a direct run, so the list leaves them out. [Page
+268](https://www.wolframscience.com/nks/p268--special-initial-conditions/) gives a block of 275 cells for period 11; the
+background of 143 cells has period 11 as well.
+
 ## Reproduce
 
 ```bash
 python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10,11,12,13,14 --table
 python -m computations.space_time_periodic 4,8,10,12,14 --witnesses
 python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16
+python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10 --counts
 ```
 
 Each lists the backgrounds by squaring the map on $4^P$ pairs: under a minute to period 13, and period 14 in about two
 minutes with a peak of about 6 GB. The chains of the traps come from `chain_cycle` in
 [computations/lock_chain.py](../../computations/lock_chain.py), on the traps of `natural_tables`, `tables` and
-`carried`. The test compares the backgrounds of periods up to 6 with every ring of up to 16 cells run directly, and runs
-the witness for $0001$ on its ring.
+`carried`. The test compares the backgrounds of periods up to 6 with every ring of up to 16 cells run directly, runs
+every background of period up to 10 on its ring and counts its rows, and runs the witness for $0001$ on its ring.
