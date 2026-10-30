@@ -63,7 +63,12 @@ that every finite right half enters a certificate set. The kit states attraction
 contains the certificate, as the open `Rule30Ether.Absorption`, and
 [the absorption census](absorption-census.md) finds that every right half of up to 20 cells enters that family, for
 each word and phase. For $0001$, [EtherDomain.md](../../Rule30Open/Columns/EtherDomain.md) reduces the same question
-on the left half to an integer condition.
+on the left half to an integer condition. Lean proves entry for classes of halves ([the roadmap](../../ROADMAP.md) lists
+them) and for every half whose column 17, 15 or 14 reads one fixed sequence
+([LockWord](../../Rule30Open/Columns/LockWord.md)): every window next to the center can be steered into the family
+through the column beyond it, so the lock can fail only for halves whose own dynamics never steer it there. Beside an
+alternating center about half the windows cannot be steered into it at all
+([the absorption route for period two](../../negative-results/period-two/absorption-route.md)).
 
 ## Reproduce
 
