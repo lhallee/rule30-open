@@ -55,6 +55,8 @@ public import Rule30Open.Columns.TenTraps
 public import Rule30Open.Columns.TenGap
 public import Rule30Open.Columns.ElevenTraps
 public import Rule30Open.Columns.TwelveTraps
+public import Rule30Open.Columns.ThirteenTraps
+public import Rule30Open.Columns.FourteenTraps
 public import Rule30Open.Columns.WallGaps
 public import Rule30Open.Columns.NaturalTraps
 public import Rule30Open.Columns.NaturalTrapsLarge

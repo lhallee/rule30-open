@@ -2,11 +2,12 @@
 
 For each period: the primitive blocks; those excluded outright, by the finite game at width 6, 10 or 14 or by the kit
 (`game.first_width`, `game.kit_blocks`), each of which is excluded in Lean up to period 20; those that a trap in Lean
-reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `NaturalTraps`,
-`NaturalTrapsLarge` and `PeriodFourCertificate`, and the kit's `t001` for 001); those that a steering sequence of the
-`LockBlocks` modules reduces to a condition on column 14; and the rest, which no method here reaches.
+reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
+`FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge` and `PeriodFourCertificate`, and the kit's `t001` for 001); those
+that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14; and the rest, which no method
+here reaches.
 
-    python -m computations.coverage --max-period 12   # about a minute
+    python -m computations.coverage --max-period 14   # about four minutes
 """
 
 from __future__ import annotations
@@ -34,8 +35,8 @@ def trap_blocks() -> dict[str, str]:
     found.setdefault(lock_chain.tables("trap001010011")["word"], "NineTraps")
     for distance in lock_chain.ten_distances():
         found.setdefault(lock_chain.carried("trap0000010001", distance)["word"], "TenTraps")
-    for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps")):
-        for _, _, word in lock_chain.wall_distances(period, 40):
+    for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"), (14, "FourteenTraps")):
+        for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period]):
             found.setdefault(word, module)
     for word, *_ in lock_chain.EXTRA_TRAPS:
         found.setdefault(word, "NaturalTraps")

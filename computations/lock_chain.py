@@ -36,7 +36,7 @@ whether the white right half settles.
     python -m computations.lock_chain --ten-entry --cells 8 --steps 50000   # entry into each trap of TenTraps
     python -m computations.lock_chain --lean-ten-gap   # the entries of the halves of 8 cells, TenGap.lean
     python -m computations.lock_chain --ten-coin   # the period-10 wall with a fair coin beyond, about a minute
-    python -m computations.lock_chain --lean-walls 11   # the traps of ElevenTraps (12: TwelveTraps)
+    python -m computations.lock_chain --lean-walls 11   # the traps of ElevenTraps; 12, 13, 14 for the others
     python -m computations.lock_chain --lean-wall-gaps   # the entries of WallGaps
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
@@ -54,6 +54,7 @@ import argparse
 import functools
 import multiprocessing
 import sys
+from collections.abc import Iterator
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -381,12 +382,21 @@ NATURAL = [("trap001011111", "001011111", 18202347099481127113, 12000, 43, 9),
            ("trap00001101001", "00001101001", 0, 12000, 16, 11),
            ("trap001011100111", "001011100111", 0, 12000, 16, 12),
            ("trap000110110011", "000110110011", 0, 12000, 16, 12),
-           ("trap000010011111", "000010011111", 6991680298694716019, 12000, 16, 12)]
+           ("trap000010011111", "000010011111", 6991680298694716019, 12000, 16, 12),
+           ("trap0001110010011", "0001110010011", 0, 12000, 16, 13),
+           ("trap0000000000001", "0000000000001", 0, 12000, 16, 13),
+           ("trap0000000000011", "0000000000011", 0, 12000, 16, 13),
+           ("trap00011100101011", "00011100101011", 0, 12000, 16, 14)]
 
-# The walls of periods 11 and 12 that `ElevenTraps` and `TwelveTraps` carry: the narrowest of the commonest traps that
-# the natural scan finds there (`wall_chains`), each the trap of a white or random half at step 12,000.
+# The walls of periods 11 to 14 that `ElevenTraps`, `TwelveTraps`, `ThirteenTraps` and `FourteenTraps` carry: the
+# narrowest of the commonest traps that the natural scan finds there (`wall_chains`), each the trap of a white or random
+# half at step 12,000. At periods 13 and 14 only the smallest wall, carried until its chain has shown every block it
+# holds (`WALL_DEPTHS`); carried 40 columns, the walls of 5,088 and 13,904 states of period 13 take 4 MB of tables.
 WALLS = {11: ["trap00000011011", "trap00110100111", "trap00001101001"],
-         12: ["trap001011100111", "trap000110110011", "trap000010011111"]}
+         12: ["trap001011100111", "trap000110110011", "trap000010011111"],
+         13: ["trap0001110010011"],
+         14: ["trap00011100101011"]}
+WALL_DEPTHS = {11: 40, 12: 40, 13: 53, 14: 103}
 
 
 def tables(name: str) -> dict:
@@ -485,12 +495,13 @@ def ten_member() -> np.ndarray:
     return trap_member(carried("trap0000010001", 0))
 
 
-def trap_coin(word: str, member: np.ndarray, steps: int = 12000) -> dict:
+def trap_coin(word: str, member: np.ndarray, steps: int = 12000, limit: int | None = None) -> dict:
     """A trap against a fair coin in the column beyond its window (`coin_lock`): the longest of the shortest entry
     paths, the largest and the mean (at phase 0) expected entry time, the decay factor per step, the largest chance of
     staying out after `steps` steps, the length of a word of the column beyond that brings every window at phase 0 in,
     and for each value the number of windows that a constant column beyond leaves outside after 3,000 steps from phase
-    0. When some window cannot enter, the expected entry, the decay and the word are left out (None)."""
+    0. When some window cannot enter, the expected entry, the decay and the word are left out (None). `limit` caps the
+    power iteration of `coin_lock.decay_rate`."""
     from computations import coin_lock
     from computations.lock_certificate import successor_table
     # member: (period, 2^W)
@@ -510,7 +521,8 @@ def trap_coin(word: str, member: np.ndarray, steps: int = 12000) -> dict:
     if reachable:
         expected = coin_lock.expected_entry(word, member)  # (period, 2^W)
         found.update(expected_max=float(expected.max()), expected_mean=float(expected[0].mean()),
-                     decay=coin_lock.decay_rate(word, member), word=len(coin_lock.universal_word(word, member)))
+                     decay=coin_lock.decay_rate(word, member, limit=limit),
+                     word=len(coin_lock.universal_word(word, member)))
     return found
 
 
@@ -519,10 +531,12 @@ def ten_coin(steps: int = 12000) -> dict:
     return trap_coin("0000010001", ten_member(), steps)
 
 
-def natural_coin(steps: int = 12000) -> list[tuple[str, dict]]:
-    """`trap_coin` for each trap of 16 cells of `EXTRA_TRAPS`, with a fair coin in column 17."""
-    return [(word, trap_coin(word, trap_member(extra_tables(word)), steps))
-            for word, _, cells, _ in tqdm(EXTRA_TRAPS, desc="natural traps", file=sys.stderr) if cells == 16]
+def natural_coin(steps: int = 12000, limit: int = 2000) -> Iterator[tuple[str, dict]]:
+    """`trap_coin` for each trap of 16 cells of `EXTRA_TRAPS`, with a fair coin in column 17, the power iteration
+    capped at `limit` periods; yields (block, results) one trap at a time."""
+    for word, _, cells, _ in tqdm(EXTRA_TRAPS, desc="natural traps", file=sys.stderr):
+        if cells == 16:
+            yield word, trap_coin(word, trap_member(extra_tables(word)), steps, limit)
 
 
 def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> list[tuple[int, np.ndarray]]:
@@ -691,12 +705,17 @@ def walls_entry(period: int, cells: int, steps: int, depth: int = 40) -> list[tu
     return found
 
 
-def lean_walls(period: int, depth: int, prefix: str) -> str:
-    """The trap definitions of `Rule30Open.Columns.ElevenTraps` or `TwelveTraps`: each wall of the period carried to
-    each distance of `wall_distances`, named by the prefix, the wall's index and the distance."""
+def lean_walls(period: int, depth: int, prefix: str, piece: int = 0, check: bool = False) -> str:
+    """The trap definitions of `Rule30Open.Columns.ElevenTraps`, `TwelveTraps` or `ThirteenTraps`: each wall of the
+    period carried to each distance of `wall_distances`, named by the prefix, the wall's index and the distance, with
+    the packed numbers in pieces of `piece` bits (`lean_number`) and, with `check`, each with its own kernel check."""
     names = {name: k for k, name in enumerate(WALLS[period])}
-    return "\n".join(lean_entry(carried(name, d), f"{prefix}{names[name]}_{d}")
-                     for name, d, _ in wall_distances(period, depth))
+    out = []
+    for name, d, _ in wall_distances(period, depth):
+        label = f"{prefix}{names[name]}_{d}"
+        out.append(lean_entry(carried(name, d), label, piece)
+                   + (f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n" if check else ""))
+    return "\n".join(out)
 
 
 def lean_ten() -> str:
@@ -1185,13 +1204,13 @@ def main() -> None:
     parser.add_argument("--lean-wall-gaps", action="store_true", help="print the entry data of WallGaps.lean")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
     parser.add_argument("--lean-large", action="store_true", help="print the trap and parts of NaturalTrapsLarge.lean")
-    parser.add_argument("--lean-walls", type=int, default=0, choices=[0, 11, 12],
-                        help="print the trap entries of ElevenTraps.lean or TwelveTraps.lean")
-    parser.add_argument("--walls-entry", type=int, default=0, choices=[0, 11, 12],
+    parser.add_argument("--lean-walls", type=int, default=0, choices=[0, 11, 12, 13, 14],
+                        help="print the trap entries of ElevenTraps, TwelveTraps, ThirteenTraps or FourteenTraps")
+    parser.add_argument("--walls-entry", type=int, default=0, choices=[0, 11, 12, 13, 14],
                         help="entry of the halves with support in cells 1 .. --cells into each trap of that module")
     parser.add_argument("--extra-entry", action="store_true",
-                        help="entry of the halves with support in cells 1 .. --cells into each trap of NaturalTraps and "
-                        "NaturalTrapsLarge")
+                        help="entry of the halves with support in cells 1 .. --cells into each trap of NaturalTraps "
+                        "and NaturalTrapsLarge")
     parser.add_argument("--natural-coin", action="store_true",
                         help="each trap of 16 cells of NaturalTraps against a fair coin in column 17")
     parser.add_argument("--ten-coin", action="store_true",
@@ -1375,7 +1394,10 @@ def main() -> None:
         print(lean_ten())
     if args.lean_ten_gap:
         print(lean_ten_gap())
-    if args.lean_walls:
+    if args.lean_walls in (13, 14):
+        prefix = "th" if args.lean_walls == 13 else "fo"
+        print(lean_walls(args.lean_walls, WALL_DEPTHS[args.lean_walls], prefix, 1 << 16, True))
+    elif args.lean_walls:
         print(lean_walls(args.lean_walls, 40, "el" if args.lean_walls == 11 else "tw"))
     if args.lean_extra:
         print(lean_extra())
@@ -1386,7 +1408,8 @@ def main() -> None:
             print(lean_gap(name, trap, bound, prefix))
     if args.walls_entry:
         counts = [0, 0, 0]  # traps that every pair, some pairs and no pair enter
-        for name, distance, word, cells, times in walls_entry(args.walls_entry, args.cells, args.steps):
+        for name, distance, word, cells, times in walls_entry(args.walls_entry, args.cells, args.steps,
+                                                              WALL_DEPTHS[args.walls_entry]):
             done = times[times >= 0]  # (k,)
             counts[0 if done.size == times.size else 1 if done.size else 2] += 1
             print(f"{name} at distance {distance} ({word}, {cells} cells): {done.size} of {times.size} halves and phases "

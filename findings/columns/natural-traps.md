@@ -76,6 +76,21 @@ or 7, and one start each for six blocks of period 9.
   are entered by 7 to 52 of the 160 to 192 pairs of a half and a phase (`extra_entry`). The kernel checks all 35
   ([NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md)), the trap of $00010001011$, 61,857 windows of 30 cells, in
   parts ([NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md)).
+- **A fair coin beyond the window.** As for the period-10 wall, a fair coin in column 17 in place of the cells beyond
+  brings every window into each of the 29 traps of 16 cells of [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md):
+  every window can enter within 59 to 123 steps, the expected entry is at most 79 to 1,549 steps, and the chance of
+  staying out falls by a factor of 0.952 to 0.9993 per step, below $2.5 \cdot 10^{-4}$ after 12,000 steps for every
+  trap and below $10^{-11}$ for 25 of them (`natural_coin`, the power iteration capped at 2,000 periods). A constant
+  column 17 brings every window in for 8 of them, white for five and black for five. The trap slowest under the coin,
+  that of $001110111101$, is also the one Rule 30's own small halves take longest to enter, within 8,622 steps.
+- **Periods 13 and 14, windows of 16 cells.** Closing windows of 16 cells only (`--max-width 16`, since wider closures
+  make the scan of these periods run for hours), the scan finds traps for 86 of the 630 blocks of period 13, every
+  sampled start inside one for 76 of them, and for 109 of the 1,161 of period 14, every start for 105; at periods 10 to
+  12 the same width holds traps for 12, 31 and 41 blocks. The commonest traps are again walls of one background each,
+  of 689 cells at period 13 and of 728 at period 14 ([backgrounds periodic in
+  time](space-time-backgrounds.md)), and carried leftward the smallest wall of each gives traps to every block of the
+  period among that background's columns, 53 and 101 ([ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
+  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)).
 
 ## What it means
 
@@ -104,6 +119,8 @@ python -m computations.lock_chain --ten-coin
 python -m computations.lock_chain --walls-entry 11 --cells 4 --steps 20000
 python -m computations.lock_chain --walls-entry 12 --cells 4 --steps 20000
 python -m computations.lock_chain --extra-entry --cells 4 --steps 20000
+python -m computations.lock_chain --natural 13,14 --steps 20000 --max-width 16 --workers 3
+python -m computations.lock_chain --natural-coin
 ```
 
 The first takes under two minutes and the second about 48 with four processes and prints each block that locks for some
@@ -113,4 +130,5 @@ each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7 minutes, 
 of growing length, about a minute and a half; the eighth and ninth, entry into each trap of
 [ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md) and [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md), about
 20 minutes each; and the last, entry into each trap of [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md) and
-[NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md), about four minutes.
+[NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md), about four minutes; the scan of periods 13 and 14
+with windows of 16 cells takes about 40 minutes with three processes, and the coin for the 29 traps about 50 minutes.

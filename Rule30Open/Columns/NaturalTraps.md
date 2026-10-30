@@ -51,7 +51,10 @@ halves of the scan is inside the trap at step 12,000; for $0001010101$, $0010010
 $000101001001$, one, five, two, one and one of them. Small halves enter the traps of 16 cells fast: every right half
 with support in cells 1 to 4, driven from every phase, enters each of the 29 within 8,622 steps, and for 26 of them
 within 2,500 (`extra_entry`). The five wider traps are entered less: 7 to 52 of the 160 to 192 pairs of such a half
-and a phase within 20,000 steps. Entry for every finite right half stays open, as for the kit's traps.
+and a phase within 20,000 steps. With a fair coin in column 17 in place of the cells beyond, every window enters each
+trap of 16 cells, the chance of staying out falling by a factor of 0.952 to 0.9993 per step ([natural
+traps](../../findings/columns/natural-traps.md)). Entry for every finite right half stays open, as for the kit's
+traps.
 
 ## The 35th block
 

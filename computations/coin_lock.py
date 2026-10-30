@@ -140,10 +140,12 @@ def expected_entry(word: str, member: np.ndarray, tolerance: float = 1e-7) -> np
             bar.update()
 
 
-def decay_rate(word: str, member: np.ndarray, settle: int = 100, tolerance: float = 1e-11) -> float:
+def decay_rate(word: str, member: np.ndarray, settle: int = 100, tolerance: float = 1e-11,
+               limit: int | None = None) -> float:
     """The factor per step by which the probability of staying out decays with a fair coin beyond: power iteration of
     one period of `coin_step` from phase 0, until the factor per period changes by less than `tolerance` over
-    `settle` periods."""
+    `settle` periods. When the leading factors share a modulus the factor per period oscillates; after `limit` periods,
+    if given, the geometric mean of the last `settle` factors is the rate."""
     # member: (period, 2^W)
     period = member.shape[0]
     successors = successor_table(word, member.shape[1].bit_length() - 1)  # (period, 2, 2^W)
@@ -151,6 +153,8 @@ def decay_rate(word: str, member: np.ndarray, settle: int = 100, tolerance: floa
     factors: list[float] = []
     with tqdm(desc=f"decay, {word}", file=sys.stderr, leave=False) as bar:
         while len(factors) <= settle or abs(factors[-1] - factors[-1 - settle]) >= tolerance:
+            if limit is not None and len(factors) >= limit:
+                return float(np.exp(np.mean(np.log(factors[-settle:]))) ** (1 / period))
             before = values[0].sum()
             for _ in range(period):
                 values = coin_step(word, member, values, successors)

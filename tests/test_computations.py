@@ -2080,16 +2080,19 @@ def test_wall_gaps() -> None:
 def test_coverage() -> None:
     """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
     the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
-    Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 34 of NaturalTraps and 1 of NaturalTrapsLarge,
-    each of its period, and the steered blocks are the 49 entries of the LockBlocks modules."""
+    Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
+    NaturalTraps and 1 of NaturalTrapsLarge, each of its period, and the steered blocks are the 49 entries of the
+    LockBlocks modules."""
     from collections import Counter
     from computations import coverage
     assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
     traps = coverage.trap_blocks()
     modules = Counter(traps.values())
     assert (modules["TenTraps"], modules["ElevenTraps"], modules["TwelveTraps"]) == (25, 57, 83)
+    assert (modules["ThirteenTraps"], modules["FourteenTraps"]) == (53, 101)
     assert (modules["NaturalTraps"], modules["NaturalTrapsLarge"]) == (34, 1)
-    assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12}.get(module, len(block))
+    assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12, "ThirteenTraps": 13,
+                              "FourteenTraps": 14}.get(module, len(block))
                for block, module in traps.items())
     assert "011" not in traps and len(coverage.steered_blocks()) == 49
 
@@ -2172,23 +2175,35 @@ def test_ten_traps() -> None:
 
 
 def test_eleven_twelve_traps() -> None:
-    """The walls of periods 11 and 12: the trap of each in `WALLS` has the size the natural scan reports, every trap
-    that `wall_distances` carries within 40 columns is a lock by `is_lock`, a direct check with the rule, for its block,
-    the blocks are distinct and none is the kit's, and `lean_walls` is the text of ElevenTraps.lean and
-    TwelveTraps.lean."""
+    """The walls of periods 11 to 14: the trap of each in `WALLS` has the size the natural scan reports, every trap
+    that `wall_distances` carries within `WALL_DEPTHS` columns is a lock by `is_lock`, a direct check with the rule, for
+    its block, the blocks are distinct and none is the kit's, and `lean_walls` is the text of ElevenTraps.lean,
+    TwelveTraps.lean, ThirteenTraps.lean and FourteenTraps.lean; the walls of periods 13 and 14 reach the blocks of
+    period 13 of the background of 689 cells and of period 14 of that of 728, the cycles their chains repeat with."""
     from computations import lock_chain
-    sizes = {name: len(lock_chain.tables(name)["states"]) for period in (11, 12) for name in lock_chain.WALLS[period]}
+    sizes = {name: len(lock_chain.tables(name)["states"]) for period in (11, 12, 13, 14)
+             for name in lock_chain.WALLS[period]}
     assert sizes == {"trap00000011011": 313, "trap00110100111": 103, "trap00001101001": 138,
-                     "trap001011100111": 119, "trap000110110011": 116, "trap000010011111": 150}
-    for period, module, prefix, count in ((11, "ElevenTraps", "el", 57), (12, "TwelveTraps", "tw", 83)):
-        found = lock_chain.wall_distances(period, 40)
+                     "trap001011100111": 119, "trap000110110011": 116, "trap000010011111": 150,
+                     "trap0001110010011": 213, "trap00011100101011": 225}
+    for period, module, prefix, count in ((11, "ElevenTraps", "el", 57), (12, "TwelveTraps", "tw", 83),
+                                          (13, "ThirteenTraps", "th", 53), (14, "FourteenTraps", "fo", 101)):
+        found = lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])
         assert len(found) == count and len({word for _, _, word in found}) == count
-        assert not {word for _, _, word in found} & set(game.KIT_WORDS)
+        assert not {word for _, _, word in found} & set(game.kit_blocks(period))
         for name, distance, word in found:
             t = lock_chain.carried(name, distance)
             assert t["word"] == word and lock_chain.is_lock(word, t["states"], 16 + distance)
         lean = (ROOT / "Rule30Open" / "Columns" / f"{module}.lean").read_text(encoding="utf-8")
-        assert lock_chain.lean_walls(period, 40, prefix) in lean
+        piece, check = (1 << 16, True) if period >= 13 else (0, False)
+        assert lock_chain.lean_walls(period, lock_chain.WALL_DEPTHS[period], prefix, piece, check) in lean
+    for period, length in ((13, 689), (14, 728)):
+        t = lock_chain.tables(lock_chain.WALLS[period][0])
+        values = "".join(str((t["first"] >> label) & 1) if t["word"][label] == "0" else "0" for label in range(period))
+        start, cycle = lock_chain.chain_cycle(t["word"], values)
+        background = {lock_chain.necklace(c) for c in cycle if lock_chain.least_period(c) == period}
+        assert start <= 1 and len(cycle) == length
+        assert background == {word for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])}
 
 
 def test_natural_traps() -> None:
