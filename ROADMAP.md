@@ -10,7 +10,8 @@ The kit's own status table, in its
 [lean/README.md](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/README.md#status-by-period),
 summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
-kit's commit 932cf8d.
+kit's commit 932cf8d; the kit's main branch has since gained 27 modules from nine pull requests (a6399ef, October 30),
+and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
 
@@ -58,8 +59,9 @@ kit's commit 932cf8d.
     $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most $4 \lfloor (b - 1)/9 \rfloor + 2$
     steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 262{,}125$ ([a window of
     262,144 cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells in
-    [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every
-    eventual period whose white runs are all at least 17, and four more families with long white runs ([the kit's pull
+    [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October 30
+    and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at least
+    17, and four more families with long white runs ([the kit's pull
     requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
   - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
     every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
@@ -159,8 +161,9 @@ kit's commit 932cf8d.
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
-  at least about $\log n$ times before $n$ (the kit); a black-run slope of $3/5$ and $\log\log$ margins are claimed in
-  open pull requests to the kit. Numerically the longest runs are logarithmic. *Assessment:* going below linear needs
+  at least about $\log n$ times before $n$ (the kit); a black-run slope of $3/5$ and $\log\log$ margins are in the
+  kit's main branch since October 30, after the commit this repository is pinned at ([the kit's pull
+  requests](literature/kit-pull-requests.md#runs-of-the-center-column)). Numerically the longest runs are logarithmic. *Assessment:* going below linear needs
   a statement about the chaotic left half near the center, and even a logarithmic bound gives no positive density.
 - **Statistics.** *No signal.* The column passes every randomness and compression test tried
   ([randomness tests](negative-results/statistics/randomness-tests.md), [compression](negative-results/statistics/compression.md)).

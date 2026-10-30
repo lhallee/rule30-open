@@ -1,11 +1,14 @@
 # Open pull requests to the prize kit
 
 The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch,
-commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit had 23 open
-[pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls), most written by agents. Each adds Lean
-modules that its author reports as checked by the kit's `Check.lean`; none is merged, so here every one is a claim.
-The summaries below come from the pull request pages and from the module sources at each pull request's head
-(`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
+commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit merged nine of its 23 open
+[pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its main branch, at commit
+[a6399ef](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a6399ef15ff409d4dc0c5feb119b289aa31588a4), which
+brings its catalog to 168 modules: #36, #43, #45, #46, #49, #51, #53, #54 and #56, each marked *merged* below. This
+repository is not yet pinned there, so here they are results of the kit's main branch that the pin does not include,
+and the 14 still open are claims. Each pull request adds Lean modules that its author reports as checked by the kit's
+`Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull request's
+head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
 ## Least periods four and three: traps for the right half
 
@@ -37,7 +40,7 @@ The summaries below come from the pull request pages and from the module sources
   Closing for every length is stated as open. *Here:* the same left row is the object of
   [the white right half](../findings/period-two/white-right-half.md) and [the held column](../Rule30Open/PeriodTwo/HeldColumn.md);
   no finite certificate in the forms tried settles it ([no certificate](../negative-results/period-two/no-finite-certificate.md)).
-- **#53, `Rule30ResetFreeThree` and four more modules.** Claims that every nonzero finite row of the kit's
+- **#53, `Rule30ResetFreeThree` and four more modules.** *Merged.* Claims that every nonzero finite row of the kit's
   zero-boundary evolution, beside a column held white, contains a word $0\,1^{3m+1}\,0$ in one of its first three rows,
   with two rows not enough, and that a tail avoiding these words for five rows is eventually of period five. *Here:* no
   route here uses it.
@@ -65,38 +68,41 @@ The summaries below come from the pull request pages and from the module sources
 
 ## Excluding eventual periods by families of blocks
 
-- **#36, `Rule30White17Runs` and `Rule30GrammarRuns`.** Claims that the single cell's center column is not eventually a
-  repetition of any word $1^{r_1} 0^{q_1} \cdots 1^{r_k} 0^{q_k}$ with every $q_i \ge 17$, nor of one whose blocks fall in four
-  categories ($r = 1, q \ge 10$; $r = 2, q \ge 8$; $r = 4, q \ge 7$; $r \ge 9, q \ge 9$), whatever the number of blocks and
-  the transient. The method ranks the strip of fourteen cells right of the center: the blocks capture every strip into
-  an envelope of 683 strips (1,791 for the four categories), no block raises the rank, and a block that keeps it fixes
-  column 1 along its white run, which masked Jen forbids.
-- **#43, `Rule30ResetMixtures`.** Claims the same for repetitions of blocks $1\,0^q$ with every gap at least nine and one
-  at least 17.
+- **#36, `Rule30White17Runs` and `Rule30GrammarRuns`.** *Merged.* Claims that the single cell's center column is not
+  eventually a repetition of any word $1^{r_1} 0^{q_1} \cdots 1^{r_k} 0^{q_k}$ with every $q_i \ge 17$, nor of one whose
+  blocks fall in four categories ($r = 1, q \ge 10$; $r = 2, q \ge 8$; $r = 4, q \ge 7$; $r \ge 9, q \ge 9$), whatever
+  the number of blocks and the transient. The method ranks the strip of fourteen cells right of the center: the blocks
+  capture every strip into an envelope of 683 strips (1,791 for the four categories), no block raises the rank, and a
+  block that keeps it fixes column 1 along its white run, which masked Jen forbids.
+- **#43, `Rule30ResetMixtures`.** *Merged.* Claims the same for repetitions of blocks $1\,0^q$ with every gap at least
+  nine and one at least 17.
 - *Here:* [the game blocks](../findings/columns/game-blocks.md) exclude single repeating blocks of period at most 14,
   one certificate each; these families exclude unboundedly long words at once, provided their white runs are long.
   Neither reaches the words of least period four, whose white runs are at most three.
 
 ## Structure near the edges and of periodic profiles
 
-- **#51, #54 and #55, right diagonals.** On the diagonals $D_j(t) = x_t(t - j)$ counted from the right edge of a
-  finite seed, claims a shift law for the doubling of their periods (`shift_law`) and a universal start: if $m \ge 2$ is
-  the first index, counted left from the seed's rightmost black cell, where two adjacent seed cells agree, then
-  $D_{m+1}, \dots, D_{m+6}$ have least periods 4, 8, 8, 16, 32 and 32 (`universal_start`). With #55, the whole-prefix
-  clock reaches at least 64 by diagonal $m + 15$, sharp for the seed 47649.
+- **#51, #54 and #55, right diagonals.** *#51 and #54 merged, #55 open.* On the diagonals $D_j(t) = x_t(t - j)$ counted
+  from the right edge of a finite seed, claims a shift law for the doubling of their periods (`shift_law`) and a
+  universal start: if $m \ge 2$ is the first index, counted left from the seed's rightmost black cell, where two
+  adjacent seed cells agree, then $D_{m+1}, \dots, D_{m+6}$ have least periods 4, 8, 8, 16, 32 and 32
+  (`universal_start`). With #55, the whole-prefix clock reaches at least 64 by diagonal $m + 15$, sharp for the seed
+  47649.
 - **#48, `Rule30EdgeClockDrop`.** Claims restrictions on how temporal periods of edge columns can drop, and finite
   observations that imitate a drop for bounded time.
 - **#50, `Rule30TemporalProfiles`.** Claims facts on periodic profiles linked by the left-diagonal recurrence: a
   periodic driver has exactly one periodic child, and a chain of them that starts white returns to white within
   $2^{2q}$ links.
-- **#49, `Rule30PairedColumnRuns`.** Claims that when columns 0 and 1 both have period $P \ge 2$ from time 0 and
-  column 0 is black at some time, every white run left of column 0 in row 0 has length at most $2P - 2$; the
-  hypotheses fail whenever there is a leftmost black cell. *Here:* [AdjacentColumns](../Rule30Open/Columns/AdjacentColumns.md) proves the hypotheses impossible
-  with a leftmost black cell.
-- **#56, `Rule30RingOrbits`.** Claims that spatially periodic configurations that return to themselves after $P$ steps
-  shifted by $P$ cells correspond to closed walks of temporal profiles, and that for $P = 2$ these are only the white
-  and alternating ones. *Here:* [ring orbits](../negative-results/columns/ring-orbits.md) takes the orbits that return
-  without a shift, on rings of up to 25 cells, as witnesses against the finite game; they witness only the block $01$.
+- **#49, `Rule30PairedColumnRuns`.** *Merged.* Claims that when columns 0 and 1 both have period $P \ge 2$ from time 0
+  and column 0 is black at some time, every white run left of column 0 in row 0 has length at most $2P - 2$; the
+  hypotheses fail whenever there is a leftmost black cell. *Here:*
+  [AdjacentColumns](../Rule30Open/Columns/AdjacentColumns.md) proves the hypotheses impossible with a leftmost black
+  cell.
+- **#56, `Rule30RingOrbits`.** *Merged.* Claims that spatially periodic configurations that return to themselves after
+  $P$ steps shifted by $P$ cells correspond to closed walks of temporal profiles, and that for $P = 2$ these are only
+  the white and alternating ones. *Here:* [ring orbits](../negative-results/columns/ring-orbits.md) takes the orbits
+  that return without a shift, on rings of up to 25 cells, as witnesses against the finite game; they witness only the
+  block $01$.
 - **#57, `Rule30DrivenMaskTransport`.** Claims that, for any driving column and any start, the left half evolves the
   same beside the column and beside the kit's effective boundary exactly when cell $-1$ is black at every 1 of the
   column that a 0 follows (`transport_iff_falling`, `consistency_iff`), and that an exclusion of periodic masks would
@@ -106,8 +112,8 @@ The summaries below come from the pull request pages and from the module sources
   kicks only at two consecutive 1s.
 - **#33, `Rule30FiniteReturnEight`.** Claims that a finite state of the kit's triangular evolution returns to itself
   after eight steps exactly when it returns after two once its three newest cells are dropped.
-- **#45, `Rule30ZeroBoundaryStripeStructure`.** Claims structure for the front windows of the kit's zero-boundary
-  stripes: a two-step clone map, lifting of certified cycles to wider windows, and a backward dichotomy.
+- **#45, `Rule30ZeroBoundaryStripeStructure`.** *Merged.* Claims structure for the front windows of the kit's
+  zero-boundary stripes: a two-step clone map, lifting of certified cycles to wider windows, and a backward dichotomy.
 - **#23, `Rule30RunBoundarySources`.** Claims that the center at time $2^{e+1} - 1$ is 1 plus, modulo 2, the
   contribution of run-boundary sources at depths beyond $e$, from an expansion through Rule 90. *Here:* it is of the same kind as
   [the Duhamel form](../findings/structure/duhamel.md), which writes the center column as a sum over adjacent black
@@ -118,8 +124,8 @@ The summaries below come from the pull request pages and from the module sources
 
 ## Runs of the center column
 
-- **#46, `Rule30BlackRunErosion`, `Rule30WhiteSpacing` and five more modules.** Claims that a black run of length $L$
-  starting at time $a \ge 16$ satisfies $5L + 18\,\ell(a) \le 3a + 51$ and a white run starting at $a \ge 256$ satisfies
-  $L + 6\,\ell(a) \le a + 17$, with $\ell(a) = \lfloor \log_2 \log_2 a \rfloor$; the slope $3/5$ is credited to the earlier
-  prize submission R30-20261025-0554f7. *Here:* the roadmap's run bounds for Problem 2; a bound linear in $a$ gives no
-  positive density.
+- **#46, `Rule30BlackRunErosion`, `Rule30WhiteSpacing` and five more modules.** *Merged.* Claims that a black run of
+  length $L$ starting at time $a \ge 16$ satisfies $5L + 18\,\ell(a) \le 3a + 51$ and a white run starting at $a \ge
+  256$ satisfies $L + 6\,\ell(a) \le a + 17$, with $\ell(a) = \lfloor \log_2 \log_2 a \rfloor$; the slope $3/5$ is
+  credited to the earlier prize submission R30-20261025-0554f7. *Here:* the roadmap's run bounds for Problem 2; a bound
+  linear in $a$ gives no positive density.
