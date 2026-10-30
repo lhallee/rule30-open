@@ -10,7 +10,8 @@ which column 1 is fixed at the white phases: the closure of its window under bot
 scan of [natural traps](../../findings/columns/natural-traps.md) finds one for 35 blocks that the kit and the finite game
 do not exclude and that the walls of [TenTraps](TenTraps.md), [ElevenTraps](ElevenTraps.md) and
 [TwelveTraps](TwelveTraps.md) do not carry. Here the kernel checks 34 of them, 3 blocks of period 10, 13 of period 11 and
-18 of period 12, with 107 to 15,752 states; the 35th, of 61,857 states for $00010001011$, is left out for its cost.
+18 of period 12, with 107 to 15,752 states; [NaturalTrapsLarge](NaturalTrapsLarge.md) checks the 35th, of 61,857
+states for $00010001011$, in parts.
 
 * `nat<block>`, `nat<block>_check`: the traps, each passing the check of [WordTraps](WordTraps.md).
 * `naturalTraps`, `naturalTraps_check`, `naturalTraps_blocks`: the list, its check and its blocks.

@@ -30,7 +30,7 @@ order.
 | 8 | 30 | 3 | 0 | 5 | 22 |
 | 9 | 56 | 0 | 23 | 0 | 33 |
 | 10 | 99 | 4 | 27 | 0 | 68 |
-| 11 | 186 | 7 | 69 | 0 | 110 |
+| 11 | 186 | 7 | 70 | 0 | 109 |
 | 12 | 335 | 9 | 101 | 0 | 225 |
 
 - **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
@@ -38,7 +38,8 @@ order.
 - **Reduced to entry into a trap**: the blocks of [WordTraps](../../Rule30Open/Columns/WordTraps.md),
   [NineTraps](../../Rule30Open/Columns/NineTraps.md), [TenTraps](../../Rule30Open/Columns/TenTraps.md),
   [ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md),
-  [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md) and
+  [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
+  [NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md) and
   [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
 - **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
   companions that no trap reaches.
@@ -49,7 +50,7 @@ The reach is uneven in the period. Every block of period 1, 2 and 4 is excluded 
 block each has a trap, which small halves almost never enter ([trap
 entry](../../negative-results/columns/trap-entry.md)), and the rest is not reached at all. From period 9 the walls at
 the edges of periodic backgrounds, and at periods 10 to 12 also the closed sets that driven halves settle into, give
-traps to 23, 27, 69 and 101 blocks, a quarter to two fifths of each period ([natural traps](natural-traps.md)), and
+traps to 23, 27, 70 and 101 blocks, a quarter to two fifths of each period ([natural traps](natural-traps.md)), and
 there small halves do enter many of them. Every block of periods 11 and 12 that steering reduces has a trap too, so
 steering alone reaches blocks only at period 8. Every reduction still needs its open step, entry for every finite half
 or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the 747 blocks of period at

@@ -19,7 +19,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
-| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9, 28 of the 99 of period 10, 70 of the 186 of period 11 and 101 of the 335 of period 12 come down to entry into traps, in Lean, from walls at the edges of backgrounds periodic in time and space and from the closed sets that driven right halves settle into, all but one block of periods 10 to 12 that a sampled half settles into a trap for; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
+| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9, 28 of the 99 of period 10, 71 of the 186 of period 11 and 101 of the 335 of period 12 come down to entry into traps, in Lean, from walls at the edges of backgrounds periodic in time and space and from the closed sets that driven right halves settle into, every block of periods 10 to 12 that a sampled half settles into a trap for; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
@@ -83,8 +83,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     random halves enter ([natural traps](findings/columns/natural-traps.md)); walls of periods 11 and 12 give traps to
     57 and 83 more blocks ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md),
     [TwelveTraps](Rule30Open/Columns/TwelveTraps.md)), and the closed sets that sampled halves settle into give traps to
-    34 of the 35 other blocks of periods 10 to 12 that one settles into and that nothing excludes, 29 of them entered by
-    every right half of up to four cells ([NaturalTraps](Rule30Open/Columns/NaturalTraps.md)); for $0000010001$, $00000011011$ and $001011100111$ no
+    the 35 other blocks of periods 10 to 12 that one settles into and that nothing excludes, 30 of them entered by every
+    right half of up to four cells ([NaturalTraps](Rule30Open/Columns/NaturalTraps.md),
+    [NaturalTrapsLarge](Rule30Open/Columns/NaturalTrapsLarge.md)); for $0000010001$, $00000011011$ and $001011100111$ no
     finite configuration white on cells 9 to 3,058, 1,610 or 2,357 has a center repeating the block
     ([TenGap](Rule30Open/Columns/TenGap.md), [WallGaps](Rule30Open/Columns/WallGaps.md)); the left half reaches every
     block, as statements only (below).
@@ -257,9 +258,9 @@ In order of the assessment above.
    blocks that the kit does not exclude, the nine blocks with locked windows of 13 cells among its columns
    ([TenTraps](Rule30Open/Columns/TenTraps.md)). In Lean, no finite configuration whose cells 9 to 3,058 are white has a
    center repeating $0000010001$ ([TenGap](Rule30Open/Columns/TenGap.md)), and every block of periods 10 to 12 that a
-   sampled half settles into a trap for, and that nothing excludes, has a trap there but one: carried from a wall, or
-   the closed set itself for 34 blocks ([NaturalTraps](Rule30Open/Columns/NaturalTraps.md)); the trap of $00010001011$,
-   61,857 windows of 30 cells, waits for a packing the kernel can check. Next: wider classes of halves for that edge,
+   sampled half settles into a trap for, and that nothing excludes, has a trap there: carried from a wall, or the closed
+   set itself for 35 blocks ([NaturalTraps](Rule30Open/Columns/NaturalTraps.md)), one of them of 61,857 windows checked
+   in parts ([NaturalTrapsLarge](Rule30Open/Columns/NaturalTrapsLarge.md)). Next: wider classes of halves for that edge,
    such as every half of twelve cells, as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and
    the word of 569 values of column 17 that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md)
    does for period four; the walls of periods 11 and 12 are carried in Lean too

@@ -16,7 +16,7 @@ evidence: [computations/lock_chain.py]
 cells by every block of periods 10 to 12 and closes the window of each half whose column 1 locks under both values of
 the cell beyond. It finds traps for 153 blocks. The walls of [TenTraps](TenTraps.md), [ElevenTraps](ElevenTraps.md)
 and [TwelveTraps](TwelveTraps.md) carry traps to 100 of them, and the kit or the finite game excludes 18 more. This
-module checks the traps of 34 of the other 35; the 35th is left out for the cost of its check (below).
+module checks the traps of 34 of the other 35, and [NaturalTrapsLarge](NaturalTrapsLarge.md) the 35th, in parts.
 
 ## Statement
 
@@ -53,15 +53,12 @@ with support in cells 1 to 4, driven from every phase, enters each of the 29 wit
 within 2,500 (`extra_entry`). The five wider traps are entered less: 7 to 52 of the 160 to 192 pairs of such a half
 and a phase within 20,000 steps. Entry for every finite right half stays open, as for the kit's traps.
 
-## The block left out
+## The 35th block
 
-The 35th block, $00010001011$ of period 11, has a natural trap too: 61,857 windows of 30 cells with labels modulo 22,
-the same for all 31 halves of the scan up to a shift of its labels by 11, closed and fixing column 1 at the white
-phases by a direct check with the rule (`is_lock`), and entered by every right half with support in cells 1 to 4 from
-each of the 11 phases within 12,584 steps, a median of 2,386. Packed as a `WTrap`, its tables hold numbers of about two
-million bits, and the check reads a state by shifting them: checked whole it needed more than 13 GB in the kernel, and
-the first of 31 parts of 2,048 states, checked as its own declaration, took about 5 minutes and 3 GB, so the parts would
-add hours to every build. A packing in smaller numbers would bring it in.
+The 35th block, $00010001011$ of period 11, has a natural trap of 61,857 windows of 30 cells with labels modulo 22,
+whose packed numbers have about two million bits. [NaturalTrapsLarge](NaturalTrapsLarge.md) writes them in pieces and
+checks the trap in parts of 1,024 states. Every right half with support in cells 1 to 4, from each of the 11 phases,
+enters it within 12,584 steps.
 
 ## Relation to the kit
 
@@ -82,5 +79,5 @@ block of period 10, 11 or 12, and none of these blocks is among those it exclude
 python -m computations.lock_chain --extra-entry --cells 4 --steps 20000
 ```
 
-It prints, for each trap here and for the one left out, how many pairs of a half and a phase enter within the steps,
-with the median and the latest entry, in about four minutes.
+It prints, for each trap here and in [NaturalTrapsLarge](NaturalTrapsLarge.md), how many pairs of a half and a phase
+enter within the steps, with the median and the latest entry, in about four minutes.
