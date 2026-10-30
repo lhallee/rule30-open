@@ -18,11 +18,12 @@ kit's commit 932cf8d.
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all but 40 in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
+| 1 | Single blocks through traps | open | one block each of period 2, 3, 5, 6, 7 and 9 comes down to entry into a trap, in Lean; entry is open, as for the kit's traps |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{52}$ fails |
-| 1 | Least period three | open | $001$ through the kit's trap, $011$ through the left half |
+| 1 | Least period three | open | $001$ through the kit's trap or a second one, $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal | no small row has a periodic column; no right half found escapes the period-four lock |
@@ -65,8 +66,11 @@ kit's commit 932cf8d.
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
-    to 18 cells, so no method of this kind reaches those periods ([window
-    locks](negative-results/columns/window-locks.md)); the left half reaches them, as statements only (below).
+    to 18 cells ([window locks](negative-results/columns/window-locks.md)). Wider ones exist for one block or more of
+    each of these periods, the locks of seeds with long runs of 1s carried leftward through columns the rule determines
+    ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
+    $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)); the left half reaches
+    every block, as statements only (below).
   - *Conditional.* For 49 blocks of period 4 to 12 that nothing excludes, 16 of them without a run of more than four,
     one sequence of values in column 14 leads every window of 13 cells into a lock, so once the center repeats the
     block, column 14 never reads that sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block
@@ -109,7 +113,8 @@ kit's commit 932cf8d.
 - **Every period through the left half.** *Open.* One statement for each block of each period, `LeftLatch b`, rules the
   block out in the orbit of every row with a leftmost 1: no finite left half, kicked where the block reads 1 twice in a
   row, meets the check at each 1 with a cell right of the column that latches
-  ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). It reaches the periods 3, 5, 6, 7 and 9 that no window lock reaches,
+  ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). It reaches the periods 3, 5, 6, 7 and 9 that no window lock of up to
+  18 cells reaches,
   and for each of their 91 blocks no left half of at most 37 to 100 cells meets it ([every
   block](findings/columns/left-half-every-block.md)). *Assessment:* each statement is of the kind of period two and of
   `C3`; past the half's length the readings fail at the rate of fair coins, so computation settles bounded cases only,
@@ -129,9 +134,12 @@ kit's commit 932cf8d.
   route for period three. For $001$ its period-21 trap `t001` remains: every right half white on its first 1,317 cells
   enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half of up to ten cells
   enters, but a median of about 16,000 steps in and the latest at step 186,490 ([the
-  census](findings/columns/t001-census.md)), so a census in Lean is out of reach. For $011$ the right half never settles
-  next to the center, so no trap of that kind appears ([the word 011](negative-results/columns/period-three-011.md)),
-  and the route is the kit's left-only statement `C3w`.
+  census](findings/columns/t001-census.md)), so a census in Lean is out of reach. `t001` is the lock of a block of
+  period 21 with twelve 1s in a row carried 38 columns left, and a second trap of the same kind, 52 cells with labels
+  modulo 15, is in Lean ([lock chains](findings/columns/lock-chains.md),
+  [WordTraps](Rule30Open/Columns/WordTraps.md)). For $011$ the right half never settles next to the center, so no trap
+  of that kind appears ([the word 011](negative-results/columns/period-three-011.md)), no chain found holds it, and the
+  route is the kit's left-only statement `C3w`.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
@@ -206,12 +214,16 @@ In order of the assessment above.
    blocks without long runs, though only to a condition on a farther column. Column words without long runs also fix the
    cell beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses
    ([forcing words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long
-   runs, and a typical block of large period has only short ones, so these exclusions stay thin. An open question with a
-   concrete form: why no window of up to 18 cells locks at periods 2, 3, 5, 6, 7 and 9, while periods 1, 4 and 8 and
-   every period from 10 to 20 have blocks with locked windows of at most 14 cells; in three families the locks appear at
-   period 8 and at every period from 10, but not at 9 ([window locks](negative-results/columns/window-locks.md)). At
-   those periods the route is the left half: one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)),
-   which no small half meets ([every block](findings/columns/left-half-every-block.md)).
+   runs, and a typical block of large period has only short ones, so these exclusions stay thin. Every locked window
+   found is the lock of a seed carried leftward through columns the rule determines ([lock
+   chains](findings/columns/lock-chains.md)): the three families that lock at period 8 and from 10 but not at 9 are one
+   chain, that of $0\,1^{P-1}$, whose block of period 9 does not lock, and the kit's wall for period four and its trap
+   for $001$ are chains too. Wider chain locks reach one block or more of each period from 2 to 9, and six are traps in
+   Lean ([WordTraps](Rule30Open/Columns/WordTraps.md)). Next: entry into those traps for small right halves, as [the
+   census for 001](findings/columns/t001-census.md) does for the kit's; seeds whose chains hold more blocks of periods
+   5 to 9, $011$, or a word of period 4, which would be a second wall for the ether; and for the blocks no trap reaches,
+   the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets
+   ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
    periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
    seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),

@@ -42,13 +42,15 @@ simulation](../../findings/columns/period-four-locking.md).
   blocks](../../findings/columns/game-blocks.md)).
 - Wherever a block of period at most 12 has a locked window at width 13, every window of 13 cells can be steered into
   one: the blocks with a locked window are exactly the 72 steerable blocks.
-- **Period 9 is singular.** In each of three families, $0^k 11101$, $0\,0\,1^k 0\,1$ and $0^k 101$, the blocks have
-  locked windows of 13 cells at every period from 8 to the largest tried (17, 16 and 15), except 9; none has one at a
-  period below 8. The locked windows of the first family show the mechanism: while the center is white, column 1 stays
-  black whatever lies right of it, which fixes column $-1$ through the white run, and the lock holds when the block's
-  last, black, phase finds columns 1 and 2 white, so that column 1 turns black as the run starts. At period 9 the
-  mechanism fails completely: for $000011101$ and $001111101$ every window can reach both values of column $-1$ at every
-  white phase.
+- **Period 9 is singular, and the three families are one.** In each of three families, $0^k 11101$,
+  $0\,0\,1^k 0\,1$ and $0^k 101$, the blocks have locked windows of 13 cells at every period from 8 to the largest
+  tried (17, 16 and 15), except 9; none has one at a period below 8. At period 9, for $000011101$ and $001111101$ every
+  window can reach both values of column $-1$ at every white phase. The three families have one lock: in every bottom
+  component of their locked windows, columns 1 to 5, 1 to 4 and 1 to 7 repeat with the phase, the last of them repeats
+  $0\,1^{P-1}$, and the cells beyond it lie in a locked window of $0\,1^{P-1}$ ([lock
+  chains](../../findings/columns/lock-chains.md)). So all three skip period 9 because $0\,1^8$ has no locked window:
+  from the wall that a long run of 1s leaves, its white phase finds cell 1 white one period later and black the next,
+  for every continuation in a window of 11 cells.
 
 **What it means.** The finite game and every lock built inside a window beside the repeating column say nothing about
 periods 2, 3, 5, 6, 7 and 9 below these widths: the game cannot exclude such a block, and no sequence in a column beyond
@@ -65,9 +67,18 @@ more than a thousand times (`right_half.lock_breaks`). For period two, [the abso
 route](../period-two/absorption-route.md) records that about half the windows of 19 to 21 columns cannot enter the kit's
 family at all.
 
-Heuristic: the kit's ether, the background of its period-four family, repeats with period 4 in time, which fits periods
-4, 8 and 12; the locks at periods 10 and 11 rest on other structures, and none of the structures found at these widths
-fits periods 2, 3, 5, 6, 7 or 9.
+Wider windows, with the phase counted modulo a multiple of the period, do lock for some block of every one of these
+periods. Every locked window found is the locked window of a seed carried leftward through columns that the rule
+determines, and such chains give locked windows to $01111$ of period 5 (107 cells, phase modulo 20), $001011$ of period
+6 (29 cells, modulo 12), $0011101$ and $0000011$ of period 7 (35 and 43 cells, modulo 14), five blocks of period 9, the
+first $001011101$ (30 cells, modulo 18), and a second one to $001$ (52 cells, modulo 15, beside the kit's trap of 47
+cells modulo 21) ([lock chains](../../findings/columns/lock-chains.md));
+[WordTraps](../../Rule30Open/Columns/WordTraps.md) proves six of them in Lean as traps. The kit's period-four family is
+the chain of $0\,1^7$, whose period 8 fits periods 4 and 8, and the locks of periods 10 to 12 are chains of seeds with
+long runs of 1s; no block of period 2, 3, 5, 6, 7 or 9 is a seed at the widths above. The negative result stands as
+stated: no window of up to 18 cells, with the phase counted modulo the period, and none of the multiples tried at the
+widths tried.
+
 
 **Reproduce.**
 

@@ -1577,3 +1577,96 @@ def test_left_halves_entropy() -> None:
         rates = [left_halves.window_entropy(block, width) for width in range(1, 6)]
         assert abs(rates[0] - left_halves.entropy(block, True)) < 1e-9
         assert all(wide <= narrow + 1e-6 for narrow, wide in zip(rates, rates[1:]))  # eigenvalues to about 1e-8
+
+
+def test_lock_chain() -> None:
+    """`lock_chain` against a step of the rule, the game and the kit. `left_column` inverts `step` on random columns;
+    the bottom components of the locked nodes of 0000011101, 0011111101 and 0000000101 at width 13 have columns 1 .. 5,
+    1 .. 4 and 1 .. 7 fixed by the phase, the last repeating 0 1^9, and `chain` from it, white at its white phase, gives
+    the others and the block; the blocks of period 8 with a locked node at width 13 are the chain of 0 1^7 at distances
+    0 to 7; that chain is the kit's ether from distance 8, and the bottom components of 01110111 at width 13 are the
+    kit's wall states, read from its source; from the wall, the white phase of 0 1^8 finds cell 1 white and then black,
+    as an exact run from the wall does, and those of 0 1^7 and 0 1^9 find it white. The kit's trap for 001 is the chain
+    of its column 38; `is_lock` agrees with `locks.lock_info` on the wall and fails once one node is dropped, and passes
+    the chain locks of 001 modulo 15 and of 001011 modulo 12."""
+    from computations import lock_chain, locks
+    rng = np.random.default_rng(11)
+    for _ in range(50):
+        period = int(rng.integers(2, 13))
+        column = "".join(map(str, rng.integers(0, 2, period).tolist()))
+        right = "".join(map(str, rng.integers(0, 2, period).tolist()))
+        left = lock_chain.left_column(column, right)
+        for ph in range(period):
+            row = int(left[ph]) | int(column[ph]) << 1 | int(right[ph]) << 2  # bit 0 is the left cell
+            assert (step(row) >> 1) & 1 == int(column[(ph + 1) % period])
+    for block, frozen in (("0000011101", 5), ("0011111101", 4), ("0000000101", 7)):
+        components = lock_chain.frozen_columns(block, 13)
+        assert components
+        for _, columns in components:
+            assert len(columns) == frozen and lock_chain.necklace(columns[-1]) == "0111111111"
+            assert lock_chain.chain(columns[-1], "0" * 10, frozen) == columns[::-1] + [block]
+    seeds, placed = lock_chain.classify(lock_chain.survey([8], 13), 26)
+    assert seeds == {"01111111": ["00000000"]}
+    chain8 = [lock_chain.necklace(column) for column in lock_chain.chain("01111111", "0" * 8, 7)]
+    assert {block: set(entries) for block, entries in placed.items()} == {
+        block: {("01111111", distance)} for distance, block in enumerate(chain8)}
+    assert lock_chain.ether_from("01111111", "0" * 8, 8, 21)
+    wall = lean_states("wallStates")
+    components = lock_chain.bottom_components("01110111", 13)
+    assert len(components) == 2
+    for members in components:
+        assert {(((int(x) >> 13) - 2) % 4, int(x) & 8191) for x in members} == wall
+    assert lock_chain.wall_returns(9, 11, 3) == ["0", "1", "01"]
+    assert lock_chain.wall_returns(8, 11, 12) == ["0"] * 12 == lock_chain.wall_returns(10, 11, 12)
+    cells = 200
+    for period, returns in ((8, [0, 0, 0]), (9, [0, 1]), (10, [0, 0, 0])):
+        row = sum(1 << j for j in range(2, cells, 2))  # bit j is cell j, bit 0 the column: the wall
+        seen = []
+        for t in range(len(returns) * period + 1):
+            row = (row & ~1) | int(t % period != 0)
+            if t and t % period == 0:
+                seen.append((row >> 1) & 1)
+            row = step(row) & ((1 << cells) - 1)
+        assert seen == returns
+    seed, _, rebuilt, single, least = lock_chain.t001_as_chain()
+    assert lock_chain.necklace(seed) == "000001011111111111101" and rebuilt and single and least == 9
+    block, nodes = lock_chain.chain_lock("01111111", 5, 8)
+    locked, _ = locks.lock_info(block, 13)  # (8 2^13,)
+    assert block == "01110111" and all(locked[ph << 13 | window] for ph, window in nodes)
+    assert lock_chain.is_lock(block, nodes, 13) and not lock_chain.is_lock(block, nodes[1:], 13)
+    for seed, distance, word in (("000010111111111", 47, "001"), ("000111111111", 24, "001011")):
+        block, nodes = lock_chain.chain_lock(seed, 5, distance)
+        assert lock_chain.necklace(block[:len(word)]) == word and lock_chain.is_lock(block, nodes, distance + 5)
+
+
+def test_word_traps() -> None:
+    """The traps of `WordTraps.lean` are the entries that `lock_chain.lean_trap` prints, and their packed tables, read
+    back from the Lean source, pass the module's check by `step`: each listed successor is the window one step of the
+    rule later, beside the block at the label's phase, with the label one more, and at a white phase the first cell is
+    the label's bit of `u`."""
+    import sys
+    from computations import lock_chain
+    lean = (ROOT / "Rule30Open" / "Columns" / "WordTraps.lean").read_text(encoding="utf-8")
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
+    try:
+        for name, seed, width, distance, want in lock_chain.TRAPS:
+            assert lock_chain.lean_trap(name, seed, width, distance, want) in lean
+            body = lean.split(f"def {name} : WTrap :=", 1)[1].split("}", 1)[0]
+            fields = dict(re.findall(r"(\w+) := (\[[^\]]*\]|\d+)", body))
+            block = [cell.strip() == "true" for cell in fields["b"].strip("[]").split(",")]
+            cells, modulus, n, lb, ib, u, windows, labels, nexts = (
+                int(fields[key]) for key in ("K", "m", "n", "lb", "ib", "u", "R", "L", "S"))
+            period, mask = len(block), (1 << cells) - 1
+            assert modulus % period == 0
+            for i in range(n):
+                window, label = (windows >> (cells * i)) & mask, (labels >> (lb * i)) % (1 << lb)
+                here = int(block[label % period])
+                assert label < modulus and (here or (window & 1) == (u >> label) & 1)
+                for free in (0, 1):
+                    j = (nexts >> (ib * (2 * i + free))) % (1 << ib)
+                    row = here | window << 1 | free << (cells + 1)  # bit 0 the block's column, bit x cell x
+                    assert j < n and (windows >> (cells * j)) & mask == (step(row) >> 1) & mask
+                    assert (labels >> (lb * j)) % (1 << lb) == (label + 1) % modulus
+    finally:
+        sys.set_int_max_str_digits(digits)

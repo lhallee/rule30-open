@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-51 Lean modules with 248 headline theorems, 24 findings (proved on paper,
+52 Lean modules with 257 headline theorems, 25 findings (proved on paper,
 computed or conjectured) and 30 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 38 | 11 | 7 |
+| [Columns](#columns) | 39 | 12 | 7 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -48,6 +48,7 @@ approach stopped.
 - [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md): problem 1
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md): problem 1
+- [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
 - [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
@@ -132,6 +133,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [A right half white past its first six cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/WhiteGap.md) | [`Columns.WhiteGap`](Rule30Open/Columns/WhiteGap.lean) | `drv_cone`, `inFamily_of_check_cone`, `gap_absorption`, `gap_0001`, `gap_0011`, `gap_0111`, `gapRight_0001`, `gapRight_0011`, `gapRight_0111`, `high_0011`, `high_0111` | 1 | extends a kit result |
 | [A black run of r ≥ 9 steps rules out every eventual period with a tail of at most 4⌊r/9⌋ steps; nine 1s and then b 0s rule out every tail of at most 4⌊(b - 1)/9⌋ + 2](Rule30Open/Columns/WideWall.md) | [`Columns.WideWall`](Rule30Open/Columns/WideWall.lean) | `center_long_run_tail`, `center_black_white_tail`, `long_run_tail_column`, `black_white_tail_column`, `wide_wall_column`, `stripe_agree`, `black_shield` | 1 | extends a kit result |
 | [An eventual period of the center column needs T + P of at least 262,125](Rule30Open/Columns/WideWindow.md) | [`Columns.WideWindow`](Rule30Open/Columns/WideWindow.lean) | `runRel_fst`, `runRel_snd`, `center_eq_wide`, `wideFactor_new`, `transient_add_period_ge_262125` | 1 | extends a kit result |
+| [Traps for blocks of period 2, 3, 5, 6, 7 and 9, by the kit's labelled-trap check for a block of any period](Rule30Open/Columns/WordTraps.md) | [`Columns.WordTraps`](Rule30Open/Columns/WordTraps.lean) | `wtrap_column`, `center_wtrap`, `absorption_excludes`, `not_eventually_01_of_absorption`, `not_eventually_001_of_absorption_fifteen`, `not_eventually_01111_of_absorption`, `not_eventually_001011_of_absorption`, `not_eventually_0011101_of_absorption`, `not_eventually_001011101_of_absorption` | 1 | extends a kit result |
 
 **Findings**
 
@@ -144,6 +146,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
+| [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md) | computed | 1 | partial |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |

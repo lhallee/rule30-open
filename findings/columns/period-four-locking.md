@@ -35,10 +35,15 @@ The same test at longer periods counts the primitive words that lock for all 31 
 | lock for every start | 0 | 0 | 3 | 0 | 0 | 0 | 8 | 0 | 17 | 35 | 46 |
 
 The eight of period 8 are $00000001$, $00000011$, $00000101$, $00011101$, $00011111$, $00111101$, $00111111$ and
-$01111111$. No word of period 9 locks for more than one start, although periods 8, 10 and 11 lock often; that gap is
-unexplained. The finite game at width 13 shows the same gap: 71 of the 109 words that lock for every start, and one
-word that locks for none, have a lock that every window of 13 cells can be steered into, and no word of period 9 does
-([steerable locks](steerable-locks.md)).
+$01111111$, the columns at distances 0 to 7 left of a column that repeats $0\,1^7$ in its lock ([lock
+chains](lock-chains.md)). No word of period 9 locks for more than one start, although periods 8, 10 and 11 lock often:
+the locks of up to 13 cells are those of a few seeds carried leftward, and no block of period 9 is a seed; in particular
+$0\,1^8$, whose chain holds the period-9 members of the families that lock at period 8 and from 10, has no locked
+window. Five blocks of period 9 do have locked windows, of 30 cells and more with the phase counted modulo 18, from
+seeds of period 18 ([lock chains](lock-chains.md)). The finite game at width 13 shows the same gap: 71 of the 109 words
+that lock for every start, and one word that locks for none, have a lock that every window of 13 cells can be steered
+into, and no word of period 9 does ([steerable locks](steerable-locks.md)).
+
 
 ## A finite certificate
 

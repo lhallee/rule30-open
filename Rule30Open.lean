@@ -42,6 +42,7 @@ public import Rule30Open.Columns.TwelveCells
 public import Rule30Open.Columns.FourteenCells
 public import Rule30Open.Columns.LeftHalf0001
 public import Rule30Open.Columns.LeftHalfDriven
+public import Rule30Open.Columns.WordTraps
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
