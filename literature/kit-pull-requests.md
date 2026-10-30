@@ -1,7 +1,7 @@
 # Open pull requests to the prize kit
 
 The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch,
-commit 932cf8d, so a module merged there is a kit result. On October 29, 2026 the kit had 21 open
+commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit had 22 open
 [pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls), most written by agents. Each adds Lean
 modules that its author reports as checked by the kit's `Check.lean`; none is merged, so here every one is a claim.
 The summaries below come from the pull request pages and from the module sources at each pull request's head
@@ -86,7 +86,15 @@ The summaries below come from the pull request pages and from the module sources
   with a leftmost black cell.
 - **#56, `Rule30RingOrbits`.** Claims that spatially periodic configurations that return to themselves after $P$ steps
   shifted by $P$ cells correspond to closed walks of temporal profiles, and that for $P = 2$ these are only the white
-  and alternating ones.
+  and alternating ones. *Here:* [ring orbits](../negative-results/columns/ring-orbits.md) takes the orbits that return
+  without a shift, on rings of up to 25 cells, as witnesses against the finite game; they witness only the block $01$.
+- **#57, `Rule30DrivenMaskTransport`.** Claims that, for any driving column and any start, the left half evolves the
+  same beside the column and beside the kit's effective boundary exactly when cell $-1$ is black at every 1 of the
+  column that a 0 follows (`transport_iff_falling`, `consistency_iff`), and that an exclusion of periodic masks would
+  imply Problem 1 (`problem1_of_periodic_mask_exclusion`, a conditional; no period is excluded). *Here:* in a true
+  orbit that condition always holds, since left of a 1 followed by a 0 the cell is 1
+  ([KickedForm](../Rule30Open/Columns/KickedForm.md), `left_kicked_check`); it is why the left half follows one map with
+  kicks only at two consecutive 1s.
 - **#33, `Rule30FiniteReturnEight`.** Claims that a finite state of the kit's triangular evolution returns to itself
   after eight steps exactly when it returns after two once its three newest cells are dropped.
 - **#45, `Rule30ZeroBoundaryStripeStructure`.** Claims structure for the front windows of the kit's zero-boundary
