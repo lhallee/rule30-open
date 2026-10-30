@@ -45,8 +45,8 @@ and [WordTraps](WordTraps.md)'s `absorption_excludes` gives each reduction.
 
 Each trap reduces its block to entry, into a set that every sampled half of the scan has entered by step 12,000. With
 this module and [CensusTrapsLarge](CensusTrapsLarge.md), every block of periods 13 and 14 for which the scan finds a
-trap of 16 cells is excluded or has a trap in Lean, as at periods 10 to 12. Entry for every finite right half stays
-open, as for the kit's traps.
+trap of 16 cells is excluded or reduced in Lean, as at periods 10 to 12, four of them by [TrapPairs](TrapPairs.md) to
+entry into one of two traps. Entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

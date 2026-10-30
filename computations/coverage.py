@@ -57,6 +57,8 @@ def trap_blocks() -> dict[str, str]:
         found.setdefault(block, "CensusTrapsLarge")
     for block, *_ in lock_chain.CENSUS_LARGE15:
         found.setdefault(block, "CensusTrapsLarge15")
+    for block in lock_chain.PAIRS:
+        found.setdefault(block, "TrapPairs")
     for word in ("0001", "0011", "0111"):
         found.setdefault(word, "PeriodFourCertificate")
     return found

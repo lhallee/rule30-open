@@ -91,13 +91,15 @@ or 7, and one start each for six blocks of period 9.
   carried leftward the smallest wall of each gives traps to every block of the period among that background's columns,
   53 and 101 ([ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
   [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)). Of the other blocks with a trap that nothing excludes,
-  the 74 whose traps have at most 3,000 states have them checked as they are
-  ([NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md)), and the other 34 in parts
-  ([CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
-  [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md)), so every block of periods 13 and 14 that
-  a sampled half settles into a trap of 16 cells for, and that nothing excludes, has a trap in Lean; every right half of
-  up to four cells enters 61 of the 74 from every phase. The chains of the 74 end in the backgrounds of 533 and 689
-  cells at period 13 and of 644, 728 and 1,316 at period 14. A census of every locked window of 16 cells finds 89 and
+  74 have traps of at most 3,000 states. For 70 the trap is checked as it is
+  ([NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md)); for the other four some node of the finite game
+  cannot reach it, so entry into it is false ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)), and the sampled
+  halves settle into one of two traps, which [TrapPairs](../../Rule30Open/Columns/TrapPairs.md) checks together. The
+  other 34 blocks have their traps checked in parts ([CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
+  [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md)). So every block of periods 13 and 14 that
+  a sampled half settles into a trap of 16 cells for, and that nothing excludes, is reduced in Lean; every right half of
+  up to four cells enters 61 of the 70 traps from every phase. The chains of the 70 end in the backgrounds of 533 and
+  689 cells at period 13 and of 644, 728 and 1,316 at period 14. A census of every locked window of 16 cells finds 89 and
   109 blocks with one, about as many as the scan, but carried by their chains the locks reach 135 and 244 blocks more
   than all of these traps ([backgrounds periodic in time](space-time-backgrounds.md),
   [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),

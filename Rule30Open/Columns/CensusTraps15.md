@@ -1,5 +1,5 @@
 ---
-title: Traps for 571 blocks of period 15, from every locked window of 16 cells carried leftward
+title: Traps for 569 blocks of period 15, from every locked window of 16 cells carried leftward
 category: columns
 problems: [1]
 status: proved
@@ -10,22 +10,24 @@ kit_modules: [Rule30EtherThreeTrap, Rule30Ether]
 evidence: [computations/lock_chain.py, computations/coverage.py]
 ---
 
-# Traps for 571 blocks of period 15, from every locked window of 16 cells carried leftward
+# Traps for 569 blocks of period 15, from every locked window of 16 cells carried leftward
 
 [The census of locked windows of 16 cells](../../findings/columns/space-time-backgrounds.md), as in
-[CensusTraps13](CensusTraps13.md), takes every block of period 15 and finds the bottom components of its locked
-windows, with the phase counted modulo 15: 197 of the 2,182 blocks have one. The chain of each component ends in one
-of six backgrounds of period 15, of 64, 85, 105, 540, 795 and 2,145 cells, each confirmed by running one of its rows
-on its ring, and the chains hold 648 blocks of period 15: the 53 that the game or the kit excludes, and 595 that no
-trap module reached before, since none had a trap of period 15. For 571 of the 595 a component of at most 3,000
-states carries to the block; this module checks, for each, the component of least cost, states times cells.
+[CensusTraps13](CensusTraps13.md), takes every block of period 15 and finds the bottom components of its locked windows,
+with the phase counted modulo 15: 197 of the 2,182 blocks have one. The chain of each component ends in one of six
+backgrounds of period 15, of 64, 85, 105, 540, 795 and 2,145 cells, each confirmed by running one of its rows on its
+ring, and the chains hold 648 blocks of period 15: the 53 that the game or the kit excludes, and 595 that no trap module
+reached before, since none had a trap of period 15. For 571 of the 595 a component of at most 3,000 states carries to
+the block. For two of them, $000001010110101$ and $001001111010111$, that component is the block's own, which some node
+of the finite game cannot reach, and so are those carried to them one and two columns; [MissedTraps](MissedTraps.md)
+refutes entry into the first. For the other 569 this module checks the component of least cost, states times cells.
 
 ## Statement
 
-1. **The traps** (`censusTraps15`, `censusTraps15_check`). A list of 571 labelled traps `WTrap` with labels modulo 15,
+1. **The traps** (`censusTraps15`, `censusTraps15_check`). A list of 569 labelled traps `WTrap` with labels modulo 15,
    each passing the check of [WordTraps](WordTraps.md) in its own declaration (`cen<block>_check`): 131 to 2,829
    states, 16 to 129 cells.
-2. **The blocks** (`censusTraps15_blocks`): 571 distinct blocks of period 15, none the kit's or excluded by the finite
+2. **The blocks** (`censusTraps15_blocks`): 569 distinct blocks of period 15, none the kit's or excluded by the finite
    game at width 6, 10 or 14.
 3. **The reduction** (`census15_absorption_excludes`). For each of them, if every finitely supported right half
    driven by the block enters its trap (`WTrap.Absorption`), the center column does not eventually repeat the block.
@@ -39,17 +41,17 @@ carries it leftward to a trap of $16 + d$ cells for the block $d$ columns left (
 nor the carrying is trusted, and [WordTraps](WordTraps.md)'s `absorption_excludes` gives each reduction.
 
 The traps come from 62 components, of 131 to 2,829 states, carried 0 to 113 columns. By the background their chains
-end in, 371 of the blocks belong to that of 2,145 cells, 85 to that of 795, 57 to that of 64, 27 to that of 540, 19 to
+end in, 370 of the blocks belong to that of 2,145 cells, 85 to that of 795, 56 to that of 64, 27 to that of 540, 19 to
 that of 105 and 12 to that of 85. The other 24 blocks are reached only by their own components, of 3,172 to 30,345
 states, which [CensusTrapsLarge15](CensusTrapsLarge15.md) checks in parts.
 
 ## What it covers
 
-Each trap reduces its block to entry. With [CensusTrapsLarge15](CensusTrapsLarge15.md), 595 of the 2,182 blocks of
-period 15 come down to entry, every block that a chain of a locked window of 16 cells holds and nothing excludes. No
-entry census of small halves has been run at this period; at periods 13 and 14 small halves enter the traps carried a
-short way and few of those carried far ([CensusTraps13](CensusTraps13.md), [CensusTraps14](CensusTraps14.md)). Entry
-for every finite right half stays open, as for the kit's traps.
+Each trap reduces its block to entry. With [CensusTrapsLarge15](CensusTrapsLarge15.md), 593 of the 2,182 blocks of
+period 15 come down to entry, every block that a chain of a locked window of 16 cells holds and nothing excludes but the
+two of [MissedTraps](MissedTraps.md). No entry census of small halves has been run at this period; at periods 13 and 14
+small halves enter the traps carried a short way and few of those carried far ([CensusTraps13](CensusTraps13.md),
+[CensusTraps14](CensusTraps14.md)). Entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

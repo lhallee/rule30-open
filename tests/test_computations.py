@@ -2130,23 +2130,25 @@ def test_coverage() -> None:
     """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
     the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
     Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
-    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of NaturalTrapsLongLarge, 12 of FarWalls, and of
-    CensusTraps13, CensusTraps14 and CensusTrapsLarge the 117, 228 and 22 that no earlier module holds, each of its
-    period, 571 of CensusTraps15 and 24 of CensusTrapsLarge15, and the steered blocks are the 49 entries of the
-    LockBlocks modules."""
+    NaturalTraps, 1 of NaturalTrapsLarge, 70 of NaturalTrapsLong, 12 of NaturalTrapsLongLarge, 12 of FarWalls, and of
+    CensusTraps13, CensusTraps14 and CensusTrapsLarge the 116, 228 and 22 that no earlier module holds, each of its
+    period, 569 of CensusTraps15 and 24 of CensusTrapsLarge15, 4 of TrapPairs, the blocks of the census traps of
+    MissedTraps in none, and the steered blocks are the 49 entries of the LockBlocks modules."""
     from collections import Counter
-    from computations import coverage
+    from computations import coverage, lock_chain
     assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
     traps = coverage.trap_blocks()
     modules = Counter(traps.values())
     assert (modules["TenTraps"], modules["ElevenTraps"], modules["TwelveTraps"]) == (25, 57, 83)
     assert (modules["ThirteenTraps"], modules["FourteenTraps"]) == (53, 101)
-    assert (modules["NaturalTraps"], modules["NaturalTrapsLarge"], modules["NaturalTrapsLong"]) == (34, 1, 74)
+    assert (modules["NaturalTraps"], modules["NaturalTrapsLarge"], modules["NaturalTrapsLong"]) == (34, 1, 70)
     assert modules["FarWalls"] == 12 and all(len(b) == 12 for b, m in traps.items() if m == "FarWalls")
-    assert modules["CensusTraps13"] == 117 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
+    assert modules["CensusTraps13"] == 116 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
     assert modules["CensusTraps14"] == 228 and all(len(b) == 14 for b, m in traps.items() if m == "CensusTraps14")
     assert modules["NaturalTrapsLongLarge"] == 12
-    assert (modules["CensusTraps15"], modules["CensusTrapsLarge15"]) == (571, 24)
+    assert (modules["CensusTraps15"], modules["CensusTrapsLarge15"]) == (569, 24)
+    assert modules["TrapPairs"] == 4 and {b for b, m in traps.items() if m == "TrapPairs"} == set(lock_chain.PAIRS)
+    assert not {block for block, *_ in lock_chain.MISSED_CENSUS} & set(traps)
     assert modules["CensusTrapsLarge"] == 22 and all(len(b) in (13, 14) for b, m in traps.items()
                                                      if m == "CensusTrapsLarge")
     assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12, "ThirteenTraps": 13,
@@ -2303,7 +2305,7 @@ def test_census_traps() -> None:
     groups = [(13, lock_chain.CENSUS_TRAPS[13]), (14, lock_chain.CENSUS_TRAPS[14]), (15, lock_chain.CENSUS_TRAPS[15]),
               (0, lock_chain.CENSUS_LARGE), (0, lock_chain.CENSUS_LARGE15)]
     words = [block for _, entries in groups for block, *_ in entries]
-    assert len(words) == len(set(words)) == 125 + 232 + 571 + 22 + 24
+    assert len(words) == len(set(words)) == 124 + 232 + 569 + 22 + 24
     assert not set(words) & (set(game.kit_blocks(15)) | others)
     assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
     for large, entries in groups:
@@ -2319,10 +2321,61 @@ def test_census_traps() -> None:
         assert lock_chain.lean_census_large(entries) in lean
 
 
+def test_missed_traps() -> None:
+    """`trap_reach` and `miss_tables`: every node of the game reaches the census trap of 0000000110001, while only a
+    share reaches the natural trap of 0010101111111 and the census trap of 0000010111001; for each of these two, the
+    closed set of `miss_tables`, checked with `step`, is closed under both values of the cell beyond and apart from the
+    trap, and a right half started in it, run with `step` for 3,000 steps, keeps its first cells in it and never
+    enters the trap; and `lean_missed` is the text of MissedTraps."""
+    from computations import lock_chain
+    assert lock_chain.trap_reach(lock_chain.census_tables(lock_chain.CENSUS_LARGE[0])) == 1.0
+    for t, share in ((lock_chain.extra_tables("0010101111111"), (0.34, 0.35)),
+                     (lock_chain.census_tables(lock_chain.MISSED_CENSUS[0]), (0.008, 0.009))):
+        assert share[0] < lock_chain.trap_reach(t) < share[1]
+        word, period = t["word"], len(t["word"])
+        s = lock_chain.miss_tables(t)
+        width, states = s["cells"], set(s["states"])
+        assert s["word"] == word and s["modulus"] == period and width < t["cells"]
+        for label, window in states:
+            for free in (0, 1):
+                row = step(int(word[label]) | window << 1 | free << (width + 1))
+                assert ((label + 1) % period, (row >> 1) & ((1 << width) - 1)) in states
+        assert not {(label, window & ((1 << width) - 1)) for label, window in t["states"]} & states
+        label, window = s["states"][0]
+        trap = set(t["states"])
+        row = window << 1  # bit 0 the block's column, bit i column i
+        for time in range(3000):
+            phase = (label + time) % period
+            row = (row & ~1) | int(word[phase])
+            assert (phase, (row >> 1) & ((1 << width) - 1)) in states
+            assert (phase, (row >> 1) & ((1 << t["cells"]) - 1)) not in trap
+            row = step(row)
+    assert lock_chain.lean_missed() in (ROOT / "Rule30Open" / "Columns" / "MissedTraps.lean").read_text(
+        encoding="utf-8")
+
+
+def test_trap_pairs() -> None:
+    """The traps of TrapPairs: each block of `PAIRS` is that of a natural trap of MissedTraps, and has two bottom
+    components of locked windows of 16 cells, the second that natural trap, each a lock by `is_lock` with its own values
+    of column 1 at the white phases; some node of the game cannot reach either alone, every node can reach one of the two; and `lean_pairs` is
+    the text of the module."""
+    from computations import lock_chain
+    assert lock_chain.PAIRS == [word for word, *_ in lock_chain.MISSED_NATURAL]
+    for block in lock_chain.PAIRS:
+        traps = lock_chain.pair_tables(block)
+        assert len(traps) == 2 and all(t["word"] == block and t["cells"] == 16 for t in traps)
+        assert set(traps[1]["states"]) == set(lock_chain.extra_tables(block)["states"])
+        assert all(lock_chain.is_lock(block, t["states"], 16) for t in traps)
+        values = [{(label, window & 1) for label, window in t["states"] if block[label] == "0"} for t in traps]
+        assert values[0] != values[1]
+        assert max(lock_chain.trap_reach(t) for t in traps) < 1 == lock_chain.trap_reach(*traps)
+    assert lock_chain.lean_pairs() in (ROOT / "Rule30Open" / "Columns" / "TrapPairs.lean").read_text(encoding="utf-8")
+
+
 def test_natural_traps() -> None:
     """The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLong and NaturalTrapsLongLarge: each is a lock by
     `is_lock`, a direct check with the rule, for its block; for the first three, its half, driven by the block with
-    `step`, has its window in the trap at step 12,000; the 35 blocks of periods 10 to 12 and the 74 of periods 13 and 14
+    `step`, has its window in the trap at step 12,000; the 35 blocks of periods 10 to 12 and the 70 of periods 13 and 14
     are distinct, and neither the kit's nor a block of another trap module; the 12 large ones of periods 13 and 14 have
     census traps too; `lean_extra`, `lean_large` and `lean_long_large` are the text of the modules; and `lean_number`
     writes numbers in pieces that sum back to them."""
@@ -2357,7 +2410,7 @@ def test_natural_traps() -> None:
         inside = {(label % len(word), window) for label, window in t["states"]}
         assert (12000 % len(word), (row >> 1) & ((1 << cells) - 1)) in inside
     long_blocks = [word for word, *_ in lock_chain.LONG_TRAPS]
-    assert sorted(len(word) for word in long_blocks) == [13] * 34 + [14] * 40 and len(set(long_blocks)) == 74
+    assert sorted(len(word) for word in long_blocks) == [13] * 31 + [14] * 39 and len(set(long_blocks)) == 70
     others = {word for word, module in coverage.trap_blocks().items() if module != "NaturalTrapsLong"}
     assert not set(long_blocks) & (others | set(game.kit_blocks(14)))
     # the large natural traps of periods 13 and 14: every sampled half's trap, checked in parts; each block has a

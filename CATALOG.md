@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-79 Lean modules with 344 headline theorems, 29 findings (proved on paper,
-computed or conjectured) and 31 negative results. Prize problem 1 asks whether the center column
+81 Lean modules with 350 headline theorems, 29 findings (proved on paper,
+computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 66 | 16 | 8 |
+| [Columns](#columns) | 68 | 16 | 9 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -114,9 +114,9 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game decided phase by phase in the kernel excludes the 11 blocks of period 19 that need 13 or 14 cells](Rule30Open/Columns/BitPhases19.md) | [`Columns.BitPhases19`](Rule30Open/Columns/BitPhases19.lean) | `center_not_blocksPhases19`, `not_eventually_blocksPhases19` | 1 | not in the kit |
 | [The game decided phase by phase in the kernel excludes the 15 blocks of period 20 that need 13 or 14 cells](Rule30Open/Columns/BitPhases20.md) | [`Columns.BitPhases20`](Rule30Open/Columns/BitPhases20.lean) | `center_not_blocksPhases20`, `not_eventually_blocksPhases20` | 1 | not in the kit |
 | [The game decided phase by phase in the kernel excludes the 35 blocks of period 21 that need 13 or 14 cells](Rule30Open/Columns/BitPhases21.md) | [`Columns.BitPhases21`](Rule30Open/Columns/BitPhases21.lean) | `center_not_blocksPhases21`, `not_eventually_blocksPhases21` | 1 | not in the kit |
-| [Traps for 125 more blocks of period 13, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps13.md) | [`Columns.CensusTraps13`](Rule30Open/Columns/CensusTraps13.lean) | `censusTraps13_check`, `censusTraps13_blocks`, `census13_absorption_excludes` | 1 | not in the kit |
+| [Traps for 124 more blocks of period 13, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps13.md) | [`Columns.CensusTraps13`](Rule30Open/Columns/CensusTraps13.lean) | `censusTraps13_check`, `censusTraps13_blocks`, `census13_absorption_excludes` | 1 | not in the kit |
 | [Traps for 232 more blocks of period 14, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps14.md) | [`Columns.CensusTraps14`](Rule30Open/Columns/CensusTraps14.lean) | `censusTraps14_check`, `censusTraps14_blocks`, `census14_absorption_excludes` | 1 | not in the kit |
-| [Traps for 571 blocks of period 15, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps15.md) | [`Columns.CensusTraps15`](Rule30Open/Columns/CensusTraps15.lean) | `censusTraps15_check`, `censusTraps15_blocks`, `census15_absorption_excludes` | 1 | not in the kit |
+| [Traps for 569 blocks of period 15, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps15.md) | [`Columns.CensusTraps15`](Rule30Open/Columns/CensusTraps15.lean) | `censusTraps15_check`, `censusTraps15_blocks`, `census15_absorption_excludes` | 1 | not in the kit |
 | [Traps for 22 more blocks of periods 13 and 14, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge.md) | [`Columns.CensusTrapsLarge`](Rule30Open/Columns/CensusTrapsLarge.lean) | `censusTrapsLarge_check`, `censusTrapsLarge_blocks`, `censusLarge_absorption_excludes` | 1 | not in the kit |
 | [Traps for 24 more blocks of period 15, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge15.md) | [`Columns.CensusTrapsLarge15`](Rule30Open/Columns/CensusTrapsLarge15.lean) | `censusTrapsLarge15_check`, `censusTrapsLarge15_blocks`, `censusLarge15_absorption_excludes` | 1 | not in the kit |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
@@ -142,9 +142,10 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [One word in a column beside the center forces the period-four lock, for each of the three words](Rule30Open/Columns/LockWord.md) | [`Columns.LockWord`](Rule30Open/Columns/LockWord.lean) | `lockWord_column`, `family_contra`, `lock_0001`, `lock_0011`, `lock_0111`, `center_lock_0001`, `center_lock_0011`, `center_lock_0111`, `center_not_0001_of_word`, `center_not_0011_of_word`, `center_not_0111_of_word` | 1 | not in the kit |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
 | [An eventual period of the center column needs T + P of at least 65,518](Rule30Open/Columns/LongWindow.md) | [`Columns.LongWindow`](Rule30Open/Columns/LongWindow.lean) | `center_eq_big`, `factor_new`, `transient_add_period_ge_65518` | 1 | extends a kit result |
+| [Seven checked traps of periods 13 to 15 that some finitely supported right half never enters](Rule30Open/Columns/MissedTraps.md) | [`Columns.MissedTraps`](Rule30Open/Columns/MissedTraps.lean) | `not_absorption`, `missedTraps_check`, `missedTraps_not_absorption` | 1 | not in the kit |
 | [Traps for 34 more blocks of periods 10 to 12, the closed sets that driven right halves settle into](Rule30Open/Columns/NaturalTraps.md) | [`Columns.NaturalTraps`](Rule30Open/Columns/NaturalTraps.lean) | `naturalTraps_check`, `naturalTraps_blocks`, `natural_absorption_excludes` | 1 | not in the kit |
 | [A trap of 61,857 states for the block 00010001011 of period 11, checked in parts](Rule30Open/Columns/NaturalTrapsLarge.md) | [`Columns.NaturalTrapsLarge`](Rule30Open/Columns/NaturalTrapsLarge.lean) | `allRange_cover`, `nat00010001011_check`, `not_eventually_00010001011_of_trap` | 1 | not in the kit |
-| [Traps for 74 blocks of periods 13 and 14, the closed sets that driven right halves settle into](Rule30Open/Columns/NaturalTrapsLong.md) | [`Columns.NaturalTrapsLong`](Rule30Open/Columns/NaturalTrapsLong.lean) | `naturalTrapsLong_check`, `naturalTrapsLong_blocks`, `naturalLong_absorption_excludes` | 1 | not in the kit |
+| [Traps for 70 blocks of periods 13 and 14, the closed sets that driven right halves settle into](Rule30Open/Columns/NaturalTrapsLong.md) | [`Columns.NaturalTrapsLong`](Rule30Open/Columns/NaturalTrapsLong.lean) | `naturalTrapsLong_check`, `naturalTrapsLong_blocks`, `naturalLong_absorption_excludes` | 1 | not in the kit |
 | [The natural traps of 12 more blocks of periods 13 and 14, of 3,295 to 18,132 states, checked in parts](Rule30Open/Columns/NaturalTrapsLongLarge.md) | [`Columns.NaturalTrapsLongLarge`](Rule30Open/Columns/NaturalTrapsLongLarge.lean) | `naturalTrapsLongLarge_check`, `naturalTrapsLongLarge_blocks`, `naturalLongLarge_absorption_excludes` | 1 | not in the kit |
 | [Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter](Rule30Open/Columns/NineTraps.md) | [`Columns.NineTraps`](Rule30Open/Columns/NineTraps.lean) | `nineTraps_check`, `nineTraps_blocks`, `nine_absorption_excludes`, `trap001010011_check`, `not_eventually_001010011_of_absorption` | 1 | not in the kit |
 | [Right halves white on their first 91,129 to 201,172 cells enter the walls of period 9](Rule30Open/Columns/NineWhite.md) | [`Columns.NineWhite`](Rule30Open/Columns/NineWhite.lean) | `highRightW_of_entry`, `white_first_wall`, `white_first_wall_eight`, `white_second_wall`, `white_second_wall_zero` | 1 | not in the kit |
@@ -155,6 +156,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No finite configuration whose cells 9 to 3,058 are white has a center column that repeats 0000010001](Rule30Open/Columns/TenGap.md) | [`Columns.TenGap`](Rule30Open/Columns/TenGap.lean) | `prefixRightW_of_entry`, `gapRightW_of_entries`, `ten_gap`, `ten_white` | 1 | not in the kit |
 | [Traps for 25 blocks of period 10, from one background of period ten whose edge driven right halves enter](Rule30Open/Columns/TenTraps.md) | [`Columns.TenTraps`](Rule30Open/Columns/TenTraps.lean) | `tenTraps_check`, `tenTraps_blocks`, `ten_absorption_excludes` | 1 | not in the kit |
 | [Traps for 53 of the 630 blocks of period 13, from a wall of period thirteen carried leftward](Rule30Open/Columns/ThirteenTraps.md) | [`Columns.ThirteenTraps`](Rule30Open/Columns/ThirteenTraps.lean) | `thirteenTraps_check`, `thirteenTraps_blocks`, `thirteen_absorption_excludes` | 1 | not in the kit |
+| [Four blocks of periods 13 and 14 reduced to entry into one of two traps](Rule30Open/Columns/TrapPairs.md) | [`Columns.TrapPairs`](Rule30Open/Columns/TrapPairs.lean) | `absorption_some_excludes`, `pair0001101101011_excludes`, `pair0010101111111_excludes` | 1 | not in the kit |
 | [A right half white past its first twelve cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TwelveCells.md) | [`Columns.TwelveCells`](Rule30Open/Columns/TwelveCells.lean) | `twelve_absorption`, `twelve_0001`, `twelve_0011`, `twelve_0111`, `twelveRight_0001`, `twelveRight_0011`, `twelveRight_0111`, `smallTwelve_0001`, `smallTwelve_0011`, `smallTwelve_0111` | 1 | extends a kit result |
 | [Traps for 83 of the 335 blocks of period 12, from walls of period twelve carried leftward](Rule30Open/Columns/TwelveTraps.md) | [`Columns.TwelveTraps`](Rule30Open/Columns/TwelveTraps.lean) | `twelveTraps_check`, `twelveTraps_blocks`, `twelve_absorption_excludes` | 1 | not in the kit |
 | [No finite configuration white on cells 9 to 1,610 has a center repeating 00000011011, nor one white on cells 9 to 2,357 a center repeating 001011100111](Rule30Open/Columns/WallGaps.md) | [`Columns.WallGaps`](Rule30Open/Columns/WallGaps.lean) | `eleven_gap`, `eleven_white`, `twelve_gap`, `twelve_white` | 1 | not in the kit |
@@ -192,6 +194,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
 | [Jen's theorem on farther columns, or on periods longer than the block's, does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
+| [Entry into seven checked traps of periods 13 to 15 is false, so their reductions were empty](negative-results/columns/missed-traps.md) | refuted | 1 |
 | [Driven by 011, the right half does not settle next to the center](negative-results/columns/period-three-011.md) | no signal | 1 |
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |
 | [Periodic orbits on rings of up to 25 cells explain the finite game's failure only for the alternating block](negative-results/columns/ring-orbits.md) | no signal | 1 |

@@ -13,10 +13,11 @@ evidence: [computations/lock_chain.py, computations/coverage.py]
 # Traps for 24 more blocks of period 15, from locked windows of 16 cells, checked in parts
 
 [The census of locked windows of 16 cells](../../findings/columns/space-time-backgrounds.md) reaches 595 blocks of
-period 15 that nothing excludes. [CensusTraps15](CensusTraps15.md) checks traps of at most 3,000 states for all but 24
-of them, each of which only its own bottom component reaches, of 3,172 to 30,345 states. This module checks those 24
-components as they are, in parts, as [CensusTrapsLarge](CensusTrapsLarge.md) does at periods 13 and 14. With it every
-block of period 15 that the chains of the locked windows of 16 cells hold is excluded or has a trap in Lean.
+period 15 that nothing excludes. [CensusTraps15](CensusTraps15.md) checks traps of at most 3,000 states for 569 of them,
+[MissedTraps](MissedTraps.md) refutes the traps of two more, and only its own bottom component, of 3,172 to 30,345
+states, reaches each of the other 24. This module checks those 24 components as they are, in parts, as
+[CensusTrapsLarge](CensusTrapsLarge.md) does at periods 13 and 14. With it every block of period 15 that the chains of
+the locked windows of 16 cells hold is excluded or has a trap in Lean, but the two of MissedTraps.
 
 ## Statement
 

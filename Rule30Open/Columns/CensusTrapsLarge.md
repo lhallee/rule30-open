@@ -14,10 +14,12 @@ evidence: [computations/lock_chain.py, computations/coverage.py]
 
 [The census of locked windows of 16 cells](../../findings/columns/space-time-backgrounds.md) reaches 135 blocks of
 period 13 and 244 of period 14 that no earlier trap module has and nothing excludes. [CensusTraps13](CensusTraps13.md)
-and [CensusTraps14](CensusTraps14.md) check traps of at most 3,000 states for all but 22 of them, 10 of period 13 and
-12 of period 14, each of which only its own bottom component reaches, of 3,169 to 22,746 states. This module checks
-those 22 components as they are, in parts, as [NaturalTrapsLarge](NaturalTrapsLarge.md) checks its trap. With it every
-block that the chains of the locked windows of 16 cells hold at periods 13 and 14 is excluded or has a trap in Lean.
+and [CensusTraps14](CensusTraps14.md) check traps of at most 3,000 states for all but 23 of them. For one,
+$0000010111001$, [MissedTraps](MissedTraps.md) refutes entry into its trap; only its own bottom component, of 3,169 to
+22,746 states, reaches each of the other 22, 10 of period 13 and 12 of period 14. This module checks those 22 components
+as they are, in parts, as [NaturalTrapsLarge](NaturalTrapsLarge.md) checks its trap. With it every block that the chains
+of the locked windows of 16 cells hold at periods 13 and 14 is excluded or reduced in Lean, four of them by
+[TrapPairs](TrapPairs.md), but $0000010111001$.
 
 ## Statement
 

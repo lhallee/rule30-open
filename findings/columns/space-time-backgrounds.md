@@ -75,7 +75,7 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   have no wall of 16 cells. A wider window does not change this at periods 10 to 12: with 18 cells, 14, 36 and 47 blocks
   have a lock, against 12, 30 and 41, but their chains end in the same backgrounds and hold the same 28, 73 and 121
   blocks, so the wider locks lie along the same chains. Those of 533, 644 and 1,316 cells have walls too, which the
-  traps of [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 16, 14 and 15 of its 74.
+  traps of [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 13, 14 and 14 of its 70.
   Period 15 is past the list above, since its map has $4^{15}$ states; the census finds six backgrounds of that period,
   each confirmed by running one of its rows on its ring. The chains hold every block of these periods that the game or
   the kit excludes; every block that a trap module reached before the census, except eight whose natural traps count the
@@ -85,7 +85,9 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md) check traps for all of them but 22 of periods 13 and 14 and
   24 of period 15, whose only components have 3,169 to 30,345 states and which
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md) and
-  [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md) check in parts. The scan with windows of 16
+  [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md) check in parts, and but three, one of period 13
+  and two of period 15, whose components some node of the finite game cannot reach
+  ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)). The scan with windows of 16
   cells, which samples 31 halves per block, finds traps for 12, 31, 41, 86 and 109 blocks at periods 10 to 14 ([natural
   traps](natural-traps.md)): it misses few of the blocks with a lock, but most of what their chains hold.
 - **Witnesses against the game.** In a background a column can repeat a block of period $p$, a proper divisor of $P$,
