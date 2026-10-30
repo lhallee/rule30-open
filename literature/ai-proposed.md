@@ -105,7 +105,12 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   as AlphaProof Nexus, whose proofs are in
   [alphaproof-nexus-results](https://github.com/google-deepmind/alphaproof-nexus-results); that repository's index
   groups them as additive combinatorics, algebraic geometry, graphs, optimization, quantum optics, Erdős problems, OEIS
-  conjectures and the Stacks Project, and names no other problem on cellular automata. On October 29, 2026,
+  conjectures and the Stacks Project, and names no other problem on cellular automata. By the search record (the problem
+  page, erdosproblems.com, is outside this session's network), one of its nine Erdős problems is #125: the sums of a
+  number whose base-3 digits are 0 and 1 and a number whose base-4 digits are 0 and 1 have lower density zero, by
+  Diophantine approximation with the irrationality of $\log 4 / \log 3$. A density statement about digits, the kind
+  Problem 2 asks; it rests on two multiplicatively independent bases, a structure the center column is not known to
+  have. On October 29, 2026,
   38 entries of the repository cite it: 36 conjectures from the OEIS, one Erdős problem and one from *Written on the
   Wall II*. Two concern cellular automata: [A300997](https://oeis.org/A300997), on an automaton that redistributes mass,
   and [A267581](https://oeis.org/A267581), the center column of the elementary rule 167 from a single black cell, whose
