@@ -18,7 +18,7 @@ kit's commit 932cf8d.
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all but 40 in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
-| 1 | Single blocks through traps | open | 21 of the 56 blocks of period 9 come down to entry into traps that driven right halves enter, from a wall of period nine, in Lean; one block each of period 2, 3, 5, 6 and 7 has a trap that no small half enters |
+| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9 come down to entry into traps that driven right halves enter, from two walls of period nine, in Lean, and for two of them every right half white on its first $10^5$ cells or so enters from most phases, in Lean; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
@@ -232,12 +232,13 @@ In order of the assessment above.
    often as the rule's own half does, so the traps found there are hard to reach whatever arrives from the right ([trap
    entry](negative-results/columns/trap-entry.md)). Over 500,000 steps, small halves keep entering both walls of period
    9 at steady rates, about $2.2 \cdot 10^{-6}$ and $1.4 \cdot 10^{-6}$ per step: two thirds and one half of a sample by
-   the end. Next: the Lean proof that the white half enters the walls of period 9 from the phases where it does, after
-   about $10^5$ steps, as [EmptyRight](Rule30Open/Columns/EmptyRight.md) proves it for `t001`, and other classes of
-   halves as for period four; walls of other periods, found as the closure of a driven half's window, the search that
-   found these, and at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap
-   reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half
-   meets ([every block](findings/columns/left-half-every-block.md)).
+   the end. In Lean, every right half white on its first 91,129 to 201,172 cells enters them from the phases where the
+   white half does, 4 of the 9 phases of $001011111$ and 6 of $001010011$
+   ([NineWhite](Rule30Open/Columns/NineWhite.md)). Next: other classes of halves for these walls, as for period four;
+   walls of other periods, found as the closure of a driven half's window, the search that found these, and at periods
+   5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one
+   statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
+   block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
    periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
    seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),

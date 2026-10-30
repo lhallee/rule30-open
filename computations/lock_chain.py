@@ -413,6 +413,65 @@ def lean_nine() -> str:
     return "\n".join(lean_entry(carried("trap001011111", d), f"nine{d}") for d in nine_distances() if d)
 
 
+# The white half's runs that `Rule30Open.Columns.NineWhite` checks: a prefix for their names, the trap, the phase and
+# the step at which the run is in the trap (`entry_steps` with --cells 0); and the length of a part of a run.
+WHITE_RUNS = [("nwa", "trap001011111", 2, 119947), ("nwb", "trap001011111", 8, 201129),
+              ("nwc", "trap001010011", 7, 91086), ("nwd", "trap001010011", 2, 169098)]
+PART = 16384
+
+
+def white_parts(word: str, phase: int, total: int, cells: int) -> tuple[list[int], list[int], list[int]]:
+    """The run of the white right half driven by `word` from `phase`, cut into parts: the checkpoints 0, `PART`, 2
+    `PART`, .., `total`, the number of cells of each that can still reach the first `cells` columns at step `total`
+    (by the light cone, `total` - checkpoint + `cells`), and the rows at the checkpoints cut to those cells."""
+    marks = list(range(0, total, PART)) + [total]
+    need = [total - mark + cells for mark in marks]
+    row, rows = 0, [0]
+    for t in range(total):
+        row = ((row << 1) | int(word[(t + phase) % len(word)])) ^ (row | (row >> 1))
+        if t + 1 in marks:
+            rows.append(row % (1 << need[len(rows)]))
+    return marks, need, rows
+
+
+def lean_white_run(prefix: str, name: str, phase: int, total: int) -> str:
+    """The part of `Rule30Open.Columns.NineWhite` for one run: the rows at the checkpoints as literals, a kernel check
+    of each part (`runDrive`), the chain of the parts (`part`) to a state of the trap, and the label of that state."""
+    t = tables(name)
+    word, cells = t["word"], t["cells"]
+    marks, need, rows = white_parts(word, phase, total, cells)
+    i = next(k for k, (label, window) in enumerate(t["states"])
+             if window == rows[-1] and label % len(word) == (total + phase) % len(word))
+    names = [f"{prefix}{j}" for j in range(1, len(marks) - 1)] + [f"{name}.st {i}"]
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)  # the rows have tens of thousands of digits
+    try:
+        out = [f"/-! ### `{word}` from phase {phase}: {total} steps in {len(marks) - 1} parts -/\n"]
+        out += [f"def {names[j - 1]} : Nat := {rows[j]}\n" for j in range(1, len(marks) - 1)]
+    finally:
+        sys.set_int_max_str_digits(digits)
+    previous = ["0"] + names[:-1]
+    for j in range(1, len(marks)):
+        out.append(f"theorem {prefix}_p{j} : runDrive {name}.b {marks[j] - marks[j - 1]} ({phase} + {marks[j - 1]}) "
+                   f"{previous[j - 1]} % 2 ^ {need[j]} = {names[j - 1]} := by decide +kernel\n")
+    proof = [f"theorem {prefix}_entry : rowN (phased {name}.b {phase}) 0 {total} % 2 ^ {cells} = {name}.st {i} := by",
+             f"  have h0 := start {name}.b {phase} {need[0]}"]
+    for j in range(1, len(marks)):
+        before = previous[j - 1] if j == 1 else f"({previous[j - 1]})"
+        proof.append(f"  have h{j} := part {name}.b {phase} {marks[j - 1]} {marks[j] - marks[j - 1]} {marks[j]} "
+                     f"{need[j]} {need[j - 1]} {before} ({names[j - 1]}) rfl rfl h{j - 1} {prefix}_p{j}")
+    proof.append(f"  exact h{len(marks) - 1}")
+    out.append("\n".join(proof) + "\n")
+    out.append(f"theorem {prefix}_label : ({total} + {phase}) % {name}.b.length = {name}.lab {i} % {name}.b.length := "
+               f"by decide\n")
+    return "\n".join(out)
+
+
+def lean_white() -> str:
+    """The runs of `Rule30Open.Columns.NineWhite`."""
+    return "\n".join(lean_white_run(*run) for run in WHITE_RUNS)
+
+
 def trap_states(name: str) -> tuple[str, int, set[tuple[int, int]]]:
     """For a trap of `TRAPS` or `NATURAL`: its block, its width, and its states as pairs of a phase of the block and a
     window."""
@@ -629,6 +688,29 @@ def white_scan(item: tuple[str, int], steps: int) -> tuple[str, int, int, int | 
     return (word, phase, *white_lock(word, phase, steps))
 
 
+def edge_periods(columns: list[str], distance: int, phase: int, steps: int, span: int = 6) -> list[int | None]:
+    """A background read off a chain, white to the right: the row at time 0 has, at cell x <= 0, the chain's column at
+    distance `distance` - x read at `phase`, and is white at x > 0. For the columns x = -`span` .. `span`, the least
+    period up to 64 with which each repeats over the second half of `steps` steps, or None. The chain must reach
+    `distance` + `steps` + 64; the background is cut there, far enough left that its end does not reach the edge."""
+    reach = steps + 64
+    row = np.zeros(reach + span + steps + 8, dtype=np.uint8)  # (cells,), index i is cell i - reach
+    for i in range(reach + 1):
+        column = columns[distance + reach - i]
+        row[i] = int(column[phase % len(column)])
+    seen = np.zeros((steps, 2 * span + 1), dtype=np.uint8)  # (steps, 2 span + 1)
+    for t in range(steps):
+        seen[t] = row[reach - span:reach + span + 1]
+        left, right = np.roll(row, 1), np.roll(row, -1)  # (cells,) each
+        left[0], right[-1] = 0, 0
+        row = left ^ (row | right)
+    periods = []
+    for k in range(2 * span + 1):
+        tail = seen[steps // 2:, k]  # (steps / 2,)
+        periods.append(next((p for p in range(1, 65) if np.array_equal(tail[p:], tail[:-p])), None))
+    return periods
+
+
 def ether_from(seed: str, values: str, distance: int, count: int) -> bool:
     """Whether columns distance, distance + 1, .., distance + count - 1 of the chain are the kit's ether read leftward
     from a B3 column: column distance + i is ether column 2 - i (modulo 7) at ether phase p - 2, p the phase of the
@@ -737,6 +819,7 @@ def main() -> None:
     parser.add_argument("--t001", action="store_true", help="the kit's trap for 001 as a chain")
     parser.add_argument("--verify", action="store_true", help="check the chain locks of short-period blocks directly")
     parser.add_argument("--lean", action="store_true", help="print the trap entries of WordTraps.lean")
+    parser.add_argument("--lean-white", action="store_true", help="print the runs of NineWhite.lean")
     parser.add_argument("--entry", type=str, default="", help="traps whose entry by small right halves to measure")
     parser.add_argument("--cells", type=int, default=8, help="with --entry, every half with support in these cells")
     parser.add_argument("--steps", type=int, default=50000)
@@ -745,6 +828,8 @@ def main() -> None:
     parser.add_argument("--natural", type=str, default="", help="periods whose words to search for natural traps")
     parser.add_argument("--starts", type=int, default=30, help="with --natural, random right halves besides the empty "
                         "one")
+    parser.add_argument("--edges", action="store_true", help="backgrounds of the chains of 0 1^7 and of the first wall "
+                        "of period 9, white to the right: do columns near the edge repeat?")
     parser.add_argument("--runs", type=str, default="", help="words whose white-half runs from the phases to group by "
                         "agreement on columns 1 .. --cells at step --steps")
     parser.add_argument("--coin", type=str, default="", help="traps whose entry to measure with a fair coin beyond "
@@ -839,6 +924,20 @@ def main() -> None:
                     print(f"{word}: column 1 locks for {locks_found} of {args.starts + 1} starts; natural traps "
                           f"{traps}", flush=True)
         print(f"period {period}: done", flush=True)
+    if args.edges:
+        backgrounds = [("the kit's ether, the chain of 0 1^7", chain("01111111", "0" * 8, args.steps + 300), 8, 7, 8)]
+        t = tables("trap001011111")
+        values = "".join(str((t["first"] >> ph) & 1) if t["word"][ph] == "0" else "0" for ph in range(9))
+        # 15 distances suffice: there each column is the one 15 places right of it, 8 steps on
+        backgrounds.append(("the background of period 9, the chain of the first wall", chain(t["word"], values,
+                            args.steps + 500), 10, 15, 9))
+        for label, columns, start, spatial, period in backgrounds:
+            edges = [(d, ph) for d in range(start, start + spatial) for ph in range(period)]
+            periodic = [(d, ph) for d, ph in tqdm(edges, desc="edges", file=sys.stderr, mininterval=10)
+                        if any(p is not None for p in edge_periods(columns, d, ph, args.steps))]
+            print(f"{label}: {len(periodic)} of {len(edges)} edges, white to the right, give a column among the 13 "
+                  f"next to the edge that repeats with a period up to 64 over the second half of {args.steps} steps",
+                  flush=True)
     for word in [w for w in args.runs.split(",") if w]:
         print(f"{word}: the white half's runs from the phases, by agreement on columns 1 .. {args.cells} at step "
               f"{args.steps}: {white_runs(word, args.steps, args.cells)}", flush=True)
@@ -876,6 +975,8 @@ def main() -> None:
         print("\n".join(lean_trap(entry[0]) for entry in TRAPS + NATURAL[:1]))
         print(lean_nine())
         print(lean_trap(NATURAL[1][0]))
+    if args.lean_white:
+        print(lean_white())
     if args.verify:
         for seed, width, distance, want in VERIFIED:
             block, nodes = chain_lock(seed, width, distance, want)

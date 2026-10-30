@@ -1821,6 +1821,51 @@ def test_white_runs() -> None:
     assert windows[0] == windows[1]
 
 
+def test_nine_white() -> None:
+    """`NineWhite.lean`: for each run of `lock_chain.WHITE_RUNS`, the row its first part ends on, cut to the cells that
+    can reach the window, is what a direct run of 16,384 steps with `step` gives; and the shortest run, the white half
+    under 001010011 from phase 7, enters its wall at step 91,086 by `entry_steps`, and at no earlier step."""
+    import sys
+    from computations import lock_chain
+    lean = (ROOT / "Rule30Open" / "Columns" / "NineWhite.lean").read_text(encoding="utf-8")
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)  # the rows have tens of thousands of digits
+    try:
+        for prefix, name, phase, total in lock_chain.WHITE_RUNS:
+            word, cells, _ = lock_chain.trap_states(name)
+            literal = int(re.search(rf"def {prefix}1 : Nat := (\d+)", lean).group(1))
+            row = 0
+            for t in range(lock_chain.PART):
+                row = (row & ~1) | int(word[(t + phase) % 9])
+                row = step(row)
+            assert (row >> 1) % (1 << (total - lock_chain.PART + cells)) == literal
+    finally:
+        sys.set_int_max_str_digits(digits)
+    assert lock_chain.entry_steps("trap001010011", [0], 7, 91087).tolist() == [91086]
+
+
+def test_edge_periods() -> None:
+    """`lock_chain.edge_periods`: next to the kit's ether, white to the right, the edge column repeats; next to the
+    background of period 9 no column near the edge does; for both, the column at the edge, run directly with `step`,
+    agrees on whether it repeats with a period up to 64 over the second half of 512 steps."""
+    from computations import lock_chain
+    t = lock_chain.tables("trap001011111")
+    values = "".join(str((t["first"] >> ph) & 1) if t["word"][ph] == "0" else "0" for ph in range(9))
+    cases = [(lock_chain.chain("01111111", "0" * 8, 800), 8, True), (lock_chain.chain(t["word"], values, 900), 10, False)]
+    for columns, distance, repeats in cases:
+        periods = lock_chain.edge_periods(columns, distance, 0, 512)
+        assert any(p is not None for p in periods) == repeats
+        reach = 512 + 64
+        row = sum(int(columns[distance + reach - i][0]) << i for i in range(reach + 1))
+        edge = []
+        for _ in range(512):
+            edge.append((row >> reach) & 1)
+            row = step(row)
+        tail = edge[256:]
+        found = next((p for p in range(1, 65) if tail[p:] == tail[:-p]), None)
+        assert found == periods[6]
+
+
 def test_second_nine_wall() -> None:
     """The second wall of period 9: from the random start that `NATURAL` names, a run of 001010011 is inside a closed
     set of 5,710 windows of 41 cells, with the phase modulo 27, that fixes column 1 at the white phases, by `is_lock`;

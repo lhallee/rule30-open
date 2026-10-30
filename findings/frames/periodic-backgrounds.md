@@ -4,7 +4,7 @@ category: frames
 problems: [1]
 status: computed
 formalization: wanted
-evidence: [computations/backgrounds.py]
+evidence: [computations/backgrounds.py, computations/lock_chain.py]
 ---
 
 # Only the stripe and the ether backgrounds give a periodic column
@@ -38,10 +38,19 @@ would need near the center, a stripe or an ether, and that it would have to pers
 left. A survey of the 2-adic rationals $p/q$ with odd $q \le 31$, whose periods reach 30 cells, found the
 same three kinds and no others.
 
+The background of period 9 that the chain of the first wall of [NineTraps](../../Rule30Open/Columns/NineTraps.md)
+enters, 15 columns that repeat with a shift of 8 steps, so 135 cells as a row, lies beyond both surveys, and it gives
+no periodic column either: of its 135 edges against a white right side, by distance and phase, none has a column among
+the 13 next to the edge that repeats with a period up to 64 over the second half of 2,048 steps, while 48 of the 56
+edges of the kit's ether do (`edge_periods` in [computations/lock_chain.py](../../computations/lock_chain.py)). Beside
+that background a periodic column needs its wall, which shields it from the right as the white side cannot.
+
 ## Reproduce
 
 ```bash
 python -m computations.backgrounds 9 2 2048
+python -m computations.lock_chain --edges --steps 2048
 ```
 
-[computations/backgrounds.py](../../computations/backgrounds.py) runs in about 5 s.
+[computations/backgrounds.py](../../computations/backgrounds.py) runs in about 5 s, the edges of the two backgrounds in
+about 15.
