@@ -13,17 +13,18 @@ evidence: [computations/game.py, computations/bit_game.py, computations/wall_seg
 6, 10 and 14 in turn, excludes 508 of the 79,971 blocks as the eventual period of any column of any row with a leftmost
 1: 217 of the 27,594 of period 19 and 291 of the 52,377 of period 20. The kit excludes 33 of them, all 33 that it
 excludes at these periods, [WallSets](../../Rule30Open/Columns/WallSets.md) 148 more, and 327 are new. Lean checks
-the 148 by WallSets' check and 301 of the 327 by the game decided in the kernel
+the 148 by WallSets' check and all 327 by the game decided in the kernel: 301 in one check per block
 ([BitBlocks19](../../Rule30Open/Columns/BitBlocks19.md), [BitBlocks19Wide](../../Rule30Open/Columns/BitBlocks19Wide.md),
 [BitBlocks20](../../Rule30Open/Columns/BitBlocks20.md), [BitBlocks20Mid](../../Rule30Open/Columns/BitBlocks20Mid.md),
-[BitBlocks20Wide](../../Rule30Open/Columns/BitBlocks20Wide.md)); the other 26 need 13 or 14 cells.
+[BitBlocks20Wide](../../Rule30Open/Columns/BitBlocks20Wide.md)), and the 26 that need 13 or 14 cells in one check per
+phase ([BitPhases19](../../Rule30Open/Columns/BitPhases19.md), [BitPhases20](../../Rule30Open/Columns/BitPhases20.md)).
 
 ## Result
 
 | Period | Blocks | Excluded | By the kit | By WallSets | New | New, in Lean |
 |---:|---:|---:|---:|---:|---:|---:|
-| 19 | 27,594 | 217 | 16 | 67 | 134 | 123 |
-| 20 | 52,377 | 291 | 17 | 81 | 193 | 178 |
+| 19 | 27,594 | 217 | 16 | 67 | 134 | 134 |
+| 20 | 52,377 | 291 | 17 | 81 | 193 | 193 |
 
 - **Widths.** Of the 508, the game excludes 324 at width 6, 133 at width 10 and 51 at width 14; of the 327 new blocks,
   145, 131 and 51. At the least width the 327 need 5 to 14 cells: 3 need 5, 142 need 6, 29 need 7, 58 need 8, 25 need

@@ -8,6 +8,12 @@ bits, and computes images and preimages with the shifts and masks of the Lean mo
 
     python -m computations.bit_game   # the seven blocks left out of the certificates, with their parameters
     python -m computations.bit_game --max-period 16   # every block the game excludes, about 20 min
+    python -m computations.bit_game --phases 17,18   # the phase checks of BitPhases.lean, under a minute
+    python -m computations.bit_game --phases 19   # those of BitPhases19.lean
+    python -m computations.bit_game --phases 20   # those of BitPhases20.lean
+
+`phase_rounds` gives, for `BitPhases.phaseCheck`, the rounds each phase needs with no images at all; one kernel check
+per phase keeps the kernel's tables of one phase at a time.
 """
 
 from __future__ import annotations
@@ -24,6 +30,20 @@ from computations import game
 # the kit leave out, with the least width at which the game excludes each.
 SEVEN = {"00000001001111": 13, "00000000010001": 14, "000000000101101": 14, "000001011111011": 14,
          "0000001011111011": 12, "0000101111111011": 13, "0001011111111001": 14}
+
+
+# The 40 blocks of period 17 to 20 that the game excludes, that neither the kit nor WallSets excludes, and that need 13
+# or 14 cells, with that least width (findings/columns/game-blocks-18.md and game-blocks-20.md).
+WIDE = {"00000000000101101": 13, "00000000000111011": 14, "00000000011011111": 13, "00000000101110101": 13,
+        "00000000110110111": 13, "00000001011111001": 14, "00000010111101111": 13, "00111001111111101": 13,
+        "000000000000000111": 14, "000000000010000101": 13, "000000000010010001": 14, "000001011111111001": 14,
+        "000010111111110111": 14, "000101111111111001": 13, "0000000000001111111": 14, "0000000000101001111": 13,
+        "0000000000110101111": 14, "0000000001001010111": 14, "0000000101001111011": 13, "0000001011011000011": 13,
+        "0000100111111111111": 13, "0000101111111001001": 13, "0001011100111111011": 14, "0001011111111111001": 13,
+        "0010011011111111111": 13, "00000000000000110001": 14, "00000000000001000001": 13, "00000000000001010001": 14,
+        "00000000000011000101": 14, "00000000001100101111": 14, "00000000110001111011": 13, "00000001011111100011": 13,
+        "00000001101111111011": 14, "00000101111111001001": 14, "00000101111111110111": 14, "00001011111111001001": 14,
+        "00010111111111110111": 13, "00100101110011111111": 13, "00101001111111111101": 14, "01111011111111111111": 14}
 
 
 def criterion(block: str, width: int, steps: int | None = None) -> tuple[bool, int, int, int]:
@@ -72,6 +92,80 @@ def criterion(block: str, width: int, steps: int | None = None) -> tuple[bool, i
             zeros, ones = new_zeros, new_ones
         most = max(most, rounds)
     return True, count, most, longest[0]
+
+
+def phase_rounds(block: str, width: int) -> list[int]:
+    """The rounds that the refinement of `BitPhases.phaseCheck` needs at each phase with no images (`D = 0`): it starts
+    from every node of the phase, split by the value of the left column, and keeps the nodes of each value that reach
+    and are reached by nodes of the other value until one side is empty. Raises if a side never empties at some phase,
+    which happens exactly when the game does not exclude the block at this width."""
+    source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), (p n,)
+    nodes = column.size
+    phase_of = np.arange(nodes) >> width  # (p n,)
+
+    def close(seed: np.ndarray, src: np.ndarray, tgt: np.ndarray) -> np.ndarray:
+        found = np.zeros(nodes, dtype=bool)  # (p n,)
+        frontier = seed.copy()  # (p n,)
+        while frontier.any():
+            reached = np.zeros(nodes, dtype=bool)  # (p n,)
+            reached[tgt[frontier[src]]] = True
+            frontier = reached & ~found
+            found |= frontier
+        return found
+
+    rounds = []
+    for phase in range(len(block)):
+        here = phase_of == phase  # (p n,)
+        ones, zeros = here & column, here & ~column  # (p n,), (p n,)
+        count = 0
+        while ones.any() and zeros.any():
+            fz, fo = close(zeros, source, target), close(ones, source, target)
+            bz, bo = close(zeros, target, source), close(ones, target, source)
+            new_zeros, new_ones = zeros & fo & bo, ones & fz & bz
+            if (new_zeros == zeros).all() and (new_ones == ones).all():
+                raise ValueError(f"{block} at width {width}: both values stay at phase {phase}")
+            zeros, ones = new_zeros, new_ones
+            count += 1
+        rounds.append(count)
+    return rounds
+
+
+def lean_block(block: str, width: int) -> str:
+    """The checks of one block in a `BitPhases` module: one kernel check of `phaseCheck` per phase, with no images, the
+    rounds of `phase_rounds` and fuel 300, and one theorem that gathers them."""
+    period, word = len(block), f"(wordOf {len(block)} 0b{block})"
+    rounds = phase_rounds(block, width)
+    out = [f"set_option maxHeartbeats 0 in\ntheorem w{block}_{phase} : phaseCheck {word} {width} 0 {count} 300 {phase} = "
+           f"true := by\n  decide +kernel\n" for phase, count in enumerate(rounds)]
+    cases = "".join(f"  | {phase}, _ => ⟨0, {count}, 300, w{block}_{phase}⟩\n" for phase, count in enumerate(rounds))
+    out.append(f"/-- Every phase of `{block}` at width {width}. -/\ntheorem w{block} : ∀ φ, φ < {period} → ∃ D rounds "
+               f"fuel,\n    phaseCheck {word} {width} D rounds fuel φ = true\n{cases}"
+               f"  | _ + {period}, h => absurd h (by omega)\n")
+    return "\n".join(out)
+
+
+def lean_phases(blocks: dict[str, int], name: str) -> str:
+    """The checks of one `BitPhases` module: those of `lean_block` for each block, then the list `name` of the blocks
+    with their widths and the theorem that every entry of the list has its checks."""
+    out = [lean_block(block, width) for block, width in tqdm(blocks.items(), desc="blocks", file=sys.stderr)]
+    entries = [f"(({len(block)}, 0b{block}), {width})" for block, width in blocks.items()]
+    lines, line = [], "    "
+    for k, entry in enumerate(entries):
+        piece = entry + (", " if k + 1 < len(entries) else "]")
+        if len(line) + len(piece.rstrip()) > 120:
+            lines.append(line.rstrip())
+            line = "    "
+        line += piece
+    lines.append(line)
+    alternatives = " | ".join(["rfl"] * len(blocks))
+    names = "".join(f"  · exact w{block}\n" for block in blocks)
+    out.append(f"/-- The blocks of this module, each as its least rotation `wordOf n bits`, with the width of its checks. -/\n"
+               f"def {name} : List ((Nat × Nat) × Nat) := [\n" + "\n".join(lines) + "\n")
+    out.append(f"theorem {name}_phases : ∀ e ∈ {name}, ∀ φ, φ < e.1.1 → ∃ D rounds fuel,\n"
+               f"    phaseCheck (wordOf e.1.1 e.1.2) e.2 D rounds fuel φ = true := by\n"
+               f"  intro e he\n  simp only [{name}, List.mem_cons, List.not_mem_nil, or_false] at he\n"
+               f"  rcases he with {alternatives}\n{names}")
+    return "\n".join(out)
 
 
 class BitTables:
@@ -158,7 +252,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=0,
                         help="instead of the seven blocks, every block the game excludes up to this period")
+    parser.add_argument("--phases", type=str, default="",
+                        help="print the phase checks of the blocks of WIDE of these periods, comma separated")
     args = parser.parse_args()
+    if args.phases:
+        periods = [int(period) for period in args.phases.split(",")]
+        chosen = {block: width for block, width in WIDE.items() if len(block) in periods}
+        print(lean_phases(chosen, f"blocksPhases{max(periods)}"))
+        return
     if not args.max_period:
         for block, width in SEVEN.items():
             ok, steps, rounds, longest = criterion(block, width)

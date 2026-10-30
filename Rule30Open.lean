@@ -20,6 +20,9 @@ public import Rule30Open.Columns.BitBlocks19Wide
 public import Rule30Open.Columns.BitBlocks20
 public import Rule30Open.Columns.BitBlocks20Mid
 public import Rule30Open.Columns.BitBlocks20Wide
+public import Rule30Open.Columns.BitPhases
+public import Rule30Open.Columns.BitPhases19
+public import Rule30Open.Columns.BitPhases20
 public import Rule30Open.Columns.LockWord
 public import Rule30Open.Columns.LockBlocks
 public import Rule30Open.Columns.LockBlocks11

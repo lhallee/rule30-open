@@ -1192,6 +1192,31 @@ def test_windows_after_ones() -> None:
     assert all(len({w[0] for w in wall_segments.windows_after_ones(ones)}) == 2 for ones in range(1, 9))
 
 
+def test_bit_phases() -> None:
+    """`bit_game.phase_rounds` against the game: up to period 10 at width 6 every phase empties a side exactly when
+    `game.bad_pairs` finds no component showing both values at a phase. For two blocks of `WIDE`, `lean_block` is the
+    text of their checks in BitPhases.lean, and the lists of the three modules hold exactly the 40 blocks of `WIDE`."""
+    from computations import bit_game
+    for period in range(2, 11):
+        for pattern in game.necklaces(period):
+            try:
+                bit_game.phase_rounds(pattern, 6)
+                decided = True
+            except ValueError:
+                decided = False
+            assert decided == (game.bad_pairs(pattern, 6) == 0), pattern
+    lean = {name: (ROOT / "Rule30Open" / "Columns" / f"{name}.lean").read_text(encoding="utf-8")
+            for name in ("BitPhases", "BitPhases19", "BitPhases20")}
+    for block in ("00000000000101101", "000000000010000101"):
+        assert bit_game.lean_block(block, bit_game.WIDE[block]) in lean["BitPhases"]
+    listed = {}
+    for text in lean.values():
+        for n, bits, width in re.findall(r"\(\((\d+), 0b([01]+)\), (\d+)\)", text):
+            listed[bits] = int(width)
+            assert len(bits) == int(n)
+    assert listed == bit_game.WIDE
+
+
 def test_bit_game() -> None:
     """The check of `BitGame` against the finite game: on every primitive block of period at most 9, at widths 5 and 6,
     it decides exactly the blocks the game excludes; and the bit tables' images and preimages agree with the game

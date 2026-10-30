@@ -20,9 +20,9 @@ and in any rotation (`center_not_blocks20Wide`); `not_eventually_blocks20Wide` s
 
 Of the 52,377 primitive blocks of period 20, [the finite game](FiniteGame.md) excludes 291 ([the game blocks of period
 19 and 20](../../findings/columns/game-blocks-20.md)). The kit excludes 17 of them, WallSets 81 more, and 193 are new.
-Of the new ones, 178 need a width of at most 12 and 15 need 13 or 14 cells, which are left to the computation. This
-module checks the 44 that need 9 to 12 cells: 16 at width 9, 12 at 10, 14 at 11, 2 at 12; [BitBlocks20](BitBlocks20.md)
-and [BitBlocks20Mid](BitBlocks20Mid.md) hold the others of width at most 12.
+Of the new ones, 178 need a width of at most 12 and 15 need 13 or 14 cells, which [BitPhases20](BitPhases20.md) checks
+one phase at a time. This module checks the 44 that need 9 to 12 cells: 16 at width 9, 12 at 10, 14 at 11, 2 at 12;
+[BitBlocks20](BitBlocks20.md) and [BitBlocks20Mid](BitBlocks20Mid.md) hold the others of width at most 12.
 
 ## Argument
 

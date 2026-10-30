@@ -13,16 +13,16 @@ evidence: [computations/game.py, computations/bit_game.py, computations/wall_seg
 6, 10 and 14 in turn, excludes 261 of the 22,242 blocks as the eventual period of any column of any row with a leftmost
 1: 119 of the 7,710 of period 17 and 142 of the 14,532 of period 18. The kit excludes 26 of them, all 26 that it
 excludes at these periods, [WallSets](../../Rule30Open/Columns/WallSets.md) 80 more, and 155 are new. Lean checks the
-80 by WallSets' check and 141 of the 155 by the game decided in the kernel
-([BitBlocks17](../../Rule30Open/Columns/BitBlocks17.md), [BitBlocks18](../../Rule30Open/Columns/BitBlocks18.md)); the
-other 14 need a game of 13 or 14 cells.
+80 by WallSets' check and all 155 by the game decided in the kernel: 141 in one check per block
+([BitBlocks17](../../Rule30Open/Columns/BitBlocks17.md), [BitBlocks18](../../Rule30Open/Columns/BitBlocks18.md)), and
+the 14 that need 13 or 14 cells in one check per phase ([BitPhases](../../Rule30Open/Columns/BitPhases.md)).
 
 ## Result
 
 | Period | Blocks | Excluded | By the kit | By WallSets | New | New, in Lean |
 |---:|---:|---:|---:|---:|---:|---:|
-| 17 | 7,710 | 119 | 12 | 35 | 72 | 64 |
-| 18 | 14,532 | 142 | 14 | 45 | 83 | 77 |
+| 17 | 7,710 | 119 | 12 | 35 | 72 | 72 |
+| 18 | 14,532 | 142 | 14 | 45 | 83 | 83 |
 
 - **Widths.** Of the 261, the game excludes 187 at width 6, 53 at width 10 and 21 at width 14. At the least width the
   155 new blocks need 5 to 14 cells: 3 need 5, 80 need 6, 11 need 7, 22 need 8, 7 need 9, 11 need 10, 3 need 11, 4
@@ -46,11 +46,12 @@ family B ($r \ge 14$), which reach these periods for the first time. Its other f
 $r \ge 18$), the white-padding families A and C to H, the tails of at most six cells after at least 69 white cells and
 its suffix families, start at period 19 or later. The game excludes all 26.
 
-## The 14 left out of Lean
+## The 14 that need 13 or 14 cells
 
-Eight of period 17 and six of period 18 need 13 or 14 cells, such as $00000000000101101$ and $0^{15} 111$. The kernel
-runs the bit check on them, but at width 14 one block takes 34 to 83 seconds and 7 to 9.5 GB, measured on
-$0^{15} 111$ and $000010111111110111$; the module would add several minutes and too much memory to the build.
+Eight of period 17 and six of period 18 need 13 or 14 cells, such as $00000000000101101$ and $0^{15} 111$. The kernel's
+check of a whole block takes 2 to 9.5 GB for each of them, 34 to 83 seconds at width 14, measured on $0^{15} 111$ and
+$000010111111110111$; [BitPhases](../../Rule30Open/Columns/BitPhases.md) checks each phase in its own declaration
+instead, which keeps the kernel's tables of one phase at a time.
 
 ## Reproduce
 

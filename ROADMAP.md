@@ -18,7 +18,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | Problem | Route | Status | Where it stands |
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
-| 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all but 40 in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
+| 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
 | 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9 come down to entry into traps that driven right halves enter, from two walls of period nine, in Lean, and for two of them every right half white on its first $10^5$ cells or so enters from most phases, in Lean; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
@@ -47,9 +47,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   and the share of blocks covered falls with the period.
   - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at most
     16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
-    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18, all but 14 in Lean ([periods 17
-    and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of period 19 and 20, all but 26 in Lean
-    ([periods 19 and 20](findings/columns/game-blocks-20.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every
+    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18 and 508 of the 79,971 of period
+    19 and 20, all in Lean, those that need 13 or 14 cells one phase at a time ([periods 17 and
+    18](findings/columns/game-blocks-18.md), [periods 19 and 20](findings/columns/game-blocks-20.md),
+    [BitPhases](Rule30Open/Columns/BitPhases.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every
     block followed by exponentially many white cells. After nine 1s, following the cells beside the column extends the
     kit's long black runs to every period whose runs of nine or more 1s are separated by segments that the possible
     windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game
@@ -212,11 +213,11 @@ In order of the assessment above.
    are blocks without a long run of 1s. All 197 blocks [the game](findings/columns/game-blocks.md) excludes up to period
    16 are kernel-checked, seven of them by [BitGame](Rule30Open/Columns/BitGame.md), which decides the game from the
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
-   equal values, and Lean checks all but 14, which need 13 or 14 cells ([periods 17 and
-   18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's failure only for $01$ ([ring
-   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, and
-   Lean checks all but the 26 that need 13 or 14 cells ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next:
-   a cheaper kernel form of the check for 13 and 14 cells, and steering ([steerable
+   equal values ([periods 17 and 18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's
+   failure only for $01$ ([ring orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508
+   more, 327 of them new ([periods 19 and 20](findings/columns/game-blocks-20.md)). Lean checks every one of these 966
+   blocks; the 40 that need 13 or 14 cells, whose check as one declaration takes the kernel up to 12 GB or more, are
+   checked one phase at a time ([BitPhases](Rule30Open/Columns/BitPhases.md)). Next: steering ([steerable
    locks](findings/columns/steerable-locks.md)) at wider windows and longer periods, the one tool here that reaches
    blocks without long runs, though only to a condition on a farther column. Column words without long runs also fix the
    cell beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses

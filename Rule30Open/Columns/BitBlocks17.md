@@ -23,7 +23,8 @@ excludes none of the 99.
 Of the 7,710 primitive blocks of period 17, [the finite game](FiniteGame.md) excludes 119 ([the game blocks of period 17
 and 18](../../findings/columns/game-blocks-18.md)). The kit excludes 12 of them, WallSets 35 more, and 72 are new. This
 module checks the 64 of those that the game excludes at a width of at most 12: 1 at width 5, 36 at 6, 4 at 7, 12 at 8, 4
-at 9, 3 at 10, 2 at 11 and 2 at 12. The other 8 need 13 or 14 cells and are left to the computation.
+at 9, 3 at 10, 2 at 11 and 2 at 12. The other 8 need 13 or 14 cells; [BitPhases](BitPhases.md) checks them one phase at
+a time.
 
 ## Argument
 
