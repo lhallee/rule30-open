@@ -43,6 +43,7 @@ whether the white right half settles.
     python -m computations.lock_chain --far-entry --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --lean-census 13   # the traps of CensusTraps13; 14 for CensusTraps14
     python -m computations.lock_chain --census-entry 13 --cells 4 --steps 20000   # entry into each of them
+    python -m computations.lock_chain --lean-census-large   # the traps of CensusTrapsLarge, in parts
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
@@ -636,6 +637,19 @@ CENSUS_TRAPS = {13: [("0000000000111", "0001100011011", 0, 17), ("0000000100011"
                     ("01010111111011", "00101101101101", 0, 33), ("01011011010111", "00011111001111", 0, 55),
                     ("01011011110111", "00101101101101", 0, 59), ("01011101101111", "00101101010011", 0, 16),
                     ("01011111111011", "00011110110011", 0, 10), ("01101101110111", "00011111001111", 0, 20)]}
+# The census traps of more than 3,000 states, of the blocks of periods 13 and 14 that no smaller component reaches, in
+# the same form; checked in parts in `Rule30Open.Columns.CensusTrapsLarge`.
+CENSUS_LARGE = [("0000000110001", "0000000110001", 0, 0), ("0000001001111", "0000001001111", 0, 0),
+                ("0000001011111", "0000001011111", 0, 0), ("0000101111011", "0000101111011", 0, 0),
+                ("0001001011001", "0001001011001", 0, 0), ("0001101111011", "0001101111011", 0, 0),
+                ("0001111110101", "0001111110101", 0, 0), ("0011101011111", "0011101011111", 0, 0),
+                ("0101111111011", "0101111111011", 0, 0), ("0111101111111", "0111101111111", 0, 0),
+                ("00000000110001", "00000000110001", 0, 0), ("00000010010001", "00000010010001", 0, 0),
+                ("00000010010011", "00000010010011", 0, 0), ("00000010111011", "00000010111011", 0, 0),
+                ("00000011011011", "00000011011011", 0, 0), ("00000101111111", "00000101111111", 0, 0),
+                ("00100101111111", "00100101111111", 0, 0), ("00101111111011", "00101111111011", 0, 0),
+                ("00111010111111", "00111010111111", 0, 0), ("01010111111111", "01010111111111", 0, 0),
+                ("01011010111111", "01011010111111", 0, 0), ("01111011111111", "01111011111111", 0, 0)]
 
 
 def tables(name: str) -> dict:
@@ -922,7 +936,13 @@ def lean_large(part: int = 1024, piece: int = 1 << 16) -> str:
     `piece` bits (`lean_number`), and its check in parts of `part` states, one kernel check each (`allRangeT`), so that
     the kernel's tables of one part at a time are in memory, gathered by `allRange_cover` into `nat<block>_check`."""
     [(word, *_)] = LARGE_TRAPS
-    t, name = extra_tables(word), f"nat{word}"
+    return lean_parts(extra_tables(word), f"nat{word}", part, piece)
+
+
+def lean_parts(t: dict, name: str, part: int = 1024, piece: int = 1 << 16) -> str:
+    """A trap as `lean_entry` writes it, with its numbers in pieces of `piece` bits, and its check in parts of `part`
+    states, one kernel check each (`allRangeT` of `Rule30Open.Columns.NaturalTrapsLarge`), gathered by
+    `allRange_cover` into `<name>_check`."""
     full, rest = divmod(len(t["states"]), part)
     out = [lean_entry(t, name, piece)]
     for k, size in enumerate([part] * full + [rest]):
@@ -1029,6 +1049,12 @@ def lean_census(period: int, piece: int = 1 << 16) -> str:
         out.append(lean_entry(census_tables(entry), label, piece)
                    + f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n")
     return "\n".join(out)
+
+
+def lean_census_large(part: int = 1024, piece: int = 1 << 16) -> str:
+    """The traps of `Rule30Open.Columns.CensusTrapsLarge`: each entry of `CENSUS_LARGE`, named by its block, checked in
+    parts (`lean_parts`)."""
+    return "\n".join(lean_parts(census_tables(entry), f"cen{entry[0]}", part, piece) for entry in CENSUS_LARGE)
 
 
 def lean_far(piece: int = 1 << 16) -> str:
@@ -1535,6 +1561,7 @@ def main() -> None:
                         help="print the traps of CensusTraps13.lean or CensusTraps14.lean")
     parser.add_argument("--census-entry", type=int, default=0, choices=[0, 13, 14],
                         help="entry into each trap of CensusTraps13 or CensusTraps14")
+    parser.add_argument("--lean-census-large", action="store_true", help="print the traps of CensusTrapsLarge.lean")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
     parser.add_argument("--lean-long", action="store_true", help="print the trap entries of NaturalTrapsLong.lean")
     parser.add_argument("--long-entry", action="store_true",
@@ -1753,6 +1780,8 @@ def main() -> None:
         print(lean_far())
     if args.lean_census:
         print(lean_census(args.lean_census))
+    if args.lean_census_large:
+        print(lean_census_large())
     if args.lean_wall_gaps:
         for name, trap, bound, prefix in WALL_GAPS:
             print(lean_gap(name, trap, bound, prefix))

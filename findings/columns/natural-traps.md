@@ -97,7 +97,8 @@ or 7, and one start each for six blocks of period 9.
   1,316 at period 14. A census of every locked window of 16 cells finds 89 and 109 blocks with one, about as many as
   the scan, but carried by their chains the locks reach 135 and 244 blocks more than all of these traps ([backgrounds
   periodic in time](space-time-backgrounds.md), [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
-  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md)).
+  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md),
+  [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md)).
 
 ## What it means
 

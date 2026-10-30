@@ -39,10 +39,11 @@ carries it leftward to a trap of $16 + d$ cells for the block $d$ columns left (
 nor the carrying is trusted, and [WordTraps](WordTraps.md)'s `absorption_excludes` gives each reduction.
 
 The traps come from seven components, of 126 to 174 states, carried 0 to 88 columns. 116 of the blocks lie in chains
-that end in the background of 1,316 cells and 69 in chains that end in that of 644, two backgrounds whose walls appear
-first in this census; 47 lie in chains that end in the background of 728 cells, where
-[FourteenTraps](FourteenTraps.md) carries one wall, in the part before those chains repeat. The other 12 blocks are
-reached only by their own components, of 3,169 to 15,546 states, and are left out.
+that end in the background of 1,316 cells and 69 in chains that end in that of 644, where 15 and 14 traps of
+[NaturalTrapsLong](NaturalTrapsLong.md) end as well, though no module carried them leftward; 47 lie in chains that end
+in the background of 728 cells, where [FourteenTraps](FourteenTraps.md) carries one wall, in the part before those
+chains repeat. The other 12 blocks are reached only by their own components, of 3,169 to 15,546 states, which
+[CensusTrapsLarge](CensusTrapsLarge.md) checks in parts.
 
 ## What it covers
 

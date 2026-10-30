@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-75 Lean modules with 332 headline theorems, 29 findings (proved on paper,
+76 Lean modules with 335 headline theorems, 29 findings (proved on paper,
 computed or conjectured) and 31 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 62 | 16 | 8 |
+| [Columns](#columns) | 63 | 16 | 8 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -116,6 +116,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game decided phase by phase in the kernel excludes the 35 blocks of period 21 that need 13 or 14 cells](Rule30Open/Columns/BitPhases21.md) | [`Columns.BitPhases21`](Rule30Open/Columns/BitPhases21.lean) | `center_not_blocksPhases21`, `not_eventually_blocksPhases21` | 1 | not in the kit |
 | [Traps for 125 more blocks of period 13, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps13.md) | [`Columns.CensusTraps13`](Rule30Open/Columns/CensusTraps13.lean) | `censusTraps13_check`, `censusTraps13_blocks`, `census13_absorption_excludes` | 1 | not in the kit |
 | [Traps for 232 more blocks of period 14, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps14.md) | [`Columns.CensusTraps14`](Rule30Open/Columns/CensusTraps14.lean) | `censusTraps14_check`, `censusTraps14_blocks`, `census14_absorption_excludes` | 1 | not in the kit |
+| [Traps for 22 more blocks of periods 13 and 14, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge.md) | [`Columns.CensusTrapsLarge`](Rule30Open/Columns/CensusTrapsLarge.lean) | `censusTrapsLarge_check`, `censusTrapsLarge_blocks`, `censusLarge_absorption_excludes` | 1 | not in the kit |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
 | [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
 | [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |

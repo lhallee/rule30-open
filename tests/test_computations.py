@@ -2129,8 +2129,9 @@ def test_coverage() -> None:
     """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
     the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
     Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
-    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of FarWalls, 125 of CensusTraps13 and 232 of
-    CensusTraps14, each of its period, and the steered blocks are the 49 entries of the LockBlocks modules."""
+    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of FarWalls, 125 of CensusTraps13, 232 of
+    CensusTraps14 and 22 of CensusTrapsLarge, each of its period, and the steered blocks are the 49 entries of the
+    LockBlocks modules."""
     from collections import Counter
     from computations import coverage
     assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
@@ -2142,6 +2143,8 @@ def test_coverage() -> None:
     assert modules["FarWalls"] == 12 and all(len(b) == 12 for b, m in traps.items() if m == "FarWalls")
     assert modules["CensusTraps13"] == 125 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
     assert modules["CensusTraps14"] == 232 and all(len(b) == 14 for b, m in traps.items() if m == "CensusTraps14")
+    assert modules["CensusTrapsLarge"] == 22 and all(len(b) in (13, 14) for b, m in traps.items()
+                                                     if m == "CensusTrapsLarge")
     assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12, "ThirteenTraps": 13,
                               "FourteenTraps": 14}.get(module, len(block))
                for block, module in traps.items())
@@ -2285,22 +2288,28 @@ def test_far_walls() -> None:
 
 
 def test_census_traps() -> None:
-    """The traps of CensusTraps13 and CensusTraps14: each is a bottom component of the locked windows of 16 cells of its
-    source block, carried by its chain, and a lock by `is_lock`, a direct check with the rule, for its block; the
-    blocks are distinct and none is the kit's, excluded by the game at width 6, 10 or 14, or a block of another trap
-    module; and `lean_census` is the text of the two modules."""
+    """The traps of CensusTraps13, CensusTraps14 and CensusTrapsLarge: each is a bottom component of the locked windows
+    of 16 cells of its source block, carried by its chain, and a lock by `is_lock`, a direct check with the rule, for
+    its block; the blocks are distinct and none is the kit's, excluded by the game at width 6, 10 or 14, or a block of
+    another trap module; those of more than 3,000 states are the large ones; and `lean_census` and
+    `lean_census_large` are the text of the three modules."""
     from computations import coverage, lock_chain
     others = {block for block, module in coverage.trap_blocks().items() if not module.startswith("CensusTraps")}
-    for period, entries in lock_chain.CENSUS_TRAPS.items():
-        words = [block for block, *_ in entries]
-        assert len(words) == len(set(words)) and not set(words) & (set(game.kit_blocks(period)) | others)
-        assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
+    groups = [(13, lock_chain.CENSUS_TRAPS[13]), (14, lock_chain.CENSUS_TRAPS[14]), (0, lock_chain.CENSUS_LARGE)]
+    words = [block for _, entries in groups for block, *_ in entries]
+    assert len(words) == len(set(words)) == 125 + 232 + 22
+    assert not set(words) & (set(game.kit_blocks(14)) | others)
+    assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
+    for large, entries in groups:
         for entry in entries:
             t = lock_chain.census_tables(entry)
-            assert t["word"] == entry[0] and len(t["states"]) <= 3000
+            assert t["word"] == entry[0] and (len(t["states"]) > 3000) == (large == 0)
             assert lock_chain.is_lock(t["word"], t["states"], 16 + entry[3])
+    for period in (13, 14):
         lean = (ROOT / "Rule30Open" / "Columns" / f"CensusTraps{period}.lean").read_text(encoding="utf-8")
         assert lock_chain.lean_census(period) in lean
+    lean = (ROOT / "Rule30Open" / "Columns" / "CensusTrapsLarge.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_census_large() in lean
 
 
 def test_natural_traps() -> None:

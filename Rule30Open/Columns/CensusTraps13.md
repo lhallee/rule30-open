@@ -42,10 +42,12 @@ two to its right, and putting the $d$ columns of the chain in front of every nod
 the block $d$ columns left (`component_tables`). The kernel checks every trap, so neither the census nor the carrying
 is trusted, and [WordTraps](WordTraps.md)'s `absorption_excludes` gives each reduction.
 
-The traps come from eight components, of 117 to 718 states, carried 0 to 92 columns. 93 of the blocks lie in chains
-that end in the background of 689 cells, where [ThirteenTraps](ThirteenTraps.md) carries one wall, in the part before
-those chains repeat; 32 lie in chains that end in the background of 533 cells, whose walls appear first in this census.
-The other 10 blocks are reached only by their own components, of 3,336 to 22,746 states, and are left out.
+The traps come from eight components, of 117 to 718 states, carried 0 to 92 columns. 93 of the blocks lie in chains that
+end in the background of 689 cells, where [ThirteenTraps](ThirteenTraps.md) carries one wall, in the part before those
+chains repeat; 32 lie in chains that end in the background of 533 cells, where 16 traps of
+[NaturalTrapsLong](NaturalTrapsLong.md) end as well, though no module carried them leftward. The other 10 blocks are
+reached only by their own components, of 3,336 to 22,746 states, which [CensusTrapsLarge](CensusTrapsLarge.md) checks in
+parts.
 
 ## What it covers
 

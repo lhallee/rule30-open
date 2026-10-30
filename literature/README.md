@@ -23,7 +23,7 @@ for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 c
 Lean, none of which has led to a proof. Specific eventual periods are excluded block by block: between the kit and this
 repository, every block of period at most 21 that the finite game excludes is excluded in Lean, 197 of the 8,800
 primitive blocks of period at most 16, 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and 20 and
-434 of the 99,858 of period 21, and 819 blocks of periods 9 to 14 come down to the entry of the right half into a trap,
+434 of the 99,858 of period 21, and 841 blocks of periods 9 to 14 come down to the entry of the right half into a trap,
 a closed set of windows beside the column, most of them at the edge of a background periodic in time. For 49 blocks of
 period at most 12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14 off one
 fixed sequence forever. The kit also excludes families of padded words and shows that an eventual period $P$ after a
@@ -95,6 +95,12 @@ The search found these but could not confirm the record or read the text. Check 
   a map with the shape of a Collatz problem ([the held column](../Rule30Open/PeriodTwo/HeldColumn.md)).
 - Goux (2026), prize submission R30-20261025-0554f7, credited in the kit's pull request #46 with the black-run slope
   $3/5$; the submission was not reached.
+- Hanson and Crutchfield (1997), *Computational mechanics of cellular automata: an example*, *Physica D*, and their
+  earlier papers on rule 18; seen only in search results and Santa Fe Institute working-paper listings. Reported to
+  describe a cellular automaton's space-time patterns by regular domains, patterns invariant under shifts in space and
+  time, and the domain walls between them, as particles when localized, worked out for elementary rule 54. The
+  backgrounds periodic in time are domains of the simplest kind, and their walls one-sided domain walls
+  ([backgrounds periodic in time](../findings/columns/space-time-backgrounds.md)).
 
 Kumar (2024), arXiv:2411.03468, which claimed to settle Mahler's 3/2 problem, was withdrawn; do not cite it.
 

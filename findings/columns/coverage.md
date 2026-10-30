@@ -32,8 +32,8 @@ order.
 | 10 | 99 | 4 | 27 | 0 | 68 |
 | 11 | 186 | 7 | 70 | 0 | 109 |
 | 12 | 335 | 9 | 113 | 0 | 213 |
-| 13 | 630 | 21 | 212 | 0 | 397 |
-| 14 | 1161 | 31 | 368 | 0 | 762 |
+| 13 | 630 | 21 | 222 | 0 | 387 |
+| 14 | 1161 | 31 | 380 | 0 | 750 |
 
 - **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
   block up to period 20 is excluded in Lean, by the kit or here.
@@ -45,8 +45,10 @@ order.
   [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
   [NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md),
   [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md), [FarWalls](../../Rule30Open/Columns/FarWalls.md),
-  [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md), [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md)
-  and [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
+  [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
+  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md),
+  [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md) and
+  [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
 - **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
   companions that no trap reaches.
 
@@ -60,7 +62,7 @@ traps to 23, 27, 70 and 113 blocks, a quarter to two fifths of each period ([nat
 there small halves do enter many of them. Every block of periods 11 and 12 that steering reduces has a trap too, so
 steering alone reaches blocks only at period 8. At periods 13 and 14 sampling gives traps to 87 and 136 blocks that
 nothing excludes, 14% and 12% of each period ([natural traps](natural-traps.md)); the census of every locked window of
-16 cells, carried by its chain, raises this to 212 and 368, about a third, as at period 12 ([backgrounds periodic in
+16 cells, carried by its chain, raises this to 222 and 380, about a third, as at period 12 ([backgrounds periodic in
 time](space-time-backgrounds.md)), though small halves enter few of the traps carried far. Every reduction still needs
 its open step, entry for every finite half or the steering condition for the true orbit, and outright exclusions stay
 rare: 25 of the 747 blocks of period at most 12. Period 8 has

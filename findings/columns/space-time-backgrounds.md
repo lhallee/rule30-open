@@ -73,14 +73,15 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   So the backgrounds of 30 and 90 cells at period 10, of 100 at 12, of 117 and 130 at 13, and of 14, 28 and 84 at 14
   have no wall of 16 cells. Those of 533, 644 and 1,316 cells have walls too, which the traps of
   [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 16, 14 and 15 of its 74. The chains
-  hold every block of these periods that the game or the kit excludes; every block that a trap module reached before
-  the census, except eight whose natural traps count the phase modulo twice or three times the period; and 12, 135 and
-  244 blocks of periods 12, 13 and 14 that nothing reached. [FarWalls](../../Rule30Open/Columns/FarWalls.md),
+  hold every block of these periods that the game or the kit excludes; every block that a trap module reached before the
+  census, except eight whose natural traps count the phase modulo twice or three times the period; and 12, 135 and 244
+  blocks of periods 12, 13 and 14 that nothing reached. [FarWalls](../../Rule30Open/Columns/FarWalls.md),
   [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md) and
-  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md) check traps for all of these but 22 blocks of periods 13
-  and 14, whose only components have 3,169 to 22,746 states. The scan with windows of 16 cells, which samples 31 halves
-  per block, finds traps for 12, 31, 41, 86 and 109 blocks at these periods ([natural traps](natural-traps.md)): it
-  misses few of the blocks with a lock, but most of what their chains hold.
+  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md) check traps for all of them but 22 of periods 13 and 14,
+  whose only components have 3,169 to 22,746 states and which
+  [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md) checks in parts. The scan with windows of 16 cells,
+  which samples 31 halves per block, finds traps for 12, 31, 41, 86 and 109 blocks at these periods ([natural
+  traps](natural-traps.md)): it misses few of the blocks with a lock, but most of what their chains hold.
 - **Witnesses against the game.** In a background a column can repeat a block of period $p$, a proper divisor of $P$,
   while the column left of it does not repeat with period $p$. Its right side then makes a closed walk of [the finite
   game](../../Rule30Open/Columns/FiniteGame.md) on which the left column takes both values at one phase, so the game
