@@ -34,6 +34,7 @@ whether the white right half settles.
     python -m computations.lock_chain --lean   # the trap entries of WordTraps and NineTraps
     python -m computations.lock_chain --lean-ten   # the trap entries of TenTraps, the wall of period 10 carried
     python -m computations.lock_chain --ten-entry --cells 8 --steps 50000   # entry into each trap of TenTraps
+    python -m computations.lock_chain --lean-ten-gap   # the entries of the halves of 8 cells, TenGap.lean
     python -m computations.lock_chain --natural 10,11,12 --steps 20000 --workers 4   # periods 10 to 12
     python -m computations.lock_chain --natural-from saved.txt   # the per-period summary of a saved --natural run
 """
@@ -435,6 +436,51 @@ def ten_entry(cells: int, steps: int) -> list[tuple[int, str, int, np.ndarray]]:
         times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(10)])  # (10 2^cells,)
         found.append((distance, t["word"], t["cells"], times))
     return found
+
+
+def ten_gap_entries(cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
+    """For each phase of the period-10 wall `ten0` and each right half r with support in cells 1 .. `cells` (bit i is
+    column i + 1), the first step T at which the run of r driven from that phase has its first 16 cells in a state of
+    the trap with the label of its phase, and that state's index in the sorted states of `TenTraps.ten0`."""
+    t = carried("trap0000010001", 0)
+    word, period, width = t["word"], len(t["word"]), t["cells"]
+    index = {state: k for k, state in enumerate(t["states"])}
+    out = []
+    for phase in range(period):
+        row_entries = []
+        for r in range(1 << cells):
+            row = r
+            for step in range(steps + 1):
+                k = index.get(((step + phase) % period, row & ((1 << width) - 1)))
+                if k is not None:
+                    row_entries.append((step, k))
+                    break
+                row = ((row << 1) | int(word[(step + phase) % period])) ^ (row | (row >> 1))
+            else:
+                raise ValueError(f"half {r} from phase {phase} does not enter by step {steps}")
+        out.append(row_entries)
+    return out
+
+
+def lean_ten_gap() -> str:
+    """The entry data of `Rule30Open.Columns.TenGap`: for each phase, the step and the state of each half of
+    `ten_gap_entries`, with the kernel check of the phase."""
+    blocks = []
+    for phase, entries in enumerate(ten_gap_entries()):
+        items = [f"({step}, {k})" for step, k in entries]
+        lines, line = [], "    "
+        for j, item in enumerate(items):
+            piece = item + (", " if j + 1 < len(items) else "]")
+            if len(line) + len(piece.rstrip()) > 120:
+                lines.append(line.rstrip())
+                line = "    "
+            line += piece
+        lines.append(line)
+        blocks.append(f"/-- The entry step and state of each right half of at most eight cells, from phase {phase}. -/\n"
+                      f"def tenGap{phase} : List (Nat × Nat) := [\n" + "\n".join(lines) + "\n\n"
+                      f"set_option maxHeartbeats 0 in\ntheorem tenGap{phase}_ok : gapEntriesOk ten0 {phase} 3058 tenGap{phase} = "
+                      f"true := by\n  decide +kernel\n\ntheorem tenGap{phase}_len : tenGap{phase}.length = 2 ^ 8 := by decide +kernel\n")
+    return "\n".join(blocks)
 
 
 def lean_ten() -> str:
@@ -894,6 +940,7 @@ def main() -> None:
     parser.add_argument("--lean", action="store_true", help="print the trap entries of WordTraps.lean")
     parser.add_argument("--lean-white", action="store_true", help="print the runs of NineWhite.lean")
     parser.add_argument("--lean-ten", action="store_true", help="print the trap entries of TenTraps.lean")
+    parser.add_argument("--lean-ten-gap", action="store_true", help="print the entry data of TenGap.lean")
     parser.add_argument("--ten-entry", action="store_true",
                         help="entry of the halves with support in cells 1 .. --cells into each trap of TenTraps")
     parser.add_argument("--entry", type=str, default="", help="traps whose entry by small right halves to measure")
@@ -1062,6 +1109,8 @@ def main() -> None:
         print(lean_white())
     if args.lean_ten:
         print(lean_ten())
+    if args.lean_ten_gap:
+        print(lean_ten_gap())
     if args.ten_entry:
         for distance, word, cells, times in ten_entry(args.cells, args.steps):
             done = times[times >= 0]  # (k,)

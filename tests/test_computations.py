@@ -1896,6 +1896,32 @@ def test_nine_white() -> None:
     assert lock_chain.entry_steps("trap001010011", [0], 7, 91087).tolist() == [91086]
 
 
+def test_ten_gap() -> None:
+    """`TenGap.lean`: `lean_ten_gap` is the text of its entries; for sampled halves of at most eight cells and every
+    phase, a direct run with `step` (the row with the center as bit 0) is, at the listed step, in the listed state of
+    the wall `ten0` with the label of its phase, and in no state of it at any earlier step; the latest entry is at step
+    3,042 and the white half's at step 74."""
+    from computations import lock_chain
+    lean = (ROOT / "Rule30Open" / "Columns" / "TenGap.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_ten_gap() in lean
+    entries = lock_chain.ten_gap_entries()
+    trap = lock_chain.carried("trap0000010001", 0)
+    word, states = trap["word"], trap["states"]
+    members = set(states)
+    for phase in range(10):
+        for r in (0, 1, 37, 128, 255):
+            when, index = entries[phase][r]
+            row = r << 1  # (cells 0 .. ), cell 0 the center
+            for t in range(when + 1):
+                row = (row & ~1) | int(word[(t + phase) % 10])
+                state = ((t + phase) % 10, (row >> 1) & 0xFFFF)
+                assert (state in members) == (t == when), (phase, r, t)
+                row = step(row)
+            assert states[index] == state
+    assert max(e[0] for es in entries for e in es) == 3042
+    assert max(es[0][0] for es in entries) == 74
+
+
 def test_edge_periods() -> None:
     """`lock_chain.edge_periods`: next to the kit's ether, white to the right, the edge column repeats; next to the
     background of period 9 no column near the edge does; for both, the column at the edge, run directly with `step`,

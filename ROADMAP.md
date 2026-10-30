@@ -247,13 +247,13 @@ In order of the assessment above.
    ([natural traps](findings/columns/natural-traps.md)), and at period 10 one background of spatial period 155, whose
    edge every right half of up to eight cells and the white half enter within 3,042 and 74 steps, gives traps to 25
    blocks that the kit does not exclude, the nine blocks with locked windows of 13 cells among its columns
-   ([TenTraps](Rule30Open/Columns/TenTraps.md)). Next: the classes of halves that enter the edge of period 10 in Lean,
-   as [NineWhite](Rule30Open/Columns/NineWhite.md) and [FourteenCells](Rule30Open/Columns/FourteenCells.md) do for other
-   traps, which its fast entry makes cheap; the walls behind the traps of 313, 103 and 138 states at period 11 and 119,
-   116 and 150 at period 12; other classes of halves for the walls of period 9; at periods 5, 6 and 7 traps that the
-   coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one statement per block
-   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
-   block](findings/columns/left-half-every-block.md)).
+   ([TenTraps](Rule30Open/Columns/TenTraps.md)). In Lean, no finite configuration whose cells 9 to 3,058 are white has a
+   center repeating $0000010001$ ([TenGap](Rule30Open/Columns/TenGap.md)). Next: wider classes of halves for that edge,
+   such as every half of twelve cells, as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four; the
+   walls behind the traps of 313, 103 and 138 states at period 11 and 119, 116 and 150 at period 12; other classes of
+   halves for the walls of period 9; at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for
+   the blocks no trap reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)),
+   which no small half meets ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
    period-four certificate, the periodic backgrounds and the period-two computations ([open
    work](CATALOG.md#open-work)); the general facts of the seed's past are now in Lean

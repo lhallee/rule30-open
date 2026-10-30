@@ -62,8 +62,10 @@ to 30, [the natural scan](../../findings/columns/natural-traps.md) finds narrowe
 half enters. In that scan every one of 31 driven halves ends inside a trap of 100 states for $0000010001$, $0011010111$,
 $0010101111$, $0001101111$, $0001110011$ and $0000010101$, at the least width that holds a trap: this wall at distances
 0, 2, 5, 6, 7 and 9. The finite game does not exclude $0000010001$ at any width up to 18: one component of 5,337 to
-34,044 nodes at widths 12 to 16 lets a free cell beyond the window keep column 1 from locking. Entry for every finite
-right half stays open, as for the kit's traps.
+34,044 nodes at widths 12 to 16 lets a free cell beyond the window keep column 1 from locking. In Lean,
+[TenGap](TenGap.md) checks the entries of the 2,560 small halves and carries them along the light cone: no finite
+configuration whose cells 9 to 3,058 are white, or 1 to 90, has a center column that repeats $0000010001$. Entry for
+every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 
