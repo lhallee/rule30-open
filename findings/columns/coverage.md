@@ -1,0 +1,65 @@
+---
+title: Up to period 12, what the exclusions and reductions in Lean reach, period by period
+category: columns
+problems: [1]
+status: computed
+formalization: not-applicable
+evidence: [computations/coverage.py, computations/game.py, computations/lock_chain.py]
+---
+
+# Up to period 12, what the exclusions and reductions in Lean reach, period by period
+
+Problem 1 asks that no block be the eventual period of the center column. The repository and the kit reach a block in
+three ways: an exclusion outright, a reduction to entry into a trap (if every finite right half driven by the block
+enters a set of windows that keeps the cell beside the column fixed at the white phases, masked Jen excludes the
+block), or a reduction by steering (once the center repeats the block, a column beyond the window never reads one fixed
+sequence). This table counts, for each period up to 12, the primitive blocks each way reaches, each block once, in that
+order.
+
+## Result
+
+| Period | Blocks | Excluded | Reduced to entry into a trap | Reduced by steering only | Not reached |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 2 | 2 | 0 | 0 | 0 |
+| 2 | 1 | 0 | 1 | 0 | 0 |
+| 3 | 2 | 0 | 1 | 0 | 1 |
+| 4 | 3 | 0 | 3 | 0 | 0 |
+| 5 | 6 | 0 | 1 | 0 | 5 |
+| 6 | 9 | 0 | 1 | 0 | 8 |
+| 7 | 18 | 0 | 1 | 0 | 17 |
+| 8 | 30 | 3 | 0 | 5 | 22 |
+| 9 | 56 | 0 | 23 | 0 | 33 |
+| 10 | 99 | 4 | 24 | 0 | 71 |
+| 11 | 186 | 7 | 56 | 7 | 116 |
+| 12 | 335 | 9 | 83 | 14 | 229 |
+
+- **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
+  block up to period 20 is excluded in Lean, by the kit or here.
+- **Reduced to entry into a trap**: the blocks of [WordTraps](../../Rule30Open/Columns/WordTraps.md),
+  [NineTraps](../../Rule30Open/Columns/NineTraps.md), [TenTraps](../../Rule30Open/Columns/TenTraps.md),
+  [ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md) and
+  [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
+- **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
+  companions that no trap reaches.
+
+## What it means
+
+The reach is uneven in the period. Every block of period 1, 2 and 4 is excluded or reduced; at periods 5, 6 and 7 one
+block each has a trap, which small halves almost never enter ([trap
+entry](../../negative-results/columns/trap-entry.md)), and the rest is not reached at all. From period 9 the walls at
+the edges of periodic backgrounds give traps to 23, 24, 56 and 83 blocks, a quarter to two fifths of each period
+([natural traps](natural-traps.md)), and there small halves do enter them. Every reduction still needs its open step,
+entry for every finite half or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the
+747 blocks of period at most 12. Period 8 has no wall wider than 16 cells: its traps are the window locks of 13 cells of
+its eight blocks that have one, which every sampled half enters, three of them excluded by the game and five reduced by
+steering ([natural traps](natural-traps.md)).
+
+## Reproduce
+
+```bash
+python -m computations.coverage --max-period 12
+```
+
+It takes about a minute: the game at widths 6, 10 and 14 for each block, and the block lists of the trap modules
+from [computations/lock_chain.py](../../computations/lock_chain.py) and of the LockBlocks modules from their Lean
+sources.

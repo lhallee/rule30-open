@@ -36,6 +36,9 @@ whether the white right half settles.
     python -m computations.lock_chain --ten-entry --cells 8 --steps 50000   # entry into each trap of TenTraps
     python -m computations.lock_chain --lean-ten-gap   # the entries of the halves of 8 cells, TenGap.lean
     python -m computations.lock_chain --ten-coin   # the period-10 wall with a fair coin beyond, about a minute
+    python -m computations.lock_chain --lean-walls 11   # the traps of ElevenTraps (12: TwelveTraps)
+    python -m computations.lock_chain --lean-wall-gaps   # the entries of WallGaps
+    python -m computations.lock_chain --walls-entry 11 --cells 6 --steps 20000   # entry into each trap of ElevenTraps
     python -m computations.lock_chain --natural 10,11,12 --steps 20000 --workers 4   # periods 10 to 12
     python -m computations.lock_chain --natural-from saved.txt   # the per-period summary of a saved --natural run
 """
@@ -359,14 +362,26 @@ def carried(name: str, distance: int) -> dict:
 
 
 # Natural traps: name, word, a right half that a run of the word drives into the trap (bit i is column i + 1;
-# `right_half.random_starts(300, 64)[13]`, `[2]` and `[79]`, and the white half), the time, the width and the modulus.
-# The first is checked in `Rule30Open.Columns.WordTraps`, the second in `Rule30Open.Columns.NineTraps`; the third, a
-# second trap for 01, is the chain of the lock of 0^4 1 0 1^8 (`test_period_two_fourteen`); the fourth, the wall of
-# period 10, is carried by its chain in `Rule30Open.Columns.TenTraps`.
+# `right_half.random_starts(300, 64)[13]`, `[2]` and `[79]`, the white half, and `random_starts(30, 64)[4]`), the time,
+# the width and the modulus. The first is checked in `Rule30Open.Columns.WordTraps`, the second in
+# `Rule30Open.Columns.NineTraps`; the third, a second trap for 01, is the chain of the lock of 0^4 1 0 1^8
+# (`test_period_two_fourteen`); the fourth, the wall of period 10, is carried by its chain in
+# `Rule30Open.Columns.TenTraps`, and the last six, the walls of periods 11 and 12, in `ElevenTraps` and `TwelveTraps`.
 NATURAL = [("trap001011111", "001011111", 18202347099481127113, 12000, 43, 9),
            ("trap001010011", "001010011", 12828593127923856452, 12000, 41, 27),
            ("trap01fourteen", "01", 18368822234183756340, 12000, 31, 14),
-           ("trap0000010001", "0000010001", 0, 12000, 16, 10)]
+           ("trap0000010001", "0000010001", 0, 12000, 16, 10),
+           ("trap00000011011", "00000011011", 0, 12000, 16, 11),
+           ("trap00110100111", "00110100111", 0, 12000, 16, 11),
+           ("trap00001101001", "00001101001", 0, 12000, 16, 11),
+           ("trap001011100111", "001011100111", 0, 12000, 16, 12),
+           ("trap000110110011", "000110110011", 0, 12000, 16, 12),
+           ("trap000010011111", "000010011111", 6991680298694716019, 12000, 16, 12)]
+
+# The walls of periods 11 and 12 that `ElevenTraps` and `TwelveTraps` carry: the narrowest of the commonest traps that
+# the natural scan finds there (`wall_chains`), each the trap of a white or random half at step 12,000.
+WALLS = {11: ["trap00000011011", "trap00110100111", "trap00001101001"],
+         12: ["trap001011100111", "trap000110110011", "trap000010011111"]}
 
 
 def tables(name: str) -> dict:
@@ -485,11 +500,11 @@ def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> lis
     return found
 
 
-def ten_gap_entries(cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
-    """For each phase of the period-10 wall `ten0` and each right half r with support in cells 1 .. `cells` (bit i is
-    column i + 1), the first step T at which the run of r driven from that phase has its first 16 cells in a state of
-    the trap with the label of its phase, and that state's index in the sorted states of `TenTraps.ten0`."""
-    t = carried("trap0000010001", 0)
+def gap_entries(name: str, cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
+    """For each phase of the natural trap `name` and each right half r with support in cells 1 .. `cells` (bit i is
+    column i + 1), the first step T at which the run of r driven from that phase has its first cells in a state of the
+    trap with the label of its phase, and that state's index in the sorted states of the trap's Lean definition."""
+    t = carried(name, 0)
     word, period, width = t["word"], len(t["word"]), t["cells"]
     index = {state: k for k, state in enumerate(t["states"])}
     out = []
@@ -509,11 +524,16 @@ def ten_gap_entries(cells: int = 8, steps: int = 50000) -> list[list[tuple[int, 
     return out
 
 
-def lean_ten_gap() -> str:
-    """The entry data of `Rule30Open.Columns.TenGap`: for each phase, the step and the state of each half of
-    `ten_gap_entries`, with the kernel check of the phase."""
+def ten_gap_entries(cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
+    """`gap_entries` for the period-10 wall `ten0`."""
+    return gap_entries("trap0000010001", cells, steps)
+
+
+def lean_gap(name: str, trap: str, bound: int, prefix: str) -> str:
+    """The entry data of a gap module for the natural trap `name`, whose Lean definition is `trap`: for each phase, the
+    step and the state of each half of `gap_entries`, with the kernel check of the phase against the bound."""
     blocks = []
-    for phase, entries in enumerate(ten_gap_entries()):
+    for phase, entries in enumerate(gap_entries(name)):
         items = [f"({step}, {k})" for step, k in entries]
         lines, line = [], "    "
         for j, item in enumerate(items):
@@ -524,10 +544,54 @@ def lean_ten_gap() -> str:
             line += piece
         lines.append(line)
         blocks.append(f"/-- The entry step and state of each right half of at most eight cells, from phase {phase}. -/\n"
-                      f"def tenGap{phase} : List (Nat × Nat) := [\n" + "\n".join(lines) + "\n\n"
-                      f"set_option maxHeartbeats 0 in\ntheorem tenGap{phase}_ok : gapEntriesOk ten0 {phase} 3058 tenGap{phase} = "
-                      f"true := by\n  decide +kernel\n\ntheorem tenGap{phase}_len : tenGap{phase}.length = 2 ^ 8 := by decide +kernel\n")
+                      f"def {prefix}{phase} : List (Nat × Nat) := [\n" + "\n".join(lines) + "\n\n"
+                      f"set_option maxHeartbeats 0 in\ntheorem {prefix}{phase}_ok : gapEntriesOk {trap} {phase} {bound} "
+                      f"{prefix}{phase} = true := by\n  decide +kernel\n\ntheorem {prefix}{phase}_len : {prefix}{phase}.length = "
+                      f"2 ^ 8 := by decide +kernel\n")
     return "\n".join(blocks)
+
+
+def lean_ten_gap() -> str:
+    """The entry data of `Rule30Open.Columns.TenGap`."""
+    return lean_gap("trap0000010001", "ten0", 3058, "tenGap")
+
+
+# The walls of `Rule30Open.Columns.WallGaps`: the trap, its Lean definition, the bound (the latest entry plus 16) and
+# the prefix of the entry lists.
+WALL_GAPS = [("trap00000011011", "el0_0", 1610, "elGap"), ("trap001011100111", "tw0_0", 2357, "twGap")]
+
+
+def wall_distances(period: int, depth: int) -> list[tuple[str, int, str]]:
+    """The blocks of `period` that the walls of `WALLS` carry within `depth` columns, each once, at the first wall and
+    the least distance that reaches it, leaving out the blocks the kit excludes: (wall, distance, block)."""
+    seen, found = set(game.KIT_WORDS), []
+    for name in WALLS[period]:
+        for distance in range(depth + 1):
+            word = carried(name, distance)["word"]
+            if len(word) == period and word not in seen:
+                seen.add(word)
+                found.append((name, distance, word))
+    return found
+
+
+def walls_entry(period: int, cells: int, steps: int, depth: int = 40) -> list[tuple[str, int, str, int, np.ndarray]]:
+    """For each trap of `wall_distances`: its wall, distance, block and width, and the entry step (`entry_steps`) of
+    each right half with support in cells 1 .. `cells`, driven from each phase, or -1."""
+    halves = list(range(1 << cells))
+    found = []
+    for name, distance, word in tqdm(wall_distances(period, depth), desc=f"traps of period {period}", file=sys.stderr):
+        t = carried(name, distance)
+        times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(period)])  # (P 2^cells,)
+        found.append((name, distance, word, t["cells"], times))
+    return found
+
+
+def lean_walls(period: int, depth: int, prefix: str) -> str:
+    """The trap definitions of `Rule30Open.Columns.ElevenTraps` or `TwelveTraps`: each wall of the period carried to
+    each distance of `wall_distances`, named by the prefix, the wall's index and the distance."""
+    names = {name: k for k, name in enumerate(WALLS[period])}
+    return "\n".join(lean_entry(carried(name, d), f"{prefix}{names[name]}_{d}")
+                     for name, d, _ in wall_distances(period, depth))
 
 
 def lean_ten() -> str:
@@ -1013,6 +1077,11 @@ def main() -> None:
     parser.add_argument("--lean-white", action="store_true", help="print the runs of NineWhite.lean")
     parser.add_argument("--lean-ten", action="store_true", help="print the trap entries of TenTraps.lean")
     parser.add_argument("--lean-ten-gap", action="store_true", help="print the entry data of TenGap.lean")
+    parser.add_argument("--lean-wall-gaps", action="store_true", help="print the entry data of WallGaps.lean")
+    parser.add_argument("--lean-walls", type=int, default=0, choices=[0, 11, 12],
+                        help="print the trap entries of ElevenTraps.lean or TwelveTraps.lean")
+    parser.add_argument("--walls-entry", type=int, default=0, choices=[0, 11, 12],
+                        help="entry of the halves with support in cells 1 .. --cells into each trap of that module")
     parser.add_argument("--ten-coin", action="store_true",
                         help="the period-10 wall against a fair coin beyond, and random halves of growing length")
     parser.add_argument("--ten-entry", action="store_true",
@@ -1193,6 +1262,21 @@ def main() -> None:
         print(lean_ten())
     if args.lean_ten_gap:
         print(lean_ten_gap())
+    if args.lean_walls:
+        print(lean_walls(args.lean_walls, 40, "el" if args.lean_walls == 11 else "tw"))
+    if args.lean_wall_gaps:
+        for name, trap, bound, prefix in WALL_GAPS:
+            print(lean_gap(name, trap, bound, prefix))
+    if args.walls_entry:
+        counts = [0, 0, 0]  # traps that every pair, some pairs and no pair enter
+        for name, distance, word, cells, times in walls_entry(args.walls_entry, args.cells, args.steps):
+            done = times[times >= 0]  # (k,)
+            counts[0 if done.size == times.size else 1 if done.size else 2] += 1
+            print(f"{name} at distance {distance} ({word}, {cells} cells): {done.size} of {times.size} halves and phases "
+                  f"enter by step {args.steps}" + (f", median {int(np.median(done))}, latest {int(done.max())}"
+                                                   if done.size else ""), flush=True)
+        print(f"period {args.walls_entry}: {counts[0]} traps entered by every pair, {counts[1]} by some, {counts[2]} by "
+              f"none", flush=True)
     if args.ten_coin:
         coin = ten_coin()
         print(f"every window can enter: {coin['reachable']}, within {coin['longest_path']} steps; with a fair coin the "

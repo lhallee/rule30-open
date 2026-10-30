@@ -1949,6 +1949,47 @@ def test_ten_coin() -> None:
     assert member[len(values) % 10][end].all()
 
 
+def test_wall_gaps() -> None:
+    """`WallGaps.lean`: `lean_gap` is the text of the entries of each wall of `WALL_GAPS`, whose bound is the latest
+    entry plus 16; and for sampled halves of at most eight cells and every phase, a direct run with `step` is, at the
+    listed step, in the listed state of the wall with the label of its phase, and in no state of it earlier."""
+    from computations import lock_chain
+    lean = (ROOT / "Rule30Open" / "Columns" / "WallGaps.lean").read_text(encoding="utf-8")
+    for name, trap, bound, prefix in lock_chain.WALL_GAPS:
+        assert lock_chain.lean_gap(name, trap, bound, prefix) in lean
+        entries = lock_chain.gap_entries(name)
+        assert bound == max(e[0] for es in entries for e in es) + 16
+        t = lock_chain.carried(name, 0)
+        word, states, period = t["word"], t["states"], len(t["word"])
+        members = set(states)
+        for phase in range(period):
+            for r in (0, 3, 101, 200, 255):
+                when, index = entries[phase][r]
+                row = r << 1  # cell 0 the center
+                for u in range(when + 1):
+                    row = (row & ~1) | int(word[(u + phase) % period])
+                    state = ((u + phase) % period, (row >> 1) & 0xFFFF)
+                    assert (state in members) == (u == when), (name, phase, r, u)
+                    row = step(row)
+                assert states[index] == state
+
+
+def test_coverage() -> None:
+    """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
+    the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
+    Lean lists: 25 of TenTraps, 57 of ElevenTraps and 83 of TwelveTraps, each of its period, and the steered blocks are
+    the 49 entries of the LockBlocks modules."""
+    from collections import Counter
+    from computations import coverage
+    assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
+    traps = coverage.trap_blocks()
+    modules = Counter(traps.values())
+    assert (modules["TenTraps"], modules["ElevenTraps"], modules["TwelveTraps"]) == (25, 57, 83)
+    assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12}.get(module, len(block))
+               for block, module in traps.items())
+    assert "011" not in traps and len(coverage.steered_blocks()) == 49
+
+
 def test_edge_periods() -> None:
     """`lock_chain.edge_periods`: next to the kit's ether, white to the right, the edge column repeats; next to the
     background of period 9 no column near the edge does; for both, the column at the edge, run directly with `step`,
@@ -2024,6 +2065,26 @@ def test_ten_traps() -> None:
     assert (size, word, cells, start, spatial) == (100, "0000010001", 16, 0, 155)
     assert blocks == {lock_chain.carried("trap0000010001", d)["word"] for d in range(31)
                       if len(lock_chain.carried("trap0000010001", d)["word"]) == 10}
+
+
+def test_eleven_twelve_traps() -> None:
+    """The walls of periods 11 and 12: the trap of each in `WALLS` has the size the natural scan reports, every trap
+    that `wall_distances` carries within 40 columns is a lock by `is_lock`, a direct check with the rule, for its block,
+    the blocks are distinct and none is the kit's, and `lean_walls` is the text of ElevenTraps.lean and
+    TwelveTraps.lean."""
+    from computations import lock_chain
+    sizes = {name: len(lock_chain.tables(name)["states"]) for period in (11, 12) for name in lock_chain.WALLS[period]}
+    assert sizes == {"trap00000011011": 313, "trap00110100111": 103, "trap00001101001": 138,
+                     "trap001011100111": 119, "trap000110110011": 116, "trap000010011111": 150}
+    for period, module, prefix, count in ((11, "ElevenTraps", "el", 57), (12, "TwelveTraps", "tw", 83)):
+        found = lock_chain.wall_distances(period, 40)
+        assert len(found) == count and len({word for _, _, word in found}) == count
+        assert not {word for _, _, word in found} & set(game.KIT_WORDS)
+        for name, distance, word in found:
+            t = lock_chain.carried(name, distance)
+            assert t["word"] == word and lock_chain.is_lock(word, t["states"], 16 + distance)
+        lean = (ROOT / "Rule30Open" / "Columns" / f"{module}.lean").read_text(encoding="utf-8")
+        assert lock_chain.lean_walls(period, 40, prefix) in lean
 
 
 def test_second_nine_wall() -> None:

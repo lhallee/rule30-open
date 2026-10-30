@@ -29,6 +29,7 @@ a trap that the half has entered.
 
 | Period | Blocks | Lock for some start | A start inside a trap | Every start inside one | Trap wider than 16 cells | Phase modulo a multiple | Locked window of 13 cells | Excluded by the game |
 |---|---|---|---|---|---|---|---|---|
+| 8 | 30 | 8 | 8 | 8 | 0 | 0 | 8 | 3 |
 | 10 | 99 | 36 | 27 | 18 | 15 | 3 | 9 | 3 |
 | 11 | 186 | 53 | 51 | 38 | 20 | 4 | 21 | 7 |
 | 12 | 335 | 78 | 75 | 48 | 34 | 1 | 32 | 9 |
@@ -36,8 +37,9 @@ a trap that the half has entered.
 The last four columns count blocks with a trap: those whose least trap needs more than 16 cells, those whose traps all
 count the phase modulo a multiple of the period, those with a locked window of 13 cells (`locks.has_lock`), and those
 [the finite game](game-blocks.md) excludes. Every block of these periods with a locked window of 13 cells has a start
-inside a trap but one of period 11. The same scan finds none at period 5, 6 or 7, and one start each for six blocks of
-period 9.
+inside a trap but one of period 11. At period 8 the traps are exactly the window locks of 13 cells, of the eight blocks
+that have one, each entered by every start, and none needs more than 16 cells. The same scan finds none at period 5, 6
+or 7, and one start each for six blocks of period 9.
 
 - **Period 10: one background.** The traps found there have 100 states in 269 of the 618 pairs of a block and a start
   inside a trap. They are one trap: the wall of $0000010001$, 16 cells, carried leftward by its chain to the blocks
@@ -61,7 +63,12 @@ period 9.
   distances 23, 9 and 0, whose chains hold 33, 31 and 13 blocks of period 11, 57 in all; at period 12 the walls of
   $001011100111$, $000110110011$ and $000010011111$, with spatial periods 60, 138 and 138 from distances 41, 0 and 7,
   holding 50, 45 and 51 blocks, 97 in all, 95 of them beyond the kit. At period 10 the three commonest sizes, 100, 6,413
-  and 18,038 states, are walls of the one background of spatial period 155.
+  and 18,038 states, are walls of the one background of spatial period 155. In Lean, the walls carried up to 40 columns
+  give traps to 57 blocks of period 11 and 83 of period 12 that the kit does not exclude
+  ([ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md));
+  every half of at most eight cells enters the walls of $00000011011$, $001011100111$ and $000110110011$ within 1,594,
+  2,341 and 2,810 steps, and [WallGaps](../../Rule30Open/Columns/WallGaps.md) carries the first two along the light
+  cone, as [TenGap](../../Rule30Open/Columns/TenGap.md) does at period 10.
 
 ## What it means
 
@@ -80,16 +87,21 @@ through one large component even with Jen's theorem on farther columns, where a 
 ## Reproduce
 
 ```bash
+python -m computations.lock_chain --natural 8 --steps 20000
 python -m computations.lock_chain --natural 10,11,12 --steps 20000 --workers 4 > natural.txt
 python -m computations.lock_chain --natural-from natural.txt
 python -m computations.lock_chain --entry trap0000010001 --cells 8 --steps 50000
 python -m computations.lock_chain --entry trap0000010001 --cells 0 --steps 200000
 python -m computations.lock_chain --ten-entry --cells 6 --steps 20000
 python -m computations.lock_chain --ten-coin
+python -m computations.lock_chain --walls-entry 11 --cells 4 --steps 20000
+python -m computations.lock_chain --walls-entry 12 --cells 4 --steps 20000
 ```
 
-The first takes about 48 minutes with four processes and prints each block that locks for some start, with its traps,
-and the summary of each period, which the second prints again from the saved output, with the walls of the commonest
-traps and their chains; the third takes about a minute,
-the fourth seconds, the fifth, entry into each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7
-minutes, and the sixth, the coin and the halves of growing length, about a minute and a half.
+The first takes under two minutes and the second about 48 with four processes and prints each block that locks for some
+start, with its traps, and the summary of each period, which the third prints again from the saved output, with the
+walls of the commonest traps and their chains; the fourth takes about a minute, the fifth seconds, the sixth, entry into
+each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7 minutes, and the seventh, the coin and the halves
+of growing length, about a minute and a half; the last two, entry into each trap of
+[ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md) and [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md), about
+20 minutes each.
