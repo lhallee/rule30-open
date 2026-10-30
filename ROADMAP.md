@@ -20,8 +20,9 @@ kit's commit 932cf8d.
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
   specific repeating blocks: 197 of the 8,800 blocks of period at most 16, all 136 beyond the kit in Lean ([game
-  blocks](findings/columns/game-blocks.md), [BitGame](Rule30Open/Columns/BitGame.md)), and 261 of the 22,242 of period
-  17 and 18, all but 14 in Lean ([periods 17 and 18](findings/columns/game-blocks-18.md)), every $1\,0^q$ with
+  blocks](findings/columns/game-blocks.md), [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period
+  17 and 18, all but 14 in Lean ([periods 17 and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of
+  period 19 and 20, by computation ([periods 19 and 20](findings/columns/game-blocks-20.md)), every $1\,0^q$ with
   $q \ge 9$, and every block followed by exponentially many white cells (the kit). Following the cells beside the column
   after nine 1s extends the kit's long black runs to every period whose runs of nine or more 1s are separated by
   segments that the possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at
@@ -37,7 +38,12 @@ kit's commit 932cf8d.
   families each block needs its own certificate, and most blocks do not lock the right half
   ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a long
   run exist, but exclude no block the game misses up to period 20 ([forcing
-  words](negative-results/columns/forcing-words.md)).
+  words](negative-results/columns/forcing-words.md)). The share of blocks the game excludes falls with the period, from
+  2.7% at period 12 to 0.56% at period 20, and every exclusion rests on a run of five or more equal values. For 49 blocks
+  of period 4 to 12 that nothing excludes, 16 of them without a run of more than four, one sequence of values in column
+  14 leads every window of 13 cells into a lock, so once the center repeats the block, column 14 never reads that
+  sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block and its instances) and, by
+  computation, has entropy below one bit per step ([steerable locks](findings/columns/steerable-locks.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
@@ -151,9 +157,12 @@ In order of the assessment above.
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
    equal values, and Lean checks all but 14, which need 13 or 14 cells ([periods 17 and
    18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's failure only for $01$ ([ring
-   orbits](negative-results/columns/ring-orbits.md)). Next: a cheaper kernel form of the check for 13 and 14 cells, and
-   periods 19 and 20. Column words without long runs also fix the cell beside the column, the shortest being $0110000$,
-   but up to period 20 they exclude no block the game misses ([forcing
+   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, by
+   computation ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next: a cheaper kernel form of the check for
+   13 and 14 cells, the 327 blocks in Lean, and steering ([steerable locks](findings/columns/steerable-locks.md)) at
+   wider windows and longer periods, the one tool here that reaches blocks without long runs, though only to a
+   condition on a farther column. Column words without long runs also fix the cell beside the column, the shortest
+   being $0110000$, but up to period 20 they exclude no block the game misses ([forcing
    words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long runs, and a
    typical block of large period has only short ones, so these exclusions stay thin.
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the period-four

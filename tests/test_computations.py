@@ -1380,3 +1380,46 @@ def test_lock_avoid_growth() -> None:
         worst.append(np.log(scale))
     rate = np.exp(np.mean(worst[600:]))
     assert abs(rate - lock_word.avoid_growth("0111", member)) < 1e-3
+
+
+def test_locks() -> None:
+    """`locks.lock_info` against forward searches: for sampled nodes of the games of 0111 at width 13 and 01010101011 at
+    width 10, a node is locked exactly when the nodes it reaches show one value of the left column at each phase, and it
+    reaches a locked node exactly when `lock_info` says so; 0111 at width 13 is steerable and 0001 is not. `steering`
+    against Rule 30 run on all windows at once: its sequence leaves every start at a listed window that is locked."""
+    from computations import locks
+    assert locks.steerable("0111", 13) and not locks.steerable("0001", 13)
+    rng = np.random.default_rng(11)
+    for block, width in (("0111", 13), ("01010101011", 10)):
+        source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), _, _, (p n,)
+        locked, reach = locks.lock_info(block, width)  # (p n,), (p n,)
+        nodes = column.size
+        phase = np.arange(nodes) >> width  # (p n,)
+        for node in rng.integers(0, nodes, 6).tolist():
+            seen = np.zeros(nodes, dtype=bool)  # (p n,)
+            seen[node] = True
+            frontier = seen.copy()  # (p n,)
+            while frontier.any():
+                after = np.zeros(nodes, dtype=bool)  # (p n,)
+                after[target[frontier[source]]] = True
+                frontier = after & ~seen
+                seen |= frontier
+            both = any(column[seen & (phase == ph)].any() and (~column[seen & (phase == ph)]).any()
+                       for ph in range(len(block)))
+            assert locked[node] == (not both)
+            assert reach[node] == bool((seen & locked).any())
+    # the steering sequence of 0111, run on every window by bit operations: each ends at a listed locked window
+    width, period = 13, 4
+    values, finals = locks.steering("0111", width)
+    locked, _ = locks.lock_info("0111", width)  # (p n,)
+    mask = (1 << width) - 1
+    for start in range(period):
+        windows = np.arange(1 << width, dtype=np.int64)  # (2^W,), bit j is cell j + 1 right of the column
+        for step, value in enumerate(values):
+            left = ((windows << 1) | int("0111"[(start + step) % period])) & mask  # (2^W,)
+            right = (windows >> 1) | (value << (width - 1))  # (2^W,)
+            windows = left ^ (windows | right)  # (2^W,)
+        final = (start + len(values)) % period
+        assert set(np.unique(windows).tolist()) <= set(finals[final])
+        assert locked[(final << width) + windows].all()
+    assert locks.longest_run("0111") == 3 and locks.longest_run("01010101011") == 2 and locks.longest_run("1000001") == 5

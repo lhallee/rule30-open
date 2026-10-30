@@ -16,6 +16,9 @@ public import Rule30Open.Columns.BitGame
 public import Rule30Open.Columns.BitBlocks17
 public import Rule30Open.Columns.BitBlocks18
 public import Rule30Open.Columns.LockWord
+public import Rule30Open.Columns.LockBlocks
+public import Rule30Open.Columns.LockBlocks11
+public import Rule30Open.Columns.LockBlocks12
 public import Rule30Open.Columns.RunCountdown
 public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.EtherDomain

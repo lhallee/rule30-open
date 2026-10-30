@@ -33,7 +33,9 @@ The same test at longer periods counts the primitive words that lock for all 31 
 
 The eight of period 8 are $00000001$, $00000011$, $00000101$, $00011101$, $00011111$, $00111101$, $00111111$ and
 $01111111$. No word of period 9 locks for more than one start, although periods 8, 10 and 11 lock often; that gap is
-unexplained.
+unexplained. The finite game at width 13 shows the same gap: 71 of the 109 words that lock for every start, and one
+word that locks for none, have a lock that every window of 13 cells can be steered into, and no word of period 9 does
+([steerable locks](steerable-locks.md)).
 
 ## A finite certificate
 

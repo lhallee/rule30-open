@@ -22,7 +22,9 @@ and no column is eventually constant, for every row with a leftmost black cell (
 for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 catalogued restatements of Problem 1 in
 Lean, none of which has led to a proof. Specific eventual periods are excluded block by block: between the kit and this
 repository, 198 of the 8,800 primitive blocks of period at most 16 are excluded in Lean, and 247 of the 22,242 of period
-17 and 18, and the kit also excludes families of padded words and shows that an eventual period $P$ after a transient
+17 and 18; the finite game excludes 508 of the 79,971 of period 19 and 20 by computation. For 49 blocks of period at
+most 12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14 off one fixed
+sequence forever. The kit also excludes families of padded words and shows that an eventual period $P$ after a transient
 $T$ needs $T + P \ge 16{,}359$, which a window of 65,536 cells raises to 65,518 here. The general theory of single
 columns reaches pairs of columns and special classes of automata, not one column of one orbit: Kopra (2023) puts Rule 30
 in a class whose traces two cells wide are never eventually periodic and states the one-cell center column as open, and
