@@ -3,7 +3,7 @@ title: Every background of Rule 30 periodic in time, to period 14, and the traps
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/space_time_periodic.py, computations/lock_chain.py]
 ---
 
@@ -16,7 +16,10 @@ follow one map on the $4^P$ pairs of words of length $P$ (`column_map` in
 [lock chains](lock-chains.md)). A background is a chain of the map infinite both ways, and on a finite set such a chain
 lies on the map's cycles: every background is periodic in space, its spatial period the length of its cycle, and every
 cycle is a background. Repeated squaring of the map finds all its cycles, so for each period the list below is
-complete.
+complete. The kit proves the first part in Lean, in its equivalent forms: every configuration $x$ with $F^k x = x$ is
+periodic in space with period $(4^k)!$ (`evol_add_factorial` in `Rule30Equivalents.PeriodicPoints`), at most $4^k$
+configurations satisfy it (`ncard_recurs_le`), and exactly three are fixed (`evol_one_eq_self_iff`). The list, the
+walls and the witnesses below are computed here; the traps of the walls of periods 9 to 14 are checked in Lean.
 
 ## Result
 

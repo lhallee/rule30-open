@@ -35,7 +35,6 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
-- [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 
@@ -52,6 +51,7 @@ approach stopped.
 - [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md): problem 1
 - [Driven right halves settle into traps for 27 of the 99 blocks of period 10, 51 of the 186 of period 11 and 75 of the 335 of period 12](findings/columns/natural-traps.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
+- [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
 - [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
@@ -175,7 +175,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Driven right halves settle into traps for 27 of the 99 blocks of period 10, 51 of the 186 of period 11 and 75 of the 335 of period 12](findings/columns/natural-traps.md) | computed | 1 | partial |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | partial |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
-| [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md) | computed | 1 | wanted |
+| [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md) | computed | 1 | partial |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |
 | [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md) | computed | 1 | partial |
 
