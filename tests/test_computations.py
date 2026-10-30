@@ -2354,6 +2354,32 @@ def test_missed_traps() -> None:
         encoding="utf-8")
 
 
+def test_kit_reach() -> None:
+    """`game.moves` gives the moves of `game.game_graph`; `absorption.family_cut` holds every window that
+    `absorption.family_depth`, on whole rows, puts in the family at a depth whose wall ends inside the window, and the
+    pure aligned ether; every node of the game of each word of period four at width 14 can reach the cut family, and
+    every node of the game of 001 at width 14 the states of `t001` cut to 14 cells."""
+    from computations import absorption, lock_chain
+    for pattern, width in (("0001", 6), ("001", 7), ("0010111", 5)):
+        source, target, *_ = game.game_graph(pattern, width)
+        mine = game.moves(pattern, width)
+        assert sorted(zip(source.tolist(), target.tolist())) == sorted(zip(*(m.tolist() for m in mine)))
+    wall = absorption.kit_wall()
+    width = 17  # a wall ends inside the window at depths 0 to 4, where every word has a member
+    for word in absorption.WORDS:
+        cut = absorption.family_cut(word, width, wall).reshape(4, 1 << width)
+        windows = np.arange(1 << width, dtype=np.uint64)
+        for phase in range(4):
+            depth = absorption.family_depth(word, windows, phase, wall)
+            members = np.flatnonzero((depth >= 0) & (depth + absorption.WALL_CELLS <= width))
+            assert members.size and cut[phase][members].all()
+            for j0, shift in absorption.ALIGNMENTS[word]:
+                pure = sum(absorption.ether(j0 + p, phase + shift) << (p - 1) for p in range(1, width + 1))
+                assert cut[phase][pure]
+        assert absorption.family_reach(word, 14, wall) == 1.0
+    assert lock_chain.t001_reach(14) == 1.0
+
+
 def test_trap_pairs() -> None:
     """The traps of TrapPairs: each block of `PAIRS` is that of a natural trap of MissedTraps, and has two bottom
     components of locked windows of 16 cells, the second that natural trap, each a lock by `is_lock` with its own values

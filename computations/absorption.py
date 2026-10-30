@@ -12,7 +12,8 @@ has exactly one terminal strongly connected component, and that component is the
 is the wall of the certificate in `lock_certificate.py` (its core seed for 0001 is the ether's B1 B2 B3).
 
 Each run also reports how entry times are spread (`tail`), and names each periodic half that never enters with the
-step at which it is the pure ether aligned with the drive (`pure_ether`), or -1.
+step at which it is the pure ether aligned with the drive (`pure_ether`), or -1. `family_reach` asks whether every node
+of the finite game of a width can reach the family cut to that width (`family_cut`), which entry needs.
 
 `--words 0101` drives with the alternating center, whose alignments with the ether are (3, 0) and (3, 2). `shield` puts
 the ether on columns 1 to 120 and random cells beyond, and reports when and at what depth each half enters and how far
@@ -24,6 +25,7 @@ that `Rule30Open.Columns.EmptyRight` checks in the kernel.
     python -m computations.absorption starts --steps 12000   # the 31 starts of the locking finding
     python -m computations.absorption census --cells 14 --words 0101   # the alternating center: few halves enter
     python -m computations.absorption shield --count 300 --steps 3000   # the ether on columns 1 to 120, random beyond
+    python -m computations.absorption reach --width 23   # every node of the game can reach the family, about 4 min
 """
 
 from __future__ import annotations
@@ -122,6 +124,40 @@ def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np
             found = ether_ok & wall[psi][strip] & ((depth < 0) | (depth > k))  # (n,)
             depth[found] = k
     return depth  # (n,)
+
+
+def family_cut(word: str, width: int, wall: np.ndarray) -> np.ndarray:
+    """The nodes of the game of `word` at `width` (phase times 2^width plus the window) whose window is the first
+    `width` cells of some member of the family: for an alignment and a depth k with column j0 + k a B3 column, the
+    ether on columns 1 .. k and then the start of a wall state, or the ether alone when k is at least `width`."""
+    n = 1 << width
+    windows = np.arange(n, dtype=np.int64)  # (n,)
+    inside = np.zeros(4 * n, dtype=bool)  # (4 n,)
+    for phase in range(4):
+        for j0, shift in ALIGNMENTS[word]:
+            psi = (phase + shift) % 4  # the ether phase of now
+            pattern = sum(ether(j0 + p, psi) << (p - 1) for p in range(1, width + 1))
+            for k in range(width + 7):
+                if (j0 + k) % 7 != 2:
+                    continue
+                if k >= width:
+                    inside[phase * n + pattern] = True
+                    continue
+                cells = min(WALL_CELLS, width - k)
+                starts = np.zeros(1 << cells, dtype=bool)  # (2^cells,), the wall states cut to `cells` cells
+                starts[np.flatnonzero(wall[psi]) & ((1 << cells) - 1)] = True
+                found = (((windows ^ pattern) & ((1 << k) - 1)) == 0) & starts[(windows >> k) & ((1 << cells) - 1)]
+                inside[phase * n + windows[found]] = True
+    return inside  # (4 n,)
+
+
+def family_reach(word: str, width: int, wall: np.ndarray) -> float:
+    """The share of the nodes of the game of `word` at `width` from which some values of the cell beyond reach
+    `family_cut`. Entry into the family for every finitely supported right half needs 1 at every width: the nodes that
+    cannot reach it form a set that no move leaves, and a half that starts there never has a member's first cells."""
+    from computations import game, locks
+    source, target = game.moves(word, width)  # (8 n,), (8 n,)
+    return float(locks.back_closure(family_cut(word, width, wall), source, target).mean())
 
 
 def step_rows(rows: np.ndarray, center: int) -> np.ndarray:
@@ -287,12 +323,13 @@ def periodic_halves(max_period: int, cells: int) -> tuple[list[str], np.ndarray]
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("mode", choices=["census", "infinite", "starts", "shield"])
+    parser.add_argument("mode", choices=["census", "infinite", "starts", "shield", "reach"])
     parser.add_argument("--cells", type=int, default=12, help="census: every right half of up to this many cells")
     parser.add_argument("--steps", type=int, default=4000)
     parser.add_argument("--count", type=int, default=40, help="infinite: random halves per word and phase")
     parser.add_argument("--max-period", type=int, default=8, help="infinite: periods of the periodic halves")
     parser.add_argument("--words", nargs="+", default=list(WORDS), choices=sorted(ALIGNMENTS))
+    parser.add_argument("--width", type=int, default=23, help="reach: the widest game, from width 1")
     args = parser.parse_args()
 
     started = time.perf_counter()
@@ -300,6 +337,15 @@ def main() -> None:
     print(f"the kit's wall, computed: {wall.sum(axis=1).tolist()} states at phases 0 to 3, of "
           f"{greatest_wall().sum(axis=1).tolist()} in the greatest wall")
     rng = np.random.default_rng(30)
+    if args.mode == "reach":
+        for word in args.words:
+            shares = [family_reach(word, width, wall)
+                      for width in tqdm(range(1, args.width + 1), desc=word, file=sys.stderr, leave=False)]
+            print(f"{word}: at widths 1 to {args.width}, the share of the game's nodes that can reach the family cut "
+                  f"to the width is at least {min(shares):.6f}; the cut family has "
+                  f"{int(family_cut(word, args.width, wall).sum())} nodes at width {args.width}")
+        print(f"({time.perf_counter() - started:.0f} s)")
+        return
     for word in args.words:
         assert all(aligned(word, j0, shift) for j0, shift in ALIGNMENTS[word])
         for phase in tqdm(range(4), desc=word, file=sys.stderr, leave=False):

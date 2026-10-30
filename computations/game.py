@@ -62,6 +62,21 @@ def necklaces(period: int) -> list[str]:
     return found
 
 
+def moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray]:
+    """The game's moves (source, target) alone, on integer windows, for widths too large for `game_graph`'s
+    components."""
+    period, n_cells = len(pattern), 1 << width
+    windows = np.arange(n_cells, dtype=np.int64)  # (n,)
+    sources, targets = [], []
+    for phase in range(period):
+        for free in (0, 1):
+            wide = int(pattern[phase]) | windows << 1 | free << (width + 1)  # (n,), the column at bit 0
+            sources.append(phase * n_cells + windows)  # (n,)
+            targets.append(((phase + 1) % period) * n_cells + ((((wide << 1) ^ (wide | (wide >> 1))) >> 1)
+                                                               & (n_cells - 1)))  # (n,)
+    return np.concatenate(sources), np.concatenate(targets)  # (2 p n,), (2 p n,)
+
+
 def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """The game's moves (source, target), each node's strongly connected component, whether a play can stay in each
     component, and the left column at each node."""

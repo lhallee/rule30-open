@@ -53,6 +53,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --reach 16   # which traps every window can reach, about an hour
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
+    python -m computations.lock_chain --t001-reach 24   # every node of the game of 001 can reach t001, about 2 min
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
@@ -1935,6 +1936,18 @@ def t001_states() -> list[tuple[int, int]]:
             for i in range(count)]
 
 
+def t001_reach(width: int) -> float:
+    """The share of the nodes of the game of 001 at `width`, the phase counted modulo 3 as the kit's `AbsorptionT`
+    counts it, from which some values of the cell beyond reach the states of `t001` cut to their first `width` cells.
+    Entry into `t001` for every finitely supported right half needs 1 at every width (`trap_reach`)."""
+    low = (1 << width) - 1
+    source, target = game.moves("001", width)  # (6 n,), (6 n,)
+    inside = np.zeros(3 << width, dtype=bool)  # (3 n,)
+    for strip, label in t001_states():
+        inside[(label % 3) << width | strip & low] = True
+    return float(locks.back_closure(inside, source, target).mean())
+
+
 def t001_as_chain() -> tuple[str, str, bool, bool, int]:
     """The kit's trap for 001 read as a chain: its last column that is a function of the label, the values of the next
     column at that column's white labels, whether `chain` from them gives the columns before it and then the center
@@ -2006,6 +2019,8 @@ def main() -> None:
     parser.add_argument("--rest", type=int, default=None, help="with --short, only seeds of a long run and this many "
                         "other cells")
     parser.add_argument("--t001", action="store_true", help="the kit's trap for 001 as a chain")
+    parser.add_argument("--t001-reach", type=int, default=0,
+                        help="with a width, the share of nodes that can reach t001 cut to each width up to it")
     parser.add_argument("--verify", action="store_true", help="check the chain locks of short-period blocks directly")
     parser.add_argument("--lean", action="store_true", help="print the trap entries of WordTraps.lean")
     parser.add_argument("--lean-white", action="store_true", help="print the runs of NineWhite.lean")
@@ -2263,6 +2278,10 @@ def main() -> None:
         print(lean_census_large(CENSUS_LARGE15 if args.lean_census_large == 15 else None))
     if args.lean_missed:
         print(lean_missed())
+    if args.t001_reach:
+        shares = [t001_reach(width) for width in tqdm(range(1, args.t001_reach + 1), file=sys.stderr)]
+        print(f"t001: at widths 1 to {args.t001_reach}, the share of the nodes of the game of 001 that can reach its "
+              f"states cut to the width is at least {min(shares):.6f}", flush=True)
     if args.lean_pairs:
         print(lean_pairs())
     if args.lean_long_large:

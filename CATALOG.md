@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-81 Lean modules with 350 headline theorems, 29 findings (proved on paper,
+81 Lean modules with 350 headline theorems, 30 findings (proved on paper,
 computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 68 | 16 | 9 |
+| [Columns](#columns) | 68 | 17 | 9 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -178,6 +178,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
 | [The finite game excludes 434 of the 99,858 blocks of period 21](findings/columns/game-blocks-21.md) | computed | 1 | partial |
 | [The finite game excludes 197 of the 8,800 blocks up to period 16](findings/columns/game-blocks.md) | computed | 1 | partial |
+| [The kit's two absorption conjectures pass the test of reach that refutes seven traps found here](findings/columns/kit-absorption-reach.md) | computed | 1 | not applicable |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
 | [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md) | computed | 1 | partial |

@@ -115,15 +115,17 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   truncation of the aligned ether, the only infinite half seen to stay out, followed by at most six cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md) for four, [EtherPrefixSix](Rule30Open/Columns/EtherPrefixSix.md) for
   six); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)), in
-  Lean a trap ([PeriodFourCertificate](Rule30Open/Columns/PeriodFourCertificate.md)), every
-  window can reach it, and one word of a few hundred values in column 17 forces entry ([the coin
-  lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings
-  every window into the family, so a center that repeats the word keeps that column off the sequence forever
-  ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at least three black cells among the
-  first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$, one among columns 11 to $G'$ and one
-  among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells. *Assessment:* the most direct route to a full
-  case of Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement
-  of the same kind as the problem.
+  Lean a trap ([PeriodFourCertificate](Rule30Open/Columns/PeriodFourCertificate.md)), every window can reach it, and one
+  word of a few hundred values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one
+  sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings every window into the family, so a center that
+  repeats the word keeps that column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). No set of
+  windows of up to 23 cells that no move leaves misses the family, nor one of up to 24 cells the kit's `t001` for $001$
+  ([reach of the kit's conjectures](findings/columns/kit-absorption-reach.md)): the test that refutes entry into seven
+  traps of periods 13 to 15 ([MissedTraps](Rule30Open/Columns/MissedTraps.md)) finds nothing against either. Open:
+  attraction for halves with at least three black cells among the first $G$ columns, one of them among columns 1 to 30,
+  one among columns 7 to $B$, one among columns 11 to $G'$ and one among columns 15 to 750, 1,446 and 560, beyond the
+  census's 20 cells. *Assessment:* the most direct route to a full case of Problem 1, though attraction asks the chaotic
+  part of the right half to deliver an entry pattern, a statement of the same kind as the problem.
 - **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite left
   half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left half of
   up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)), and

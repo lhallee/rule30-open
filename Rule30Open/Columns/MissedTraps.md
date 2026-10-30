@@ -87,7 +87,8 @@ The kit refutes entry into each of its own period-four certificates `S0001`, `S0
 (`Rule30Ether.never_enters_S0001`, `never_enters_S0011`, `never_enters_S0111`): an explicit finite right half stays in
 deeper members of the ether-and-wall family forever. This is why its `Absorption` asks for entry into the whole family.
 Here the same failure is found for traps of periods 13 to 15 by a general test, and refuted with a closed set that the
-kernel checks, in the form of the kit's `AbsorptionT`.
+kernel checks, in the form of the kit's `AbsorptionT`. The kit's family and its `t001` pass the same test at every width
+searched, 23 and 24 cells ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)).
 
 ## Lean
 
