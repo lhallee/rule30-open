@@ -37,6 +37,7 @@ public import Rule30Open.Columns.HighThree
 public import Rule30Open.Columns.LongWindow
 public import Rule30Open.Columns.TenCells
 public import Rule30Open.Columns.TwelveCells
+public import Rule30Open.Columns.FourteenCells
 public import Rule30Open.Columns.LeftHalf0001
 public import Rule30Open.Columns.LeftHalfDriven
 public import Rule30Open.PeriodTwo.HeldColumn

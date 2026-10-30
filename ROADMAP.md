@@ -12,6 +12,29 @@ summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
 kit's commit 932cf8d.
 
+## At a glance
+
+| Problem | Route | Status | Where it stands |
+|---|---|---|---|
+| 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
+| 1 | Excluding eventual periods block by block | open | the finite game excludes 966 blocks of period at most 20, all but 40 in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
+| 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
+| 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
+| 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{52}$ fails |
+| 1 | Least period three | open | $001$ through the kit's trap, $011$ through the left half |
+| 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
+| 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
+| 1 | Counterexamples | no signal | no small row has a periodic column; no right half found escapes the period-four lock |
+| 2 | Invariant measures and random rows | closed | exact for random rows only |
+| 2 | Conservation laws | closed | none over four steps |
+| 2 | Bounds on runs | open | runs at most linear in their start time |
+| 2 | Statistics | no signal | the column passes every test tried |
+| 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
+| 3 | A space lower bound | open, as hard | space $O(\sqrt{n} \log n)$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
+| 3 | A shortcut | no signal | automata, recurrences and learned predictors find none |
+| 3 | Restricted models | open | no automaton below 131,070 states on the range searched |
+
 ## Problem 1: is the center column eventually periodic?
 
 - **Rigidity from the left edge.** *Closed as a route on its own; every other route ends with it.* Two adjacent
@@ -53,23 +76,25 @@ kit's commit 932cf8d.
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
   enters (the kit for $0001$, [WhiteGap](Rule30Open/Columns/WhiteGap.md) for all three words); in Lean, halves of up to
-  twelve cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md) for six, [TenCells](Rule30Open/Columns/TenCells.md)
-  for ten, [TwelveCells](Rule30Open/Columns/TwelveCells.md) for twelve), so does every half white on columns 7 to $B$,
+  fourteen cells enter ([EmptyRight](Rule30Open/Columns/EmptyRight.md) for six,
+  [TenCells](Rule30Open/Columns/TenCells.md) for ten, [TwelveCells](Rule30Open/Columns/TwelveCells.md) for twelve,
+  [FourteenCells](Rule30Open/Columns/FourteenCells.md) for fourteen), so does every half white on columns 7 to $B$,
   whatever lies beyond, with $B$ = 316, 535 and 310 ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), every half white on
   columns 11 to $G'$, with $G'$ = 562, 654 and 371 ([TenCells](Rule30Open/Columns/TenCells.md)), and every half white on
-  columns 13 to 750, 995 and 560 ([TwelveCells](Rule30Open/Columns/TwelveCells.md)), and so does every half with at most
-  two black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black
-  cell anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
+  columns 13 to 750, 995 and 560 ([TwelveCells](Rule30Open/Columns/TwelveCells.md)) and every half white on columns 15
+  to 750, 1,446 and 560 ([FourteenCells](Rule30Open/Columns/FourteenCells.md)), and so does every half with at most two
+  black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell
+  anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
   truncation of the aligned ether, the only infinite half seen to stay out, followed by at most four cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
   certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few hundred
   values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955
   or 381 values in column 17, 15 or 14 brings every window into the family, so a center that repeats the word keeps that
   column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at
-  least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$ and
-  one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
-  Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the
-  same kind as the problem.
+  least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$,
+  one among columns 11 to $G'$ and one among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells.
+  *Assessment:* the most direct route to a full case of Problem 1, though attraction asks the chaotic part of the right
+  half to deliver an entry pattern, a statement of the same kind as the problem.
 - **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite left
   half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left half of
   up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)), and
@@ -153,18 +178,18 @@ kit's commit 932cf8d.
 
 In order of the assessment above.
 
-1. **Attraction for period four.** The Lean classes so far are halves of at most twelve cells, a white gap after the
-   sixth, the tenth or the twelfth cell, at most two black cells among the first $G$, the aligned ether cut anywhere with at most four
-   cells after it, and every half whose column 17, 15 or 14 reads one fixed sequence
+1. **Attraction for period four.** The Lean classes so far are halves of at most fourteen cells, a white gap after the
+   sixth, the tenth, the twelfth or the fourteenth cell, at most two black cells among the first $G$, the aligned ether
+   cut anywhere with at most four cells after it, and every half whose column 17, 15 or 14 reads one fixed sequence
    ([LockWord](Rule30Open/Columns/LockWord.md)). Next: the shift lemma of
    [EtherPrefix](Rule30Open/Columns/EtherPrefix.md) applies to any half whose column 1 stays the ether's until it
    enters, so ether prefixes in front of the census halves, or of longer tails, need only base checks; three black cells
    by [SparseRight](Rule30Open/Columns/SparseRight.md)'s route need 32,219 to 476,314 kernel checks per word and phase;
-   halves of 14 cells by [TwelveCells](Rule30Open/Columns/TwelveCells.md)'s route would take about four times its three
-   minutes of kernel time; and the
-   slowest halves, which are rare and which local and beam searches do not find ([the slow-half
-   searches](negative-results/columns/slow-half-search.md)). *Assessment:* each class is thin; a proof for every finite
-   half needs an argument that the chaotic part near the center delivers a wall, which none of these gives.
+   halves of 16 cells by [FourteenCells](Rule30Open/Columns/FourteenCells.md)'s route would take about four times its
+   twelve minutes of kernel time and a data file of about 4 MB; and the slowest halves, which are rare and which local
+   and beam searches do not find ([the slow-half searches](negative-results/columns/slow-half-search.md)). *Assessment:*
+   each class is thin; a proof for every finite half needs an argument that the chaotic part near the center delivers a
+   wall, which none of these gives.
 2. **Block exclusions.** Blocks with nine 1s in a row now have a uniform argument
    ([WallSets](Rule30Open/Columns/WallSets.md)), which matches the game on every such block to period 16. The open cases
    are blocks without a long run of 1s. All 197 blocks [the game](findings/columns/game-blocks.md) excludes up to period
