@@ -895,6 +895,26 @@ def test_long_window() -> None:
     assert length == 19
 
 
+def test_wide_window() -> None:
+    """The window of `WideWindow`: the packed center cells against `center_column`, the checkpoint rows against the
+    integer rows stepped to their times, and the new factor of length 20 against the sets of earlier factors."""
+    bits, checkpoints = long_window.simulate(long_window.WIDE)
+    column = center_column(long_window.WIDE)  # (WIDE,)
+    assert np.array_equal(np.array([(bits >> t) & 1 for t in range(long_window.WIDE)], dtype=np.uint8), column)
+    assert sorted(checkpoints) == [16384 * q for q in range(1, 16)]
+    row = 1 << long_window.WIDE
+    for t in range(1, max(checkpoints) + 1):
+        row = step(row)
+        if t in checkpoints:
+            assert checkpoints[t] == row, t
+    cells = "".join(map(str, column.tolist()))
+    for size, new in ((19, False), (20, True)):
+        start = long_window.WIDE - size
+        earlier = {cells[j:j + size] for j in range(start)}
+        assert (cells[start:] not in earlier) == new, size
+    assert long_window.new_factor(bits, long_window.WIDE) == 20
+
+
 def test_period_three() -> None:
     """Column 1 of driven right halves against cell arrays stepped with the center as column 0, for both words and
     every phase; `settled_periods` on sequences with a known transient and period; and the counts the negative result

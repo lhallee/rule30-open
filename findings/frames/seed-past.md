@@ -3,7 +3,7 @@ title: The single cell has a unique past, and every row of it is periodic
 category: frames
 problems: [1]
 status: paper
-formalization: wanted
+formalization: partial
 evidence: [computations/frames.py]
 ---
 
@@ -58,6 +58,12 @@ Examples: $\rho_1 = -1$, $\rho_2 = (100)^\infty = -1/7$, $\rho_{10} = (100100010
 $100010011101010111000110$ of $\rho_{28}$, repeated leftward from a cut with white cells right of it, becomes exactly
 one black cell after 28 steps. A corollary: Rule 30 on a ring of 48 cells has configurations that die in exactly $k$
 steps for every $k$ from 66 to 3,000.
+
+## In Lean
+
+[SeedPast](../../Rule30Open/Frames/SeedPast.md) proves the frame, the bijection, the uniqueness of $\rho_k$ and its
+eventual periodicity, for every $k$ (`rho_evPer`, `past_evPer`). The exact death of the tail and the unbounded periods
+are not formalized.
 
 ## In the kit
 

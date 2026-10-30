@@ -28,6 +28,7 @@
 
 - id: frames
   title: Frames and the seed's past
+  lean: Frames
   summary: Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and the rows that lead to the seed.
 
 - id: analogs

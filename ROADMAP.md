@@ -43,8 +43,8 @@ kit's commit 932cf8d.
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period.
-  - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at
-    most 16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
+  - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at most
+    16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
     [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18, all but 14 in Lean ([periods 17
     and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of period 19 and 20, all but 26 in Lean
     ([periods 19 and 20](findings/columns/game-blocks-20.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every
@@ -55,10 +55,11 @@ kit's commit 932cf8d.
     for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md),
     [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r \ge 9$ 1s rules out every tail of at most
     $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most $4 \lfloor (b - 1)/9 \rfloor + 2$
-    steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 65{,}518$ ([a window of
-    65,536 cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim
-    every eventual period whose white runs are all at least 17, and four more families with long white runs ([the
-    kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
+    steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 262{,}125$ ([a window of
+    262,144 cells](Rule30Open/Columns/WideWindow.md); 65,518 from 65,536 cells in
+    [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every
+    eventual period whose white runs are all at least 17, and four more families with long white runs ([the kit's pull
+    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
   - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
     every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
@@ -85,16 +86,17 @@ kit's commit 932cf8d.
   to 750, 1,446 and 560 ([FourteenCells](Rule30Open/Columns/FourteenCells.md)), and so does every half with at most two
   black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell
   anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
-  truncation of the aligned ether, the only infinite half seen to stay out, followed by at most four cells
-  ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
-  certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few hundred
-  values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955
-  or 381 values in column 17, 15 or 14 brings every window into the family, so a center that repeats the word keeps that
-  column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at
-  least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$,
-  one among columns 11 to $G'$ and one among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells.
-  *Assessment:* the most direct route to a full case of Problem 1, though attraction asks the chaotic part of the right
-  half to deliver an entry pattern, a statement of the same kind as the problem.
+  truncation of the aligned ether, the only infinite half seen to stay out, followed by at most six cells
+  ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md) for four, [EtherPrefixSix](Rule30Open/Columns/EtherPrefixSix.md) for
+  six); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)), every
+  window can reach it, and one word of a few hundred values in column 17 forces entry ([the coin
+  lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings
+  every window into the family, so a center that repeats the word keeps that column off the sequence forever
+  ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at least three black cells among the
+  first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$, one among columns 11 to $G'$ and one
+  among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells. *Assessment:* the most direct route to a full
+  case of Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement
+  of the same kind as the problem.
 - **Least period four through the left half.** *Open.* The kit's other reduction of period four asks that no finite left
   half keep column $-1$ on a pattern with one free reading in four (`C3`, one statement for each word). No left half of
   up to 80 cells does, for each word in each phase ([the left-half statements](findings/columns/left-half-c3.md)), and
@@ -180,7 +182,7 @@ In order of the assessment above.
 
 1. **Attraction for period four.** The Lean classes so far are halves of at most fourteen cells, a white gap after the
    sixth, the tenth, the twelfth or the fourteenth cell, at most two black cells among the first $G$, the aligned ether
-   cut anywhere with at most four cells after it, and every half whose column 17, 15 or 14 reads one fixed sequence
+   cut anywhere with at most six cells after it, and every half whose column 17, 15 or 14 reads one fixed sequence
    ([LockWord](Rule30Open/Columns/LockWord.md)). Next: the shift lemma of
    [EtherPrefix](Rule30Open/Columns/EtherPrefix.md) applies to any half whose column 1 stays the ether's until it
    enters, so ether prefixes in front of the census halves, or of longer tails, need only base checks; three black cells

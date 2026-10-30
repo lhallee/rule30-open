@@ -44,8 +44,8 @@ Every eventual period with $T + P \le 65{,}517$ is excluded: a period from time 
 $P \le 65{,}517 - T$ after any transient $T$. The factor of length 18 at 65,518 does occur earlier, so 19 is the least
 length that works at the end of this window. As a heuristic, a column that looks random gives a bound a little below
 $N - \log_2 N$ from a window of $N$ cells. The bound is a computation, made formal. Published computations go much
-further: the first billion cells show no period ([the literature](../../literature/rule-30.md)). A window of $2^{20}$
-cells would need 16 times as many kernel steps on rows 16 times as wide, with checkpoint literals of up to 512 KB.
+further: the first billion cells show no period ([the literature](../../literature/rule-30.md)).
+[WideWindow](WideWindow.md) runs the same argument on 262,144 cells, for $T + P \ge 262{,}125$.
 
 ## Relation to the kit
 

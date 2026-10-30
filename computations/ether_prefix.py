@@ -1,4 +1,4 @@
-"""Truncated ether: the certificates of `EtherPrefix.lean`.
+"""Truncated ether: the certificates of `EtherPrefix.lean` and `EtherPrefixSix.lean`.
 
 The right half that is the ether aligned with the center's word never enters the kit's ether-and-wall family. Its
 truncations do: the half that is the aligned ether on cells 1 .. K, then a word u, then white, enters for every K. A
@@ -13,6 +13,7 @@ entry (t, k) as t * 64 + k, the direct entries for K = 0 .. B - 1 and then the b
 
     python -m computations.ether_prefix --tail 4            # B and the latest entries for tails of up to 4 cells
     python -m computations.ether_prefix --tail 4 --lean     # the certificate section of EtherPrefix.lean
+    python -m computations.ether_prefix --tail 6 --lean     # that of EtherPrefixSix.lean, about 9 minutes
     python -m computations.ether_prefix --slowest 16        # the slowest halves of 16 cells and their ether agreement
 """
 
@@ -126,11 +127,13 @@ def combos() -> list[tuple[str, int, int, int]]:
 
 
 def lean_data(tail_cells: int) -> str:
-    """The certificate section of `EtherPrefix.lean`: one list per word, alignment and phase, one number per tail
-    word, and the kernel check of each list."""
+    """The certificate section of `EtherPrefix.lean` (tails of 4 cells, lists `tails<word>_<j0>_<phase>`) or of
+    `EtherPrefixSix.lean` (6 cells, `six<word>_<j0>_<phase>`): one list per word, alignment and phase, one number per
+    tail word, and the kernel check of each list."""
     blocks = []
+    prefix = {4: "tails", 6: "six"}[tail_cells]
     for word, j0, shift, phase in tqdm(combos(), desc="alignments and phases", file=sys.stderr, leave=False):
-        name = f"tails{word}_{j0}_{phase}"
+        name = f"{prefix}{word}_{j0}_{phase}"
         numbers = ",\n".join(f"  0x{encode(*certificate(word, j0, shift, phase, tail)):x}"
                              for tail in range(1 << tail_cells))
         blocks.append(f"def {name} : List Nat := [\n{numbers}]\n\n"

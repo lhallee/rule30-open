@@ -33,8 +33,10 @@ public import Rule30Open.Columns.EmptyRight
 public import Rule30Open.Columns.WhiteGap
 public import Rule30Open.Columns.SparseRight
 public import Rule30Open.Columns.EtherPrefix
+public import Rule30Open.Columns.EtherPrefixSix
 public import Rule30Open.Columns.HighThree
 public import Rule30Open.Columns.LongWindow
+public import Rule30Open.Columns.WideWindow
 public import Rule30Open.Columns.TenCells
 public import Rule30Open.Columns.TwelveCells
 public import Rule30Open.Columns.FourteenCells
@@ -44,6 +46,7 @@ public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
 public import Rule30Open.Diagonals.LeftMemory
+public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.RandomRows.LeftWindow
