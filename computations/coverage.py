@@ -2,11 +2,11 @@
 
 For each period: the primitive blocks; those excluded outright, by the finite game at width 6, 10 or 14 or by the kit
 (`game.first_width`, `game.kit_blocks`), each of which is excluded in Lean up to period 20; those that a trap in Lean
-reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps` and
+reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `NaturalTraps` and
 `PeriodFourCertificate`, and the kit's `t001` for 001); those that a steering sequence of the `LockBlocks` modules
 reduces to a condition on column 14; and the rest, which no method here reaches.
 
-    python -m computations.coverage --max-period 12   # about 10 minutes
+    python -m computations.coverage --max-period 12   # about a minute
 """
 
 from __future__ import annotations
@@ -37,6 +37,8 @@ def trap_blocks() -> dict[str, str]:
     for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps")):
         for _, _, word in lock_chain.wall_distances(period, 40):
             found.setdefault(word, module)
+    for word, *_ in lock_chain.EXTRA_TRAPS:
+        found.setdefault(word, "NaturalTraps")
     for word in ("0001", "0011", "0111"):
         found.setdefault(word, "PeriodFourCertificate")
     return found

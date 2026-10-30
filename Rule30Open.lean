@@ -52,6 +52,7 @@ public import Rule30Open.Columns.TenGap
 public import Rule30Open.Columns.ElevenTraps
 public import Rule30Open.Columns.TwelveTraps
 public import Rule30Open.Columns.WallGaps
+public import Rule30Open.Columns.NaturalTraps
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn

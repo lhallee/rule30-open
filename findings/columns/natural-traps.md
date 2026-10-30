@@ -69,6 +69,13 @@ or 7, and one start each for six blocks of period 9.
   every half of at most eight cells enters the walls of $00000011011$, $001011100111$ and $000110110011$ within 1,594,
   2,341 and 2,810 steps, and [WallGaps](../../Rule30Open/Columns/WallGaps.md) carries the first two along the light
   cone, as [TenGap](../../Rule30Open/Columns/TenGap.md) does at period 10.
+- **The traps found, in Lean.** Of the 153 blocks of periods 10 to 12 with a start inside a trap, the walls carry traps
+  to 100 in Lean, the kit or the game excludes 18, and the other 35 have the trap the scan finds, one per block up to a
+  shift of its labels; none of the 35 lies in the chain of a wall. Every right half with support in cells 1 to 4 enters
+  30 of these traps from every phase within 20,000 steps, 29 of them within 8,622; the other five, 22 to 44 cells wide,
+  are entered by 7 to 52 of the 160 to 192 pairs of a half and a phase (`extra_entry`). The kernel checks 34 of them
+  ([NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md)); the trap of $00010001011$, 61,857 windows of 30 cells, is
+  too costly for it as packed.
 
 ## What it means
 
@@ -96,12 +103,14 @@ python -m computations.lock_chain --ten-entry --cells 6 --steps 20000
 python -m computations.lock_chain --ten-coin
 python -m computations.lock_chain --walls-entry 11 --cells 4 --steps 20000
 python -m computations.lock_chain --walls-entry 12 --cells 4 --steps 20000
+python -m computations.lock_chain --extra-entry --cells 4 --steps 20000
 ```
 
 The first takes under two minutes and the second about 48 with four processes and prints each block that locks for some
 start, with its traps, and the summary of each period, which the third prints again from the saved output, with the
 walls of the commonest traps and their chains; the fourth takes about a minute, the fifth seconds, the sixth, entry into
 each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7 minutes, and the seventh, the coin and the halves
-of growing length, about a minute and a half; the last two, entry into each trap of
+of growing length, about a minute and a half; the eighth and ninth, entry into each trap of
 [ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md) and [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md), about
-20 minutes each.
+20 minutes each; and the last, entry into each trap of [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md) and
+the one it leaves out, about four minutes.
