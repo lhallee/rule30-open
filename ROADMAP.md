@@ -19,7 +19,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 1,400 blocks of period at most 21, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
-| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9, 28 of the 99 of period 10, 71 of the 186 of period 11, 113 of the 335 of period 12, 222 of the 630 of period 13 and 385 of the 1,161 of period 14 come down to entry into traps, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 14, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
+| 1 | Single blocks through traps | open | 22 of the 56 blocks of period 9, 28 of the 99 of period 10, 71 of the 186 of period 11, 113 of the 335 of period 12, 222 of the 630 of period 13, 385 of the 1,161 of period 14 and 595 of the 2,182 of period 15 come down to entry into traps, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14 and six of period 15, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 15, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 2, 3, 5, 6 and 7 has a trap that small halves almost never enter |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
@@ -281,8 +281,11 @@ In order of the assessment above.
    time](findings/columns/space-time-backgrounds.md), [FarWalls](Rule30Open/Columns/FarWalls.md),
    [CensusTraps13](Rule30Open/Columns/CensusTraps13.md), [CensusTraps14](Rule30Open/Columns/CensusTraps14.md),
    [CensusTrapsLarge](Rule30Open/Columns/CensusTrapsLarge.md)); a third of each of those periods now comes down to
-   entry, though small halves enter few of the traps carried far. Next: the census at wider windows, where the walls of
-   period 9 (43 cells) suggest the backgrounds without a wall of 16 cells may have wider ones, and at periods 15 and 16;
+   entry, though small halves enter few of the traps carried far. At period 15 the same census finds six backgrounds
+   with walls, of 64 to 2,145 cells, and its chains hold 648 of the 2,182 blocks, every block excluded there and 595
+   more, all now with traps in Lean ([CensusTraps15](Rule30Open/Columns/CensusTraps15.md),
+   [CensusTrapsLarge15](Rule30Open/Columns/CensusTrapsLarge15.md)). Next: the census at wider windows, where the walls
+   of period 9 (43 cells) suggest the backgrounds without a wall of 16 cells may have wider ones, and at period 16;
    wider classes of halves for that edge, such as every half of twelve cells, as
    [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569 values of column 17
    that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md) does for period four; the walls of

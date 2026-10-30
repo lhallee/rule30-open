@@ -66,6 +66,8 @@ public import Rule30Open.Columns.CensusTraps13
 public import Rule30Open.Columns.CensusTraps14
 public import Rule30Open.Columns.CensusTrapsLarge
 public import Rule30Open.Columns.NaturalTrapsLongLarge
+public import Rule30Open.Columns.CensusTraps15
+public import Rule30Open.Columns.CensusTrapsLarge15
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn

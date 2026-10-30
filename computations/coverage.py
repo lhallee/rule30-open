@@ -4,11 +4,11 @@ For each period: the primitive blocks; those excluded outright, by the finite ga
 (`game.first_width`, `game.kit_blocks`), each of which is excluded in Lean up to period 20; those that a trap in Lean
 reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
 `FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge`, `NaturalTrapsLong`, `NaturalTrapsLongLarge`, `FarWalls`,
-`CensusTraps13`, `CensusTraps14`, `CensusTrapsLarge` and `PeriodFourCertificate`, and the kit's `t001` for 001); those
-that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14; and the rest, which no method
-here reaches.
+`CensusTraps13`, `CensusTraps14`, `CensusTraps15`, `CensusTrapsLarge`, `CensusTrapsLarge15` and
+`PeriodFourCertificate`, and the kit's `t001` for 001); those that a steering sequence of the `LockBlocks` modules
+reduces to a condition on column 14; and the rest, which no method here reaches.
 
-    python -m computations.coverage --max-period 14   # about four minutes
+    python -m computations.coverage --max-period 15   # about ten minutes
 """
 
 from __future__ import annotations
@@ -55,6 +55,8 @@ def trap_blocks() -> dict[str, str]:
             found.setdefault(block, f"CensusTraps{period}")
     for block, *_ in lock_chain.CENSUS_LARGE:
         found.setdefault(block, "CensusTrapsLarge")
+    for block, *_ in lock_chain.CENSUS_LARGE15:
+        found.setdefault(block, "CensusTrapsLarge15")
     for word in ("0001", "0011", "0111"):
         found.setdefault(word, "PeriodFourCertificate")
     return found

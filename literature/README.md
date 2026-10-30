@@ -23,13 +23,13 @@ for finite rows in a 2026 preprint). The kit's equivalent forms prove 52 of 54 c
 Lean, none of which has led to a proof. Specific eventual periods are excluded block by block: between the kit and this
 repository, every block of period at most 21 that the finite game excludes is excluded in Lean, 197 of the 8,800
 primitive blocks of period at most 16, 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and 20 and
-434 of the 99,858 of period 21, and 841 blocks of periods 9 to 14 come down to the entry of the right half into a trap,
-a closed set of windows beside the column, most of them at the edge of a background periodic in time. For 49 blocks of
-period at most 12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14 off one
-fixed sequence forever. The kit also excludes families of padded words and shows that an eventual period $P$ after a
-transient $T$ needs $T + P \ge 16{,}359$, which windows of 65,536 and 262,144 cells raise to 65,518 and 262,125 here.
-The general theory of single columns reaches pairs of columns and special classes of automata, not one column of one
-orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic and states the
+434 of the 99,858 of period 21, and 1,436 blocks of periods 9 to 15 come down to the entry of the right half into a
+trap, a closed set of windows beside the column, most of them at the edge of a background periodic in time. For 49
+blocks of period at most 12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14
+off one fixed sequence forever. The kit also excludes families of padded words and shows that an eventual period $P$
+after a transient $T$ needs $T + P \ge 16{,}359$, which windows of 65,536 and 262,144 cells raise to 65,518 and 262,125
+here. The general theory of single columns reaches pairs of columns and special classes of automata, not one column of
+one orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic and states the
 one-cell center column as open, and Rule 90, in the same class, has an eventually periodic center column, so a proof has
 to use more than the properties that define the class. One preprint claims a solution; none is refereed, and the prize
 is unclaimed.

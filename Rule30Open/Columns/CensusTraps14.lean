@@ -5,7 +5,7 @@ public import Rule30Open.Columns.WordTraps
 /-!
 # Traps for 232 blocks of period 14, from the locked windows of 16 cells carried leftward
 
-The census of locked windows of 16 cells at periods 10 to 14 finds, for every block, the bottom components of its
+The census of locked windows of 16 cells at periods 10 to 15 finds, for every block, the bottom components of its
 locked windows, closed sets of windows on which column 1 is fixed at the white phases, and the chain of columns that
 each fixes to its left. At period 14 those chains hold 232 blocks that no other trap module has, that nothing
 excludes, and that a component of at most 3,000 states reaches. Here each is the component of least cost carried to
