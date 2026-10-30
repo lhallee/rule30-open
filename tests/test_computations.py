@@ -1273,6 +1273,7 @@ def test_space_time_periodic() -> None:
     found = {period: {length for length, _, _ in stp.backgrounds(period)} for period in (9, 10, 11, 12)}
     assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11] and {60, 138} <= found[12]
     assert stp.witnesses(8) == {("01", 2), ("0001", 4)} and stp.witnesses(12) == {("01", 2), ("000101", 6), ("001011", 6)}
+    assert stp.background_walls(10, 16) == [(30, 30, 0), (90, 85, 0), (155, 150, 60)]
     # the witness for 0001, run directly: on the ring of the background, a column repeats 0001 with period 4 while the
     # column left of it takes both values at one phase of it
     nodes, label = stp.cycles(8)  # (c,), (c,)

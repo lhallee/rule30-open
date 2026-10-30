@@ -63,6 +63,13 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   block (`witnesses`). For $0001$ this settles what [Jen's farther
   columns](../../negative-results/columns/jen-farther-columns.md) found at widths 6 to 12: the game fails at every
   width.
+- **Seeding with the background does not find the walls.** Closing the background's own window right of a column,
+  rather than a driven half's, gives a trap only on two backgrounds at width 16: at 60 of the 150 columns of period 10
+  of the background of 155 cells (70 at width 24), and at 36 of the 135 of period 12 of the one of 138 (42 at 24). It
+  gives none on the backgrounds of 143 and 275 cells at period 11 or of 689 at 13, which the traps found by sampling
+  have as theirs, nor on the others of periods 8 to 13, nor on that of 135 cells at period 9 even at 43 cells, the
+  width of its wall (`background_walls`). The walls are closures of windows where a background meets an irregular
+  right side, not of the background itself.
 
 ## What it means
 
@@ -79,6 +86,7 @@ backgrounds of periods 5 to 7 show that having a background is not enough.
 ```bash
 python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10,11,12,13,14 --table
 python -m computations.space_time_periodic 4,8,10,12,14 --witnesses
+python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16
 ```
 
 Each lists the backgrounds by squaring the map on $4^P$ pairs: under a minute to period 13, and period 14 in about two

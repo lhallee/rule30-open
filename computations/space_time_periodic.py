@@ -12,6 +12,7 @@ every cycle for a given period, by repeated squaring of the map, and the blocks 
     python -m computations.space_time_periodic 14   # about two minutes and 6 GB
     python -m computations.space_time_periodic 8,10,12,14 --witnesses   # blocks whose game fails at every width
     python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10,11,12,13,14 --table   # the finding's table
+    python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16   # walls the backgrounds seed, a minute
 """
 
 from __future__ import annotations
@@ -141,6 +142,44 @@ def witnesses(period: int) -> set[tuple[str, int]]:
     return found
 
 
+def background_walls(period: int, cells: int, cap: int = 100000) -> list[tuple[int, int, int]]:
+    """For each background of `period` and each of its columns whose block has least period `period`: whether the
+    background's own window of `cells` cells right of that column, closed under both values of the cell beyond
+    (`lock_chain.closure`), fixes column 1 at the white phases, a trap whose chain to the left is the background: a wall
+    at its edge. Returns, for each background up to a shift in time that has such columns, its spatial period, the
+    number of those columns, and how many of them carry a wall."""
+    from computations.lock_chain import closure, escapes, fixes_left
+    nodes, label = cycles(period)  # (c,), (c,)
+    f = column_map(period)  # (4^P,)
+    mask = (1 << period) - 1
+    found = []
+    for length, count, blocks in backgrounds(period):
+        if not blocks:
+            continue
+        lab = next(int(lab) for lab in set(label.tolist()) if (label == lab).sum() == length and
+                   necklace(word_of(lab >> period, period)) in blocks | {necklace(word_of(lab >> period, period))}
+                   and {necklace(word_of(int(st) >> period, period)) for st in nodes[label == lab]
+                        if least_period(word_of(int(st) >> period, period)) == period} == blocks)
+        states = [lab]
+        while (nxt := int(f[states[-1]])) != lab:
+            states.append(nxt)
+        columns = [state >> period for state in states]  # column at position -k is columns[k]
+        size = len(columns)
+        positions = walls = 0
+        for k in tqdm(range(size), desc=f"background of {size} cells", file=sys.stderr, leave=False):
+            word = word_of(columns[k], period)
+            if least_period(word) != period:
+                continue
+            positions += 1
+            window = sum(((columns[(k - i) % size] >> 0) & 1) << (i - 1) for i in range(1, cells + 1))
+            if escapes(word, period, cells, 0, window):
+                continue
+            trap = closure(word, period, cells, 0, window, cap, locked=True)
+            walls += trap is not None and fixes_left(word, trap)
+        found.append((size, positions, walls))
+    return found
+
+
 def ring_period(cells: list[int], limit: int) -> int | None:
     """The least number of steps, up to `limit`, after which the ring of cells returns to itself under Rule 30, a
     direct run, or None."""
@@ -158,7 +197,13 @@ def main() -> None:
     parser.add_argument("periods", type=str, help="temporal periods, comma separated")
     parser.add_argument("--witnesses", action="store_true", help="the blocks each period's backgrounds witness")
     parser.add_argument("--table", action="store_true", help="a markdown table of the backgrounds of each period")
+    parser.add_argument("--walls", type=int, default=0, help="with a width, the walls seeded by each background")
     args = parser.parse_args()
+    if args.walls:
+        for period in [int(p) for p in args.periods.split(",")]:
+            print(f"period {period}, width {args.walls}: (spatial period, columns of the period, walls) "
+                  f"{background_walls(period, args.walls)}", flush=True)
+        return
     if args.table:
         print("| Period | Backgrounds | Of exactly this period, by spatial period | Blocks among their columns |")
         print("|---:|---:|---|---:|")
@@ -172,9 +217,11 @@ def main() -> None:
             continue
         found = backgrounds(period)
         blocks = set().union(*(b for _, _, b in found))
-        print(f"period {period}: {sum(count for _, count, _ in found)} cycles in {len(found)} backgrounds up to a shift "
-              f"in time, of spatial periods {[length for length, _, _ in found]}; {len(blocks)} blocks of least period "
-              f"{period} appear as columns", flush=True)
+        lengths = [length for length, _, _ in found]
+        cycle_count = sum(count for _, count, _ in found)
+        print(f"period {period}: {cycle_count} cycles in {len(found)} backgrounds up to a shift "
+              f"in time, of spatial periods {lengths}; {len(blocks)} blocks of least period {period} appear as "
+              f"columns", flush=True)
         for length, count, b in found:
             if b:
                 print(f"  spatial period {length} ({count} shifts): {len(b)} blocks: {' '.join(sorted(b))}", flush=True)
