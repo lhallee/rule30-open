@@ -64,9 +64,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     in [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October
     30 and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at
     least 17, and four more families with long white runs ([the kit's pull
-    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). - *Where it stops.*
-    The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and every exclusion rests
-    on a run of five or more equal values; most blocks do not lock the right half
+    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
+  - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
+    every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
