@@ -259,6 +259,34 @@ def forced_entry(word: str, member: np.ndarray) -> np.ndarray:
     return forced  # (period, 2^W)
 
 
+# The certificates that `Rule30Open.Columns.PeriodFourCertificate` checks: the word and the width.
+CERTIFICATES = [("0001", 16), ("0011", 14), ("0111", 14)]
+
+
+def certificate_tables(word: str, width: int) -> dict:
+    """The `jen` certificate of the word at this width as a labelled trap of `lock_chain.relabeled_tables`: the
+    nonempty greatest invariant sets of the assignments of column 1 at the white phases, which must be exactly one."""
+    from computations import lock_chain
+    found = []
+    for seed in jen_seeds(word):
+        member, _ = greatest_invariant_set(word, seed, width)  # (period, 2^W)
+        if member.any():
+            found.append({(ph, int(w)) for ph in range(len(word)) for w in np.flatnonzero(member[ph])})
+    assert len(found) == 1, "one assignment of the white phases carries the certificate"
+    return lock_chain.relabeled_tables(word, width, found[0])
+
+
+def lean_certificates() -> str:
+    """The trap entries of `Rule30Open.Columns.PeriodFourCertificate`, with their kernel checks."""
+    from computations import lock_chain
+    out = []
+    for word, width in CERTIFICATES:
+        name = f"cert{word}"
+        out.append(lock_chain.lean_entry(certificate_tables(word, width), name)
+                   + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n")
+    return "\n".join(out)
+
+
 def entry_time(word: str, member: np.ndarray, start: int, steps: int) -> int | None:
     """The first time before `steps` at which the window of the right half `start` lies in the set of its phase."""
     # member: (period, 2^W)
@@ -271,7 +299,8 @@ def entry_time(word: str, member: np.ndarray, start: int, steps: int) -> int | N
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("word")
+    parser.add_argument("word", nargs="?", default="")
+    parser.add_argument("--lean", action="store_true", help="print the traps of PeriodFourCertificate.lean")
     parser.add_argument("--widths", type=int, nargs="+", default=[14, 16], help="widths of the invariant set")
     parser.add_argument("--steps", type=int, default=20000)
     parser.add_argument("--burn", type=int, default=1000, help="tables and hulls read times burn .. steps - 1")
@@ -281,6 +310,9 @@ def main() -> None:
     parser.add_argument("--lattice-width", type=int, default=120)
     parser.add_argument("--entry-steps", type=int, default=6000)
     args = parser.parse_args()
+    if args.lean:
+        print(lean_certificates())
+        return
 
     word, period = args.word, len(args.word)
     starts = random_starts(30, 64)

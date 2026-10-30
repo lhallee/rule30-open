@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-54 Lean modules with 267 headline theorems, 25 findings (proved on paper,
+55 Lean modules with 273 headline theorems, 25 findings (proved on paper,
 computed or conjectured) and 31 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 41 | 12 | 8 |
+| [Columns](#columns) | 42 | 12 | 8 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -35,7 +35,6 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
-- [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 
@@ -49,6 +48,7 @@ approach stopped.
 - [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md): problem 1
 - [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md): problem 1
 - [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md): problem 1
+- [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
 - [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
@@ -126,6 +126,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [An eventual period of the center column needs T + P of at least 65,518](Rule30Open/Columns/LongWindow.md) | [`Columns.LongWindow`](Rule30Open/Columns/LongWindow.lean) | `center_eq_big`, `factor_new`, `transient_add_period_ge_65518` | 1 | extends a kit result |
 | [Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter](Rule30Open/Columns/NineTraps.md) | [`Columns.NineTraps`](Rule30Open/Columns/NineTraps.lean) | `nineTraps_check`, `nineTraps_blocks`, `nine_absorption_excludes`, `trap001010011_check`, `not_eventually_001010011_of_absorption` | 1 | not in the kit |
 | [Right halves white on their first 91,129 to 201,172 cells enter the walls of period 9](Rule30Open/Columns/NineWhite.md) | [`Columns.NineWhite`](Rule30Open/Columns/NineWhite.lean) | `highRightW_of_entry`, `white_first_wall`, `white_first_wall_eight`, `white_second_wall`, `white_second_wall_zero` | 1 | not in the kit |
+| [The period-four certificates are traps, and entry into one excludes its word](Rule30Open/Columns/PeriodFourCertificate.md) | [`Columns.PeriodFourCertificate`](Rule30Open/Columns/PeriodFourCertificate.lean) | `cert0001_check`, `cert0011_check`, `cert0111_check`, `not_eventually_0001_of_certificate`, `not_eventually_0011_of_certificate`, `not_eventually_0111_of_certificate` | 1 | not in the kit |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |
 | [A right half with at most two black cells among its first cells enters the ether-and-wall family](Rule30Open/Columns/SparseRight.md) | [`Columns.SparseRight`](Rule30Open/Columns/SparseRight.lean) | `inFamily_of_fast`, `stateAt_eq`, `two_absorption`, `sparse_0001`, `sparse_0011`, `sparse_0111`, `oneCell_0011`, `oneCell_0111`, `sparseRight_0001`, `sparseRight_0011`, `sparseRight_0111` | 1 | extends a kit result |
 | [A right half white past its first ten cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TenCells.md) | [`Columns.TenCells`](Rule30Open/Columns/TenCells.lean) | `ten_absorption`, `ten_0001`, `ten_0011`, `ten_0111`, `tenRight_0001`, `tenRight_0011`, `tenRight_0111`, `smallTen_0001`, `smallTen_0011`, `smallTen_0111` | 1 | extends a kit result |
@@ -149,7 +150,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
 | [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md) | computed | 1 | partial |
-| [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | wanted |
+| [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | partial |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |
 | [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md) | computed | 1 | partial |

@@ -97,7 +97,8 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
   truncation of the aligned ether, the only infinite half seen to stay out, followed by at most six cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md) for four, [EtherPrefixSix](Rule30Open/Columns/EtherPrefixSix.md) for
-  six); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)), every
+  six); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)), in
+  Lean a trap ([PeriodFourCertificate](Rule30Open/Columns/PeriodFourCertificate.md)), every
   window can reach it, and one word of a few hundred values in column 17 forces entry ([the coin
   lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings
   every window into the family, so a center that repeats the word keeps that column off the sequence forever
@@ -242,8 +243,8 @@ In order of the assessment above.
    5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one
    statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
    block](findings/columns/left-half-every-block.md)).
-3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
-   periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
+3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
+   period-four certificate, the periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
    seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),
    [SeedPastPeriods](Rule30Open/Frames/SeedPastPeriods.md)). The 2-adic trace, the center degree
    and the Duhamel form are proved in the kit's equivalent forms, which a search should include before any formalization

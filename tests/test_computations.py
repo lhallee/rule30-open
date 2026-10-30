@@ -1866,6 +1866,27 @@ def test_edge_periods() -> None:
         assert found == periods[6]
 
 
+def test_period_four_certificate_traps() -> None:
+    """`lock_certificate.certificate_tables`: the certificates of 0001 at width 16 and of 0011 and 0111 at width 14 have
+    2,611, 1,915 and 4,898 windows, each is a lock by `lock_chain.is_lock`, a direct check with the rule, and
+    `lean_certificates` is the text of `PeriodFourCertificate.lean`."""
+    import sys
+    from computations import lock_certificate, lock_chain
+    sizes = []
+    for word, width in lock_certificate.CERTIFICATES:
+        t = lock_certificate.certificate_tables(word, width)
+        sizes.append(len(t["states"]))
+        assert t["word"] == word and lock_chain.is_lock(word, t["states"], width)
+    assert sizes == [2611, 1915, 4898]
+    lean = (ROOT / "Rule30Open" / "Columns" / "PeriodFourCertificate.lean").read_text(encoding="utf-8")
+    digits = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)
+    try:
+        assert lock_certificate.lean_certificates() in lean
+    finally:
+        sys.set_int_max_str_digits(digits)
+
+
 def test_second_nine_wall() -> None:
     """The second wall of period 9: from the random start that `NATURAL` names, a run of 001010011 is inside a closed
     set of 5,710 windows of 41 cells, with the phase modulo 27, that fixes column 1 at the white phases, by `is_lock`;

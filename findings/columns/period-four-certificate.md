@@ -3,7 +3,7 @@ title: A width-16 window certifies the period-four lock from most starts
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/lock_certificate.py]
 ---
 
@@ -14,7 +14,9 @@ states of columns 1 to $W$, one set per phase) that the driven rule never leaves
 does, and on which column 1 at the white times is fixed. A right half whose window ever enters the set locks for good,
 as [the locking conjecture](period-four-locking.md) needs. The set exists from $W = 16$ for $0001$ and from $W = 14$ for
 $0011$ and $0111$, and 29 or 30 of 31 sample starts enter it at $W = 16$. That every finite right half enters it
-(attraction) is not proved, and with a free beyond cell the window alone does not force entry at any width tried.
+(attraction) is not proved, and with a free beyond cell the window alone does not force entry at any width tried. In
+Lean the three sets are checked as traps, each reducing its word to entry
+([PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md)).
 
 ## Setting
 

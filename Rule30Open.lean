@@ -45,6 +45,7 @@ public import Rule30Open.Columns.LeftHalfDriven
 public import Rule30Open.Columns.WordTraps
 public import Rule30Open.Columns.NineTraps
 public import Rule30Open.Columns.NineWhite
+public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
