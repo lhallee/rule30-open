@@ -129,13 +129,13 @@ None of the following is refereed, and the prize site lists no winner.
   `Rule30ArbitraryWhitePadding` and `Rule30WhitePaddingMixtures` (a center column cannot eventually repeat a block
   followed by enough white cells, with a threshold exponential in the block's length), `Rule30AgedLeftDiagonals`,
   `Rule30FrozenRuler` and `Rule30EdgeStaircases` (structure near the two edges of the pattern),
-  `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. Its 21 open pull requests claim more, among them a Lean
-  proof that the ether-and-wall family cannot give period two (#39), exclusions of every eventual period whose white
-  runs are all long (#36, #43), and $\log\log$ margins for runs of the center column (#46); they are summarized, by
-  route, in [kit-pull-requests.md](kit-pull-requests.md). The kit's own status table puts least period 4 at its open
-  `Absorption`, period 2 at the open Q01, and any eventual period at $T + P \ge 16{,}359$. *Here:* the repository is
-  pinned at the kit's commit 932cf8d, so the merged modules count as kit results; an open pull request counts as a
-  claim. [The roadmap](../ROADMAP.md) tracks where they meet the routes here, and [a window of 65,536
+  `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. On October 30 its 23 open pull requests claim more,
+  among them a Lean proof that the ether-and-wall family cannot give period two (#39), exclusions of every eventual
+  period whose white runs are all long (#36, #43), and $\log\log$ margins for runs of the center column (#46); they are
+  summarized, by route, in [kit-pull-requests.md](kit-pull-requests.md). The kit's own status table puts least period 4
+  at its open `Absorption`, period 2 at the open Q01, and any eventual period at $T + P \ge 16{,}359$. *Here:* the
+  repository is pinned at the kit's commit 932cf8d, so the merged modules count as kit results; an open pull request
+  counts as a claim. [The roadmap](../ROADMAP.md) tracks where they meet the routes here, and [a window of 65,536
   cells](../Rule30Open/Columns/LongWindow.md) raises the last bound to $T + P \ge 65{,}518$.
 - Faster simulation of the whole pattern, and Boolean functions computed by Rule 30's orbits, are in
   [complexity.md](complexity.md). Results proposed by AI systems outside the prize are in

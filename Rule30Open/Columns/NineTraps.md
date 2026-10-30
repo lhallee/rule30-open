@@ -50,11 +50,12 @@ block that the carrying does not reach.
    in [computations/lock_chain.py](../../computations/lock_chain.py), as in [lock
    chains](../../findings/columns/lock-chains.md)). The kernel checks all 21 at once (`nineTraps_check`), so the
    carrying is not trusted.
-3. **The background.** From distance 10 the carried columns repeat with spatial period 135, every one a block of period
-   9: 13 distinct blocks, from $000001101$ to $011101111$. It is a background of period 9 as the kit's ether is one of
-   period 4, and the chain of $0\,1^8$, which has no lock, enters the same one from distance 8. The blocks at distances
-   0 to 9 lie between the wall and the background. Beyond distance 21 the chain holds no block of period 9 that is not
-   already in the list.
+3. **The background.** From distance 10 each carried column is the one 15 places right of it, shifted by 8 steps in
+   time, so the columns repeat exactly with spatial period 135, every one a block of period 9: 13 distinct blocks, from
+   $000001101$ to $011101111$, each recurring every 15 columns. It is a background of period 9 as the kit's ether is one
+   of period 4, and the chain of $0\,1^8$, which has no lock, enters the same one from distance 8. The blocks at
+   distances 0 to 9 lie between the wall and the background. Beyond distance 21 the chain holds no block of period 9
+   that is not already in the list.
 4. **The reduction** is [WordTraps](WordTraps.md)'s `absorption_excludes` for each member of the list.
 5. **The second wall.** A right half driven by $001010011$ locks column 1 with period 27, three times the block's. The
    closure of its true window at step 12,000, with labels modulo 27, is a trap from width 41 on; at widths 16 to 40
@@ -65,16 +66,20 @@ block that the carrying does not reach.
 ## What it covers
 
 Each trap reduces its block to entry, the route of the kit's `t001` for $001$, and unlike the traps of
-[WordTraps](WordTraps.md) for other periods, these are entered. Of the right halves with support in cells 1 to 8,
-driven from each of the 9 phases, 247 of 2,304 enter `trap001011111` within 50,000 steps, a median of 17,403 steps in
-and the latest at 49,425, and 167 enter `trap001010011`, a median of 33,653 steps in and the latest at 49,797, so for
-both walls entries are still coming at the end; of 31 random halves of 64 cells, the traps at distances 0 to 6 and 16
-are each entered by one or two within 20,000 steps ([trap entry](../../negative-results/columns/trap-entry.md)). The
-white right half does not enter `trap001011111` within 100,000 steps from any phase, and its column 1 does not repeat
-at the white times over steps 30,000 to 60,000, so entry for every finite half has only partial support. Entry under
-$001$ into the kit's `t001` is faster: about 91% of the halves of up to ten cells by step 50,000 ([the census for
-001](../../findings/columns/t001-census.md)). The other 34 blocks of period 9 have no trap found. Entry for every
-finite right half stays open, as for the kit's traps.
+[WordTraps](WordTraps.md) for other periods, these are entered. Of the right halves with support in cells 1 to 8, driven
+from each of the 9 phases, 247 of 2,304 enter `trap001011111` within 50,000 steps, a median of 17,403 steps in and the
+latest at 49,425, and 167 enter `trap001010011`, a median of 33,653 steps in and the latest at 49,797, so for both walls
+entries are still coming at the end; of 31 random halves of 64 cells, the traps at distances 0 to 6 and 16 are each
+entered by one or two within 20,000 steps, and of 301 halves, the 67 whose column 1 locks under a block of period 9 are
+all inside traps ([trap entry](../../negative-results/columns/trap-entry.md)). The white right half enters both walls,
+but late. Its runs from two phases coincide when the center reads white at the first (the half is still white a step
+later), so the 9 phases give 6 runs under $001011111$ and 4 under $001010011$. Under $001011111$ two of the six enter,
+at step 119,947 from phase 2 and at step 201,129 from phase 8, and the other four stay out for 1,000,000 steps; under
+$001010011$ three of the four enter, at steps 91,086 from phase 7, 169,098 from phase 2 and 659,740 from phase 4, and
+the run from phase 8 stays out. So entry for every finite half has only partial support. Entry under $001$ into the
+kit's `t001` is faster: about 91% of the halves of up to ten cells by step 50,000 ([the census for
+001](../../findings/columns/t001-census.md)). The other 34 blocks of period 9 have no trap found. Entry for every finite
+right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

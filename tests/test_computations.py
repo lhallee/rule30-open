@@ -1724,7 +1724,8 @@ def test_period_nine_wall() -> None:
     233 windows of 43 cells, with the phase modulo 9, that fixes column 1 at the white phases, and enters it at step
     6,084 by a direct run with `step`; its chain holds 21 blocks of period 9 at the distances `nine_distances` gives and
     repeats from distance 10 with spatial period 135 in the background that the chain of 0 1^8 enters, columns of the
-    two cycles agreeing as sets; and the trap carried to distance 16 is a lock by `is_lock`."""
+    two cycles agreeing as sets, each column there being the one 15 places right of it shifted by 8 steps; and the trap
+    carried to distance 16 is a lock by `is_lock`."""
     from computations import lock_chain, right_half
     name, word, start, time, cells, modulus = lock_chain.NATURAL[0]
     assert start == right_half.random_starts(30, 64)[13]
@@ -1744,8 +1745,62 @@ def test_period_nine_wall() -> None:
     begin, cycle = lock_chain.chain_cycle(word, values)
     begin8, cycle8 = lock_chain.chain_cycle("011111111", "0" * 9)
     assert (begin, len(cycle), begin8, len(cycle8)) == (10, 135, 8, 135) and set(cycle) == set(cycle8)
+    columns = lock_chain.chain(word, values, 160)
+    assert all(columns[d + 15] == columns[d][8:] + columns[d][:8] for d in range(10, 145))
     t16 = lock_chain.carried(name, 16)
     assert t16["word"] == "000101011" and lock_chain.is_lock(t16["word"], t16["states"], t16["cells"])
+
+
+def test_white_lock() -> None:
+    """`lock_chain.white_lock`: the white right half driven by 001 locks column 1 with period 21 from every phase and is
+    then inside a trap of 815 windows of 47 cells modulo 21, the size of the kit's `t001`; driven by 0001 from phase 0 it
+    locks with period 4 inside 109 windows of 16 cells; driven by 01 it does not lock within 20,000 steps; and for 001
+    from phase 1 column 1 computed by `step` repeats with period 21 at the white times over the second half."""
+    from computations import lock_chain
+    for phase in range(3):
+        lock, last, trap = lock_chain.white_lock("001", phase, 20000)
+        assert lock == 21 and last < 1000 and trap is not None and trap[1:] == (47, 21, 815)
+    lock, _, trap = lock_chain.white_lock("0001", 0, 20000)
+    assert lock == 4 and trap is not None and trap[1:] == (16, 4, 109)
+    assert lock_chain.white_lock("01", 0, 20000) == (0, None, None)
+    turned, row, column = "010", 0, []
+    for t in range(20000):
+        row = (row & ~1) | int(turned[t % 3])
+        column.append((row >> 1) & 1)
+        row = step(row)
+    assert all(column[t] == column[t + 21] for t in range(10000, 20000 - 21) if turned[t % 3] == "0")
+
+
+def test_period_two_fourteen() -> None:
+    """A second trap for 01: the random start that `NATURAL` names, driven by 01, is at step 12,000 inside the closure
+    of its window of 31 cells with the phase modulo 14, 225 states that fix column 1 at the white phases, and none of
+    29 or 30 cells is a trap; the same states, up to the labels, are the 6-cell lock of 0^4 1 0 1^8, of period 14,
+    carried 25 columns by `chain_lock`, a lock by `is_lock`; and its column 1 at the white phases has black values
+    two white phases apart."""
+    from computations import lock_chain, right_half
+    name, word, start, time, cells, modulus = lock_chain.NATURAL[2]
+    assert start == right_half.random_starts(300, 64)[79]
+    assert lock_chain.natural_trap(word, start, [time], list(range(29, 32)), [modulus]) == (time, 31, 14, 225)
+    block, nodes = lock_chain.chain_lock("00001011111111", 6, 25)
+    assert lock_chain.necklace(block[:2]) == "01" and len(nodes) == 225 and lock_chain.is_lock(block, nodes, 31)
+    t = lock_chain.tables(name)
+    windows = {window for _, window in t["states"]}
+    assert windows == {window for _, window in nodes}
+    gate = [(t["first"] >> label) & 1 for label in range(0, 14, 2)]  # column 1 at the white labels
+    blacks = [i for i, bit in enumerate(gate) if bit]
+    assert any((b - a) % 7 == 2 for a in blacks for b in blacks)
+
+
+def test_coin_entry() -> None:
+    """`lock_chain.coin_entry`: the halves and phases with support in cells 1 to 8 whose windows are already inside
+    `trap001011` when the coin takes over at step 200 are exactly those that `entry_steps`, with the rule throughout,
+    finds inside by step 200, and with the coin no other enters within 2,000 steps."""
+    from computations import lock_chain
+    coin = lock_chain.coin_entry("trap001011", 8, 200, 2000)  # (1536,)
+    real = np.concatenate([lock_chain.entry_steps("trap001011", list(range(256)), phase, 201)
+                           for phase in range(6)])  # (1536,)
+    assert set(np.flatnonzero(coin == 0).tolist()) == set(np.flatnonzero(real >= 0).tolist())
+    assert (coin == 0).sum() == 10 and (coin > 0).sum() == 0
 
 
 def test_second_nine_wall() -> None:

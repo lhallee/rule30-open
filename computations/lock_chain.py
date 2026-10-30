@@ -13,7 +13,10 @@ among the blocks with a locked node and places every such block in the chain of 
 of windows beside a column that repeats 0 1^(P-1), from the wall that a long run of 1s leaves, and reports the cell
 beside the column at each white phase. `short_scan` follows the chains of many seeds for columns of a shorter period,
 `chain_lock` builds the lock such a column gets, `is_lock` checks it with the rule on whole windows, and `lean_trap`
-writes it as a trap of `Rule30Open.Columns.WordTraps`.
+writes it as a trap of `Rule30Open.Columns.WordTraps`. `natural_trap` finds the trap a driven right half has entered,
+as the closure of its true window at the least width that works; `entry_steps` measures entry into a trap by the
+rule's own halves, `coin_entry` with a fair coin in place of the cells beyond the window, and `white_lock` asks
+whether the white right half settles.
 
     python -m computations.lock_chain --chain 8,9,10,11,12,13 --depth 12   # the chains of 0 1^(P-1), 15 s
     python -m computations.lock_chain --classify 4,8,10,11,12 --width 13 --workers 3   # every lock's seed, about 2 min
@@ -24,6 +27,10 @@ writes it as a trap of `Rule30Open.Columns.WordTraps`.
     python -m computations.lock_chain --short 24,27,30 --width 5 --rest 15 --depth 3000 --workers 4   # long-run seeds
     python -m computations.lock_chain --entry trap001011,trap001011101 --cells 8 --steps 50000   # entry by small halves
     python -m computations.lock_chain --natural 3,5,6,7,9 --steps 20000   # traps that driven halves enter
+    python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000 --starts 300 --workers 3   # 301 halves
+    python -m computations.lock_chain --entry trap001011111,trap001010011 --cells 0 --steps 1000000   # the white half
+    python -m computations.lock_chain --entry trap001011111 --cells 8 --steps 500000 --sample 100   # a long sample
+    python -m computations.lock_chain --coin trap001011,trap0011101,trap001011111 --cells 8 --steps 50000   # a coin
     python -m computations.lock_chain --lean   # the trap entries of WordTraps and NineTraps
 """
 
@@ -345,11 +352,13 @@ def carried(name: str, distance: int) -> dict:
     return relabeled_tables(columns[distance], distance + cells, nodes)
 
 
-# Natural traps that `Rule30Open.Columns.WordTraps` and `Rule30Open.Columns.NineTraps` check: name, word, a right half
-# that a run of the word drives into the trap (bit i is column i + 1; `right_half.random_starts(30, 64)[13]` and
-# `[2]`), the time, the width and the modulus.
+# Natural traps: name, word, a right half that a run of the word drives into the trap (bit i is column i + 1;
+# `right_half.random_starts(300, 64)[13]`, `[2]` and `[79]`), the time, the width and the modulus. The first is checked
+# in `Rule30Open.Columns.WordTraps`, the second in `Rule30Open.Columns.NineTraps`; the third, a second trap for 01, is
+# the chain of the lock of 0^4 1 0 1^8 (`test_period_two_fourteen`).
 NATURAL = [("trap001011111", "001011111", 18202347099481127113, 12000, 43, 9),
-           ("trap001010011", "001010011", 12828593127923856452, 12000, 41, 27)]
+           ("trap001010011", "001010011", 12828593127923856452, 12000, 41, 27),
+           ("trap01fourteen", "01", 18368822234183756340, 12000, 31, 14)]
 
 
 def tables(name: str) -> dict:
@@ -450,6 +459,43 @@ def entry_steps(name: str | dict, halves: list[int], phase: int, steps: int) -> 
     return entry  # (n,)
 
 
+def coin_entry(name: str, support: int, start: int, steps: int, seed: int = 30) -> np.ndarray:
+    """Entry into a trap of `TRAPS` or `NATURAL` with a fair coin beyond the window. Every right half with support in
+    cells 1 .. `support`, driven by the trap's block from each phase, is run by the rule for `start` steps; from then on
+    only its first cells, as many as the trap is wide, are kept, and the cell beyond them is a fair coin flipped at
+    every step. Returns, in the order of `entry_steps` (phase by phase, then half), the first step after `start` at
+    which the window is a state of the trap at its phase, or -1. The trap must be at most 63 cells wide."""
+    word, cells, states = trap_states(name)
+    period = len(word)
+    assert cells < 64
+    mask, top, one = np.uint64((1 << cells) - 1), np.uint64(cells - 1), np.uint64(1)
+    members = [np.array(sorted(w for ph, w in states if ph == q), dtype=np.uint64) for q in range(period)]
+    rng = np.random.default_rng(seed)
+    times = []
+    for phase in range(period):
+        windows = []
+        for half in range(1 << support):
+            row = half
+            for t in range(start):
+                row = ((row << 1) | int(word[(t + phase) % period])) ^ (row | (row >> 1))
+            windows.append(row & ((1 << cells) - 1))
+        w = np.array(windows, dtype=np.uint64)  # (n,)
+        entry = np.full(len(w), -1, dtype=np.int64)  # (n,)
+        alive = np.arange(len(w))  # (m,), the halves not yet inside
+        for t in range(steps):
+            q = (start + phase + t) % period
+            hit = np.isin(w[alive], members[q])  # (m,)
+            entry[alive[hit]] = t
+            alive = alive[~hit]
+            if alive.size == 0:
+                break
+            x = w[alive]  # (m,)
+            coins = rng.integers(0, 2, alive.size).astype(np.uint64)  # (m,)
+            w[alive] = (((x << one) | np.uint64(int(word[q]))) ^ (x | (x >> one) | (coins << top))) & mask
+        times.append(entry)
+    return np.concatenate(times)  # (period * 2 ** support,)
+
+
 def closure(word: str, modulus: int, cells: int, phase: int, window: int, cap: int,
             locked: bool = False) -> set[tuple[int, int]] | None:
     """The nodes (phase modulo `modulus`, window of `cells` cells) that the game of `word` reaches from one node under
@@ -533,11 +579,36 @@ def natural_scan(word: str, steps: int, starts: int = 30) -> tuple[int, list[tup
         if period is None:
             continue
         locks += 1
-        late = [steps * 3 // 5, steps * 4 // 5, steps - 1]
-        hit = natural_trap(word, start, late, list(range(16, 65)), [period, 2 * period])
+        # a half inside a trap keeps column 1 at the white times forever, so a later change rules out the checkpoints
+        # before it
+        last, _, _ = right_half.lock_breaks(word, start, 3 * steps, 2 * period, 0)
+        late = [t for t in (steps * 3 // 5, steps * 4 // 5, steps - 1) if t > last]
+        hit = natural_trap(word, start, late, list(range(16, 65)), [period, 2 * period]) if late else None
         if hit is not None:
             found.append((k, *hit))
     return locks, found
+
+
+def white_lock(word: str, phase: int, steps: int) -> tuple[int, int | None, tuple[int, int, int, int] | None]:
+    """The white right half driven by `word` from `phase` (the center reads `word[phase]` at step 0): the period with
+    which column 1, read at the word's white times, repeats over the second half of `steps` steps (0 if it does not),
+    and if it does, the step of its last change before that half and the natural trap it is in at three late steps,
+    as `natural_trap` returns it."""
+    from computations import right_half
+    turned = word[phase:] + word[:phase]
+    period = right_half.locked_period(turned, 0, steps)
+    if period is None:
+        return 0, None, None
+    last, _, _ = right_half.lock_breaks(turned, 0, steps // 2, period, 0)
+    later, _, _ = right_half.lock_breaks(turned, 0, 3 * steps // 2, 2 * period, 0)  # a trap keeps the lock forever
+    late = [t for t in (steps * 3 // 5, steps * 4 // 5, steps - 1) if t > later]
+    return period, last, natural_trap(turned, 0, late, list(range(16, 65)), [period, 2 * period]) if late else None
+
+
+def white_scan(item: tuple[str, int], steps: int) -> tuple[str, int, int, int | None, tuple | None]:
+    """`white_lock` for one (word, phase), as (word, phase, period, last change, trap)."""
+    word, phase = item
+    return (word, phase, *white_lock(word, phase, steps))
 
 
 def ether_from(seed: str, values: str, distance: int, count: int) -> bool:
@@ -651,9 +722,15 @@ def main() -> None:
     parser.add_argument("--entry", type=str, default="", help="traps whose entry by small right halves to measure")
     parser.add_argument("--cells", type=int, default=8, help="with --entry, every half with support in these cells")
     parser.add_argument("--steps", type=int, default=50000)
+    parser.add_argument("--sample", type=int, default=0, help="with --entry, this many random pairs of a half and a "
+                        "phase instead of all")
     parser.add_argument("--natural", type=str, default="", help="periods whose words to search for natural traps")
     parser.add_argument("--starts", type=int, default=30, help="with --natural, random right halves besides the empty "
                         "one")
+    parser.add_argument("--coin", type=str, default="", help="traps whose entry to measure with a fair coin beyond "
+                        "the window, from the small halves' windows at step 200")
+    parser.add_argument("--white", type=str, default="", help="periods whose words drive the white right half, "
+                        "from every phase, to look for a lock of column 1 and its trap")
     parser.add_argument("--nine", action="store_true", help="entry of the 31 starts into each trap of period 9")
     parser.add_argument("--width", type=int, default=13)
     parser.add_argument("--workers", type=int, default=1)
@@ -714,11 +791,23 @@ def main() -> None:
     for name in [n for n in args.entry.split(",") if n]:
         word, cells, _ = trap_states(name)
         halves = list(range(1 << args.cells))
-        times = np.concatenate([entry_steps(name, halves, phase, args.steps) for phase in range(len(word))])  # (n,)
+        if args.sample:  # a random sample of the pairs (half, phase), the same for every trap of the period
+            picks = np.random.default_rng(30).choice(len(halves) * len(word), args.sample, replace=False)  # (s,)
+            chosen = [[halves[k % len(halves)] for k in picks.tolist() if k // len(halves) == phase]
+                      for phase in range(len(word))]
+            what = "sampled halves and phases"
+        else:
+            chosen, what = [halves] * len(word), "halves and phases"
+        times = np.concatenate([entry_steps(name, chosen[phase], phase, args.steps)
+                                for phase in range(len(word)) if chosen[phase]])  # (n,)
         done = times[times >= 0]  # (k,)
-        summary = f", median {int(np.median(done))}, latest {int(done.max())}" if done.size else ""
-        print(f"{name} ({word}, {cells} cells): {done.size} of {times.size} halves and phases with support in cells "
+        summary = (f", median {int(np.median(done))}, latest {int(done.max())}; by step: "
+                   + ", ".join(f"{int((done < s).sum())} by {s}" for s in (50000, 100000, 200000, 500000)
+                               if s <= args.steps)) if done.size else ""
+        print(f"{name} ({word}, {cells} cells): {done.size} of {times.size} {what} with support in cells "
               f"1 .. {args.cells} enter by step {args.steps}{summary}", flush=True)
+        if len(halves) == 1 and not args.sample:  # the white half alone: the step from each phase
+            print("  by phase: " + ", ".join(f"{phase}: {int(t)}" for phase, t in enumerate(times)), flush=True)
     for period in [int(p) for p in args.natural.split(",") if p]:
         words = game.necklaces(period)
         scan = functools.partial(natural_scan, steps=args.steps, starts=args.starts)
@@ -730,6 +819,27 @@ def main() -> None:
                     print(f"{word}: column 1 locks for {locks_found} of {args.starts + 1} starts; natural traps "
                           f"{traps}", flush=True)
         print(f"period {period}: done", flush=True)
+    for name in [n for n in args.coin.split(",") if n]:
+        times = coin_entry(name, args.cells, 200, args.steps)  # (n,)
+        done = times[times >= 0]  # (k,)
+        print(f"{name}: with a fair coin beyond the window from step 200, {done.size} of {times.size} halves and "
+              f"phases with support in cells 1 .. {args.cells} enter by step {args.steps} after it"
+              + (f", median {int(np.median(done))}" if done.size else "") + "; by step: "
+              + ", ".join(f"{int((done < s).sum())} by {s}" for s in (1, 10000, 50000, 100000, 200000, 500000)
+                          if s <= args.steps), flush=True)
+    for period in [int(p) for p in args.white.split(",") if p]:
+        items = [(word, phase) for word in game.necklaces(period) for phase in range(period)]
+        scan = functools.partial(white_scan, steps=args.steps)
+        with multiprocessing.Pool(args.workers) as pool:
+            results = list(tqdm(pool.imap(scan, items), total=len(items), desc=f"white, period {period}",
+                                file=sys.stderr, mininterval=10))
+        locked = [r for r in results if r[2]]
+        for word, phase, lock, last, trap in locked:
+            print(f"{word} phase {phase}: column 1 of the white half locks with period {lock} from step {last + 1}; "
+                  f"natural trap {trap}", flush=True)
+        words = {word for word, *_ in locked}
+        print(f"period {period}: the white half locks for {len(locked)} of {len(items)} words and phases, "
+              f"{len(words)} of {len(game.necklaces(period))} words", flush=True)
     if args.nine:
         from computations import right_half
         starts = right_half.random_starts(30, 64)

@@ -225,13 +225,17 @@ In order of the assessment above.
    Lean ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has an ether and a wall like period four's: the lock of
    $001011111$, 43 cells wide, whose chain enters a background of spatial period 135, gives traps to 21 blocks of period
    9 that driven right halves enter, and a second wall, for $001010011$, a 22nd
-   ([NineTraps](Rule30Open/Columns/NineTraps.md)); at periods 5, 6 and 7 driven halves almost never settle next to the
-   center ([trap entry](negative-results/columns/trap-entry.md)). Next: entry into the traps of period 9 for every small
-   half, as [the census for 001](findings/columns/t001-census.md) does for the kit's, and their Lean proofs for classes
-   of halves as for period four; walls of other periods, found as the closure of a driven half's window, the search that
-   found this one; and for the blocks no trap reaches, the left half, one statement per block
-   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
-   block](findings/columns/left-half-every-block.md)).
+   ([NineTraps](Rule30Open/Columns/NineTraps.md)). Of 301 halves, the 67 whose column 1 locks under a word of period 9
+   are all inside traps, under 12 of these 22 blocks, and the white right half enters both walls from most phases, but
+   only after $10^5$ steps; at periods 5, 6 and 7 driven halves almost never settle next to the center, none of the 301
+   under a word of period 6 or 7, and a fair coin in place of the cells beyond the window enters the traps about as
+   often as the rule's own half does, so the traps found there are hard to reach whatever arrives from the right ([trap
+   entry](negative-results/columns/trap-entry.md)). Next: entry into the traps of period 9 over longer runs, since it
+   comes late, as [the census for 001](findings/columns/t001-census.md) does for the kit's, and their Lean proofs for
+   classes of halves as for period four; walls of other periods, found as the closure of a driven half's window, the
+   search that found these, and at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the
+   blocks no trap reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which
+   no small half meets ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
    periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
    seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),
