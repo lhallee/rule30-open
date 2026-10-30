@@ -18,35 +18,37 @@ kit's commit 932cf8d.
   columns are never both eventually periodic, and no column is eventually constant
   ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). The kit proves that Rules 90, 150 and 210 share every
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
-- **Excluding eventual periods block by block.** *Open.* Finite games, strip certificates and padding families exclude
-  specific repeating blocks: 197 of the 8,800 blocks of period at most 16, all 136 beyond the kit in Lean ([game
-  blocks](findings/columns/game-blocks.md), [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period
-  17 and 18, all but 14 in Lean ([periods 17 and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of
-  period 19 and 20, all but 26 in Lean ([periods 19 and 20](findings/columns/game-blocks-20.md)), every $1\,0^q$ with
-  $q \ge 9$, and every block followed by exponentially many white cells (the kit). Following the cells beside the column
-  after nine 1s extends the kit's long black runs to every period whose runs of nine or more 1s are separated by
-  segments that the possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at
-  most 16 that the game excludes, 616 blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and
-  $1^a 0^{2k+3} 1 0 0$ for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md) with three values per
-  cell, [WallSets](Rule30Open/Columns/WallSets.md) with sets of windows). A run of $r \ge 9$ 1s rules out every tail of
-  at most $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most
-  $4 \lfloor (b - 1)/9 \rfloor + 2$ steps, which sharpen the kit's Theorems B and D
-  ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 65{,}518$ ([a window of 65,536
-  cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim every
-  eventual period whose white runs are all at least 17, and four more families of blocks with long white runs ([the
-  kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Outside such
-  families each block needs its own certificate, and most blocks do not lock the right half
-  ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a long
-  run exist, but exclude no block the game misses up to period 20 ([forcing
-  words](negative-results/columns/forcing-words.md)). The share of blocks the game excludes falls with the period, from
-  2.7% at period 12 to 0.56% at period 20, and every exclusion rests on a run of five or more equal values. For 49 blocks
-  of period 4 to 12 that nothing excludes, 16 of them without a run of more than four, one sequence of values in column
-  14 leads every window of 13 cells into a lock, so once the center repeats the block, column 14 never reads that
-  sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block and its instances) and, by
-  computation, has entropy below one bit per step ([steerable locks](findings/columns/steerable-locks.md)); for 22 of
-  them a white run in one column suffices, as short as 27 cells in column 8
-  ([LockWhite](Rule30Open/Columns/LockWhite.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up to 18
-  cells, so no method of this kind reaches those periods ([window locks](negative-results/columns/window-locks.md)).
+- **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
+  and the share of blocks covered falls with the period.
+  - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at
+    most 16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
+    [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18, all but 14 in Lean ([periods 17
+    and 18](findings/columns/game-blocks-18.md)), and 508 of the 79,971 of period 19 and 20, all but 26 in Lean
+    ([periods 19 and 20](findings/columns/game-blocks-20.md)); the kit excludes every $1\,0^q$ with $q \ge 9$ and every
+    block followed by exponentially many white cells. After nine 1s, following the cells beside the column extends the
+    kit's long black runs to every period whose runs of nine or more 1s are separated by segments that the possible
+    windows of three cells follow: exactly the 77 blocks with nine 1s in a row of period at most 16 that the game
+    excludes, 616 blocks up to period 22, and families such as $1^a 0^b 1 0$, $1^a 0 1 1 0^c$ and $1^a 0^{2k+3} 1 0 0$
+    for every $a \ge 9$ ([WallSegments](Rule30Open/Columns/WallSegments.md),
+    [WallSets](Rule30Open/Columns/WallSets.md)). A run of $r \ge 9$ 1s rules out every tail of at most
+    $4 \lfloor r/9 \rfloor$ steps, and nine 1s and then $b$ 0s every tail of at most $4 \lfloor (b - 1)/9 \rfloor + 2$
+    steps ([WideWall](Rule30Open/Columns/WideWall.md)). Any eventual period needs $T + P \ge 65{,}518$ ([a window of
+    65,536 cells](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). Open pull requests to the kit claim
+    every eventual period whose white runs are all at least 17, and four more families with long white runs ([the
+    kit's pull requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
+  - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
+    every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
+    ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
+    long run exclude no block the game misses up to period 20 ([forcing
+    words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
+    to 18 cells, so no method of this kind reaches those periods ([window
+    locks](negative-results/columns/window-locks.md)).
+  - *Conditional.* For 49 blocks of period 4 to 12 that nothing excludes, 16 of them without a run of more than four,
+    one sequence of values in column 14 leads every window of 13 cells into a lock, so once the center repeats the
+    block, column 14 never reads that sequence (in Lean, [LockBlocks](Rule30Open/Columns/LockBlocks.md) for any block
+    and its instances) and, by computation, has entropy below one bit per step ([steerable
+    locks](findings/columns/steerable-locks.md)); for 22 of them a white run in one column suffices, as short as 27
+    cells in column 8 ([LockWhite](Rule30Open/Columns/LockWhite.md)).
 - **Least period four through the right half's lock.** *Lead.* Masked Jen excludes the three words of period four once
   every finite right half enters the kit's ether-and-wall family, the kit's open `Absorption`. Known: every right half
   of up to 20 cells enters ([the census](findings/columns/absorption-census.md)); every half white on columns 1 to 30
@@ -55,15 +57,15 @@ kit's commit 932cf8d.
   for ten, [TwelveCells](Rule30Open/Columns/TwelveCells.md) for twelve), so does every half white on columns 7 to $B$,
   whatever lies beyond, with $B$ = 316, 535 and 310 ([WhiteGap](Rule30Open/Columns/WhiteGap.md)), every half white on
   columns 11 to $G'$, with $G'$ = 562, 654 and 371 ([TenCells](Rule30Open/Columns/TenCells.md)), and every half white on
-  columns 13 to 750, 995 and 560 ([TwelveCells](Rule30Open/Columns/TwelveCells.md)), and so does every half with at most two black cells among columns 1 to
-  $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell anywhere
-  ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every truncation of
-  the aligned ether, the only infinite half seen to stay out, followed by at most four cells
+  columns 13 to 750, 995 and 560 ([TwelveCells](Rule30Open/Columns/TwelveCells.md)), and so does every half with at most
+  two black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black
+  cell anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
+  truncation of the aligned ether, the only infinite half seen to stay out, followed by at most four cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
   certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few hundred
-  values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193,
-  955 or 381 values in column 17, 15 or 14 brings every window into the family, so a center that repeats the word keeps
-  that column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at
+  values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193, 955
+  or 381 values in column 17, 15 or 14 brings every window into the family, so a center that repeats the word keeps that
+  column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at
   least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$ and
   one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
   Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the
@@ -162,14 +164,17 @@ In order of the assessment above.
    block alone, without a certificate. At periods 17 and 18 the game excludes 261 more, all with a run of at least six
    equal values, and Lean checks all but 14, which need 13 or 14 cells ([periods 17 and
    18](findings/columns/game-blocks-18.md)); periodic orbits on rings explain the game's failure only for $01$ ([ring
-   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, and Lean
-   checks all but the 26 that need 13 or 14 cells ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next: a
-   cheaper kernel form of the check for 13 and 14 cells, and steering ([steerable locks](findings/columns/steerable-locks.md)) at
-   wider windows and longer periods, the one tool here that reaches blocks without long runs, though only to a
-   condition on a farther column. Column words without long runs also fix the cell beside the column, the shortest
-   being $0110000$, but up to period 20 they exclude no block the game misses ([forcing
-   words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long runs, and a
-   typical block of large period has only short ones, so these exclusions stay thin.
+   orbits](negative-results/columns/ring-orbits.md)). At periods 19 and 20 it excludes 508 more, 327 of them new, and
+   Lean checks all but the 26 that need 13 or 14 cells ([periods 19 and 20](findings/columns/game-blocks-20.md)). Next:
+   a cheaper kernel form of the check for 13 and 14 cells, and steering ([steerable
+   locks](findings/columns/steerable-locks.md)) at wider windows and longer periods, the one tool here that reaches
+   blocks without long runs, though only to a condition on a farther column. Column words without long runs also fix the
+   cell beside the column, the shortest being $0110000$, but up to period 20 they exclude no block the game misses
+   ([forcing words](negative-results/columns/forcing-words.md)). *Assessment:* every family found so far rests on long
+   runs, and a typical block of large period has only short ones, so these exclusions stay thin. An open question with a
+   concrete form: why no window of up to 18 cells locks at periods 2, 3, 5, 6, 7 and 9, while periods 1, 4 and 8 and
+   every period from 10 to 20 have blocks with locked windows of at most 14 cells; in three families the locks appear at
+   period 8 and at every period from 10, but not at 9 ([window locks](negative-results/columns/window-locks.md)).
 3. **Findings that want a Lean proof.** The seed's past, the census beyond what SparseRight covers, the period-four
    certificate and the period-two computations ([open work](CATALOG.md#open-work)). The 2-adic trace, the center degree
    and the Duhamel form are proved in the kit's equivalent forms, which a search should include before any formalization
