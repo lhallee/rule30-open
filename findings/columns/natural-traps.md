@@ -93,7 +93,11 @@ or 7, and one start each for six blocks of period 9.
   [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)). Of the other blocks with a trap that nothing excludes,
   the 74 whose traps have at most 3,000 states have them checked as they are
   ([NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md)); every right half of up to four cells enters 61 of
-  those from every phase.
+  those from every phase. Their chains end in the backgrounds of 533 and 689 cells at period 13 and of 644, 728 and
+  1,316 at period 14. A census of every locked window of 16 cells finds 89 and 109 blocks with one, about as many as
+  the scan, but carried by their chains the locks reach 135 and 244 blocks more than all of these traps ([backgrounds
+  periodic in time](space-time-backgrounds.md), [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
+  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md)).
 
 ## What it means
 

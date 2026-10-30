@@ -1313,6 +1313,32 @@ def test_space_time_periodic() -> None:
     assert column[:4] * 4 == column and any(left[ph] != left[ph + 4] for ph in range(12))
 
 
+def test_lock_backgrounds() -> None:
+    """`lock_chain.lock_backgrounds` against `space_time_periodic`: at period 8 every locked window of 13 cells leads to
+    the kit's ether, of 7 cells, one of the backgrounds of `backgrounds(8)`, and the period of each lock's chain is a
+    cycle of `column_map`, the map built from the rule without the chain's code."""
+    from computations import lock_chain
+    from computations import space_time_periodic as stp
+
+    found = lock_chain.survey([8], 13)
+    result = lock_chain.lock_backgrounds(found)
+    assert set(result) == {8} and set(result[8]) == {7}
+    ends, reach = result[8][7]
+    assert ends == set(found) and len(ends) == 8 and len(reach) == 8
+    assert 7 in {length for length, _, _ in stp.backgrounds(8)}
+    f = stp.column_map(8)  # (4^8,)
+
+    def bits(word: str) -> int:
+        return int(word[::-1], 2)  # bit ph is the letter at phase ph
+
+    for block, entries in found.items():
+        for columns, values in entries:
+            _, cycle = lock_chain.chain_cycle(columns[-1] if columns else block, values)
+            for i in range(len(cycle)):
+                right, here, left = cycle[i], cycle[(i + 1) % len(cycle)], cycle[(i + 2) % len(cycle)]
+                assert int(f[bits(here) << 8 | bits(right)]) == bits(left) << 8 | bits(here)
+
+
 def test_bit_game() -> None:
     """The check of `BitGame` against the finite game: on every primitive block of period at most 9, at widths 5 and 6,
     it decides exactly the blocks the game excludes; and the bit tables' images and preimages agree with the game
@@ -2103,8 +2129,8 @@ def test_coverage() -> None:
     """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
     the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
     Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
-    NaturalTraps, 1 of NaturalTrapsLarge and 74 of NaturalTrapsLong, each of its period, and the steered blocks are the
-    49 entries of the LockBlocks modules."""
+    NaturalTraps, 1 of NaturalTrapsLarge, 74 of NaturalTrapsLong, 12 of FarWalls, 125 of CensusTraps13 and 232 of
+    CensusTraps14, each of its period, and the steered blocks are the 49 entries of the LockBlocks modules."""
     from collections import Counter
     from computations import coverage
     assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
@@ -2113,6 +2139,9 @@ def test_coverage() -> None:
     assert (modules["TenTraps"], modules["ElevenTraps"], modules["TwelveTraps"]) == (25, 57, 83)
     assert (modules["ThirteenTraps"], modules["FourteenTraps"]) == (53, 101)
     assert (modules["NaturalTraps"], modules["NaturalTrapsLarge"], modules["NaturalTrapsLong"]) == (34, 1, 74)
+    assert modules["FarWalls"] == 12 and all(len(b) == 12 for b, m in traps.items() if m == "FarWalls")
+    assert modules["CensusTraps13"] == 125 and all(len(b) == 13 for b, m in traps.items() if m == "CensusTraps13")
+    assert modules["CensusTraps14"] == 232 and all(len(b) == 14 for b, m in traps.items() if m == "CensusTraps14")
     assert all(len(block) == {"TenTraps": 10, "ElevenTraps": 11, "TwelveTraps": 12, "ThirteenTraps": 13,
                               "FourteenTraps": 14}.get(module, len(block))
                for block, module in traps.items())
@@ -2226,6 +2255,52 @@ def test_eleven_twelve_traps() -> None:
         background = {lock_chain.necklace(c) for c in cycle if lock_chain.least_period(c) == period}
         assert start <= 1 and len(cycle) == length
         assert background == {word for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])}
+
+
+def test_far_walls() -> None:
+    """The traps of FarWalls: each carries a wall of `WALLS` past `WALL_DEPTHS` and is a lock by `is_lock`, a direct
+    check with the rule, for its block; the blocks are distinct, none is the kit's, excluded by the game at width 6, 10
+    or 14, or a block of another trap module, and all lie in the chain of their wall, which repeats with the 60 cells of
+    its background; and `lean_far` is the text of FarWalls.lean."""
+    from computations import coverage, lock_chain
+    others = {block for block, module in coverage.trap_blocks().items() if module != "FarWalls"}
+    words = []
+    for period, entries in lock_chain.FAR_WALLS.items():
+        for name, distance in entries:
+            assert name in lock_chain.WALLS[period] and distance > lock_chain.WALL_DEPTHS[period]
+            t = lock_chain.carried(name, distance)
+            assert len(t["word"]) == period and lock_chain.is_lock(t["word"], t["states"], 16 + distance)
+            words.append(t["word"])
+    assert len(words) == len(set(words)) == 12
+    assert not set(words) & (set(game.kit_blocks(12)) | others)
+    assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
+    t = lock_chain.tables("trap001011100111")
+    values = "".join(str((t["first"] >> label) & 1) if t["word"][label] == "0" else "0" for label in range(12))
+    start, cycle = lock_chain.chain_cycle(t["word"], values)
+    assert len(cycle) == 60
+    held = {lock_chain.necklace(c) for c in lock_chain.chain(t["word"], values, start + len(cycle))}
+    assert set(words) <= held
+    lean = (ROOT / "Rule30Open" / "Columns" / "FarWalls.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_far() in lean
+
+
+def test_census_traps() -> None:
+    """The traps of CensusTraps13 and CensusTraps14: each is a bottom component of the locked windows of 16 cells of its
+    source block, carried by its chain, and a lock by `is_lock`, a direct check with the rule, for its block; the
+    blocks are distinct and none is the kit's, excluded by the game at width 6, 10 or 14, or a block of another trap
+    module; and `lean_census` is the text of the two modules."""
+    from computations import coverage, lock_chain
+    others = {block for block, module in coverage.trap_blocks().items() if not module.startswith("CensusTraps")}
+    for period, entries in lock_chain.CENSUS_TRAPS.items():
+        words = [block for block, *_ in entries]
+        assert len(words) == len(set(words)) and not set(words) & (set(game.kit_blocks(period)) | others)
+        assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
+        for entry in entries:
+            t = lock_chain.census_tables(entry)
+            assert t["word"] == entry[0] and len(t["states"]) <= 3000
+            assert lock_chain.is_lock(t["word"], t["states"], 16 + entry[3])
+        lean = (ROOT / "Rule30Open" / "Columns" / f"CensusTraps{period}.lean").read_text(encoding="utf-8")
+        assert lock_chain.lean_census(period) in lean
 
 
 def test_natural_traps() -> None:

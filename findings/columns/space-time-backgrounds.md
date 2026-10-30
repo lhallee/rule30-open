@@ -57,6 +57,30 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   within 100,000 columns. No trap found ends in the backgrounds of 4 or 80 cells at period 8, 30 or 90 at 10, or 100 at
   12, nor does a wall of period 9 end in the one of 15 cells, and at periods 5 to 7, which have backgrounds, the scan
   finds no trap at all ([trap entry](../../negative-results/columns/trap-entry.md)).
+- **Every locked window of 16 cells, by background.** Sampling finds the traps that driven halves enter; a census
+  finds every lock of a given width. For every block of periods 10 to 14, `lock_backgrounds` in
+  [computations/lock_chain.py](../../computations/lock_chain.py) takes the bottom components of its locked windows of
+  16 cells, with the phase counted modulo the period, and follows the chain of each to its background:
+
+  | Period | Blocks with a lock | Backgrounds the chains end in: spatial period (blocks) | Blocks the chains hold |
+  |---:|---:|---|---:|
+  | 10 | 12 | 155 (12) | 28 |
+  | 11 | 30 | 143 (16), 275 (14) | 73 |
+  | 12 | 41 | 60 (12), 138 (29) | 121 |
+  | 13 | 89 | 533 (35), 689 (55) | 243 |
+  | 14 | 109 | 644 (26), 728 (55), 1,316 (28) | 411 |
+
+  So the backgrounds of 30 and 90 cells at period 10, of 100 at 12, of 117 and 130 at 13, and of 14, 28 and 84 at 14
+  have no wall of 16 cells. Those of 533, 644 and 1,316 cells have walls too, which the traps of
+  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) already end in, 16, 14 and 15 of its 74. The chains
+  hold every block of these periods that the game or the kit excludes; every block that a trap module reached before
+  the census, except eight whose natural traps count the phase modulo twice or three times the period; and 12, 135 and
+  244 blocks of periods 12, 13 and 14 that nothing reached. [FarWalls](../../Rule30Open/Columns/FarWalls.md),
+  [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md) and
+  [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md) check traps for all of these but 22 blocks of periods 13
+  and 14, whose only components have 3,169 to 22,746 states. The scan with windows of 16 cells, which samples 31 halves
+  per block, finds traps for 12, 31, 41, 86 and 109 blocks at these periods ([natural traps](natural-traps.md)): it
+  misses few of the blocks with a lock, but most of what their chains hold.
 - **Witnesses against the game.** In a background a column can repeat a block of period $p$, a proper divisor of $P$,
   while the column left of it does not repeat with period $p$. Its right side then makes a closed walk of [the finite
   game](../../Rule30Open/Columns/FiniteGame.md) on which the left column takes both values at one phase, so the game
@@ -79,10 +103,11 @@ every block of the period is a column of a background, and at 7 thirteen of the 
 The traps that driven halves enter are not scattered: from period 8 to 12 each is the edge, or wall, of one of a handful
 of backgrounds, and the backgrounds themselves are few, at most nine per period up to 14, with spatial periods up to
 1,316. Their columns hold a sixth to a half of the blocks of each period from 10 on, so a block that is no column of a
-background can be reached only from the part of a chain before it repeats, as many carried traps are. The table also
-says where to look for traps at longer periods: at the edges of the backgrounds of periods 13 and 14 rather than by
-sampling. Whether a background has a wall that every finite half enters is the open entry question again; the
-backgrounds of periods 5 to 7 show that having a background is not enough.
+background can be reached only from the part of a chain before it repeats, as many carried traps are. Traps at longer
+periods come from the same place: the census of locked windows of 16 cells finds the walls of every block at once and
+brings a third of each of periods 12, 13 and 14 down to entry into a trap ([the coverage](coverage.md)), against about
+an eighth from sampling at 13 and 14. Whether a background has a wall that every finite half enters is the open entry
+question again; the backgrounds of periods 5 to 7 show that having a background is not enough.
 
 ## In *A New Kind of Science*
 
@@ -108,10 +133,12 @@ python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10,11,12,13,14 --ta
 python -m computations.space_time_periodic 4,8,10,12,14 --witnesses
 python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16
 python -m computations.space_time_periodic 1,2,3,4,5,6,7,8,9,10 --counts
+python -m computations.lock_chain --lock-backgrounds 10,11,12,13,14 --width 16 --workers 3
 ```
 
 Each lists the backgrounds by squaring the map on $4^P$ pairs: under a minute to period 13, and period 14 in about two
-minutes with a peak of about 6 GB. The chains of the traps come from `chain_cycle` in
+minutes with a peak of about 6 GB. The census of locked windows takes about an hour with three processes, most of it
+at periods 13 and 14. The chains of the traps come from `chain_cycle` in
 [computations/lock_chain.py](../../computations/lock_chain.py), on the traps of `natural_tables`, `tables` and
 `carried`. The test compares the backgrounds of periods up to 6 with every ring of up to 16 cells run directly, runs
 every background of period up to 10 on its ring and counts its rows, and runs the witness for $0001$ on its ring.

@@ -20,6 +20,7 @@ whether the white right half settles.
 
     python -m computations.lock_chain --chain 8,9,10,11,12,13 --depth 12   # the chains of 0 1^(P-1), 15 s
     python -m computations.lock_chain --classify 4,8,10,11,12 --width 13 --workers 3   # every lock's seed, about 2 min
+    python -m computations.lock_chain --lock-backgrounds 10,11,12,13,14 --width 16 --workers 3   # about an hour
     python -m computations.lock_chain --ether   # the chain of 0 1^7, the kit's ether and its wall, about 1 min
     python -m computations.lock_chain --wall 4,5,6,7,8,9,10,11,12,13,14 --width 11   # returns to the wall, 1 s
     python -m computations.lock_chain --t001 --verify   # the kit's trap for 001 and the short-period locks, 1 min
@@ -38,6 +39,10 @@ whether the white right half settles.
     python -m computations.lock_chain --ten-coin   # the period-10 wall with a fair coin beyond, about a minute
     python -m computations.lock_chain --lean-walls 11   # the traps of ElevenTraps; 12, 13, 14 for the others
     python -m computations.lock_chain --lean-wall-gaps   # the entries of WallGaps
+    python -m computations.lock_chain --lean-far   # the traps of FarWalls, walls carried past WALL_DEPTHS
+    python -m computations.lock_chain --far-entry --cells 4 --steps 20000   # entry into each of them
+    python -m computations.lock_chain --lean-census 13   # the traps of CensusTraps13; 14 for CensusTraps14
+    python -m computations.lock_chain --census-entry 13 --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
@@ -204,6 +209,50 @@ def classify(found: dict[str, list[tuple[list[str], str]]], depth: int) -> tuple
                      if steps[distance] == block and steps[distance - frozen] == last]
             placed.setdefault(block, []).append(min(spots)[::-1] if spots else ("", -1))
     return seeds, placed
+
+
+def lock_backgrounds(found: dict[str, list[tuple[list[str], str]]]) -> dict[int, dict[int, tuple[set[str], set[str]]]]:
+    """For a `survey`, by period and by the spatial period of a background: the blocks with a bottom component whose
+    chain, from its last column that is a function of the phase and its lock values, becomes periodic in the distance in
+    that background (`chain_cycle`); and the blocks of that least period among the columns of those chains, up to one
+    spatial period past where they repeat, which the locks carried leftward give traps."""
+    result: dict[int, dict[int, tuple[set[str], set[str]]]] = {}
+    for block, entries in found.items():
+        period = len(block)
+        for columns, values in entries:
+            seed = columns[-1] if columns else block
+            start, cycle = chain_cycle(seed, values)
+            ends, reach = result.setdefault(period, {}).setdefault(len(cycle), (set(), set()))
+            ends.add(block)
+            reach |= {necklace(column) for column in chain(seed, values, start + len(cycle))
+                      if least_period(column) == period}
+    return result
+
+
+@functools.lru_cache(maxsize=64)
+def cached_components(block: str, width: int) -> tuple[np.ndarray, ...]:
+    """`bottom_components`, kept for the blocks asked again."""
+    return tuple(bottom_components(block, width))
+
+
+def component_tables(block: str, width: int, index: int, distance: int) -> dict:
+    """Bottom component `index` of the locked nodes of `block` at `width` (`bottom_components`) carried `distance`
+    columns left by its chain, as a labelled trap (`relabeled_tables`): each node keeps its phase, and the `distance`
+    columns of the chain go in front of its window. The chain starts at the last column the component fixes as a
+    function of the phase, with the lock values of the column right of it (`lock_values`)."""
+    period, low = len(block), (1 << width) - 1
+    members = cached_components(block, width)[index]  # (m,)
+    columns = phase_columns(members, width, period)
+    seed, frozen = (columns[-1] if columns else block), len(columns)
+    phase, cell = members >> width, (members >> frozen) & 1  # (m,), (m,)
+    values = "".join(str(int(cell[phase == ph][0])) if seed[ph] == "0" else "0" for ph in range(period))
+    steps = chain(seed, values, frozen + distance)  # columns frozen, frozen - 1, .., -distance of the block's row
+    nodes = set()
+    for x in members.tolist():
+        ph = x >> width
+        near = sum(int(steps[frozen + distance - 1 - j][ph]) << j for j in range(distance))
+        nodes.add((ph, near | (x & low) << distance))
+    return relabeled_tables(steps[frozen + distance], distance + width, nodes)
 
 
 def chain_lock(seed: str, width: int, distance: int, want: str | None = None) -> tuple[str, list[tuple[int, int]]]:
@@ -399,6 +448,194 @@ WALLS = {11: ["trap00000011011", "trap00110100111", "trap00001101001"],
          13: ["trap0001110010011"],
          14: ["trap00011100101011"]}
 WALL_DEPTHS = {11: 40, 12: 40, 13: 53, 14: 103}
+# Blocks that the walls of `WALLS` reach only beyond `WALL_DEPTHS` and that no other trap module holds and nothing
+# excludes, which the census of locked windows of 16 cells finds (`lock_backgrounds`): the wall and the least distance,
+# checked in `Rule30Open.Columns.FarWalls`.
+FAR_WALLS = {12: [("trap001011100111", d) for d in (41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 53, 54)]}
+# Census traps: for the blocks that the chains of the locked windows of 16 cells hold (`lock_backgrounds`) and that no
+# other trap module has and nothing excludes, the lock that carries to each at the least cost (states times cells), when
+# it has at most 3,000 states: the block, the block whose bottom component it is, the component's index in
+# `bottom_components`, and the distance it is carried (`component_tables`); checked in
+# `Rule30Open.Columns.CensusTraps13` and `CensusTraps14`.
+CENSUS_TRAPS = {13: [("0000000000111", "0001100011011", 0, 17), ("0000000100011", "0001100011011", 0, 15),
+                    ("0000000111011", "0001100011011", 0, 9), ("0000000111111", "0011001111011", 0, 7),
+                    ("0000001000011", "0001100011011", 0, 7), ("0000001000111", "0000001101111", 0, 2),
+                    ("0000001011011", "0010110101011", 0, 21), ("0000001011101", "0000111001101", 0, 91),
+                    ("0000001100101", "0001100011011", 0, 13), ("0000001100111", "0001100011011", 0, 55),
+                    ("0000001101001", "0000010111001", 0, 12), ("0000001110101", "0001100011011", 0, 25),
+                    ("0000010000011", "0001100011011", 0, 23), ("0000010000111", "0000111001101", 0, 90),
+                    ("0000010010101", "0010110101111", 0, 30), ("0000010011001", "0011001111011", 0, 1),
+                    ("0000010100111", "0001100011011", 0, 41), ("0000010101011", "0001100011011", 0, 39),
+                    ("0000010111001", "0000010111001", 0, 0), ("0000010111011", "0000000010011", 0, 4),
+                    ("0000010111101", "0000001101111", 0, 3), ("0000010111111", "0000000010011", 0, 3),
+                    ("0000011000101", "0001100011011", 0, 5), ("0000011001011", "0010110101111", 0, 28),
+                    ("0000011001111", "0001100011011", 0, 43), ("0000100010001", "0001100011011", 0, 2),
+                    ("0000100101011", "0001100011011", 0, 61), ("0000101000011", "0001100011011", 0, 21),
+                    ("0000101010001", "0001100011011", 0, 19), ("0000101010011", "0001100011011", 0, 53),
+                    ("0000101100111", "0000111001101", 0, 92), ("0000101101001", "0001100011011", 0, 48),
+                    ("0000101101011", "0000111001101", 0, 70), ("0000101110011", "0001100011011", 0, 44),
+                    ("0000110000111", "0010110101111", 0, 33), ("0000110001111", "0010110101011", 0, 7),
+                    ("0000110011011", "0000111001101", 0, 82), ("0000110111001", "0001100011011", 0, 59),
+                    ("0000110111101", "0010110101011", 0, 16), ("0000111000101", "0010110101011", 0, 17),
+                    ("0000111100111", "0010110101011", 0, 8), ("0000111101011", "0000111001101", 0, 68),
+                    ("0000111110001", "0001100011011", 0, 18), ("0000111111001", "0000010111001", 0, 11),
+                    ("0000111111101", "0001100011011", 0, 16), ("0001000101011", "0000010111001", 0, 9),
+                    ("0001000110011", "0001100011011", 0, 56), ("0001001000111", "0001100011011", 0, 38),
+                    ("0001001001101", "0011001111011", 0, 2), ("0001001101011", "0010110101011", 0, 18),
+                    ("0001010001101", "0001100011011", 0, 31), ("0001010010101", "0001100011011", 0, 11),
+                    ("0001010010111", "0001100011011", 0, 34), ("0001010100101", "0001100011011", 0, 3),
+                    ("0001010101001", "0011001111011", 0, 5), ("0001010101101", "0010110101111", 0, 25),
+                    ("0001011000111", "0000001101111", 0, 4), ("0001011001001", "0000010111001", 0, 4),
+                    ("0001011001011", "0010110101111", 0, 34), ("0001011010101", "0000111001101", 0, 85),
+                    ("0001011010111", "0011001111011", 0, 3), ("0001011011001", "0001100011011", 0, 45),
+                    ("0001011111001", "0001100011011", 0, 60), ("0001011111101", "0001100011011", 0, 40),
+                    ("0001100011111", "0000111001101", 0, 89), ("0001100101001", "0000111001101", 0, 87),
+                    ("0001100101101", "0010110101011", 0, 12), ("0001101001101", "0010110101011", 0, 2),
+                    ("0001101001111", "0001100011011", 0, 10), ("0001101011001", "0000010111001", 0, 17),
+                    ("0001101011011", "0000111001101", 0, 77), ("0001101011101", "0001100011011", 0, 50),
+                    ("0001101011111", "0010110101011", 0, 14), ("0001101101101", "0001100011011", 0, 46),
+                    ("0001101101111", "0001100011011", 0, 36), ("0001110100101", "0001100011011", 0, 27),
+                    ("0001110100111", "0001100011011", 0, 26), ("0001110110011", "0001100011011", 0, 30),
+                    ("0001110111101", "0010110101011", 0, 29), ("0001111001111", "0010110101111", 0, 32),
+                    ("0001111011101", "0001100011011", 0, 28), ("0001111100111", "0010110101011", 0, 4),
+                    ("0001111101101", "0001100011011", 0, 58), ("0010010110011", "0000111001101", 0, 83),
+                    ("0010011011111", "0010110101111", 0, 29), ("0010011100101", "0001100011011", 0, 47),
+                    ("0010011100111", "0001100011011", 0, 33), ("0010011111101", "0001100011011", 0, 8),
+                    ("0010100101101", "0000111001101", 0, 78), ("0010100101111", "0010110101011", 0, 24),
+                    ("0010100111101", "0000010111001", 0, 6), ("0010101001011", "0001100011011", 0, 51),
+                    ("0010101111011", "0001100011011", 0, 35), ("0010110011011", "0000010111001", 0, 1),
+                    ("0010110101011", "0010110101011", 0, 0), ("0010110101101", "0010110101011", 0, 10),
+                    ("0010110111011", "0001100011011", 0, 49), ("0011001111101", "0001100011011", 0, 24),
+                    ("0011010100111", "0000111001101", 0, 79), ("0011010110101", "0000111001101", 0, 74),
+                    ("0011010111111", "0010110101111", 0, 27), ("0011011010101", "0010110101011", 0, 13),
+                    ("0011011011111", "0001100011011", 0, 52), ("0011011100111", "0001100011011", 0, 1),
+                    ("0011011111111", "0001100011011", 0, 14), ("0011101010111", "0000010111001", 0, 10),
+                    ("0011101101011", "0000111001101", 0, 76), ("0011101101111", "0000010111001", 0, 13),
+                    ("0011101110111", "0000111001101", 0, 86), ("0011101111111", "0001100011011", 0, 6),
+                    ("0011110111011", "0000111001101", 0, 81), ("0011110111111", "0001100011011", 0, 22),
+                    ("0011111011101", "0001100011011", 0, 42), ("0011111011111", "0001100011011", 0, 20),
+                    ("0011111101111", "0001100011011", 0, 4), ("0011111110111", "0001100011011", 0, 12),
+                    ("0101010111011", "0010110101111", 0, 26), ("0101011010111", "0000111001101", 0, 75),
+                    ("0101011011011", "0000010111001", 0, 2), ("0101011111111", "0011001111011", 0, 6),
+                    ("0101101110111", "0010110101011", 0, 11), ("0101110101111", "0010110101111", 0, 31),
+                    ("0101111101111", "0010110101011", 0, 6), ("0110110110111", "0010110101011", 0, 1),
+                    ("0110110111111", "0010110101011", 0, 22)],
+                14: [("00000000010101", "00000100000101", 0, 5), ("00000001100011", "00101101011101", 0, 51),
+                    ("00000001110111", "00111110111101", 0, 20), ("00000001111101", "00101101011101", 0, 62),
+                    ("00000001111111", "00101101011101", 0, 88), ("00000010000101", "00111110111101", 0, 18),
+                    ("00000010010111", "00101101101101", 0, 40), ("00000010100001", "00101101010011", 0, 24),
+                    ("00000010100101", "00111110111101", 0, 7), ("00000010110111", "00101101010011", 0, 37),
+                    ("00000011000101", "00111110111101", 0, 1), ("00000011010001", "00101101101101", 0, 77),
+                    ("00000011010011", "00011111001111", 0, 40), ("00000011010111", "00101101011101", 0, 58),
+                    ("00000011101001", "00011111001111", 0, 26), ("00000011101011", "00011111001111", 0, 17),
+                    ("00000011110101", "00011111001111", 0, 45), ("00000011110111", "00101101101101", 0, 68),
+                    ("00000011111001", "00101101101101", 0, 51), ("00000100010011", "00011111001111", 0, 70),
+                    ("00000100011111", "00101101010011", 0, 6), ("00000100101011", "00101101011101", 0, 26),
+                    ("00000100101101", "00101101011101", 0, 39), ("00000100101111", "00011111001111", 0, 62),
+                    ("00000100110011", "00101101101101", 0, 49), ("00000100110101", "00101101101101", 0, 6),
+                    ("00000100110111", "00101101101101", 0, 36), ("00000100111001", "00111110111101", 0, 15),
+                    ("00000100111101", "00101101011101", 0, 48), ("00000101000011", "00101101101101", 0, 47),
+                    ("00000101000111", "00011111001111", 0, 1), ("00000101001101", "00111110111101", 0, 13),
+                    ("00000101010001", "00101101010011", 0, 3), ("00000101100011", "00101101011101", 0, 56),
+                    ("00000101100101", "00011111001111", 0, 66), ("00000101101011", "00101101010011", 0, 15),
+                    ("00000110001001", "00011111001111", 0, 5), ("00000110101111", "00101101101101", 0, 34),
+                    ("00000110110011", "00101101011101", 0, 34), ("00000110110101", "00101101101101", 0, 72),
+                    ("00000110111001", "00101101101101", 0, 63), ("00000111001111", "00101101011101", 0, 63),
+                    ("00000111010011", "00101101010011", 0, 22), ("00000111100001", "00000100000101", 0, 9),
+                    ("00000111100011", "00101101010011", 0, 35), ("00000111110101", "00101101010011", 0, 4),
+                    ("00000111111011", "00101101101101", 0, 39), ("00001000010011", "00101101011101", 0, 53),
+                    ("00001000011011", "00101101101101", 0, 55), ("00001000011111", "00101101010011", 0, 5),
+                    ("00001000101011", "00011111001111", 0, 14), ("00001000101101", "00011111001111", 0, 24),
+                    ("00001001000011", "00000100000101", 0, 7), ("00001001000101", "00011111001111", 0, 57),
+                    ("00001001000111", "00101101011101", 0, 68), ("00001001010101", "00011110110011", 0, 5),
+                    ("00001001100101", "00011110110011", 0, 1), ("00001001110101", "00101101101101", 0, 61),
+                    ("00001010001001", "00101101101101", 0, 11), ("00001010001111", "00101101101101", 0, 21),
+                    ("00001010011101", "00101101011101", 0, 71), ("00001010011111", "00101101010011", 0, 36),
+                    ("00001010110011", "00011111001111", 0, 3), ("00001010110101", "00101101101101", 0, 58),
+                    ("00001011000101", "00011111001111", 0, 19), ("00001011001101", "00101101010011", 0, 17),
+                    ("00001011001111", "00101101101101", 0, 14), ("00001011011011", "00101101101101", 0, 15),
+                    ("00001011011101", "00101101101101", 0, 22), ("00001011101111", "00011111001111", 0, 46),
+                    ("00001100010011", "00101101011101", 0, 74), ("00001100101001", "00101101101101", 0, 2),
+                    ("00001100101011", "00101101101101", 0, 30), ("00001100101101", "00101101101101", 0, 5),
+                    ("00001101000111", "00101101010011", 0, 2), ("00001101100011", "00101101010011", 0, 9),
+                    ("00001101101111", "00101101011101", 0, 66), ("00001110001101", "00111110111101", 0, 6),
+                    ("00001110101011", "00000100000101", 0, 11), ("00001110110101", "00011111001111", 0, 7),
+                    ("00001110111011", "00011111001111", 0, 29), ("00001110111111", "00101101010011", 0, 34),
+                    ("00001111000101", "00011111001111", 0, 28), ("00001111001101", "00101101101101", 0, 29),
+                    ("00001111010011", "00000100000101", 0, 10), ("00001111010111", "00101101101101", 0, 13),
+                    ("00001111011001", "00101101101101", 0, 8), ("00001111100101", "00011111001111", 0, 36),
+                    ("00001111101101", "00101101101101", 0, 62), ("00001111110001", "00011111001111", 0, 16),
+                    ("00010001000101", "00101101101101", 0, 44), ("00010001101101", "00101101101101", 0, 9),
+                    ("00010001111011", "00101101101101", 0, 60), ("00010001111111", "00000100000101", 0, 4),
+                    ("00010010010011", "00011111001111", 0, 54), ("00010010011111", "00011111001111", 0, 23),
+                    ("00010010100101", "00101101010011", 0, 20), ("00010010101001", "00101101011101", 0, 77),
+                    ("00010010101111", "00101101010011", 0, 32), ("00010010111101", "00101101011101", 0, 81),
+                    ("00010011001111", "00101101011101", 0, 28), ("00010011010111", "00011111001111", 0, 32),
+                    ("00010011100011", "00011111001111", 0, 42), ("00010011100111", "00101101011101", 0, 83),
+                    ("00010011101101", "00011110110011", 0, 2), ("00010011111001", "00011110110011", 0, 4),
+                    ("00010100010111", "00101101011101", 0, 64), ("00010100011011", "00101101011101", 0, 43),
+                    ("00010100100101", "00101101101101", 0, 25), ("00010100110111", "00011110110011", 0, 3),
+                    ("00010100111001", "00101101010011", 0, 31), ("00010101001101", "00111110111101", 0, 16),
+                    ("00010101010011", "00101101011101", 0, 84), ("00010101011001", "00011111001111", 0, 33),
+                    ("00010101011011", "00101101011101", 0, 21), ("00010101011111", "00101101010011", 0, 33),
+                    ("00010101110101", "00101101101101", 0, 45), ("00010101111101", "00011111001111", 0, 71),
+                    ("00010110011101", "00101101011101", 0, 75), ("00010110100011", "00101101011101", 0, 46),
+                    ("00010110110011", "00011111001111", 0, 47), ("00010110111001", "00101101101101", 0, 64),
+                    ("00010110111101", "00101101011101", 0, 70), ("00010111000111", "00111110111101", 0, 14),
+                    ("00010111001001", "00101101011101", 0, 35), ("00010111010101", "00101101101101", 0, 37),
+                    ("00010111011111", "00011111001111", 0, 2), ("00010111100101", "00011111001111", 0, 41),
+                    ("00010111101001", "00011111001111", 0, 11), ("00011000111011", "00111110111101", 0, 5),
+                    ("00011001000111", "00111110111101", 0, 12), ("00011001011101", "00101101011101", 0, 24),
+                    ("00011001101011", "00101101101101", 0, 4), ("00011001101101", "00011111001111", 0, 21),
+                    ("00011010011101", "00011111001111", 0, 35), ("00011010110101", "00000100000101", 0, 13),
+                    ("00011011010011", "00101101101101", 0, 24), ("00011011100101", "00011111001111", 0, 10),
+                    ("00011011100111", "00101101010011", 0, 30), ("00011011101001", "00011111001111", 0, 8),
+                    ("00011100100111", "00101101101101", 0, 26), ("00011100110101", "00000100000101", 0, 3),
+                    ("00011100110111", "00101101101101", 0, 43), ("00011101001111", "00101101101101", 0, 20),
+                    ("00011101011011", "00101101101101", 0, 42), ("00011101100111", "00101101011101", 0, 42),
+                    ("00011101101001", "00011111001111", 0, 9), ("00011101101011", "00000100000101", 0, 12),
+                    ("00011101101101", "00101101101101", 0, 71), ("00011101110011", "00111110111101", 0, 11),
+                    ("00011110010011", "00101101011101", 0, 67), ("00011110011001", "00101101010011", 0, 27),
+                    ("00011110011111", "00101101010011", 0, 23), ("00011110110111", "00011111001111", 0, 56),
+                    ("00011111001011", "00101101101101", 0, 35), ("00011111011111", "00000100000101", 0, 6),
+                    ("00011111101011", "00011111001111", 0, 44), ("00011111110101", "00101101011101", 0, 87),
+                    ("00100100101101", "00101101101101", 0, 27), ("00100101001111", "00101101010011", 0, 10),
+                    ("00100101010011", "00011111001111", 0, 22), ("00100101011011", "00101101101101", 0, 65),
+                    ("00100101011101", "00101101011101", 0, 44), ("00100101101011", "00101101101101", 0, 56),
+                    ("00100101110101", "00011111001111", 0, 43), ("00100110011101", "00011111001111", 0, 6),
+                    ("00100110011111", "00101101011101", 0, 25), ("00100110101101", "00101101010011", 0, 12),
+                    ("00100110110101", "00101101011101", 0, 60), ("00100110111011", "00101101101101", 0, 3),
+                    ("00100110111101", "00111110111101", 0, 4), ("00100111001011", "00101101011101", 0, 59),
+                    ("00100111001111", "00101101101101", 0, 10), ("00100111011101", "00101101101101", 0, 1),
+                    ("00100111100111", "00101101011101", 0, 45), ("00100111101011", "00000100000101", 0, 2),
+                    ("00100111101101", "00101101010011", 0, 19), ("00100111111101", "00101101101101", 0, 79),
+                    ("00101001101101", "00101101101101", 0, 17), ("00101001110101", "00101101101101", 0, 18),
+                    ("00101010100111", "00101101101101", 0, 78), ("00101011001101", "00101101101101", 0, 70),
+                    ("00101011011011", "00101101010011", 0, 18), ("00101011011101", "00101101011101", 0, 72),
+                    ("00101011011111", "00101101011101", 0, 47), ("00101011101101", "00101101011101", 0, 22),
+                    ("00101011111011", "00101101011101", 0, 65), ("00101101011011", "00101101011101", 0, 37),
+                    ("00101101110101", "00011111001111", 0, 38), ("00101110101101", "00101101101101", 0, 53),
+                    ("00101110101111", "00101101011101", 0, 27), ("00101110111111", "00101101101101", 0, 48),
+                    ("00101111010011", "00101101101101", 0, 41), ("00101111100111", "00101101011101", 0, 52),
+                    ("00101111101011", "00101101101101", 0, 12), ("00101111110011", "00011111001111", 0, 69),
+                    ("00101111111101", "00111110111101", 0, 19), ("00110011010101", "00011111001111", 0, 68),
+                    ("00110011011101", "00101101010011", 0, 26), ("00110011111011", "00101101011101", 0, 33),
+                    ("00110101001111", "00101101011101", 0, 23), ("00110101100111", "00101101011101", 0, 20),
+                    ("00110101111101", "00101101101101", 0, 66), ("00110110110101", "00011111001111", 0, 52),
+                    ("00110111011111", "00011111001111", 0, 59), ("00111001110111", "00111110111101", 0, 2),
+                    ("00111001111111", "00111110111101", 0, 17), ("00111010101111", "00011111001111", 0, 64),
+                    ("00111011101101", "00101101010011", 0, 25), ("00111011111011", "00101101010011", 0, 8),
+                    ("00111011111101", "00101101010011", 0, 21), ("00111101011111", "00000100000101", 0, 8),
+                    ("00111101101011", "00101101011101", 0, 38), ("00111101101101", "00011111001111", 0, 34),
+                    ("00111101111011", "00011111001111", 0, 4), ("00111110101011", "00101101101101", 0, 38),
+                    ("00111110110101", "00101101011101", 0, 57), ("00111110110111", "00101101101101", 0, 76),
+                    ("00111111010101", "00101101011101", 0, 61), ("00111111011011", "00011111001111", 0, 39),
+                    ("00111111101111", "00101101011101", 0, 50), ("01010101101011", "00101101101101", 0, 75),
+                    ("01010101110111", "00101101011101", 0, 32), ("01010110111011", "00101101011101", 0, 78),
+                    ("01010111010111", "00101101011101", 0, 41), ("01010111101111", "00101101010011", 0, 13),
+                    ("01010111111011", "00101101101101", 0, 33), ("01011011010111", "00011111001111", 0, 55),
+                    ("01011011110111", "00101101101101", 0, 59), ("01011101101111", "00101101010011", 0, 16),
+                    ("01011111111011", "00011110110011", 0, 10), ("01101101110111", "00011111001111", 0, 20)]}
 
 
 def tables(name: str) -> dict:
@@ -740,6 +977,30 @@ def walls_entry(period: int, cells: int, steps: int, depth: int = 40) -> list[tu
     return found
 
 
+def census_entry(period: int, cells: int, steps: int) -> list[tuple[str, int, str, int, np.ndarray]]:
+    """`walls_entry` for the traps of `CENSUS_TRAPS` of a period, with the block whose component each carries as its
+    wall."""
+    halves = list(range(1 << cells))
+    found = []
+    for entry in tqdm(CENSUS_TRAPS[period], desc=f"census traps of period {period}", file=sys.stderr):
+        t = census_tables(entry)
+        times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(period)])  # (P 2^cells,)
+        found.append((entry[1], entry[3], t["word"], t["cells"], times))
+    return found
+
+
+def far_entry(cells: int, steps: int) -> list[tuple[str, int, str, int, np.ndarray]]:
+    """`walls_entry` for the traps of `FAR_WALLS`."""
+    halves = list(range(1 << cells))
+    found = []
+    for period, entries in sorted(FAR_WALLS.items()):
+        for name, distance in tqdm(entries, desc=f"far traps of period {period}", file=sys.stderr):
+            t = carried(name, distance)
+            times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(period)])  # (P 2^cells,)
+            found.append((name, distance, t["word"], t["cells"], times))
+    return found
+
+
 def lean_walls(period: int, depth: int, prefix: str, piece: int = 0, check: bool = False) -> str:
     """The trap definitions of `Rule30Open.Columns.ElevenTraps`, `TwelveTraps` or `ThirteenTraps`: each wall of the
     period carried to each distance of `wall_distances`, named by the prefix, the wall's index and the distance, with
@@ -750,6 +1011,35 @@ def lean_walls(period: int, depth: int, prefix: str, piece: int = 0, check: bool
         label = f"{prefix}{names[name]}_{d}"
         out.append(lean_entry(carried(name, d), label, piece)
                    + (f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n" if check else ""))
+    return "\n".join(out)
+
+
+def census_tables(entry: tuple[str, str, int, int]) -> dict:
+    """The trap of an entry of `CENSUS_TRAPS`."""
+    _, source, index, distance = entry
+    return component_tables(source, 16, index, distance)
+
+
+def lean_census(period: int, piece: int = 1 << 16) -> str:
+    """The trap definitions of `Rule30Open.Columns.CensusTraps<period>`: each entry of `CENSUS_TRAPS` for the period,
+    named by its block, with its own kernel check."""
+    out = []
+    for entry in CENSUS_TRAPS[period]:
+        label = f"cen{entry[0]}"
+        out.append(lean_entry(census_tables(entry), label, piece)
+                   + f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n")
+    return "\n".join(out)
+
+
+def lean_far(piece: int = 1 << 16) -> str:
+    """The trap definitions of `Rule30Open.Columns.FarWalls`: each entry of `FAR_WALLS` carried, named by the period
+    and the distance, with its own kernel check."""
+    out = []
+    for period, entries in sorted(FAR_WALLS.items()):
+        for name, d in entries:
+            label = f"far{period}_{d}"
+            out.append(lean_entry(carried(name, d), label, piece)
+                       + f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n")
     return "\n".join(out)
 
 
@@ -1225,6 +1515,8 @@ def main() -> None:
     parser.add_argument("--chain", type=str, default="", help="periods P whose chain of 0 1^(P-1) to print")
     parser.add_argument("--depth", type=int, default=12)
     parser.add_argument("--classify", type=str, default="", help="periods whose locks to place in seed chains")
+    parser.add_argument("--lock-backgrounds", type=str, default="",
+                        help="periods whose locked windows to sort by the background their chains end in")
     parser.add_argument("--ether", action="store_true", help="the chain of 0 1^7 and the kit's wall")
     parser.add_argument("--wall", type=str, default="", help="periods P for wall_returns of 0 1^(P-1)")
     parser.add_argument("--short", type=str, default="", help="periods whose seeds' chains to scan for shorter periods")
@@ -1237,6 +1529,12 @@ def main() -> None:
     parser.add_argument("--lean-ten", action="store_true", help="print the trap entries of TenTraps.lean")
     parser.add_argument("--lean-ten-gap", action="store_true", help="print the entry data of TenGap.lean")
     parser.add_argument("--lean-wall-gaps", action="store_true", help="print the entry data of WallGaps.lean")
+    parser.add_argument("--lean-far", action="store_true", help="print the traps of FarWalls.lean")
+    parser.add_argument("--far-entry", action="store_true", help="entry into each trap of FarWalls")
+    parser.add_argument("--lean-census", type=int, default=0, choices=[0, 13, 14],
+                        help="print the traps of CensusTraps13.lean or CensusTraps14.lean")
+    parser.add_argument("--census-entry", type=int, default=0, choices=[0, 13, 14],
+                        help="entry into each trap of CensusTraps13 or CensusTraps14")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
     parser.add_argument("--lean-long", action="store_true", help="print the trap entries of NaturalTrapsLong.lean")
     parser.add_argument("--long-entry", action="store_true",
@@ -1291,6 +1589,13 @@ def main() -> None:
             lock = locks.has_lock(word, args.width) if primitive else None
             print(f"  distance {distance:2d}: {word}  primitive {primitive}  locked window at width {args.width}: "
                   f"{lock}  kit word: {word in kit}", flush=True)
+    if args.lock_backgrounds:
+        for period in [int(p) for p in args.lock_backgrounds.split(",")]:
+            found = survey([period], args.width, args.workers)
+            print(f"period {period}: {len(found)} blocks have a locked window of {args.width} cells", flush=True)
+            for size, (ends, reach) in sorted(lock_backgrounds(found).get(period, {}).items()):
+                print(f"  background of {size} cells: the chains of the locks of {len(ends)} blocks end in it and "
+                      f"hold {len(reach)} blocks of period {period}", flush=True)
     if args.classify:
         found = survey([int(p) for p in args.classify.split(",")], args.width, args.workers)
         seeds, placed = classify(found, 2 * args.width)
@@ -1444,20 +1749,27 @@ def main() -> None:
         print(lean_extra(LONG_TRAPS))
     if args.lean_large:
         print(lean_large())
+    if args.lean_far:
+        print(lean_far())
+    if args.lean_census:
+        print(lean_census(args.lean_census))
     if args.lean_wall_gaps:
         for name, trap, bound, prefix in WALL_GAPS:
             print(lean_gap(name, trap, bound, prefix))
-    if args.walls_entry:
+    if args.walls_entry or args.far_entry or args.census_entry:
         counts = [0, 0, 0]  # traps that every pair, some pairs and no pair enter
-        for name, distance, word, cells, times in walls_entry(args.walls_entry, args.cells, args.steps,
-                                                              WALL_DEPTHS[args.walls_entry]):
+        rows = (far_entry(args.cells, args.steps) if args.far_entry else
+                census_entry(args.census_entry, args.cells, args.steps) if args.census_entry else
+                walls_entry(args.walls_entry, args.cells, args.steps, WALL_DEPTHS[args.walls_entry]))
+        for name, distance, word, cells, times in rows:
             done = times[times >= 0]  # (k,)
             counts[0 if done.size == times.size else 1 if done.size else 2] += 1
             print(f"{name} at distance {distance} ({word}, {cells} cells): {done.size} of {times.size} halves and phases "
                   f"enter by step {args.steps}" + (f", median {int(np.median(done))}, latest {int(done.max())}"
                                                    if done.size else ""), flush=True)
-        print(f"period {args.walls_entry}: {counts[0]} traps entered by every pair, {counts[1]} by some, {counts[2]} by "
-              f"none", flush=True)
+        scope = (f"period {args.walls_entry}" if args.walls_entry else
+                 f"census traps of period {args.census_entry}" if args.census_entry else "far traps")
+        print(f"{scope}: {counts[0]} traps entered by every pair, {counts[1]} by some, {counts[2]} by none", flush=True)
     if args.extra_entry or args.long_entry:
         counts = [0, 0, 0]  # traps that every pair, some pairs and no pair enter
         for word, cells, times in extra_entry(args.cells, args.steps, LONG_TRAPS if args.long_entry else None):

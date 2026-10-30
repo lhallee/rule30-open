@@ -61,6 +61,9 @@ public import Rule30Open.Columns.WallGaps
 public import Rule30Open.Columns.NaturalTraps
 public import Rule30Open.Columns.NaturalTrapsLarge
 public import Rule30Open.Columns.NaturalTrapsLong
+public import Rule30Open.Columns.FarWalls
+public import Rule30Open.Columns.CensusTraps13
+public import Rule30Open.Columns.CensusTraps14
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn

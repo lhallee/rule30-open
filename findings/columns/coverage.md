@@ -31,9 +31,9 @@ order.
 | 9 | 56 | 0 | 23 | 0 | 33 |
 | 10 | 99 | 4 | 27 | 0 | 68 |
 | 11 | 186 | 7 | 70 | 0 | 109 |
-| 12 | 335 | 9 | 101 | 0 | 225 |
-| 13 | 630 | 21 | 87 | 0 | 522 |
-| 14 | 1161 | 31 | 136 | 0 | 994 |
+| 12 | 335 | 9 | 113 | 0 | 213 |
+| 13 | 630 | 21 | 212 | 0 | 397 |
+| 14 | 1161 | 31 | 368 | 0 | 762 |
 
 - **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
   block up to period 20 is excluded in Lean, by the kit or here.
@@ -44,8 +44,9 @@ order.
   [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md),
   [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
   [NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md),
-  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) and
-  [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
+  [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md), [FarWalls](../../Rule30Open/Columns/FarWalls.md),
+  [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md), [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md)
+  and [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
 - **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
   companions that no trap reaches.
 
@@ -55,13 +56,14 @@ The reach is uneven in the period. Every block of period 1, 2 and 4 is excluded 
 block each has a trap, which small halves almost never enter ([trap
 entry](../../negative-results/columns/trap-entry.md)), and the rest is not reached at all. From period 9 the walls at
 the edges of periodic backgrounds, and at periods 10 to 12 also the closed sets that driven halves settle into, give
-traps to 23, 27, 70 and 101 blocks, a quarter to two fifths of each period ([natural traps](natural-traps.md)), and
+traps to 23, 27, 70 and 113 blocks, a quarter to two fifths of each period ([natural traps](natural-traps.md)), and
 there small halves do enter many of them. Every block of periods 11 and 12 that steering reduces has a trap too, so
-steering alone reaches blocks only at period 8. At periods 13 and 14, where the natural scan closes windows of 16 cells
-only, one wall each, carried to every block of its period among the columns of its background, and the smaller closed
-sets themselves give traps to 87 and 136 blocks that nothing excludes, 14% and 12% of each period ([natural
-traps](natural-traps.md)). Every reduction still needs its open step, entry for every finite half or the steering
-condition for the true orbit, and outright exclusions stay rare: 25 of the 747 blocks of period at most 12. Period 8 has
+steering alone reaches blocks only at period 8. At periods 13 and 14 sampling gives traps to 87 and 136 blocks that
+nothing excludes, 14% and 12% of each period ([natural traps](natural-traps.md)); the census of every locked window of
+16 cells, carried by its chain, raises this to 212 and 368, about a third, as at period 12 ([backgrounds periodic in
+time](space-time-backgrounds.md)), though small halves enter few of the traps carried far. Every reduction still needs
+its open step, entry for every finite half or the steering condition for the true orbit, and outright exclusions stay
+rare: 25 of the 747 blocks of period at most 12. Period 8 has
 no wall wider than 16 cells: its traps are the window locks of 13 cells of its eight blocks that have one, which every
 sampled half enters, three of them excluded by the game and five reduced by steering ([natural
 traps](natural-traps.md)).
