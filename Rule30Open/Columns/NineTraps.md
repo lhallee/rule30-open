@@ -60,10 +60,12 @@ Each trap reduces its block to entry, the route of the kit's `t001` for $001$, a
 driven from each of the 9 phases, 247 of 2,304 enter `trap001011111` within 50,000 steps, a median of 17,403 steps in
 and the latest at 49,425, so entries are still coming at the end; of 31 random halves of 64 cells, the traps at
 distances 0 to 6 and 16 are each entered by one or two within 20,000 steps ([trap
-entry](../../negative-results/columns/trap-entry.md)). Entry under $001$ into the kit's `t001` is faster: about 91% of
-the halves of up to ten cells by step 50,000 ([the census for 001](../../findings/columns/t001-census.md)). The other 35
-blocks of period 9 have no trap from this wall; $001010011$ locks column 1 from one of 31 random starts, but the closure
-of its window at widths up to 64 is not a trap. Entry for every finite right half stays open, as for the kit's traps.
+entry](../../negative-results/columns/trap-entry.md)). The white right half does not enter within 100,000 steps from any
+phase, and its column 1 does not repeat at the white times over steps 30,000 to 60,000, so entry for every finite half
+has only partial support. Entry under $001$ into the kit's `t001` is faster: about 91% of the halves of up to ten cells
+by step 50,000 ([the census for 001](../../findings/columns/t001-census.md)). The other 35 blocks of period 9 have no
+trap from this wall; $001010011$ locks column 1 from one of 31 random starts, but the closure of its window at widths up
+to 160 is not a trap. Entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

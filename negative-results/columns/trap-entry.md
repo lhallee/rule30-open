@@ -50,8 +50,10 @@ trap?
 | `trap001011101` | $001011101$ | 9, 18 | 2,304 | 16 | steps 42,751 to 46,470 |
 | `trap001011111` | $001011111$ | 9, 9 | 2,304 | 247 | median 17,403, latest 49,425 |
 
-The entries by step 20 are halves that start next to the trap. The ten into the trap of $0011101$ come from four
-phases and distinct halves but land within four steps of each other, as one late event would.
+The entries by step 20 are halves that start next to the trap. The ten into the trap of $0011101$ come from four phases
+and distinct halves but land within four steps of each other, as one late event would. The white right half, which the
+census includes, enters none of these traps; under $001011111$ it enters no trap within 100,000 steps from any phase,
+and its column 1 does not repeat over steps 30,000 to 60,000.
 
 *Any trap.* Column 1 locks for none of the 31 halves driven by any word of period 2, 5, 6 or 7, nor by $011$, except
 $01111$, for 2 halves, whose windows close into no trap. For $001$ it locks for 6, all inside the kit's family of
