@@ -132,7 +132,7 @@ None of the following is refereed, and the prize site lists no winner.
   `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. On October 30 it merged nine pull requests into its
   main branch, at commit a6399ef, 168 modules in all, among them exclusions of every eventual period whose white runs
   are all long (#36, #43), $\log\log$ margins for runs of the center column (#46) and spatially periodic orbits that
-  return with a shift (#56); its 14 open pull requests claim more, among them a Lean proof that the ether-and-wall
+  return with a shift (#56); its 16 open pull requests claim more, among them a Lean proof that the ether-and-wall
   family cannot give period two (#39). All are summarized, by route, in [kit-pull-requests.md](kit-pull-requests.md).
   The kit's own status table puts least period 4 at its open `Absorption`, period 2 at the open Q01, and any eventual
   period at $T + P \ge 16{,}359$. *Here:* the repository is pinned at the kit's commit 932cf8d, so the modules merged by

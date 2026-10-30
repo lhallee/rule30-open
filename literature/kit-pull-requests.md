@@ -1,12 +1,12 @@
 # Open pull requests to the prize kit
 
-The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch,
-commit 932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit merged nine of its 23 open
-[pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its main branch, at commit
+The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch, commit
+932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit merged nine of its 23 open [pull
+requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its main branch, at commit
 [a6399ef](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a6399ef15ff409d4dc0c5feb119b289aa31588a4), which
 brings its catalog to 168 modules: #36, #43, #45, #46, #49, #51, #53, #54 and #56, each marked *merged* below. This
-repository is not yet pinned there, so here they are results of the kit's main branch that the pin does not include,
-and the 14 still open are claims. Each pull request adds Lean modules that its author reports as checked by the kit's
+repository is not yet pinned there, so here they are results of the kit's main branch that the pin does not include, and
+the 16 still open are claims. Each pull request adds Lean modules that its author reports as checked by the kit's
 `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull request's
 head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
@@ -40,6 +40,13 @@ head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](.
   Closing for every length is stated as open. *Here:* the same left row is the object of
   [the white right half](../findings/period-two/white-right-half.md) and [the held column](../Rule30Open/PeriodTwo/HeldColumn.md);
   no finite certificate in the forms tried settles it ([no certificate](../negative-results/period-two/no-finite-certificate.md)).
+- **#60, inverse-cascade closing.** Claims that row closing at every depth reduces to closing finite blocks
+  (`physical_block_closes`), and that one staircase cutoff merges every competing inverse stack of any finite height for
+  every infinite reference row with recurrent resets, words $0\,1^{3k+1}\,0\,b$ (`exists_reset_schedule`,
+  `scheduled_cascade_closes`), with a counterexample when the resets stop. Whether the legal gate rows have recurrent
+  resets is stated as open, and the pull request says that no prize problem is proved. *Here:* it extends #47 and #52
+  from periodic futures to any future with recurrent resets; the open step is the same left row as in [the white right
+  half](../findings/period-two/white-right-half.md).
 - **#53, `Rule30ResetFreeThree` and four more modules.** *Merged.* Claims that every nonzero finite row of the kit's
   zero-boundary evolution, beside a column held white, contains a word $0\,1^{3m+1}\,0$ in one of its first three rows,
   with two rows not enough, and that a tail avoiding these words for five rows is eventually of period five. *Here:* no
@@ -114,6 +121,12 @@ head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](.
   after eight steps exactly when it returns after two once its three newest cells are dropped.
 - **#45, `Rule30ZeroBoundaryStripeStructure`.** *Merged.* Claims structure for the front windows of the kit's
   zero-boundary stripes: a two-step clone map, lifting of certified cycles to wider windows, and a backward dichotomy.
+- **#59, `Rule30ZeroBoundaryStripePrimitiveRoots`.** Builds on #45: explicit backward operators for the two-step map of
+  the stripe front windows, a trichotomy for the preimages of a window (a clone regime with a white tail, and two
+  primitive regimes, with a black tail or with the period-3 NOR wave $(100)^\infty$, `primitive_or_clone_trichotomy`,
+  `backward_nor_period_three`), a classification of the primitive roots of 8 cells, and projections of the orbits of
+  wider windows onto narrower ones. It states no claim on a prize problem. *Here:* no route here uses the stripe front
+  windows.
 - **#23, `Rule30RunBoundarySources`.** Claims that the center at time $2^{e+1} - 1$ is 1 plus, modulo 2, the
   contribution of run-boundary sources at depths beyond $e$, from an expansion through Rule 90. *Here:* it is of the same kind as
   [the Duhamel form](../findings/structure/duhamel.md), which writes the center column as a sum over adjacent black
