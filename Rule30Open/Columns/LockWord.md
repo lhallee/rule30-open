@@ -75,7 +75,10 @@ that is a statement of the same kind as Problem 2 for those columns, and open. [
 lock](../../findings/columns/coin-lock.md) shows that a fair coin in column 17 reaches its certificate with probability
 1, while some of Rule 30's own right halves stay out of it for 12,000 steps and enter the kit's family through ether
 plugs deeper than the window. So the condition here is sufficient, not necessary: the open `Absorption` asks for entry
-at any depth, and this result reads only the first $K$ columns.
+at any depth, and this result reads only the first $K$ columns. Beside an alternating center no such sequence exists at
+19 to 21 columns, the widths where the family first fits: about half the windows of 19 or 20 columns, and more of 21,
+can never enter it, whatever the next column does ([the absorption route for period
+two](../../negative-results/period-two/absorption-route.md)).
 
 ## Relation to the kit
 

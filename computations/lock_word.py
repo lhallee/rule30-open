@@ -16,6 +16,11 @@ k = 1) and 13 for 0111 ((2, 2), k = 0). At those widths
 
     python -m computations.lock_word   # the three words at the least widths, about 10 s
     python -m computations.lock_word --lean   # the words as Lean literals
+    python -m computations.lock_word --reach 19 20 21   # windows that no sequence brings in, about 3 min
+
+`unreachable` marks the windows from which no values of column W + 1 lead into the trap. Under the three words of
+period four there are none up to width 20; beside an alternating center, 0101, about half the windows at widths 19 and
+20 can never enter.
 """
 
 from __future__ import annotations
@@ -48,6 +53,14 @@ def trap(word: str, width: int, wall: np.ndarray) -> np.ndarray:
                 strip = (states >> k) & ((1 << WALL_CELLS) - 1)  # (2^W,)
                 member[ph] |= ((states & ((1 << k) - 1)) == prefix) & wall[psi][strip]
     return member  # (4, 2^W)
+
+
+def unreachable(word: str, width: int, wall: np.ndarray) -> np.ndarray:
+    """out[ph, s]: whether no values of column W + 1 bring window s at drive phase ph into the trap, with the most
+    steps any window needs to enter."""
+    # wall: (4, 2^13)
+    dist, _ = entry_paths(word, trap(word, width, wall))  # (4, 2^W)
+    return dist >= UNREACHED  # (4, 2^W)
 
 
 def universal_word(word: str, member: np.ndarray) -> list[int]:
@@ -129,8 +142,16 @@ def lean_literal(values: list[int]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--lean", action="store_true", help="print the words as Lean literals")
+    parser.add_argument("--reach", type=int, nargs="*", help="instead, the windows that can never enter, at these widths")
     args = parser.parse_args()
     wall = kit_wall()  # (4, 2^13)
+    if args.reach:
+        for word in ("0001", "0011", "0111", "0101"):
+            for width in args.reach:
+                out = unreachable(word, width, wall)  # (4, 2^W)
+                print(f"{word} at width {width}: windows that can never enter, by phase: "
+                      f"{[round(float(f), 4) for f in out.mean(axis=1)]}")
+        return
     for word, (width, j0, shift, k) in LEAST.items():
         member = trap(word, width, wall)  # (4, 2^W)
         values = universal_word(word, member)

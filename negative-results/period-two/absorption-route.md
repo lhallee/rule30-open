@@ -4,7 +4,7 @@ category: period-two
 problems: [1]
 status: negative
 kind: dead-end
-evidence: [computations/absorption.py]
+evidence: [computations/absorption.py, computations/lock_word.py]
 ---
 
 # The ether-and-wall family does not catch the right half beside an alternating center
@@ -25,6 +25,15 @@ at 0.97 from step 100 to step 400 and beyond.
 The kit's open pull request #39 claims a Lean proof that the white right half never enters, in every alignment
 (`not_absorption_alt`), so `Absorption` is false for the alternating word
 ([the kit's pull requests](../../literature/kit-pull-requests.md#period-two)).
+
+**Not even with help from the right.** Let the column right of a window of $W$ columns take any values at all. Under
+each word of period four, every window from the least width at which the family fits up to 21 columns can be brought
+into it, within at most 114 steps, and [LockWord](../../Rule30Open/Columns/LockWord.md) turns one such sequence into a
+theorem. Beside an alternating center, 45% to 48% of the windows of 19 columns, by phase, 49% to 52% of those of 20
+and 83% to 84% of those of 21 can never enter, whatever that column does
+(`python -m computations.lock_word --reach 19 20 21`, from
+[computations/lock_word.py](../../computations/lock_word.py)). The obstruction sits in the columns next to the center,
+not in the far right half.
 
 **Why.** Column 1 beside an alternating center nearly locks into a pattern of period 36 and keeps slipping, about once
 per 145 steps ([the right channel](../../findings/period-two/right-channel.md)). Inside the family column 1 would repeat

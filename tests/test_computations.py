@@ -1320,3 +1320,41 @@ def test_game_survey() -> None:
             assert (block in one) == (width is not None)
             if width is not None:
                 assert one[block] == (6 if width <= 6 else 10)
+
+
+def test_lock_unreachable() -> None:
+    """`lock_word.unreachable` against a forward search: beside an alternating center, at width 19, the set reached
+    from a window marked unreachable, with both values of column 20 at every step, never meets the trap, and the set
+    reached from a window marked reachable does; under 0111 at width 13 no window is unreachable."""
+    from computations import lock_word
+    wall = absorption.kit_wall()  # (4, 2^13)
+    assert not lock_word.unreachable("0111", 13, wall).any()
+    width = 19
+    out = lock_word.unreachable("0101", width, wall)  # (4, 2^W)
+    member = lock_word.trap("0101", width, wall)  # (4, 2^W)
+    successors = lock_certificate.successor_table("0101", width)  # (4, 2, 2^W)
+
+    def meets_trap(window: int) -> bool:
+        seen = np.zeros((4, 1 << width), dtype=bool)  # (4, 2^W)
+        seen[0, window] = True
+        frontier = [np.array([window], dtype=np.int64)] + [np.zeros(0, dtype=np.int64)] * 3  # by phase
+        while any(f.size for f in frontier):
+            if any(member[ph][frontier[ph]].any() for ph in range(4)):
+                return True
+            nxt = []
+            for ph in range(4):
+                prev = frontier[(ph - 1) % 4]  # (m,), at phase ph - 1
+                step = np.unique(successors[(ph - 1) % 4][:, prev].ravel())  # (k,)
+                step = step[~seen[ph][step]]
+                seen[ph][step] = True
+                nxt.append(step)
+            frontier = nxt
+        return False
+
+    rng = np.random.default_rng(7)
+    bad = np.flatnonzero(out[0])  # (n,)
+    good = np.flatnonzero(~out[0])  # (m,)
+    for window in rng.choice(bad, 2, replace=False).tolist():
+        assert not meets_trap(window)
+    for window in rng.choice(good, 2, replace=False).tolist():
+        assert meets_trap(window)

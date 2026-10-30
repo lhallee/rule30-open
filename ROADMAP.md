@@ -67,16 +67,17 @@ kit's commit 932cf8d.
   *Assessment:* the latest failure outlasts the half's length by about a third of it, and the work of a check doubles
   with every four cells, so checks settle bounded cases only; a proof needs an argument that uses the finiteness of the
   half.
-- **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz
-  problem ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails
-  ([left half alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52,
-  against the white right half no left half within depth 32,754 keeps the center alternating, in Lean
+- **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz problem
+  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails ([left half
+  alone](findings/period-two/left-half-alone.md)), the kit proves its Q01 for starts of width at most 52, against the
+  white right half no left half within depth 32,754 keeps the center alternating, in Lean
   ([WhiteRightHalf](Rule30Open/PeriodTwo/WhiteRightHalf.md), the kit's milestone `CQ01Empty` for those widths), and no
   finite certificate exists in the forms tried ([no certificate](negative-results/period-two/no-finite-certificate.md)).
-  The ether-and-wall family cannot give period two: the white right half never enters it, by computation here
-  ([the absorption route](negative-results/period-two/absorption-route.md)) and by a Lean proof claimed in the kit's
-  pull request #39. Other pull requests work on the gate, from which the kit reconstructs the one candidate left row
-  ([the kit's pull requests](literature/kit-pull-requests.md#period-two)).
+  The ether-and-wall family cannot give period two: the white right half never enters it, by computation here ([the
+  absorption route](negative-results/period-two/absorption-route.md)) and by a Lean proof claimed in the kit's pull
+  request #39, and about half the windows of 19 or 20 columns cannot enter it whatever the next column does. Other pull
+  requests work on the gate, from which the kit reconstructs the one candidate left row ([the kit's pull
+  requests](literature/kit-pull-requests.md#period-two)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains: every right half white on its first 1,317 cells
   enters it, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half of up to ten cells
