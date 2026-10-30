@@ -1803,6 +1803,24 @@ def test_coin_entry() -> None:
     assert (coin == 0).sum() == 10 and (coin > 0).sum() == 0
 
 
+def test_white_runs() -> None:
+    """`lock_chain.white_runs`: under 001011111 the white half's runs from the 9 phases are, at step 100, the six that a
+    white letter joins to the next phase, and by step 2,100 the runs from phases 3 to 7 agree on columns 1 to 2,000,
+    as a direct run with `step` of the runs from phases 3 and 5 shows."""
+    from computations import lock_chain
+    word = "001011111"
+    assert lock_chain.white_runs(word, 100, 2000) == [[0, 1, 2], [3, 4], [5], [6], [7], [8]]
+    assert lock_chain.white_runs(word, 2100, 2000) == [[0, 1, 2], [3, 4, 5, 6, 7], [8]]
+    windows = []
+    for phase in (3, 5):
+        row = 0
+        for t in range(2100 - phase):
+            row = (row & ~1) | int(word[(phase + t) % 9])
+            row = step(row)
+        windows.append((row >> 1) & ((1 << 2000) - 1))
+    assert windows[0] == windows[1]
+
+
 def test_second_nine_wall() -> None:
     """The second wall of period 9: from the random start that `NATURAL` names, a run of 001010011 is inside a closed
     set of 5,710 windows of 41 cells, with the phase modulo 27, that fixes column 1 at the white phases, by `is_lock`;

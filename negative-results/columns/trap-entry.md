@@ -67,8 +67,11 @@ The entries by step 20 are halves that start next to the trap. The ten into the 
 and distinct halves but land within four steps of each other, as one late event would. The white right half, which the
 census includes, enters none of these traps within 50,000 steps. Run for 1,000,000 steps it enters both walls of period
 9 from most phases, but late: `trap001011111` at step 119,947 from phase 2, and so from phases 0 and 1, where the center
-reads white first, one and two steps later, and at step 201,129 from phase 8, but not from phases 3 to 7;
-`trap001010011` at steps 91,086, 169,098 and 659,740 from phases 7, 2 and 4, and so from every phase but 8.
+reads white first, one and two steps later, and at step 201,129 from phase 8, but not from phases 3 to 7, whose runs
+agree on columns 1 to 2,000 from step 2,100 on, so that they are one run (`white_runs`); `trap001010011` at steps
+91,086, 169,098 and 659,740 from phases 7, 2 and 4, and so from every phase but 8. Small halves go on entering both
+walls at a steady rate over longer runs: of 100 pairs of a half and a phase drawn from the census, 66 enter the first by
+step 500,000 and 49 the second (`--sample`).
 
 *Any trap.* Column 1 locks for none of the 31 halves driven by any word of period 2, 5, 6 or 7, nor by $011$, except
 $01111$, for 2 halves, whose locks break near step 20,500, so that neither half is in a trap. For $001$ it locks for 6,
@@ -128,9 +131,11 @@ python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000
 python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000 --starts 300 --workers 3
 python -m computations.lock_chain --entry trap01fourteen --cells 0 --steps 200000
 python -m computations.lock_chain --entry trap001011111,trap001010011 --cells 0 --steps 1000000
+python -m computations.lock_chain --runs 001011111,001010011 --steps 2100 --cells 2000
+python -m computations.lock_chain --entry trap001011111,trap001010011 --cells 8 --steps 500000 --sample 100
 python -m computations.lock_chain --coin trap01,trap001fifteen,trap001011,trap0011101,trap001011101,trap001011111,trap001010011 --cells 8 --steps 50000
 ```
 
 The first takes about 40 minutes with one process per trap, the second about 15 per trap, the third about 3, the fourth
-about 50 with three processes, most of it for $001$, the fifth under a minute, the sixth about 18 and the seventh about
-25.
+about 50 with three processes, most of it for $001$, the fifth under a minute, the sixth about 18, the seventh a few
+seconds, the eighth about 15 per trap and the ninth about 25.

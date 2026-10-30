@@ -230,12 +230,14 @@ In order of the assessment above.
    only after $10^5$ steps; at periods 5, 6 and 7 driven halves almost never settle next to the center, none of the 301
    under a word of period 6 or 7, and a fair coin in place of the cells beyond the window enters the traps about as
    often as the rule's own half does, so the traps found there are hard to reach whatever arrives from the right ([trap
-   entry](negative-results/columns/trap-entry.md)). Next: entry into the traps of period 9 over longer runs, since it
-   comes late, as [the census for 001](findings/columns/t001-census.md) does for the kit's, and their Lean proofs for
-   classes of halves as for period four; walls of other periods, found as the closure of a driven half's window, the
-   search that found these, and at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the
-   blocks no trap reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which
-   no small half meets ([every block](findings/columns/left-half-every-block.md)).
+   entry](negative-results/columns/trap-entry.md)). Over 500,000 steps, small halves keep entering both walls of period
+   9 at steady rates, about $2.2 \cdot 10^{-6}$ and $1.4 \cdot 10^{-6}$ per step: two thirds and one half of a sample by
+   the end. Next: the Lean proof that the white half enters the walls of period 9 from the phases where it does, after
+   about $10^5$ steps, as [EmptyRight](Rule30Open/Columns/EmptyRight.md) proves it for `t001`, and other classes of
+   halves as for period four; walls of other periods, found as the closure of a driven half's window, the search that
+   found these, and at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap
+   reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half
+   meets ([every block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the period-four certificate, the
    periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
    seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),

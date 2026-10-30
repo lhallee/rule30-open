@@ -71,15 +71,19 @@ from each of the 9 phases, 247 of 2,304 enter `trap001011111` within 50,000 step
 latest at 49,425, and 167 enter `trap001010011`, a median of 33,653 steps in and the latest at 49,797, so for both walls
 entries are still coming at the end; of 31 random halves of 64 cells, the traps at distances 0 to 6 and 16 are each
 entered by one or two within 20,000 steps, and of 301 halves, the 67 whose column 1 locks under a block of period 9 are
-all inside traps ([trap entry](../../negative-results/columns/trap-entry.md)). The white right half enters both walls,
-but late. Its runs from two phases coincide when the center reads white at the first (the half is still white a step
-later), so the 9 phases give 6 runs under $001011111$ and 4 under $001010011$. Under $001011111$ two of the six enter,
-at step 119,947 from phase 2 and at step 201,129 from phase 8, and the other four stay out for 1,000,000 steps; under
-$001010011$ three of the four enter, at steps 91,086 from phase 7, 169,098 from phase 2 and 659,740 from phase 4, and
-the run from phase 8 stays out. So entry for every finite half has only partial support. Entry under $001$ into the
-kit's `t001` is faster: about 91% of the halves of up to ten cells by step 50,000 ([the census for
-001](../../findings/columns/t001-census.md)). The other 34 blocks of period 9 have no trap found. Entry for every finite
-right half stays open, as for the kit's traps.
+all inside traps ([trap entry](../../negative-results/columns/trap-entry.md)). Over longer runs entry goes on at a
+steady rate: of 100 pairs of such a half and a phase, drawn at random, 13 enter `trap001011111` by step 50,000, 22 by
+100,000, 34 by 200,000 and 66 by 500,000, about $2.2 \cdot 10^{-6}$ of those still out entering per step, and 8, 17, 26
+and 49 enter `trap001010011`, about $1.4 \cdot 10^{-6}$ per step, with no sign of slowing for either wall. The white
+right half enters both walls, but late. Its runs from two phases coincide when the center reads white at the first,
+since the half is still white a step later, and under $001011111$ the runs from phases 3 to 7 also agree on columns 1 to
+2,000 from step 2,100 on (`white_runs`), so the white half has 3 runs under $001011111$ and 4 under $001010011$. Under
+$001011111$ two of the three enter, at step 119,947 from phase 2 and at step 201,129 from phase 8, and the third stays
+out for 1,000,000 steps, as about one run in nine would at the rate above; under $001010011$ three of the four enter, at
+steps 91,086 from phase 7, 169,098 from phase 2 and 659,740 from phase 4, and the run from phase 8 stays out. So entry
+for every finite half has partial support. Entry under $001$ into the kit's `t001` is faster: about 91% of the halves of
+up to ten cells by step 50,000 ([the census for 001](../../findings/columns/t001-census.md)). The other 34 blocks of
+period 9 have no trap found. Entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 

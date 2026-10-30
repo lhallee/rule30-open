@@ -605,6 +605,24 @@ def white_lock(word: str, phase: int, steps: int) -> tuple[int, int | None, tupl
     return period, last, natural_trap(turned, 0, late, list(range(16, 65)), [period, 2 * period]) if late else None
 
 
+def white_runs(word: str, steps: int, cells: int) -> list[list[int]]:
+    """The phases of `word` grouped by the white right half's run: the run from phase p, after `steps` - p steps, is at
+    the phase `steps` of the word for every p, and two phases are in one group when their runs then agree on columns
+    1 .. `cells`. A run whose center reads white first is still the white half one step later, so phase p joins
+    phase p + 1 when `word[p]` is 0; runs can also merge later."""
+    period, mask = len(word), (1 << cells) - 1
+    windows = []
+    for p in range(period):
+        row = 0
+        for s in range(steps - p):
+            row = ((row << 1) | int(word[(p + s) % period])) ^ (row | (row >> 1))
+        windows.append(row & mask)
+    groups: dict[int, list[int]] = {}
+    for p, window in enumerate(windows):
+        groups.setdefault(window, []).append(p)
+    return sorted(groups.values())
+
+
 def white_scan(item: tuple[str, int], steps: int) -> tuple[str, int, int, int | None, tuple | None]:
     """`white_lock` for one (word, phase), as (word, phase, period, last change, trap)."""
     word, phase = item
@@ -727,6 +745,8 @@ def main() -> None:
     parser.add_argument("--natural", type=str, default="", help="periods whose words to search for natural traps")
     parser.add_argument("--starts", type=int, default=30, help="with --natural, random right halves besides the empty "
                         "one")
+    parser.add_argument("--runs", type=str, default="", help="words whose white-half runs from the phases to group by "
+                        "agreement on columns 1 .. --cells at step --steps")
     parser.add_argument("--coin", type=str, default="", help="traps whose entry to measure with a fair coin beyond "
                         "the window, from the small halves' windows at step 200")
     parser.add_argument("--white", type=str, default="", help="periods whose words drive the white right half, "
@@ -819,6 +839,9 @@ def main() -> None:
                     print(f"{word}: column 1 locks for {locks_found} of {args.starts + 1} starts; natural traps "
                           f"{traps}", flush=True)
         print(f"period {period}: done", flush=True)
+    for word in [w for w in args.runs.split(",") if w]:
+        print(f"{word}: the white half's runs from the phases, by agreement on columns 1 .. {args.cells} at step "
+              f"{args.steps}: {white_runs(word, args.steps, args.cells)}", flush=True)
     for name in [n for n in args.coin.split(",") if n]:
         times = coin_entry(name, args.cells, 200, args.steps)  # (n,)
         done = times[times >= 0]  # (k,)
