@@ -35,6 +35,7 @@ whether the white right half settles.
     python -m computations.lock_chain --lean-ten   # the trap entries of TenTraps, the wall of period 10 carried
     python -m computations.lock_chain --ten-entry --cells 8 --steps 50000   # entry into each trap of TenTraps
     python -m computations.lock_chain --lean-ten-gap   # the entries of the halves of 8 cells, TenGap.lean
+    python -m computations.lock_chain --ten-coin   # the period-10 wall with a fair coin beyond, about a minute
     python -m computations.lock_chain --natural 10,11,12 --steps 20000 --workers 4   # periods 10 to 12
     python -m computations.lock_chain --natural-from saved.txt   # the per-period summary of a saved --natural run
 """
@@ -435,6 +436,52 @@ def ten_entry(cells: int, steps: int) -> list[tuple[int, str, int, np.ndarray]]:
         t = carried("trap0000010001", distance)
         times = np.concatenate([entry_steps(t, halves, phase, steps) for phase in range(10)])  # (10 2^cells,)
         found.append((distance, t["word"], t["cells"], times))
+    return found
+
+
+def ten_member() -> np.ndarray:
+    """The states of the period-10 wall `ten0` as membership masks by phase, for `coin_lock`."""
+    # out: (10, 2^16)
+    t = carried("trap0000010001", 0)
+    member = np.zeros((len(t["word"]), 1 << t["cells"]), dtype=bool)  # (10, 2^16)
+    for label, window in t["states"]:
+        member[label % len(t["word"]), window] = True
+    return member
+
+
+def ten_coin(steps: int = 12000) -> dict:
+    """The period-10 wall against a fair coin in column 17 (`coin_lock`): the longest of the shortest entry paths, the
+    largest and the mean (at phase 0) expected entry time, the decay factor per step, the largest chance of staying out
+    after `steps` steps, the length of a word of column 17 that brings every window at phase 0 in, and for each value
+    the number of windows that a constant column 17 leaves outside after 3,000 steps from phase 0."""
+    from computations import coin_lock
+    from computations.lock_certificate import successor_table
+    word, member = "0000010001", ten_member()  # (10, 2^16)
+    dist, _ = coin_lock.entry_paths(word, member)  # (10, 2^16)
+    expected = coin_lock.expected_entry(word, member)  # (10, 2^16)
+    successors = successor_table(word, 16)  # (10, 2, 2^16)
+    constant = []
+    for value in (0, 1):
+        windows = np.arange(1 << 16)  # (2^16,)
+        for t in range(3000):
+            windows = successors[t % 10, value][windows]
+        constant.append(int((~member[0][windows]).sum()))
+    return {"reachable": bool((dist < coin_lock.UNREACHED).all()), "longest_path": int(dist.max()),
+            "expected_max": float(expected.max()), "expected_mean": float(expected[0].mean()),
+            "decay": coin_lock.decay_rate(word, member), "stay_out": float(coin_lock.stay_out(word, member, steps).max()),
+            "word": len(coin_lock.universal_word(word, member)), "constant": constant}
+
+
+def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> list[tuple[int, np.ndarray]]:
+    """Entry steps into the period-10 wall of `count` random right halves of each length (from
+    `numpy.random.default_rng(30)`, the last cell black), driven from phases 0 and 5."""
+    rng = np.random.default_rng(30)
+    t = carried("trap0000010001", 0)
+    found = []
+    for length in lengths:
+        halves = [int("".join(str(b) for b in rng.integers(0, 2, length)), 2) | (1 << (length - 1))
+                  for _ in range(count)]
+        found.append((length, np.concatenate([entry_steps(t, halves, phase, steps) for phase in (0, 5)])))
     return found
 
 
@@ -966,6 +1013,8 @@ def main() -> None:
     parser.add_argument("--lean-white", action="store_true", help="print the runs of NineWhite.lean")
     parser.add_argument("--lean-ten", action="store_true", help="print the trap entries of TenTraps.lean")
     parser.add_argument("--lean-ten-gap", action="store_true", help="print the entry data of TenGap.lean")
+    parser.add_argument("--ten-coin", action="store_true",
+                        help="the period-10 wall against a fair coin beyond, and random halves of growing length")
     parser.add_argument("--ten-entry", action="store_true",
                         help="entry of the halves with support in cells 1 .. --cells into each trap of TenTraps")
     parser.add_argument("--entry", type=str, default="", help="traps whose entry by small right halves to measure")
@@ -1144,6 +1193,18 @@ def main() -> None:
         print(lean_ten())
     if args.lean_ten_gap:
         print(lean_ten_gap())
+    if args.ten_coin:
+        coin = ten_coin()
+        print(f"every window can enter: {coin['reachable']}, within {coin['longest_path']} steps; with a fair coin the "
+              f"expected entry is at most {coin['expected_max']:.1f} steps, {coin['expected_mean']:.1f} on average at "
+              f"phase 0; the chance of staying out falls by {coin['decay']:.6f} per step and after 12,000 steps is at "
+              f"most {coin['stay_out']:.3g}; a word of {coin['word']} values of column 17 brings every window in; a "
+              f"white or black column 17 leaves {coin['constant'][0]} and {coin['constant'][1]} windows out after "
+              f"3,000 steps", flush=True)
+        for length, times in ten_lengths([16, 64, 256, 1024]):
+            done = times[times >= 0]  # (k,)
+            print(f"random halves of {length} cells: {done.size} of {times.size} enter by step 100,000, median "
+                  f"{int(np.median(done))}, latest {int(done.max())}", flush=True)
     if args.ten_entry:
         for distance, word, cells, times in ten_entry(args.cells, args.steps):
             done = times[times >= 0]  # (k,)

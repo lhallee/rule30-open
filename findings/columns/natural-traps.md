@@ -41,12 +41,19 @@ period 9.
 
 - **Period 10: one background.** The traps found there have 100 states in 269 of the 618 pairs of a block and a start
   inside a trap. They are one trap: the wall of $0000010001$, 16 cells, carried leftward by its chain to the blocks
-  $0011010111$, $0010101111$, $0001101111$, $0001110011$ and $0000010101$ at distances 2, 5, 6, 7 and 9, where it is
-  the least trap of each. The chain repeats with period 155 in the distance, so the wall is the edge of a background of
+  $0011010111$, $0010101111$, $0001101111$, $0001110011$ and $0000010101$ at distances 2, 5, 6, 7 and 9, where it is the
+  least trap of each. The chain repeats with period 155 in the distance, so the wall is the edge of a background of
   period 10 in time and 155 in space; its columns hold 28 blocks of period 10, among them, at distances 20 to 28, the
-  nine with locked windows of 13 cells ([TenTraps](../../Rule30Open/Columns/TenTraps.md)). Every right half with
-  support in cells 1 to 8 enters the wall from every phase within 3,042 steps, a median of 238, and the white half by
-  step 74.
+  nine with locked windows of 13 cells ([TenTraps](../../Rule30Open/Columns/TenTraps.md)). Every right half with support
+  in cells 1 to 8 enters the wall from every phase within 3,042 steps, a median of 238, and the white half by step 74.
+  Entry does not wait for a long tail to clear: random halves of 16, 64, 256 and 1,024 cells all enter, 120 of each from
+  phases 0 and 5, with medians of 172 to 266 steps and the latest at 2,955. Rule 30's own halves enter about as fast as
+  a fair coin in column 17 would bring them: every window can enter within 81 steps, with a coin the expected entry is
+  at most 482 steps and the chance of staying out falls by a factor 0.99746 per step, below $7 \cdot 10^{-14}$ after
+  12,000 steps from every window, and one word of 569 values of column 17, mostly white, brings every window at phase 0
+  in, while a constant column 17 does not (`ten_coin`, `ten_lengths`). For the words of period four, a few percent of
+  Rule 30's halves stay out of the coin's certificate by building ether plugs ([a fair coin beyond it](coin-lock.md));
+  here none of those sampled does.
 - **Periods 11 and 12: backgrounds too.** The traps recur with few sizes there as well: of the 1,364 pairs at period 11,
   263 are inside traps of 313 states, 181 of 103 and 74 of 138; of the 1,857 at period 12, 386 of 119, 159 of 116 and
   110 of 150. Each of these six is a wall whose chain becomes periodic in the distance (`wall_chains`): at period 11 the
@@ -78,10 +85,11 @@ python -m computations.lock_chain --natural-from natural.txt
 python -m computations.lock_chain --entry trap0000010001 --cells 8 --steps 50000
 python -m computations.lock_chain --entry trap0000010001 --cells 0 --steps 200000
 python -m computations.lock_chain --ten-entry --cells 6 --steps 20000
+python -m computations.lock_chain --ten-coin
 ```
 
 The first takes about 48 minutes with four processes and prints each block that locks for some start, with its traps,
 and the summary of each period, which the second prints again from the saved output, with the walls of the commonest
 traps and their chains; the third takes about a minute,
-the fourth seconds, and the fifth, entry into each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7
-minutes.
+the fourth seconds, the fifth, entry into each trap of [TenTraps](../../Rule30Open/Columns/TenTraps.md), about 7
+minutes, and the sixth, the coin and the halves of growing length, about a minute and a half.

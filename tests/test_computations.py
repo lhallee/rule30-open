@@ -1922,6 +1922,33 @@ def test_ten_gap() -> None:
     assert max(es[0][0] for es in entries) == 74
 
 
+def test_ten_coin() -> None:
+    """The period-10 wall with a fair coin in column 17: `coin_lock.stay_out` over 12 steps, for sampled windows at
+    phase 0, is the share of the 4,096 values of column 17 over those steps that keep the window outside, counted
+    directly with `successor_table`; and the word of `universal_word` brings every window at phase 0 inside by
+    `run_word`."""
+    from computations import coin_lock, lock_chain
+    from computations.lock_certificate import successor_table
+    word, member = "0000010001", lock_chain.ten_member()  # (10, 2^16)
+    successors = successor_table(word, 16)  # (10, 2, 2^16)
+    out = coin_lock.stay_out(word, member, 12)  # (10, 2^16)
+    outside = np.flatnonzero(~member[0])  # (m,)
+    for window in outside[::7919][:6].tolist():
+        kept = 0
+        for values in range(1 << 12):
+            w, inside = window, False
+            for t in range(12):
+                w = int(successors[t % 10, (values >> t) & 1, w])
+                if member[(t + 1) % 10, w]:
+                    inside = True
+                    break
+            kept += not inside
+        assert abs(out[0, window] - kept / 4096) < 1e-12, window
+    values = coin_lock.universal_word(word, member)
+    end = coin_lock.run_word(word, member, values, 0)  # (2^16,)
+    assert member[len(values) % 10][end].all()
+
+
 def test_edge_periods() -> None:
     """`lock_chain.edge_periods`: next to the kit's ether, white to the right, the edge column repeats; next to the
     background of period 9 no column near the edge does; for both, the column at the edge, run directly with `step`,

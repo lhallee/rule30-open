@@ -54,18 +54,19 @@ module checks the traps of the 25 blocks there that the kit does not exclude.
 
 Each trap reduces its block to entry, as the kit's `t001` does for $001$. For the wall itself entry is fast: of the
 right halves with support in cells 1 to 8, driven from each of the 10 phases, all 2,560 enter `ten0` within 50,000
-steps, a median of 238 steps in and the latest at 3,042, and the white right half enters from every phase by step 74.
-The carried traps are entered less evenly: of the 640 pairs of a right half with support in cells 1 to 6 and a phase,
-every one enters the traps at distances 0, 2, 5, 6, 7 and 9 within 20,000 steps, some enter those at distances 1, 3, 8,
-10, 12, 13, 14 and 16, and none those at distances 11, 15, 17 and 23 to 30 (`ten_entry`); for the blocks at distances 23
-to 30, [the natural scan](../../findings/columns/natural-traps.md) finds narrower traps, of 16 cells, that every sampled
-half enters. In that scan every one of 31 driven halves ends inside a trap of 100 states for $0000010001$, $0011010111$,
-$0010101111$, $0001101111$, $0001110011$ and $0000010101$, at the least width that holds a trap: this wall at distances
-0, 2, 5, 6, 7 and 9. The finite game does not exclude $0000010001$ at any width up to 18: one component of 5,337 to
-34,044 nodes at widths 12 to 16 lets a free cell beyond the window keep column 1 from locking. In Lean,
-[TenGap](TenGap.md) checks the entries of the 2,560 small halves and carries them along the light cone: no finite
-configuration whose cells 9 to 3,058 are white, or 1 to 90, has a center column that repeats $0000010001$. Entry for
-every finite right half stays open, as for the kit's traps.
+steps, a median of 238 steps in and the latest at 3,042, and the white right half enters from every phase by step 74;
+random halves of up to 1,024 cells enter as fast, about as a fair coin in column 17 would bring them in ([natural
+traps](../../findings/columns/natural-traps.md)). The carried traps are entered less evenly: of the 640 pairs of a right
+half with support in cells 1 to 6 and a phase, every one enters the traps at distances 0, 2, 5, 6, 7 and 9 within 20,000
+steps, some enter those at distances 1, 3, 8, 10, 12, 13, 14 and 16, and none those at distances 11, 15, 17 and 23 to 30
+(`ten_entry`); for the blocks at distances 23 to 30, [the natural scan](../../findings/columns/natural-traps.md) finds
+narrower traps, of 16 cells, that every sampled half enters. In that scan every one of 31 driven halves ends inside a
+trap of 100 states for $0000010001$, $0011010111$, $0010101111$, $0001101111$, $0001110011$ and $0000010101$, at the
+least width that holds a trap: this wall at distances 0, 2, 5, 6, 7 and 9. The finite game does not exclude $0000010001$
+at any width up to 18: one component of 5,337 to 34,044 nodes at widths 12 to 16 lets a free cell beyond the window keep
+column 1 from locking. In Lean, [TenGap](TenGap.md) checks the entries of the 2,560 small halves and carries them along
+the light cone: no finite configuration whose cells 9 to 3,058 are white, or 1 to 90, has a center column that repeats
+$0000010001$. Entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 
