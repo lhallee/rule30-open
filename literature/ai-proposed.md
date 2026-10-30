@@ -101,7 +101,11 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
 
 - **Google DeepMind (2026).** [formal-conjectures](https://github.com/google-deepmind/formal-conjectures), the
   conjectures marked solved with a formal proof found by the methods of G. Tsoukalas et al., *Advancing Mathematics
-  Research with AI-Driven Formal Proof Search*, arXiv:2605.22763 (the paper's text was not read). On October 29, 2026,
+  Research with AI-Driven Formal Proof Search*, arXiv:2605.22763 (the paper's text was not read), the system reported
+  as AlphaProof Nexus, whose proofs are in
+  [alphaproof-nexus-results](https://github.com/google-deepmind/alphaproof-nexus-results); that repository's index
+  groups them as additive combinatorics, algebraic geometry, graphs, optimization, quantum optics, Erdős problems, OEIS
+  conjectures and the Stacks Project, and names no other problem on cellular automata. On October 29, 2026,
   38 entries of the repository cite it: 36 conjectures from the OEIS, one Erdős problem and one from *Written on the
   Wall II*. Two concern cellular automata: [A300997](https://oeis.org/A300997), on an automaton that redistributes mass,
   and [A267581](https://oeis.org/A267581), the center column of the elementary rule 167 from a single black cell, whose
@@ -115,6 +119,16 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   ([rule-30.md](rule-30.md#the-prize-and-its-formal-statements)).
 
 ## Checked records, texts not read
+
+- **Chang (2026).** *Exploring Collatz Dynamics with Human-LLM Collaboration.* arXiv:2603.11066, several versions in
+  March 2026; the record was seen through a search, the text was not read, and two sites that summarize it are outside
+  this session's network. By the record, a sharpened structural reduction of the Collatz conjecture, written with an
+  LLM, that ends at an unproved condition it calls the Carry Independence Conjecture, with no cycle of period at most 13
+  checked by computer over 238,811 words. It does not claim a proof. *Here:* period two reduces to an integer map with
+  the shape of a Collatz problem ([HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)), but that map,
+  $H(U) = (U \gg 1) \oplus (U \lor (U \ll 1))$, is Rule 30 itself on the bits of $U$ and has no carries, so a condition
+  on the carries of $3n + 1$ has no counterpart there; the computer checks are of the kind of [the left-half
+  census](../findings/period-two/left-half-alone.md), where every integer below $2^{52}$ fails.
 
 - **Georgiev, Gómez-Serrano, Tao and Wagner (2025).** *Mathematical exploration and discovery at scale.*
   arXiv:2511.02864; the record was seen through a search, the text was not read. Reports an LLM-guided evolutionary
