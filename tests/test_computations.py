@@ -1249,3 +1249,74 @@ def test_lock_word() -> None:
                 bit = start * size + r
                 assert sum(((slices[j] >> bit) & 1) << j for j in range(width)) == int(windows[r])
         assert lock_word.slice_check(word, width, values, member)
+
+
+def test_ring_orbits() -> None:
+    """The periodic orbits on rings, against a step-by-step search of every state on rings of up to 10 cells, and the
+    ether's ring of 7 cells: its alternating column has a left neighbor of period 4."""
+    from computations import ring_orbits
+
+    def brute(cells: int) -> int:
+        full = (1 << cells) - 1
+
+        def nxt(s: int) -> int:
+            left = ((s << 1) | (s >> (cells - 1))) & full
+            right = ((s >> 1) | (s << (cells - 1))) & full
+            return left ^ (s | right)
+
+        cyclic = set()
+        for start in range(1 << cells):
+            s = start
+            for _ in range(1 << cells):
+                s = nxt(s)
+            cyclic.add(s)  # after 2^M steps the state is on its cycle
+        classes = set()
+        for s in cyclic:
+            orbit, x = [s], nxt(s)
+            while x != s:
+                orbit.append(x)
+                x = nxt(x)
+            classes.add(min(((y << r) | (y >> (cells - r))) & full for y in orbit for r in range(cells)))
+        return len(classes)
+
+    for cells in range(1, 11):
+        assert len(ring_orbits.orbits(cells)) == brute(cells)
+    found, counts = ring_orbits.witnessed(14, 16)
+    assert found == {"01": 7} and counts[6] == 3
+
+
+def test_kit_families() -> None:
+    """`PADDING_FAMILIES` and `BLACK_RUN_BLOCKS` are the kit's white-padding certificates and its Theorem B' instances,
+    read from its source; at periods 17 and 18 they add 0^13 1011, 0^14 1011 and 0^14 1101 to `kit_blocks`, and up to
+    period 16 nothing."""
+    padding = (KIT_SOURCE / "Rule30UniformWhitePadding.lean").read_text(encoding="utf-8") + \
+        (KIT_SOURCE / "Rule30ShortTail.lean").read_text(encoding="utf-8")
+    thresholds = dict(re.findall(r"theorem certificate([A-I]) \(r : Nat\) \(hr : (\d+) ≤ r\)", padding))
+    tails = dict(re.findall(r"def tail([A-I]) : List Bool := \[([^\]]*)\]",
+                            (KIT_SOURCE / "Rule30Certificates/WhitePaddingFamilies.lean").read_text(encoding="utf-8")))
+    assert sorted(thresholds) == sorted(tails) == list("ABCDEFGHI")
+    read = {("".join("1" if cell.strip() == "true" else "0" for cell in tails[name].split(",")), int(thresholds[name]))
+            for name in thresholds}
+    assert read == set(game.PADDING_FAMILIES)
+    blocks = re.findall(r"theorem det_[01]+ : Determined \[([^\]]*)\] (\d+) = true",
+                        (KIT_SOURCE / "Rule30BlackRunBlocks.lean").read_text(encoding="utf-8"))
+    read = {("".join("1" if cell.strip() == "true" else "0" for cell in cells.split(",")), max(9, 9 * int(j0)))
+            for cells, j0 in blocks}
+    assert read == set(game.BLACK_RUN_BLOCKS)
+    assert "padding or black-run family" not in game.kit_blocks(16).values() and len(game.kit_blocks(16)) == 62
+    added = {word for word, reason in game.kit_blocks(18).items() if reason == "padding or black-run family"}
+    assert added == {"0" * 13 + "1011", "0" * 14 + "1011", "0" * 14 + "1101"}
+
+
+def test_game_survey() -> None:
+    """The survey of `excluded_blocks` over worker processes agrees with the survey in one process, and both agree with
+    `least_width`, block by block, on every primitive block of period 8 to 10."""
+    one, tried = game.excluded_blocks(10, [6, 10], min_period=8)
+    two, tried2 = game.excluded_blocks(10, [6, 10], min_period=8, workers=2)
+    assert one == two and tried == tried2 == len(game.necklaces(8)) + len(game.necklaces(9)) + len(game.necklaces(10))
+    for period in range(8, 11):
+        for block in game.necklaces(period):
+            width = game.least_width(block, 10)
+            assert (block in one) == (width is not None)
+            if width is not None:
+                assert one[block] == (6 if width <= 6 else 10)

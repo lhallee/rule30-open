@@ -72,6 +72,7 @@ that `GameBlocks.lean` and `GameBlocksLong.lean` check.
 
 ## Open
 
-Every one of the 197 exclusions is kernel-checked, here or in the kit. The game has not been run past period 16. Up to
-period 16 every block it excludes has a run of at least five equal values, and for blocks with only short runs it fails
-at every width tried, so it does not reach the typical blocks of large period.
+Every one of the 197 exclusions is kernel-checked, here or in the kit. At periods 17 and 18 the game excludes 261 more
+blocks, all with a run of at least six equal values ([the game blocks of period 17 and 18](game-blocks-18.md)). For
+blocks with only short runs it fails at every width tried, so it does not reach the typical blocks of large period;
+rings explain that failure only for $01$ ([ring orbits](../../negative-results/columns/ring-orbits.md)).

@@ -18,11 +18,14 @@ game needs and with the number of nodes there; `lean_mask` writes the certificat
     python -m computations.game --max-period 12 --widths 6,10 --jen   # what Jen's theorem on farther columns adds
     python -m computations.game --max-period 14 --widths 6,10,14 --kit   # which of those are new to the kit
     python -m computations.game --max-period 16 --widths 6,10,14 --kit   # the same to period 16, about 20 minutes
+    python -m computations.game --min-period 17 --max-period 18 --workers 4   # periods 17 and 18, about 17 minutes
 """
 
 from __future__ import annotations
 
 import argparse
+import functools
+import multiprocessing
 import sys
 import time
 import numpy as np
@@ -220,15 +223,30 @@ def lean_mask(pattern: str, width: int) -> str:
     ])
 
 
+# The kit's white-padding certificate families, 0^r followed by a tail, with the least r: families A to E of
+# `Rule30UniformWhitePadding` and F to I of `Rule30ShortTail` (`certificateA` to `certificateI`).
+PADDING_FAMILIES = (("101011", 13), ("1101", 14), ("11101", 23), ("101", 23), ("1111", 31), ("1", 21), ("11", 11),
+                    ("1001", 22), ("1011", 13))
+# The kit's Theorem B' (`Rule30BlackRunBlocks.no_black_run_block`): 1^r followed by a block u, with the least r.
+BLACK_RUN_BLOCKS = (("0", 18), ("00", 18), ("000", 18), ("0000", 18), ("0100", 18), ("010", 27), ("0010", 27),
+                    ("0110", 27))
+
+
 def kit_blocks(max_period: int) -> dict[str, str]:
     """The primitive blocks of period up to `max_period` that the pinned kit excludes as the eventual period of the
     center column, each with the reason: a strip certificate (`KIT_WORDS`), every run of 1s lasting at least 9 steps
-    (`Rule30BlackRuns.not_eventuallyPeriodic_of_long_one_runs`, the constant blocks included), or a padded word of
-    `Rule30PaddedWords`: 0^q 1 with q >= 9, 0^r 11 with r >= 8, or 0^q 10111 with q >= 9."""
+    (`Rule30BlackRuns.not_eventuallyPeriodic_of_long_one_runs`, the constant blocks included), a padded word of
+    `Rule30PaddedWords`: 0^q 1 with q >= 9, 0^r 11 with r >= 8, or 0^q 10111 with q >= 9, a white-padding certificate
+    family (`PADDING_FAMILIES`), or Theorem B' (`BLACK_RUN_BLOCKS`). The kit's other families, its tails of at most
+    six cells after at least 69 white cells, its suffix families and its mixtures, need periods above 21."""
     found = {word: "strip certificate" for word in KIT_WORDS if len(word) <= max_period}
     for period in range(1, max_period + 1):
         padded = {least_rotation("0" * (period - len(tail)) + tail)
                   for tail, white in (("1", 9), ("11", 8), ("10111", 9)) if period - len(tail) >= white}
+        families = {least_rotation("0" * (period - len(tail)) + tail)
+                    for tail, white in PADDING_FAMILIES if period - len(tail) >= white}
+        families |= {least_rotation("1" * (period - len(block)) + block)
+                     for block, black in BLACK_RUN_BLOCKS if period - len(block) >= black}
         for word in necklaces(period):
             start = word.find("0")  # a 0 to cut the cycle at, -1 for the block 1
             ones = [len(run) for run in (word[start:] + word[:start]).split("0") if run] if start >= 0 else []
@@ -236,6 +254,8 @@ def kit_blocks(max_period: int) -> dict[str, str]:
                 found[word] = "long runs of 1s"
             elif word not in found and word in padded:
                 found[word] = "padded word"
+            elif word not in found and word in families:
+                found[word] = "padding or black-run family"
     return found
 
 
@@ -249,22 +269,33 @@ def least_width(pattern: str, max_width: int = 14) -> int | None:
     return next((width for width in range(1, max_width + 1) if bad_pairs(pattern, width) == 0), None)
 
 
-def excluded_blocks(max_period: int, widths: list[int], jen: bool = False) -> tuple[dict[str, int], int]:
-    """Each primitive block of period up to `max_period` that the game excludes, with the first width that does, and
-    the number of blocks tried. With `jen`, a component also closes by Jen's theorem on a farther column."""
-    blocks = [pattern for period in range(1, max_period + 1) for pattern in necklaces(period)]
-    excluded = {}
-    for pattern in tqdm(blocks, desc="blocks", unit="block", file=sys.stderr, mininterval=5):
-        open_at = (lambda width: len(jen_open(pattern, width))) if jen else (lambda width: bad_pairs(pattern, width))
-        width = next((width for width in widths if open_at(width) == 0), None)
-        if width is not None:
-            excluded[pattern] = width
-    return excluded, len(blocks)
+def first_width(pattern: str, widths: list[int], jen: bool = False) -> int | None:
+    """The first of `widths` at which the game excludes `pattern`, or None. With `jen`, a component also closes by
+    Jen's theorem on a farther column."""
+    open_at = (lambda width: len(jen_open(pattern, width))) if jen else (lambda width: bad_pairs(pattern, width))
+    return next((width for width in widths if open_at(width) == 0), None)
+
+
+def excluded_blocks(max_period: int, widths: list[int], jen: bool = False, min_period: int = 1,
+                    workers: int = 1) -> tuple[dict[str, int], int]:
+    """Each primitive block of period `min_period` to `max_period` that the game excludes, with the first width that
+    does, and the number of blocks tried, over `workers` processes."""
+    blocks = [pattern for period in range(min_period, max_period + 1) for pattern in necklaces(period)]
+    task = functools.partial(first_width, widths=widths, jen=jen)
+    progress = functools.partial(tqdm, total=len(blocks), desc="blocks", unit="block", file=sys.stderr, mininterval=5)
+    if workers > 1:
+        with multiprocessing.get_context("spawn").Pool(workers) as pool:  # no fork of a process that holds threads
+            found = list(progress(pool.imap(task, blocks, chunksize=8)))
+    else:
+        found = [task(pattern) for pattern in progress(blocks)]
+    return {pattern: width for pattern, width in zip(blocks, found) if width is not None}, len(blocks)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=14)
+    parser.add_argument("--min-period", type=int, default=1)
+    parser.add_argument("--workers", type=int, default=1, help="processes for the survey")
     parser.add_argument("--widths", default="6,10,14", help="widths tried in order, comma separated")
     parser.add_argument("--jen", action="store_true", help="also close components by Jen's theorem on farther columns")
     parser.add_argument("--kit", action="store_true", help="also list the excluded blocks the kit does not exclude")
@@ -272,10 +303,10 @@ def main() -> None:
 
     started = time.perf_counter()
     widths = [int(width) for width in args.widths.split(",")]
-    excluded, tried = excluded_blocks(args.max_period, widths)
+    excluded, tried = excluded_blocks(args.max_period, widths, min_period=args.min_period, workers=args.workers)
     for pattern, width in excluded.items():
         print(f"{pattern:>14}: excluded at width {width}")
-    print(f"{len(excluded)} of {tried} primitive blocks of period up to {args.max_period} excluded "
+    print(f"{len(excluded)} of {tried} primitive blocks of period {args.min_period} to {args.max_period} excluded "
           f"({time.perf_counter() - started:.0f} s)")
     if args.jen:
         extended, _ = excluded_blocks(args.max_period, widths, jen=True)
