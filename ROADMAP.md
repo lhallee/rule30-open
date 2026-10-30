@@ -244,11 +244,11 @@ In order of the assessment above.
    statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
    block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
-   period-four certificate, the periodic backgrounds and the period-two computations ([open work](CATALOG.md#open-work)); the general facts of the
-   seed's past are now in Lean ([SeedPast](Rule30Open/Frames/SeedPast.md),
-   [SeedPastPeriods](Rule30Open/Frames/SeedPastPeriods.md)). The 2-adic trace, the center degree
-   and the Duhamel form are proved in the kit's equivalent forms, which a search should include before any formalization
-   (`.lake/packages/rule30prize/equivalents/Rule30Equivalents/`).
+   period-four certificate, the periodic backgrounds and the period-two computations ([open
+   work](CATALOG.md#open-work)); the general facts of the seed's past are now in Lean
+   ([SeedPast](Rule30Open/Frames/SeedPast.md), [SeedPastPeriods](Rule30Open/Frames/SeedPastPeriods.md)). The 2-adic
+   trace, the center degree and the Duhamel form are proved in the kit's equivalent forms, which a search should include
+   before any formalization (`.lake/packages/rule30prize/equivalents/Rule30Equivalents/`).
 4. **Track the kit and the literature.** Re-pin the kit when it gains modules, after the build, the audit and the tests
    pass, and move an entry's `kit:` relation when the kit gains its result; keep [the literature](literature/README.md)
    current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull

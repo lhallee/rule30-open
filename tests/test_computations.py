@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 import numpy as np
 import pytest
@@ -312,6 +313,32 @@ def test_jen_open() -> None:
             assert game.jen_open(pattern, width) == jen_open_brute(pattern, width), (pattern, width)
     blocks = [pattern for period in range(1, 9) for pattern in game.necklaces(period)]
     assert [p for p in blocks if not game.jen_open(p, 6)] == [p for p in blocks if game.bad_pairs(p, 6) == 0]
+
+
+def test_component_periods() -> None:
+    """`game.component_periods` against closed walks: for 001 at width 4 and 0001 at width 6, the cyclic period of each
+    component that can hold a play is the gcd of the lengths up to 60 of the closed walks inside it through its first
+    node, from powers of its adjacency matrix; its phase test agrees with `bad_pairs`; and 001 at width 4 has a
+    component of period 6 where the left column takes both values at one phase but not in one class."""
+    for pattern, width in (("001", 4), ("0001", 6)):
+        source, target, label, recurrent, _ = game.game_graph(pattern, width)
+        found = game.component_periods(pattern, width)
+        assert len(found) == int(recurrent.sum())
+        for (size, cycle, _, _), component in zip(found, np.flatnonzero(recurrent).tolist()):
+            members = np.flatnonzero(label == component)  # (m,)
+            index = {node: i for i, node in enumerate(members.tolist())}
+            adjacency = np.zeros((members.size, members.size))  # (m, m)
+            for a, b in zip(source.tolist(), target.tolist()):
+                if a in index and b in index:
+                    adjacency[index[a], index[b]] = 1.0
+            walk, lengths = np.eye(members.size), []  # (m, m)
+            for n in range(1, 61):
+                walk = np.minimum(walk @ adjacency, 1.0)
+                if walk[0, 0] > 0:
+                    lengths.append(n)
+            assert size == members.size and cycle == math.gcd(*lengths), (pattern, width, component)
+        assert any(found_phase for _, _, found_phase, _ in found) == (game.bad_pairs(pattern, width) > 0)
+    assert (6, 6, True, False) in game.component_periods("001", 4)
 
 
 KIT_SOURCE = ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata"

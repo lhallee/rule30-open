@@ -8,7 +8,9 @@ function of the phase, it is eventually periodic for every row, and Jen's theore
 (Lean: `game_column` in `Rule30Open.Columns.FiniteGame`).
 
 `--jen` also closes a component when a farther column is eventually periodic along every play that stays in it, which
-Jen's theorem forbids as well (`jen_open`), and reports the blocks that this adds.
+Jen's theorem forbids as well (`jen_open`), and reports the blocks that this adds. `--cyclic` asks the left column to be
+a function of a component's cyclic class instead of the phase (`component_periods`), since a play that stays in a
+component of cyclic period d visits its classes in turn, and reports the blocks that this adds.
 
 `--kit` also lists the excluded blocks that the pinned kit does not exclude (`kit_blocks`), each at the least width the
 game needs and with the number of nodes there; `lean_mask` writes the certificate Lean checks for one
@@ -16,6 +18,7 @@ game needs and with the number of nodes there; `lean_mask` writes the certificat
 
     python -m computations.game --max-period 14 --widths 6,10,14   # which primitive blocks the game excludes
     python -m computations.game --max-period 12 --widths 6,10 --jen   # what Jen's theorem on farther columns adds
+    python -m computations.game --max-period 12 --widths 6,10 --cyclic   # what the cyclic classes add
     python -m computations.game --max-period 14 --widths 6,10,14 --kit   # which of those are new to the kit
     python -m computations.game --max-period 16 --widths 6,10,14 --kit   # the same to period 16, about 20 minutes
     python -m computations.game --min-period 17 --max-period 18 --workers 4   # periods 17 and 18, about 17 minutes
@@ -25,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import math
 import multiprocessing
 import sys
 import time
@@ -32,7 +36,7 @@ import numpy as np
 
 from graphlib import TopologicalSorter
 from scipy.sparse import csr_matrix
-from scipy.sparse.csgraph import connected_components
+from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
 
 # The words of the kit's strip-certificate table (`Rule30StripCertificateTable.certTable`) and of its three single strip
@@ -132,6 +136,40 @@ def jen_open(pattern: str, width: int) -> list[int]:
         if not deterministic:
             sizes.append(int(members.size))
     return sorted(sizes, reverse=True)
+
+
+def component_periods(pattern: str, width: int) -> list[tuple[int, int, bool, bool]]:
+    """For each component that can hold a play: its size in nodes, its cyclic period (the gcd of the lengths of its
+    cycles, a multiple of the block's period, since every move advances the phase by one), whether the left column
+    takes both values at one phase, as `bad_pairs` counts, and whether it takes both values in one cyclic class. A play
+    that stays in a component of period d visits the classes in turn, so where the second is false the left column is
+    eventually periodic with period d along every such play, which the adjacent-column theorem forbids as well."""
+    source, target, label, recurrent, column = game_graph(pattern, width)
+    period, nodes = len(pattern), label.size
+    phase_of = np.arange(nodes) >> width  # (p n,)
+    inside = label[source] == label[target]  # (2 p n,)
+    src, tgt = source[inside], target[inside]  # (k,), (k,)
+    graph = csr_matrix((np.ones(src.size, dtype=np.int8), (src, tgt)), shape=(nodes, nodes))
+    level = np.zeros(nodes, dtype=np.int64)  # (p n,), the distance from the component's first node
+    found = []
+    for component in np.flatnonzero(recurrent).tolist():
+        members = np.flatnonzero(label == component)  # (m,)
+        order, parent = breadth_first_order(graph, int(members[0]), directed=True, return_predecessors=True)  # (m,)
+        for node in order[1:].tolist():
+            level[node] = level[parent[node]] + 1
+        moves = label[src] == component  # (k,)
+        cycle = 0
+        for gap in np.unique(np.abs(level[src[moves]] + 1 - level[tgt[moves]])).tolist():
+            cycle = math.gcd(cycle, int(gap))
+
+        def mixed(key: np.ndarray, size: int) -> bool:
+            seen = np.zeros((size, 2), dtype=bool)  # (size, 2)
+            seen[key, column[members].astype(np.int64)] = True
+            return bool(seen.all(axis=1).any())
+
+        found.append((int(members.size), cycle, mixed(phase_of[members], period),
+                      mixed(level[members] % cycle, cycle)))
+    return found
 
 
 def game_ranks(pattern: str, width: int) -> tuple[np.ndarray, int, int]:
@@ -299,6 +337,8 @@ def main() -> None:
     parser.add_argument("--widths", default="6,10,14", help="widths tried in order, comma separated")
     parser.add_argument("--jen", action="store_true", help="also close components by Jen's theorem on farther columns")
     parser.add_argument("--kit", action="store_true", help="also list the excluded blocks the kit does not exclude")
+    parser.add_argument("--cyclic", action="store_true",
+                        help="also ask the left column to be a function of each component's cyclic class")
     args = parser.parse_args()
 
     started = time.perf_counter()
@@ -315,6 +355,20 @@ def main() -> None:
         for pattern in ("0001", "0011", "0111"):
             print(f"{pattern}: open components at widths 6 to 12 have "
                   + "; ".join(f"{jen_open(pattern, width)} nodes" for width in (6, 8, 10, 12)))
+    if args.cyclic:
+        gained, ratios = [], {}
+        for period in range(args.min_period, args.max_period + 1):
+            for pattern in tqdm(necklaces(period), desc=f"period {period}", file=sys.stderr, mininterval=5):
+                if pattern in excluded:
+                    continue
+                parts = [component_periods(pattern, width) for width in widths]
+                if any(not any(part[3] for part in found) for found in parts):
+                    gained.append(pattern)
+                for _, cycle, _, both in parts[-1]:
+                    if both:
+                        ratios[cycle // period] = ratios.get(cycle // period, 0) + 1
+        print(f"with cyclic classes: {sorted(gained)} beyond the game; at width {widths[-1]} the components where the "
+              f"left column takes both values in one class have cyclic period P times {dict(sorted(ratios.items()))}")
     if args.kit:
         kit = kit_blocks(args.max_period)
         new = [pattern for pattern in excluded if pattern not in kit]

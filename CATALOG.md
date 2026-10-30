@@ -160,7 +160,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Kind | Problems |
 |---|---|---|
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
-| [Jen's theorem on farther columns does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
+| [Jen's theorem on farther columns, or on periods longer than the block's, does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
 | [Driven by 011, the right half does not settle next to the center](negative-results/columns/period-three-011.md) | no signal | 1 |
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |
 | [Periodic orbits on rings explain the finite game's failure only for the alternating block](negative-results/columns/ring-orbits.md) | no signal | 1 |
