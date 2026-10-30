@@ -3,7 +3,7 @@ title: Every window can reach the period-four certificate, so a fair coin beyond
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/coin_lock.py]
 ---
 
@@ -69,6 +69,9 @@ the ones the certificate finding names stay out (start 4 under $0001$, 24 under 
 
 The first two items are finite statements, checkable like the kit's strip certificates: a table of distances on
 $4 \cdot 2^{16}$ pairs, or the word $u_w$ run on every window. The coin model's numbers are floating-point.
+[LockWord](../../Rule30Open/Columns/LockWord.md) proves the second item's form in Lean with the kit's ether-and-wall
+family in place of this certificate: one sequence in column 17, 15 or 14 brings every window, from every start phase,
+into the family, so a center that repeats the word keeps that column off the sequence forever.
 
 ## Reproduce
 

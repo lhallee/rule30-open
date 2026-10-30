@@ -12,6 +12,7 @@ and tqdm, and run on a laptop.
 | [right_half.py](right_half.py) | [Period-four locking](../findings/columns/period-four-locking.md) and [the right channel](../findings/period-two/right-channel.md) | `python -m computations.right_half 12000 30 --max-period 7` | 15 s |
 | [lock_certificate.py](lock_certificate.py) | [The period-four certificate](../findings/columns/period-four-certificate.md) | `python -m computations.lock_certificate 0001 --widths 14 16 --steps 20000` | 5 s |
 | [coin_lock.py](coin_lock.py) | [A fair coin beyond the period-four certificate](../findings/columns/coin-lock.md) | `python -m computations.coin_lock 0001 0011 0111 --widths 14 16 18` | 17 s |
+| [lock_word.py](lock_word.py) | [One word in a column beside the center forces the period-four lock](../Rule30Open/Columns/LockWord.md): the three sequences, run on every window as bit slices | `python -m computations.lock_word` | 3 s |
 | [slow_halves.py](slow_halves.py) | [The slow-half searches](../negative-results/columns/slow-half-search.md) | `python -m computations.slow_halves 0001 0011 0111 --beam 512 --start 12 --stop 64 --steps 8000` | 80 s |
 | [ether_prefix.py](ether_prefix.py) | [Truncated ether](../Rule30Open/Columns/EtherPrefix.md) | `python -m computations.ether_prefix --tail 4` | 2 min |
 | [long_window.py](long_window.py) | [The 65,536-cell window](../Rule30Open/Columns/LongWindow.md) | `python -m computations.long_window` | 1 s |

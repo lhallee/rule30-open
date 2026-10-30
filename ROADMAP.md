@@ -50,7 +50,9 @@ kit's commit 932cf8d.
   the aligned ether, the only infinite half seen to stay out, followed by at most four cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md)); a window of 16 columns has a certificate ([the
   certificate](findings/columns/period-four-certificate.md)), every window can reach it, and one word of a few hundred
-  values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)). Open: attraction for halves with at
+  values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one sequence of 1,193,
+  955 or 381 values in column 17, 15 or 14 brings every window into the family, so a center that repeats the word keeps
+  that column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). Open: attraction for halves with at
   least three black cells among the first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$ and
   one among columns 11 to $G'$, beyond the census's 20 cells. *Assessment:* the most direct route to a full case of
   Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement of the

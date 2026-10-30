@@ -1220,3 +1220,32 @@ def test_stripe() -> None:
         assert not wall_segments.stripe_brute(length, 2 * length + 1)
     for length in range(1, 11):
         assert wall_segments.stripe_known_steps(length) == 2 * length
+
+
+def test_lock_word() -> None:
+    """The lock words of `LockWord`: the trap agrees with `absorption.family_depth`, the depth-first family test, on
+    every window; each word, run window by window through the successor table from every start phase, ends every window
+    in the trap; and the bit slices agree with that run on sampled windows."""
+    from computations import lock_word
+    wall = absorption.kit_wall()  # (4, 2^13)
+    rng = np.random.default_rng(5)
+    for word, (width, _, _, _) in lock_word.LEAST.items():
+        member = lock_word.trap(word, width, wall)  # (4, 2^W)
+        assert int(member.sum()) == 109
+        states = np.arange(1 << width, dtype=np.uint64)  # (2^W,)
+        for ph in range(4):
+            depth = absorption.family_depth(word, states, ph, wall)  # (2^W,)
+            assert np.array_equal(member[ph], (depth >= 0) & (depth <= width - 13))
+        values = lock_word.universal_word(word, member)
+        successors = lock_certificate.successor_table(word, width)  # (4, 2, 2^W)
+        slices = lock_word.slice_run(word, width, values)
+        size = 1 << width
+        for start in range(4):
+            windows = np.arange(size, dtype=np.int64)  # (2^W,)
+            for t, value in enumerate(values):
+                windows = successors[(start + t) % 4, value][windows]  # (2^W,)
+            assert member[(start + len(values)) % 4][windows].all()
+            for r in rng.integers(0, size, 20).tolist():
+                bit = start * size + r
+                assert sum(((slices[j] >> bit) & 1) << j for j in range(width)) == int(windows[r])
+        assert lock_word.slice_check(word, width, values, member)
