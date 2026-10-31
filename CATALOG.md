@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 99 Lean modules with 443 headline theorems, 42 findings (proved on paper,
-computed or conjectured) and 38 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 39 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 80 | 23 | 10 |
+| [Columns](#columns) | 80 | 23 | 11 |
 | [Period two](#period-two) | 6 | 7 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -229,6 +229,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Driven by 011, the right half does not settle next to the center](negative-results/columns/period-three-011.md) | no signal | 1 |
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |
 | [Periodic orbits on rings of up to 25 cells explain the finite game's failure only for the alternating block](negative-results/columns/ring-orbits.md) | no signal | 1 |
+| [The sheaf of patches beside a repeating column gives back the finite game, and its cohomology is weaker than the limit windows one cell narrower](negative-results/columns/sheaf-sections.md) | dead end | 1 |
 | [A search for slow right halves finds no counterexample and misses the slowest halves](negative-results/columns/slow-half-search.md) | no signal | 1 |
 | [Right halves driven by blocks of period 5, 6 and 7 almost never enter a trap](negative-results/columns/trap-entry.md) | no signal | 1 |
 | [No window of up to 20 cells locks for any block of period 2, 3, 5, 6, 7 or 9](negative-results/columns/window-locks.md) | no signal | 1 |
