@@ -651,13 +651,16 @@ def relabeled_tables(full: str, cells: int, nodes: set[tuple[int, int]]) -> dict
 
 
 def carried(name: str, distance: int) -> dict:
-    """The trap of `NATURAL` named `name` carried `distance` columns left by its chain: the block at that distance, read
-    with the seed's labels, and as tables (`relabeled_tables`). The seed's lock values are its first cells at its white
-    labels; the d columns of the chain go in front of each state's window."""
-    seed, _, _, cells, modulus = next(entry for entry in NATURAL if entry[0] == name)[1:]
-    t = tables(name)
-    word, period = t["word"], len(t["word"])
-    full = word * (modulus // period)  # the seed at its labels
+    """The trap of `NATURAL` named `name` carried `distance` columns left by its chain (`carry`)."""
+    return carry(tables(name), distance)
+
+
+def carry(t: dict, distance: int) -> dict:
+    """A trap carried `distance` columns left by its chain: the block at that distance, read with the trap's labels, and
+    as tables (`relabeled_tables`). The trap's lock values are its first cells at its white labels; the d columns of
+    the chain go in front of each state's window."""
+    word, period, cells, modulus = t["word"], len(t["word"]), t["cells"], t["modulus"]
+    full = word * (modulus // period)  # the trap's block at its labels
     values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(modulus))
     columns = chain(full, values, distance)  # columns m, m - 1, .., m - distance at the labels
     nodes = set()
@@ -1687,6 +1690,15 @@ def named_tables(module: str, name: str) -> dict:
         block, index = name[4:].split("_")
         return split_tables(block)[int(index)]
     return next(build() for m, n, build in module_entries() if (m, n) == (module, name))
+
+
+def trap_chain(t: dict, depth: int) -> list[str]:
+    """The blocks, each as its least rotation, of the columns at distances 0 to `depth` to the left of a trap's block in
+    the chain that its lock carries (`chain`): the blocks a trap carried that far would be for."""
+    full = t["word"] * (t["modulus"] // len(t["word"]))  # the block at the trap's labels
+    values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(t["modulus"]))
+    period = len(t["word"])
+    return [min(c[:period][i:] + c[:period][:i] for i in range(period)) for c in chain(full, values, depth)]
 
 
 def set_tables(block: str) -> list[tuple[str, str, dict]]:

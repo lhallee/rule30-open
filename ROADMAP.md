@@ -45,8 +45,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period. [The coverage](findings/columns/coverage.md) counts, period by
-  period up to 12, the blocks excluded, reduced to entry into a trap, reduced by steering, or not reached: at periods 5
-  to 7 one block each is reached, and from period 9 a quarter to two fifths have traps.
+  period up to 15, the blocks excluded, reduced to entry into a trap that passes the two tests entry needs, reduced by
+  steering, or not reached: at periods 5 to 7 one block each is reached, and from period 9 about a quarter to three
+  tenths have traps that pass.
   - *Excluded.* Finite games, strip certificates and padding families exclude 197 of the 8,800 blocks of period at most
     16, all 136 beyond the kit in Lean ([game blocks](findings/columns/game-blocks.md),
     [BitGame](Rule30Open/Columns/BitGame.md)), 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and

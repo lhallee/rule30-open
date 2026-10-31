@@ -48,13 +48,14 @@ is the state set of one of the block's traps is left out (`TRAP_SETS`).
 For 18 of the 29 blocks no half of the scan that the scan finds in a trap is in the module's trap: for $000111111011101$
 all 31 halves are inside one natural trap of 27 cells, for $000000110011101$ 30 inside one of 28 cells and one inside
 one of 42, and for $0000010101101$ all 13 that lock inside one of 23. The modules' traps there came from walls carried
-along a background's columns, or from the census of locked windows of 16 cells, and the halves settle into wider
-closed sets instead. Nine of the natural traps of period 15 have 193 states, at widths 27 to 39, and three have 652, at
-37 to 42; a wall carried along the columns of its background keeps its number of states, as the traps of each wall
-module do, so these look like two walls of period 15 wider than the 16 cells the census sees. That is a reading of the
-counts, not a check. The 29 blocks stay among those reduced to entry into traps that pass both tests, so the counts of
-[the coverage table](../../findings/columns/coverage.md) do not change. Passing the tests is necessary for entry, not
-sufficient: entry into one of the traps of a set, for every finite right half, stays open.
+along a background's columns, or from the census of locked windows of 16 cells, and the halves settle into wider closed
+sets instead. Nine of the natural traps of period 15 have 193 states, at widths 27 to 39, and three have 652, at 37 to
+42. They are two walls of period 15 wider than the 16 cells the census sees, each carried along its background's
+columns: the nine blocks are those of the chain of the narrowest, the trap of 27 cells of $000111111011101$, at the
+distances 0 to 12 that their widths give, and the three those of the chain of the trap of 37 cells of $000001101011101$,
+at distances 0, 1 and 5 (`trap_chain`). The 29 blocks stay among those reduced to entry into traps that pass both tests,
+so the counts of [the coverage table](../../findings/columns/coverage.md) do not change. Passing the tests is necessary
+for entry, not sufficient: entry into one of the traps of a set, for every finite right half, stays open.
 
 ## Relation to the kit
 

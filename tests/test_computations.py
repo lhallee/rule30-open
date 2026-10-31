@@ -2509,7 +2509,9 @@ def test_trap_sets() -> None:
     """`lock_chain.APART` and `TRAP_SETS`: each listed block is one of a trap or pair of its module; each block of the 29
     sets has every other trap refuted, by `UNREACHED` or `APART`; for 0000110110001 the scan's one half that locks is
     inside a natural trap of 30 cells apart from `th0_45` (`halves_apart`), that trap is a lock by `is_lock`, and every
-    node of the game of 18 cells can reach one of the set's two traps; and `lean_trap_sets` is the text of the module."""
+    node of the game of 18 cells can reach one of the set's two traps; the natural traps of 193 states of period 15 are
+    for the blocks of the chain of the narrowest, at the distances their widths give (`trap_chain`); and
+    `lean_trap_sets` is the text of the module."""
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())
     assert all((block, module) in held for module, blocks in lock_chain.APART.items() for block in blocks)
@@ -2526,6 +2528,13 @@ def test_trap_sets() -> None:
     natural = traps[1][2]
     assert (natural["cells"], len(natural["states"])) == (30, 162) and lock_chain.is_lock(block, natural["states"], 30)
     assert lock_chain.trap_reach(*[t for *_, t in traps], width=18) == 1
+    # the natural traps of 193 states of period 15 are one wall carried: their blocks lie on the chain of the narrowest
+    wall = lock_chain.natural_tables("000111111011101", 0, 12000, 27, 15)
+    blocks = lock_chain.trap_chain(wall, 12)
+    for block, *_ in lock_chain.TRAP_SETS:
+        for module, name, t in lock_chain.set_tables(block) if len(block) == 15 else []:
+            if module == "TrapSets" and len(t["states"]) == 193:
+                assert blocks[t["cells"] - 27] == block
     assert lock_chain.lean_trap_sets() in (ROOT / "Rule30Open" / "Columns" / "TrapSets.lean").read_text(encoding="utf-8")
 
 
