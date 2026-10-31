@@ -113,7 +113,7 @@ lock of a block of period 27 with thirteen 1s in a row carried 31 columns, like 
 counted modulo 27.
 
 **What it means.** The traps of [lock chains](../../findings/columns/lock-chains.md) show that what keeps windows of up
-to 18 cells from locking at periods 5, 6 and 7 is not the absence of a trap: wider ones exist for a block of each
+to 22 cells from locking at periods 5, 6 and 7 is not the absence of a trap: wider ones exist for a block of each
 period. The obstruction is dynamical. Driven by these blocks, the right half next to the center almost never settles:
 column 1 repeats at the white times for none of the 301 halves under the words of period 6 and 7, and under $01111$ only
 for a while, and the small halves enter the Lean traps only from next to them or in one late event, so for these blocks

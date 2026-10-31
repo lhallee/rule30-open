@@ -20,7 +20,7 @@ chains](../../findings/columns/lock-chains.md) produce: for $01111$ of period 5,
 period 7 and $001011101$ of period 9, the first traps for blocks of these periods, a second one for $001$, and one for
 $01$, which is the kit's ether-and-wall family read as a chain. With the kit's traps for $001$ and the words of period
 four, every period from 2 to 9 except 8 now has a block that a trap reduces to entry, and at period 8 the kit excludes
-$0\,1^7$ outright. No window of up to 18 cells has a lock for any block of period 2, 3, 5, 6, 7 or 9 ([window
+$0\,1^7$ outright. No window of up to 20 cells has a lock for any block of period 2, 3, 5, 6, 7 or 9 ([window
 locks](../../negative-results/columns/window-locks.md)); these are wider and count the phase modulo a multiple of the
 period.
 

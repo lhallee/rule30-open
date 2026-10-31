@@ -72,7 +72,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
-    to 18 cells ([window locks](negative-results/columns/window-locks.md)). Wider ones exist for one block or more of
+    to 20 cells ([window locks](negative-results/columns/window-locks.md)). Wider ones exist for one block or more of
     each of these periods, the locks of seeds with long runs of 1s carried leftward through columns the rule determines
     ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
@@ -142,8 +142,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   block out in the orbit of every row with a leftmost 1: no finite left half, kicked where the block reads 1 twice in a
   row, meets the check at each 1 with a cell right of the column that latches
   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). It reaches the periods 3, 5, 6, 7 and 9 that no window lock of up to
-  18 cells reaches,
-  and for each of their 91 blocks no left half of at most 37 to 100 cells meets it ([every
+  20 cells reaches, and for each of their 91 blocks no left half of at most 37 to 100 cells meets it ([every
   block](findings/columns/left-half-every-block.md)). *Assessment:* each statement is of the kind of period two and of
   `C3`; past the half's length the readings fail at the rate of fair coins, so computation settles bounded cases only,
   and only the black block is proved.

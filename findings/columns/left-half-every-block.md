@@ -88,7 +88,7 @@ allows fewer sequences of readings, and the entropy falls slowly with $W$ withou
 This is the right channel of [the period-two finding](../period-two/right-channel.md), about 0.16 bit per step there,
 seen through the readings of cell $-1$, and it agrees with [the window
 locks](../../negative-results/columns/window-locks.md): a locked window would fix the readings at some phase, and none
-of up to 18 cells does at these periods.
+of up to 20 cells does at these periods.
 
 ## What it means
 

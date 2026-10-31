@@ -13,7 +13,7 @@ evidence: [computations/lock_chain.py]
 
 # Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter
 
-No window of up to 18 cells locks for a block of period 9 ([window
+No window of up to 20 cells locks for a block of period 9 ([window
 locks](../../negative-results/columns/window-locks.md)). Wider ones do. The right half that a column repeating
 $001011111$ drives can enter a trap of 43 cells, with the phase counted modulo 9: the closure of its true window under
 both values of the cell beyond is a set of 233 states that the rule never leaves, on which the cell beside the column is

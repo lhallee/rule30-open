@@ -26,7 +26,7 @@ Read off [the finite game](../../Rule30Open/Columns/FiniteGame.md) and the kit's
   carried 8 columns, and its trap for $001$ is the lock of a block of period 21 with twelve 1s in a row carried 38
   columns;
 - chains of seeds of period 12 to 20 give locked windows to blocks of period 5, 6, 7 and 9, which no window of up to
-  18 cells has, and a second one to $001$; six of these locks are traps in Lean.
+  20 cells has, and a second one to $001$; six of these locks are traps in Lean.
 
 ## Result
 
@@ -59,7 +59,7 @@ phase. A bottom component of a block's game is a strongly connected set of locke
    columns 1 to 5, 1 to 4 and 1 to 7 are functions of the phase, the last of them repeats $0\,1^{P-1}$, and the chain
    from it gives the block; from period 15 the first two families have two more such columns, so their seed sits two
    columns further right and its chain passes through $0\,1^{P-1}$. Their members of period 9 are the chain of
-   $0\,1^8$, so their three gaps at period 9 are one: $0\,1^8$ has no locked window of up to 18 cells, by the census
+   $0\,1^8$, so their three gaps at period 9 are one: $0\,1^8$ has no locked window of up to 20 cells, by the census
    of window locks.
 3. **Why $0\,1^8$ does not lock.** A long run of 1s leaves the window beside the column in the wall, cells
    $2, 4, 6, \dots$ black. From there, over every continuation of a window of 11 cells, the white phase of

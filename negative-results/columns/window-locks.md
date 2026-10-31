@@ -1,5 +1,5 @@
 ---
-title: No window of up to 18 cells locks for any block of period 2, 3, 5, 6, 7 or 9
+title: No window of up to 20 cells locks for any block of period 2, 3, 5, 6, 7 or 9
 category: columns
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: no-signal
 evidence: [computations/locks.py, computations/right_half.py]
 ---
 
-# No window of up to 18 cells locks for any block of period 2, 3, 5, 6, 7 or 9
+# No window of up to 20 cells locks for any block of period 2, 3, 5, 6, 7 or 9
 
 **Question.** Let column $k$ of a row with a leftmost 1 repeat a block $b$ of period $P$. A window of the $W$ cells
 right of column $k$, at a phase of $b$, is locked when along every continuation, whatever the cell beyond the window
@@ -20,7 +20,8 @@ window exist at all?
 **What was done.** `lock_census` in [computations/locks.py](../../computations/locks.py) runs `lock_info`, which finds
 the locked windows of the game as the complement of the windows from which some play shows column $k - 1$ taking both
 values at one phase, on every primitive block of a period at the given widths. It ran on periods 2 to 12 at width 13,
-on the periods without a locked window at widths 16 and 18, and on periods 2 and 3 at width 20. A lock that repeats
+on the periods without a locked window at widths 16, 18 and 20, and on periods 2, 3, 5, 6 and 7 at width 22. A locked
+window stays locked with more cells after it, so a width without one has none narrower either. A lock that repeats
 with a multiple of $P$ contradicts Jen's theorem as well, so it also ran the game for blocks repeated, with the phase
 counted modulo a multiple of $P$: modulo the least common multiple of $P$ and 4, the period of the kit's ether, for
 every period, and modulo 10 and 21 for the periods of the partial locks of [the locking
@@ -29,8 +30,8 @@ windows backward from each phase's windows, one byte per node and without the ga
 
 **Outcome.**
 
-- With the phase counted modulo $P$, no block of period 2 or 3 has a locked window at any width up to 20, and no block
-  of period 5, 6, 7 or 9 at any width up to 18.
+- With the phase counted modulo $P$, no block of period 2, 3, 5, 6 or 7 has a locked window at any width up to 22, and
+  no block of period 9 at any width up to 20.
 - With the phase counted modulo a multiple: $01$ modulo 4 has none up to width 18, and from width 19 it has the kit's
   ether-and-wall family, locked windows that only about half the windows can reach ([the absorption route for period
   two](../period-two/absorption-route.md)). The six blocks of period 5 have none modulo 10 up to width 16 or modulo 20
@@ -81,14 +82,15 @@ carried leftward it gives traps to 21 of the 56 blocks of period 9, and $0010100
 the phase counted modulo 27 ([NineTraps](../../Rule30Open/Columns/NineTraps.md)).
 The kit's period-four family is the chain of $0\,1^7$, whose period 8 fits periods 4 and 8, and the locks of periods 10
 to 12 are chains of seeds with long runs of 1s; no block of period 2, 3, 5, 6, 7 or 9 is a seed at the widths above. The
-negative result stands as stated: no window of up to 18 cells, with the phase counted modulo the period, and none of the
-multiples tried at the widths tried.
+negative result stands as stated: no window of up to 20 cells, or 22 at periods other than 9, with the phase counted
+modulo the period, and none of the multiples tried at the widths tried.
 
 **Reproduce.**
 
 ```bash
 python -m computations.locks --periods 2,3,5,6,7,9 --census 13,16,18 --workers 3
-python -m computations.locks --periods 2,3 --census 20
+python -m computations.locks --periods 2,3,5,6,7 --census 20,22 --wide
+python -m computations.locks --periods 9 --census 20 --wide
 python -m computations.locks --periods 2,3 --census 13,16 --repeat 7
 python -m computations.locks --periods 5 --census 13,16 --repeat 2
 python -m computations.locks --periods 2 --census 16,18,19,20 --repeat 2
@@ -103,6 +105,6 @@ python -m computations.right_half 200000 30 --follow 01111:10
 python -m computations.right_half 200000 30 --follow 001:21
 ```
 
-The first takes about 20 minutes with three processes, most of it at width 18, and the census of periods 3 and 7
-modulo 12 and 28 about 20 minutes with one; the others a few minutes each. The census with the phase modulo 20 for the
+The first takes about 20 minutes with three processes, most of it at width 18, the next two about 40 minutes together
+with one, and the census of periods 3 and 7 modulo 12 and 28 about 20 minutes with one; the others a few minutes each. The census with the phase modulo 20 for the
 blocks of period 5 is `python -m computations.locks --periods 5 --census 13,16,18 --repeat 4`.
