@@ -262,7 +262,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 |---|---|---|
 | [The ether-and-wall family does not catch the right half beside an alternating center](negative-results/period-two/absorption-route.md) | dead end | 1 |
 | [Condrey's proof for a constant center does not extend to an alternating center](negative-results/period-two/condrey-mechanism.md) | dead end | 1 |
-| [Windows of 5 and 8 cells at the top of a defect on the ether do not bound it, with or without the condition of K](negative-results/period-two/ether-front-windows.md) | barrier | 1 |
+| [Windows of 5, 8 and 10 cells at the top of a defect on the ether do not bound it, with or without the condition of K](negative-results/period-two/ether-front-windows.md) | barrier | 1 |
 | [The left half is not a patchwork of ether domains](negative-results/period-two/ether-patchwork.md) | refuted | 1 |
 | [The first twelve forced bits of the period-two condition are dense polynomials of full degree](negative-results/period-two/forced-bits-dense.md) | dead end | 1 |
 | [No finite certificate settles period two](negative-results/period-two/no-finite-certificate.md) | dead end | 1 |

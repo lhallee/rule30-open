@@ -132,8 +132,8 @@ domains and the defects that heal into them. A proof covers the rationals whose 
    has a longest path over 3,200 steps of rate 0.22 and 0.18 per step for $w = 8$ and 10 (`--front 8`,
    `--front 10`; `front_rate` counts a pass through the node for a lost top as a step). The automaton for $w = 8$ has
    a cycle of positive gain: its longest walk of 20,000 steps gains 4,381, and a walk with no positive cycle gains at
-   most one less than the 3,588 nodes, since no edge gains more than 1 (`--front 8 --rounds 20000`). For $w = 10$,
-   with 14,340 nodes, this is not established. So the bound allows the top to rise without limit, and the stall
+   most one less than the 3,588 nodes, since no edge gains more than 1 (`--front 8 --rounds 20000`). So does the automaton
+   for $w = 10$: 90,000 steps gain 15,757 on 14,340 nodes (`--front 10 --rounds 90000`, about 40 s). So the bound allows the top to rise without limit, and the stall
    is a property of the cells below the window that this bound does not see.
    Two more facts limit this route ([ether fronts](../../negative-results/period-two/ether-front-windows.md)): no
    strip of 12 cells or fewer below the top is closed under every input from below, and the condition of $K$ removes
@@ -193,14 +193,14 @@ python -m computations.held_shift --stripe 12
 python -m computations.held_shift --invariant 24
 python -m computations.held_shift --ether 6
 python -m computations.held_shift --front 8 --rounds 20000
-python -m computations.held_shift --front 10
+python -m computations.held_shift --front 10 --rounds 90000
 gcc -O3 -mno-avx -fopenmp computations/held_shift_search.c -o search
 ./search 64 32 126 10 8 > hits.txt
 python -m computations.held_shift --hits hits.txt --depth 64
 ```
 
 The first takes a few minutes, the second and third seconds, the fourth about two minutes, `--stripe`
-seconds, `--front 8` and `--front 10` seconds each, `--ether 6` about two minutes. The search takes about 30 minutes on 8 threads for depth 64 (about 70 s for depth 56
+seconds, `--front 8` seconds, `--front 10` about 40 s, `--ether 6` about two minutes. The search takes about 30 minutes on 8 threads for depth 64 (about 70 s for depth 56
 with $q \le 28$), and `--hits` about 30 s. `tests/test_held_shift.py` checks the tree against stepping
 all integers below $2^{12}$, the itineraries as a shift, each periodic point against the kicked map on 400 bits for
 the blocks $01$, $011$ and $001$, the degree profile against a Moebius transform, the climb rule of the top, the
