@@ -51,6 +51,12 @@ offers $011$ no trap of the kind of `t001` in this range, and the kit's ether-an
 every start of width at most 70 fails within 99 steps. The search covers the runs above only: a trap entered after
 100,000 steps, or only by larger halves, is not excluded.
 
+**A trap of another kind.** The search asks for a periodic column 1. Column 1 at the white phase does become
+constrained: every right half of up to 16 cells enters, within 104 steps, a closed set of windows of 16 columns on
+which two white readings are never 1, 2, 4 or 5 apart, at 0.442 bits per reading
+([reading constraints](../../findings/columns/reading-constraints.md)). That gives $011$ a reduction to `C3w` with
+constrained free bits, though not one that masked Jen finishes.
+
 **Reproduce.**
 
 ```bash

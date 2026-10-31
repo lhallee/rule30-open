@@ -216,7 +216,12 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   chains](findings/columns/lock-chains.md), [WordTraps](Rule30Open/Columns/WordTraps.md)). For $011$ the right half
   never settles next to the center, so no trap of that kind appears ([the word
   011](negative-results/columns/period-three-011.md)), no chain found holds it, and the route is the kit's left-only
-  statement `C3w`.
+  statement `C3w`. Column 1 does settle into a set of words: under $001$ every right half, finite or not, has readings
+  at the second white phase with no run of 1s of length 1 and no run of 0s of length 1 or 2 from step 46 on, a finite
+  computation, and under $011$ every half of up to 16 cells reads no two whites 1, 2, 4 or 5 apart from step 104 on,
+  so `C3s001` and `C3w` need only exclude free bits in those sets ([reading
+  constraints](findings/columns/reading-constraints.md)); the same holds from every state for 15 blocks of period 3 to
+  7, and by census for 8 more.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
@@ -379,6 +384,10 @@ In order of the assessment above.
    current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull
    requests ([kit-pull-requests.md](literature/kit-pull-requests.md)) until each is merged or closed.
 5. **Period two, Problems 2 and 3: the open statements at their sharpest.**
+   - *Reading constraints in Lean.* The forced sets of words of [reading
+     constraints](findings/columns/reading-constraints.md), from every state for 15 blocks of period 3 to 7, are
+     finite checks of a few million states; a kernel certificate for $001$ first, then left statements with constrained
+     free bits for those blocks.
    - *Period two, the right half.* Every finite right half entering the gap trap, the kit's ether family or the lock of
      period seven ([the census](findings/period-two/gate-census.md)) would leave the left statement `Q01Gap` alone; the
      census reaches 20 cells, and wider locks, or a test of reach for the three sets together, are next.

@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-99 Lean modules with 443 headline theorems, 41 findings (proved on paper,
+99 Lean modules with 443 headline theorems, 42 findings (proved on paper,
 computed or conjectured) and 38 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 80 | 22 | 10 |
+| [Columns](#columns) | 80 | 23 | 10 |
 | [Period two](#period-two) | 6 | 7 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -58,6 +58,7 @@ approach stopped.
 - [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md): problem 1
 - [Driven right halves settle into traps for 27 of the 99 blocks of period 10, 51 of the 186 of period 11 and 75 of the 335 of period 12](findings/columns/natural-traps.md): problem 1
 - [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md): problem 1
+- [Beside a center that repeats a block, column 1 falls into a set of words of low entropy, from every state for 15 blocks of period 3 to 7](findings/columns/reading-constraints.md): problem 1
 - [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
@@ -213,6 +214,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | partial |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
 | [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md) | proved on paper | 1 | wanted |
+| [Beside a center that repeats a block, column 1 falls into a set of words of low entropy, from every state for 15 blocks of period 3 to 7](findings/columns/reading-constraints.md) | computed | 1 | partial |
 | [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md) | computed | 1 | partial |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |
 | [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md) | computed | 1 | partial |
