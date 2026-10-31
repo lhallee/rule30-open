@@ -6,9 +6,9 @@ requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its mai
 [a6399ef](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a6399ef15ff409d4dc0c5feb119b289aa31588a4), which
 brings its catalog to 168 modules: #36, #43, #45, #46, #49, #51, #53, #54 and #56, each marked *merged* below. This
 repository is not yet pinned there, so here they are results of the kit's main branch that the pin does not include, and
-the 16 still open are claims. Each pull request adds Lean modules that its author reports as checked by the kit's
-`Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull request's
-head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
+the 17 open, with #61 since, are claims. Each pull request adds Lean modules that its author reports as checked by the
+kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
+request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
 ## Least periods four and three: traps for the right half
 
@@ -97,6 +97,12 @@ head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](.
   47649.
 - **#48, `Rule30EdgeClockDrop`.** Claims restrictions on how temporal periods of edge columns can drop, and finite
   observations that imitate a drop for bounded time.
+- **#61, `Rule30EdgeClock` and `Rule30DefectClockBudget`.** In the frame of the right edge, for any infinite code with
+  a black edge and any starting time, claims that every positive digit $j$ changes within $\lceil j/2 \rceil$ updates,
+  sharp at the single cell, and that a first difference at digit $j + 1$ escapes into digit $j + 3$ or $j + 4$ within
+  $\lceil j/2 \rceil + 2$ updates, and into $j + 5$ or $j + 6$ within $7(\lceil j/2 \rceil + 1)$, recurrently. The
+  pull request reports a partial replay by `Check.lean` and states that neither module proves escape at every width
+  or that the center column is not periodic.
 - **#50, `Rule30TemporalProfiles`.** Claims facts on periodic profiles linked by the left-diagonal recurrence: a
   periodic driver has exactly one periodic child, and a chain of them that starts white returns to white within
   $2^{2q}$ links.

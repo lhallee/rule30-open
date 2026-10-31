@@ -54,6 +54,13 @@ other 172, carried 5 to 88 columns (`census_entry`). For four of the blocks ever
 inside a larger trap of 16 cells, which [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) checks. Entry for every
 finite right half stays open, as for the kit's traps.
 
+**The test of reach.** Cut to their first 20 cells, 29 of the 232 traps here, of 18 to 104 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
+right half whose first 20 cells start there never enters, and entry into the trap is false ([what
+failed](../../negative-results/columns/missed-traps.md)). For 26 of their blocks no trap of any module passes, so the
+reduction is empty; the other 3 keep a natural trap that passes. The other 203 traps pass the test, which entry needs
+but does not imply.
+
 ## Relation to the kit
 
 The kit's traps are `t001` for $001$ and its ether-and-wall family for the words of period four; it has none for a block

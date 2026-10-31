@@ -32,7 +32,7 @@ import argparse
 import numpy as np
 
 from computations.absorption import ALIGNMENTS, WALL_CELLS, ether, kit_wall
-from computations.coin_lock import UNREACHED, decay_rate, entry_paths
+from computations.coin_lock import UNREACHED, entry_paths, period_rate
 from computations.lock_certificate import successor_table
 
 # The least window width at which the kit's family fits, with the alignment (j0, shift) and depth k used there.
@@ -67,9 +67,9 @@ def unreachable(word: str, width: int, wall: np.ndarray) -> np.ndarray:
 
 def avoid_growth(word: str, member: np.ndarray) -> float:
     """The growth rate per step of the number of sequences of column W + 1 that keep a window out of the trap: twice
-    the factor by which a fair coin's chance of staying out decays (`coin_lock.decay_rate`), in floating point."""
-    # member: (4, 2^W)
-    return 2 * decay_rate(word, member)
+    the factor by which a fair coin's chance of staying out decays (`coin_lock.period_rate`), in floating point."""
+    # member: (period, 2^W)
+    return 2 * period_rate(word, member)
 
 
 def universal_word(word: str, member: np.ndarray) -> list[int]:

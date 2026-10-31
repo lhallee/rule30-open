@@ -17,7 +17,8 @@ period 15 that nothing excludes. [CensusTraps15](CensusTraps15.md) checks traps 
 [MissedTraps](MissedTraps.md) refutes the traps of two more, and only its own bottom component, of 3,172 to 30,345
 states, reaches each of the other 24. This module checks those 24 components as they are, in parts, as
 [CensusTrapsLarge](CensusTrapsLarge.md) does at periods 13 and 14. With it every block of period 15 that the chains of
-the locked windows of 16 cells hold is excluded or has a trap in Lean, but the two of MissedTraps.
+the locked windows of 16 cells hold is excluded or has a trap in Lean, but the two of MissedTraps; for 55 of them,
+though, the trap fails the test of reach of [CensusTraps15](CensusTraps15.md), so their reductions are empty.
 
 ## Statement
 
@@ -41,6 +42,10 @@ The kernel checks every part, so the census is not trusted, and `absorption_excl
 
 Each trap reduces its block to entry. Their chains end in the backgrounds of 2,145 cells (17 blocks), 795 (4), 64 (2)
 and 540 (1). Entry for every finite right half stays open, as for the kit's traps.
+
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
 
 ## Relation to the kit
 

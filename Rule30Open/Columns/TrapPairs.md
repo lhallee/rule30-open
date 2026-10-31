@@ -65,6 +65,10 @@ natural scan's own sampled halves show why a pair is needed: driven by $00011011
 components of $0001101101011$ end in different backgrounds, of 689 and 533 cells. Entry into one of two traps for every
 finite right half stays open, as entry does for the kit's traps.
 
+**The test of reach.** Cut to 20 cells as well, every node of the finite game of 20 cells can reach one of the two traps
+of each pair, as the test of [MissedTraps](MissedTraps.md) needs ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry into one of the two needs this but is not implied by it.
+
 ## Relation to the kit
 
 The kit's `AbsorptionT` asks entry into one trap, `t001`; its period-four `Absorption` asks entry into one member of

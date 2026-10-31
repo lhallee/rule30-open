@@ -25,43 +25,50 @@ from computations import game, lock_chain
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def trap_blocks() -> dict[str, str]:
-    """The blocks that a trap in Lean reduces to entry, each as its least rotation, with the module that holds it."""
-    found: dict[str, str] = {"001": "the kit's t001"}
-    for name, *_ in lock_chain.TRAPS:
-        found.setdefault(lock_chain.tables(name)["word"], "WordTraps")
-    found.setdefault(lock_chain.tables("trap001011111")["word"], "WordTraps")
-    for distance in lock_chain.nine_distances():
-        found.setdefault(lock_chain.carried("trap001011111", distance)["word"], "NineTraps")
-    found.setdefault(lock_chain.tables("trap001010011")["word"], "NineTraps")
-    for distance in lock_chain.ten_distances():
-        found.setdefault(lock_chain.carried("trap0000010001", distance)["word"], "TenTraps")
+def module_blocks() -> list[tuple[str, str]]:
+    """Every block that a trap in Lean reduces to entry, each as its least rotation, with the module that holds the
+    trap, once per trap, in the order of the modules."""
+    found: list[tuple[str, str]] = [("001", "the kit's t001")]
+    found += [(lock_chain.tables(name)["word"], "WordTraps") for name, *_ in lock_chain.TRAPS]
+    found.append((lock_chain.tables("trap001011111")["word"], "WordTraps"))
+    found += [(lock_chain.carried("trap001011111", distance)["word"], "NineTraps")
+              for distance in lock_chain.nine_distances()]
+    found.append((lock_chain.tables("trap001010011")["word"], "NineTraps"))
+    found += [(lock_chain.carried("trap0000010001", distance)["word"], "TenTraps")
+              for distance in lock_chain.ten_distances()]
     for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"), (14, "FourteenTraps")):
-        for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period]):
-            found.setdefault(word, module)
-    for word, *_ in lock_chain.EXTRA_TRAPS:
-        found.setdefault(word, "NaturalTraps")
-    for word, *_ in lock_chain.LARGE_TRAPS:
-        found.setdefault(word, "NaturalTrapsLarge")
-    for word, *_ in lock_chain.LONG_TRAPS:
-        found.setdefault(word, "NaturalTrapsLong")
-    for word, *_ in lock_chain.LONG_LARGE:
-        found.setdefault(word, "NaturalTrapsLongLarge")
-    for entries in lock_chain.FAR_WALLS.values():
-        for name, distance in entries:
-            found.setdefault(lock_chain.carried(name, distance)["word"], "FarWalls")
+        found += [(word, module) for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])]
+    for module, entries in (("NaturalTraps", lock_chain.EXTRA_TRAPS), ("NaturalTrapsLarge", lock_chain.LARGE_TRAPS),
+                            ("NaturalTrapsLong", lock_chain.LONG_TRAPS),
+                            ("NaturalTrapsLongLarge", lock_chain.LONG_LARGE)):
+        found += [(word, module) for word, *_ in entries]
+    found += [(lock_chain.carried(name, distance)["word"], "FarWalls")
+              for entries in lock_chain.FAR_WALLS.values() for name, distance in entries]
     for period, entries in lock_chain.CENSUS_TRAPS.items():
-        for block, *_ in entries:
-            found.setdefault(block, f"CensusTraps{period}")
-    for block, *_ in lock_chain.CENSUS_LARGE:
-        found.setdefault(block, "CensusTrapsLarge")
-    for block, *_ in lock_chain.CENSUS_LARGE15:
-        found.setdefault(block, "CensusTrapsLarge15")
-    for block in lock_chain.PAIRS:
-        found.setdefault(block, "TrapPairs")
-    for word in ("0001", "0011", "0111"):
-        found.setdefault(word, "PeriodFourCertificate")
+        found += [(block, f"CensusTraps{period}") for block, *_ in entries]
+    found += [(block, "CensusTrapsLarge") for block, *_ in lock_chain.CENSUS_LARGE]
+    found += [(block, "CensusTrapsLarge15") for block, *_ in lock_chain.CENSUS_LARGE15]
+    found += [(block, "TrapPairs") for block in lock_chain.PAIRS]
+    found += [(word, "PeriodFourCertificate") for word in ("0001", "0011", "0111")]
     return found
+
+
+def trap_blocks() -> dict[str, str]:
+    """The blocks that a trap in Lean reduces to entry, each as its least rotation, with the first module that holds
+    one."""
+    found: dict[str, str] = {}
+    for block, module in module_blocks():
+        found.setdefault(block, module)
+    return found
+
+
+def refuted_blocks() -> set[str]:
+    """The blocks of `trap_blocks` whose every trap fails the test of reach (`lock_chain.UNREACHED`): some node of the
+    finite game of `lock_chain.REACH_WIDTH` cells cannot reach the trap cut to that width, so entry into it is false and
+    its reduction empty. The kit's `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test
+    ([reach of the kit's conjectures](../findings/columns/kit-absorption-reach.md))."""
+    passing = {block for block, module in module_blocks() if block not in lock_chain.UNREACHED.get(module, ())}
+    return set(trap_blocks()) - passing
 
 
 def steered_blocks() -> set[str]:
@@ -72,20 +79,22 @@ def steered_blocks() -> set[str]:
     return found
 
 
-def coverage(max_period: int) -> list[tuple[int, int, int, int, int, int]]:
+def coverage(max_period: int) -> list[tuple[int, int, int, int, int, int, int]]:
     """For each period up to `max_period`: the number of primitive blocks, those excluded outright, those reduced to
-    entry into a trap (and not excluded), those reduced by steering only, and the rest."""
-    traps, steered = trap_blocks(), steered_blocks()
+    entry into a trap that passes the test of reach (and not excluded), those reduced by steering only, those whose
+    every trap fails the test, and the rest."""
+    traps, refuted, steered = trap_blocks(), refuted_blocks(), steered_blocks()
     kit = game.kit_blocks(max_period)
     rows = []
     for period in range(1, max_period + 1):
         blocks = game.necklaces(period)
         excluded = {block for block in tqdm(blocks, desc=f"period {period}", file=sys.stderr, mininterval=5)
                     if block in kit or game.first_width(block, [6, 10, 14]) is not None}
-        trapped = {block for block in blocks if block in traps} - excluded
+        trapped = {block for block in blocks if block in traps and block not in refuted} - excluded
         steering = {block for block in blocks if block in steered} - excluded - trapped
-        rest = len(blocks) - len(excluded) - len(trapped) - len(steering)
-        rows.append((period, len(blocks), len(excluded), len(trapped), len(steering), rest))
+        empty = {block for block in blocks if block in refuted} - excluded - steering
+        rest = len(blocks) - len(excluded) - len(trapped) - len(steering) - len(empty)
+        rows.append((period, len(blocks), len(excluded), len(trapped), len(steering), len(empty), rest))
     return rows
 
 
@@ -93,10 +102,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-period", type=int, default=12)
     args = parser.parse_args()
-    print("| Period | Blocks | Excluded | Reduced to entry into a trap | Reduced by steering only | Not reached |")
-    print("|---:|---:|---:|---:|---:|---:|")
-    for period, total, excluded, trapped, steering, rest in coverage(args.max_period):
-        print(f"| {period} | {total} | {excluded} | {trapped} | {steering} | {rest} |", flush=True)
+    print("| Period | Blocks | Excluded | Reduced to entry into a trap | Reduced by steering only | Only refuted traps "
+          "| Not reached |")
+    print("|---:|---:|---:|---:|---:|---:|---:|")
+    for period, total, excluded, trapped, steering, empty, rest in coverage(args.max_period):
+        print(f"| {period} | {total} | {excluded} | {trapped} | {steering} | {empty} | {rest} |", flush=True)
 
 
 if __name__ == "__main__":

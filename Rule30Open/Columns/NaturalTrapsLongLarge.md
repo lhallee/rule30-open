@@ -48,6 +48,10 @@ this module and [CensusTrapsLarge](CensusTrapsLarge.md), every block of periods 
 trap of 16 cells is excluded or reduced in Lean, as at periods 10 to 12, four of them by [TrapPairs](TrapPairs.md) to
 entry into one of two traps. Entry for every finite right half stays open, as for the kit's traps.
 
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+
 ## Relation to the kit
 
 The kit's traps are `t001` for $001$ and its ether-and-wall family for the words of period four; it has none for a block

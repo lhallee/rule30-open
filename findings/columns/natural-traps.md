@@ -90,7 +90,8 @@ or 7, and one start each for six blocks of period 9.
   689 cells at period 13 and of 728 at period 14 ([backgrounds periodic in time](space-time-backgrounds.md)), and
   carried leftward the smallest wall of each gives traps to every block of the period among that background's columns,
   53 and 101 ([ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
-  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)). Of the other blocks with a trap that nothing excludes,
+  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md)), though entry into 21 and 29 of these carried traps
+  fails the test of reach at 20 cells ([what failed](../../negative-results/columns/missed-traps.md)). Of the other blocks with a trap that nothing excludes,
   74 have traps of at most 3,000 states. For 70 the trap is checked as it is
   ([NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md)); for the other four some node of the finite game
   cannot reach it, so entry into it is false ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)), and the sampled

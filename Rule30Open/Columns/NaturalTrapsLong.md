@@ -50,6 +50,10 @@ open, as for the kit's traps. The blocks whose traps have more than 3,000 states
 are left out here and checked in parts: 22 in [CensusTrapsLarge](CensusTrapsLarge.md), where the trap is a component of
 the census of locked windows, and 12 in [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md).
 
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+
 ## Relation to the kit
 
 The kit's traps are `t001` for $001$ and its ether-and-wall family for the words of period four; it has none for a block

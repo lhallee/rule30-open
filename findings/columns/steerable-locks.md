@@ -39,7 +39,7 @@ logarithm.
 | $00011111$ | 5 | 11.0% | 280 | 1.965533 | 0.97492 |
 | $00111101$ | 4 | 14.3% | 332 | 1.972016 | 0.97967 |
 | $00111111$ | 6 | 43.1% | 93 | 1.901928 | 0.92746 |
-| $0000000001$ (the kit's) | 9 | 28.1% | 78 | 1.844766 | 0.88344 |
+| $0000000001$ (the kit's) | 9 | 28.1% | 78 | 1.903817 | 0.92889 |
 | $0000000101$ | 7 | 7.4% | 254 | 1.989813 | 0.99263 |
 | $0000011101$ | 5 | 11.2% | 449 | 1.982016 | 0.98697 |
 | $0001111111$ | 7 | 16.0% | 275 | 1.976424 | 0.98289 |
@@ -104,6 +104,13 @@ logarithm.
   nodes and the growth rate nearest 2: a fair coin beyond the window would stay out of the lock with a chance that falls
   by a factor of 0.999991 per step, about $e$ every 110,000 steps, far beyond the simulation. The other 38 blocks that
   lock from every start are not steerable at width 13, as $0001$ and $0011$ are not.
+- **At 16 cells, periods 10 to 15.** The census of locked windows of 16 cells ([backgrounds periodic in
+  time](space-time-backgrounds.md)) gives 478 blocks of periods 10 to 15 with a locked node: 12, 30, 41, 89, 109 and
+  197. For 475 every node of the game of 16 cells can be steered into a locked node: all of periods 10, 11, 12 and 14,
+  88 of the 89 of period 13 and 195 of the 197 of period 15. The other three, $0000010111001$, $000001010110101$ and
+  $001001111010111$, are those whose traps [MissedTraps](../../Rule30Open/Columns/MissedTraps.md) refutes: from their
+  white window no locked node can be reached, at 16, 17 or 18 cells. So at 16 cells, unlike at 13 up to period 12, a
+  block can have locks that most windows never reach. The commands are under Reproduce.
 
 ## What it means
 
@@ -114,8 +121,11 @@ logarithm in the table: from 0.88 bits per step for $000000001011$ and $00001111
 $00000110001$. In particular column 14 never reads the block's sequence after that time. So any of these blocks is
 excluded if column 14 reads its sequence at arbitrarily late times, which holds if column 14 contains every finite word
 at arbitrarily late times, a statement of the same kind as Problem 2 and open. The bounds are close to 1, so the
-constraint is mild: most of the freedom of column 14 survives. The growth rates are floating-point power iterations;
-the Lean modules prove only the sequences.
+constraint is mild: most of the freedom of column 14 survives. The growth rates are twice the spectral radius of one
+step of the fair coin on every phase, in floating point (`coin_lock.period_rate`): a power iteration of the step plus
+the identity, whose vector then bounds the radius from above by the largest ratio of its image to itself (Collatz and
+Wielandt), so each entropy in the table is an upper bound. A power iteration of the step alone can oscillate between
+eigenvalues of one modulus, as it does for $0000000001$. The Lean modules prove only the sequences.
 
 ## Reproduce
 
@@ -127,3 +137,13 @@ The survey of periods 4, 8, 10, 11 and 12 takes about 3 minutes with three proce
 the comparison with the simulation uses the output of `python -m computations.right_half 12000 30 --min-period 4
 --max-period 12` ([the locking finding](period-four-locking.md#reproduce));
 `--periods 2,3,5,6,7,9` gives the periods with no steerable block. `--lean` prints the entries of the Lean modules.
+At 16 cells:
+
+```bash
+python -m computations.locks --periods 10,11,12,13,14,15 --width 16 --workers 4
+python -m computations.locks --periods 10,11,12,13,14,15 --census 16 --workers 4
+python -m computations.locks --reach 0000010111001,000001010110101,001001111010111 --width 18
+```
+
+The first two take several hours each; the last shows that the white window of each of the three reaches no lock at 18
+cells.

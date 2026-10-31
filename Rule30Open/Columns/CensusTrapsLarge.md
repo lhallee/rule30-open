@@ -19,7 +19,8 @@ $0000010111001$, [MissedTraps](MissedTraps.md) refutes entry into its trap; only
 22,746 states, reaches each of the other 22, 10 of period 13 and 12 of period 14. This module checks those 22 components
 as they are, in parts, as [NaturalTrapsLarge](NaturalTrapsLarge.md) checks its trap. With it every block that the chains
 of the locked windows of 16 cells hold at periods 13 and 14 is excluded or reduced in Lean, four of them by
-[TrapPairs](TrapPairs.md), but $0000010111001$.
+[TrapPairs](TrapPairs.md), but $0000010111001$; for 48 of them, though, every trap fails the test of reach of
+[CensusTraps13](CensusTraps13.md) and [CensusTraps14](CensusTraps14.md), so their reductions are empty.
 
 ## Statement
 
@@ -46,6 +47,10 @@ reduction.
 ## What it covers
 
 Each trap reduces its block to entry. Entry for every finite right half stays open, as for the kit's traps.
+
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
 
 ## Relation to the kit
 

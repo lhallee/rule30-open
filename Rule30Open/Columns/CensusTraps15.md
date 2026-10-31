@@ -48,10 +48,17 @@ states, which [CensusTrapsLarge15](CensusTrapsLarge15.md) checks in parts.
 ## What it covers
 
 Each trap reduces its block to entry. With [CensusTrapsLarge15](CensusTrapsLarge15.md), 593 of the 2,182 blocks of
-period 15 come down to entry, every block that a chain of a locked window of 16 cells holds and nothing excludes but the
-two of [MissedTraps](MissedTraps.md). No entry census of small halves has been run at this period; at periods 13 and 14
-small halves enter the traps carried a short way and few of those carried far ([CensusTraps13](CensusTraps13.md),
-[CensusTraps14](CensusTraps14.md)). Entry for every finite right half stays open, as for the kit's traps.
+period 15 have a trap in Lean, every block that a chain of a locked window of 16 cells holds and nothing excludes but
+the two of [MissedTraps](MissedTraps.md), and 538 a trap that passes the test of reach below. No entry census of small
+halves has been run at this period; at periods 13 and 14 small halves enter the traps carried a short way and few of
+those carried far ([CensusTraps13](CensusTraps13.md), [CensusTraps14](CensusTraps14.md)). Entry for every finite right
+half stays open, as for the kit's traps.
+
+**The test of reach.** Cut to their first 20 cells, 55 of the 569 traps here, of 18 to 115 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
+right half whose first 20 cells start there never enters, and entry into the trap is false ([what
+failed](../../negative-results/columns/missed-traps.md)). For 55 of their blocks no trap of any module passes, so the
+reduction is empty. The other 514 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

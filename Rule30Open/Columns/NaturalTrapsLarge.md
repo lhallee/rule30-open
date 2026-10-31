@@ -51,6 +51,10 @@ phases, enters it within 12,584 steps, a median of 2,386 (`extra_entry`). Entry 
 as for the kit's traps. The two remedies apply to any trap: a larger one, as natural scans at longer periods may find,
 needs only more parts.
 
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+
 ## Relation to the kit
 
 The kit has no trap for a block of period 11 and does not exclude this one. The block lies in the chain of no wall of

@@ -1577,6 +1577,38 @@ def test_lock_avoid_growth() -> None:
     assert abs(rate - lock_word.avoid_growth("0111", member)) < 1e-3
 
 
+def test_period_rate() -> None:
+    """`coin_lock.period_rate` where the power iteration of `decay_rate` oscillates: for the kit's block 0000000001 at
+    width 13, two eigenvalues of one period of the coin step share the largest modulus, and the rate equals that of a
+    power iteration shifted by the identity, which converges; for the certificates of 0011 and 0111 at width 16 the
+    rates are 0.99823 and 0.98251."""
+    from computations import coin_lock, locks
+    from scipy.sparse.linalg import LinearOperator, eigs
+    block = "0000000001"
+    locked, _ = locks.lock_info(block, 13)  # (p n,)
+    member = locked.reshape(len(block), 1 << 13)  # (10, 2^13)
+    successors = coin_lock.successor_table(block, 13)  # (10, 2, 2^13)
+
+    def one_period(v: np.ndarray) -> np.ndarray:
+        v = np.asarray(v, dtype=float).reshape(-1)  # (2^13,)
+        for ph in range(len(block) - 1, -1, -1):
+            v = 0.5 * (v[successors[ph, 0]] + v[successors[ph, 1]]) * ~member[ph]  # (2^13,)
+        return v
+
+    x = np.ones(1 << 13)  # (2^13,)
+    for _ in range(3000):
+        y = one_period(x) + x  # (2^13,)
+        shifted = np.linalg.norm(y) / np.linalg.norm(x)
+        x = y / np.linalg.norm(y)
+    rate = coin_lock.period_rate(block, member)
+    assert abs((shifted - 1) ** (1 / len(block)) - rate) < 1e-6 and round(2 * rate, 6) == 1.903817
+    top = np.sort(np.abs(eigs(LinearOperator((1 << 13, 1 << 13), matvec=one_period, dtype=float), k=4, which="LM",
+                              return_eigenvectors=False)))[::-1]  # (4,)
+    assert abs(top[0] - top[1]) < 1e-9 and top[2] < 0.9 * top[0]
+    assert round(coin_lock.period_rate("0011", coin_lock.certificate("0011", 16)), 5) == 0.99823
+    assert round(coin_lock.period_rate("0111", coin_lock.certificate("0111", 16)), 5) == 0.98251
+
+
 def test_locks() -> None:
     """`locks.lock_info` against forward searches: for sampled nodes of the games of 0111 at width 13 and 01010101011 at
     width 10, a node is locked exactly when the nodes it reaches show one value of the left column at each phase, and it
@@ -2127,8 +2159,9 @@ def test_wall_gaps() -> None:
 
 
 def test_coverage() -> None:
-    """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 01, 001 and
-    the three words of period four have traps, and 011 is not reached; and the trap blocks by module are those of the
+    """`coverage.coverage` up to period 4 against the blocks directly: both constant blocks are excluded, 001 and the
+    three words of period four have traps that pass the test of reach, 01 has only a refuted one, and 011 is not reached;
+    and the trap blocks by module are those of the
     Lean lists: 25 of TenTraps, 57 of ElevenTraps, 83 of TwelveTraps, 53 of ThirteenTraps, 101 of FourteenTraps, 34 of
     NaturalTraps, 1 of NaturalTrapsLarge, 70 of NaturalTrapsLong, 12 of NaturalTrapsLongLarge, 12 of FarWalls, and of
     CensusTraps13, CensusTraps14 and CensusTrapsLarge the 116, 228 and 22 that no earlier module holds, each of its
@@ -2136,7 +2169,8 @@ def test_coverage() -> None:
     MissedTraps in none, and the steered blocks are the 49 entries of the LockBlocks modules."""
     from collections import Counter
     from computations import coverage, lock_chain
-    assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0), (2, 1, 0, 1, 0, 0), (3, 2, 0, 1, 0, 1), (4, 3, 0, 3, 0, 0)]
+    assert coverage.coverage(4) == [(1, 2, 2, 0, 0, 0, 0), (2, 1, 0, 0, 0, 1, 0), (3, 2, 0, 1, 0, 0, 1),
+                                    (4, 3, 0, 3, 0, 0, 0)]
     traps = coverage.trap_blocks()
     modules = Counter(traps.values())
     assert (modules["TenTraps"], modules["ElevenTraps"], modules["TwelveTraps"]) == (25, 57, 83)
@@ -2378,6 +2412,29 @@ def test_kit_reach() -> None:
                 assert cut[phase][pure]
         assert absorption.family_reach(word, 14, wall) == 1.0
     assert lock_chain.t001_reach(14) == 1.0
+
+
+def test_unreached() -> None:
+    """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
+    and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells, while a natural trap
+    of 16 cells passes; and `coverage.refuted_blocks` holds the 226 blocks of periods 2 to 15 with no trap that passes,
+    01 among them and 001, which keeps the kit's t001, not."""
+    from collections import Counter
+    from computations import coverage, lock_chain
+    held = set(coverage.module_blocks())
+    assert lock_chain.REACH_WIDTH == 20 and sum(len(v) for v in lock_chain.UNREACHED.values()) == 233
+    assert all((block, module) in held for module, blocks in lock_chain.UNREACHED.items() for block in blocks)
+    assert {"01", "001"} == set(lock_chain.UNREACHED["WordTraps"])
+    assert lock_chain.trap_reach(lock_chain.tables("trap01"), width=16) < 1
+    assert lock_chain.trap_reach(lock_chain.tables("trap001fifteen"), width=16) < 1
+    ten = lock_chain.carried("trap0000010001", 10)
+    assert ten["word"] in lock_chain.UNREACHED["TenTraps"] and lock_chain.trap_reach(ten, width=12) < 1
+    natural = lock_chain.extra_tables(lock_chain.LONG_TRAPS[0][0])  # 16 cells
+    assert "NaturalTrapsLong" not in lock_chain.UNREACHED and lock_chain.trap_reach(natural) == 1
+    refuted = coverage.refuted_blocks()
+    assert len(refuted) == 226 and "01" in refuted and "001" not in refuted
+    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 11), (11, 27), (12, 27), (13, 43),
+                                                                (14, 55), (15, 55)]
 
 
 def test_trap_pairs() -> None:

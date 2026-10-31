@@ -24,7 +24,7 @@ whether some values of column $W + 1$ lead in, and compares a fair coin there wi
   column 17 never does.
 - **A fair coin locks.** With column 17 a fair coin flipped at every step, every window enters with probability 1.
   The expected entry time is at most 1,144, 688 and 140 steps, and 111.5, 95.7 and 49.8 on average over the windows at
-  phase 0. The chance of still being out falls by a factor 0.99898, 0.99782 and 0.98251 per step, and after 12,000
+  phase 0. The chance of still being out falls by a factor 0.99899, 0.99823 and 0.98251 per step, and after 12,000
   steps it is at most $6.3 \times 10^{-6}$, $7.8 \times 10^{-10}$ and $7.6 \times 10^{-92}$, from every window.
 - **Rule 30 is not a fair coin there.** Of 1,000 right halves in Rule 30 itself, the empty one and 999 random halves of
   64 cells (the first 31 are the starts of [the locking finding](period-four-locking.md)), 71, 26 and 28 stay out of the
@@ -55,8 +55,10 @@ seed: the union, over the values of column 1 at the white phases, of the greates
   inside, moving every window along. The certificate keeps every window it holds, so each round brings at least one
   more window in. The words are found greedily and need not be the shortest;
 - `expected_entry`, by value iteration of $h = 1 + \tfrac12\,(h(s_0) + h(s_1))$ outside the certificate, with $s_b$
-  the successor when column $W + 1$ reads $b$; `decay_rate`, by power iteration of one period of the chance of staying
-  out; and `stay_out`, that chance after 12,000 steps, by exact recursion over the steps;
+  the successor when column $W + 1$ reads $b$; `period_rate`, the spectral radius of one step of the chance of
+  staying out, by power iteration of the step plus the identity with a Collatz and Wielandt bound from above, where the
+  power iteration of `decay_rate` can oscillate between eigenvalues of one modulus; and `stay_out`, that chance after
+  12,000 steps, by exact recursion over the steps;
 - `sample`: entry of Rule 30's own right halves into the certificate within 12,000 steps
   (`lock_certificate.entry_time`), and of those that stay out into the kit's family within 4,000 steps
   (`absorption.absorb`).

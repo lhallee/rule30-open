@@ -56,6 +56,10 @@ trap of 16 cells, the chance of staying out falling by a factor of 0.952 to 0.99
 traps](../../findings/columns/natural-traps.md)). Entry for every finite right half stays open, as for the kit's
 traps.
 
+**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
+every node of the finite game of 20 cells can reach the trap's states so cut ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+
 ## The 35th block
 
 The 35th block, $00010001011$ of period 11, has a natural trap of 61,857 windows of 30 cells with labels modulo 22,

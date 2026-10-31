@@ -16,9 +16,11 @@ A trap of [WordTraps](WordTraps.md) reduces its block to entry, `WTrap.Absorptio
 half driven by the block, from any phase, eventually has its first cells in a state of the trap. Entry fails whenever
 some node of the finite game cannot reach the trap. The nodes that cannot form a set that no move leaves, whatever the
 cell beyond the window does, and a right half that starts there stays there. Checking every trap of at most 16 cells in
-the trap modules this way (`trap_reach`) finds seven, of 228, that some node cannot reach. This module checks each of
-the seven as a trap and refutes entry into it, so their reductions held only because their hypothesis was false. The
-trap modules no longer list them.
+the trap modules this way (`trap_reach`) finds seven, of 228, that some node cannot reach at their own width. This
+module checks each of the seven as a trap and refutes entry into it, so their reductions held only because their
+hypothesis was false. The trap modules no longer list them. Cut to their first 20 cells, 233 wider traps that the
+modules still hold fail the same test ([what failed](../../negative-results/columns/missed-traps.md)), and
+`not_absorption` applies to each of them as well, given a closed set apart from it.
 
 | block | trap from | states | nodes of the 16-cell game that can reach it | cut width | closed set |
 |---|---|---|---|---|---|
@@ -77,9 +79,9 @@ of the two: entry into one of two traps passes the test that entry into either a
 width: from the white window no locked node of 16 cells can be reached at all (`locks.lock_info`), so no trap of 16
 cells with labels modulo the period can be entered by the white right half.
 
-The test is necessary, not sufficient: the 221 traps of at most 16 cells that every node can reach still need entry
-proved. Traps wider than 16 cells, the carried ones, were not tested here, and past about 18 cells their games are too
-large to search.
+The test is necessary, not sufficient: the traps that pass it still need entry proved. Cut to 20 cells it refutes 233
+more traps of the modules, all carried ones, while every natural trap passes
+([what failed](../../negative-results/columns/missed-traps.md)).
 
 ## Relation to the kit
 

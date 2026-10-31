@@ -9,9 +9,10 @@ Whether a run enters it depends only on what column W + 1 does. This module comp
   brings the window into the certificate, and a first value on such a shortest sequence;
 - `universal_word`: one sequence of values of column W + 1 that brings every window at phase 0 into the certificate,
   found greedily, so that a run whose column W + 1 reads it from a time divisible by the period enters;
-- `stay_out`, `expected_entry`, `decay_rate`: with column W + 1 replaced by a fair coin flipped at every step, the
-  probability of staying out of the certificate for a number of steps, the expected entry time, and the rate at which
-  the probability of staying out decays per step;
+- `stay_out`, `expected_entry`, `decay_rate`, `period_rate`: with column W + 1 replaced by a fair coin flipped at every
+  step, the probability of staying out of the certificate for a number of steps, the expected entry time, and the rate
+  at which the probability of staying out decays per step, by power iteration and, where that oscillates, by power
+  iteration of the step plus the identity with a bound from above;
 - `sample`: Rule 30's own right halves, the empty one and random ones of 64 cells from `right_half.random_starts`, when
   each enters the certificate, and when those that never do enter the kit's ether-and-wall family (`absorption.py`).
 
@@ -164,6 +165,34 @@ def decay_rate(word: str, member: np.ndarray, settle: int = 100, tolerance: floa
     return factors[-1] ** (1 / period)
 
 
+def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle: int = 200,
+                limit: int = 20000) -> float:
+    """An upper bound on the factor of `decay_rate`, the spectral radius of one step of `coin_step` on every phase at
+    once, equal to it when the iteration settles. The step alone has as many eigenvalues of the largest modulus as the
+    period, one per phase rotated, so its own power iteration oscillates; adding the identity leaves the real one
+    largest. After the iteration of step plus identity settles (the estimate changes by less than `tolerance` over
+    `settle` steps) or `limit` steps pass, its vector x is positive on every window outside the certificate, and the
+    largest ratio of the step's image of x to x there bounds the spectral radius from above (Collatz and Wielandt).
+    Twice it bounds the growth of the number of sequences that stay out, which is 0 or at least 1 for a matrix of 0s
+    and 1s, so a bound below 1/2 gives 0."""
+    # member: (period, 2^W)
+    period, size = member.shape
+    successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
+    values = np.where(member, 0.0, 1.0)  # (period, 2^W), positive outside the certificate
+    estimates: list[float] = []
+    with tqdm(desc=f"rate, {word}", file=sys.stderr, leave=False, mininterval=10) as bar:
+        while len(estimates) < limit and (len(estimates) <= settle
+                                          or abs(estimates[-1] - estimates[-1 - settle]) >= tolerance):
+            shifted = coin_step(word, member, values, successors) + values  # (period, 2^W)
+            estimates.append(float(shifted.sum() / values.sum()) - 1)
+            values = shifted / shifted.max()
+            bar.update()
+    image = coin_step(word, member, values, successors)  # (period, 2^W)
+    outside = ~member  # (period, 2^W)
+    bound = float((image[outside] / values[outside]).max()) if outside.any() else 0.0
+    return bound if bound >= 0.5 else 0.0
+
+
 def sample(word: str, member: np.ndarray, count: int, steps: int) -> tuple[np.ndarray, np.ndarray]:
     """For the empty right half and count - 1 random halves of 64 cells (`right_half.random_starts`), driven from phase
     0 in Rule 30 itself: when each first lies in the certificate within `steps` steps (-1 if never), and, for those
@@ -211,7 +240,7 @@ def main() -> None:
         out = stay_out(word, member, args.stay_steps)  # (period, 2^W)
         print(f"{word}, width {args.chain_width}, fair coin: expected entry at most {expected.max():.1f} steps, "
               f"{expected[0].mean():.1f} on average over windows at phase 0; decay per step "
-              f"{decay_rate(word, member):.5f}; stays out for {args.stay_steps} steps with probability at most "
+              f"{period_rate(word, member):.5f}; stays out for {args.stay_steps} steps with probability at most "
               f"{out.max():.2e}")
         if args.samples:
             times, family = sample(word, member, args.samples, args.steps)  # (samples,), (m,)

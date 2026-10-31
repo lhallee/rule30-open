@@ -18,6 +18,7 @@ whether every node can reach them. `survey` runs it on every primitive block of 
     python -m computations.locks --lean --workers 3   # the entries of LockBlocks11 and LockBlocks12
     python -m computations.locks --periods 2,3,5,6,7,9 --census 13,16 --workers 3   # no locked node, about 2 min
     python -m computations.locks --white 4,5,6,7,8,9,10,11,12,13,14,15,16 --workers 3   # white runs, about 40 min
+    python -m computations.locks --reach 0000010111001 --width 18   # the share of nodes that can reach a lock, 20 s
 """
 
 from __future__ import annotations
@@ -257,8 +258,17 @@ def main() -> None:
     parser.add_argument("--repeat", type=int, default=1, help="with --census, play the game for each block repeated")
     parser.add_argument("--family", help="instead, with --census, the blocks of a family such as '0^k 11101', k = 0..12")
     parser.add_argument("--mixed", help="instead print, for these blocks at --width, the fewest phases with both values")
+    parser.add_argument("--reach", help="instead print, for these blocks at --width, repeated --repeat times, the locked "
+                                        "nodes, the share of nodes that can reach one, and whether the white window can")
     args = parser.parse_args()
     periods = [int(p) for p in args.periods.split(",")]
+    if args.reach:
+        for block in args.reach.split(","):
+            locked, reach = lock_info(block * args.repeat, args.width)  # (p n,), (p n,)
+            print(f"{block}, repeated {args.repeat} times, width {args.width}: {int(locked.sum())} locked nodes, "
+                  f"{reach.mean():.6f} of the nodes can reach one, the white window at phase 0 "
+                  f"{'can' if reach[0] else 'cannot'}", flush=True)
+        return
     if args.mixed:
         for block in args.mixed.split(","):
             print(f"{block} at width {args.width}: every node can reach both values of the left column at "

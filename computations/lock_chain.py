@@ -50,7 +50,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --census-entry 13 --cells 4 --steps 20000   # entry into each of them
     python -m computations.lock_chain --lean-census-large 14   # the traps of CensusTrapsLarge, in parts; 15 too
     python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
-    python -m computations.lock_chain --reach 16   # which traps every window can reach, about an hour
+    python -m computations.lock_chain --reach 18   # which traps every window of 18 cells can reach, cut to 18 cells
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
     python -m computations.lock_chain --t001-reach 24   # every node of the game of 001 can reach t001, about 2 min
@@ -222,63 +222,72 @@ def classify(found: dict[str, list[tuple[list[str], str]]], depth: int) -> tuple
     return seeds, placed
 
 
-def trap_reach(*traps: dict) -> float:
-    """The share of the nodes of the finite game of the traps' block, at the traps' width, from which some values of
-    the cell beyond the window lead into one of the traps. Every finitely supported right half enters one of them only
-    if this is 1: the nodes that cannot reach them form a set that no move leaves, and a half whose window starts there
-    never enters. The traps' labels must count the phase modulo the block's period."""
+def trap_reach(*traps: dict, width: int | None = None) -> float:
+    """The share of the nodes of the finite game of the traps' block at `width` cells (the traps' own width if None or
+    less), with the phase counted modulo the block's period as `WTrap.Absorption` compares labels, from which some
+    values of the cell beyond the window lead into the traps' states cut to their first `width` cells. Every finitely
+    supported right half enters one of the traps only if this is 1 at every width: the nodes that cannot reach the cut
+    states form a set that no move leaves, so a half whose first cells start there never has them in a state, and such
+    a set at one width gives one at every larger width, the windows that begin with its nodes."""
     word, cells = traps[0]["word"], traps[0]["cells"]
-    assert all((t["word"], t["cells"], t["modulus"]) == (word, cells, len(word)) for t in traps), "one block and width"
-    source, target, _, _, _ = game.game_graph(word, cells)  # (2 p n,), (2 p n,)
-    inside = np.zeros(len(word) << cells, dtype=bool)  # (p n,)
+    assert all((t["word"], t["cells"]) == (word, cells) for t in traps), "one block and width"
+    period, width = len(word), cells if width is None else min(width, cells)
+    low = (1 << width) - 1
+    source, target = game.moves(word, width)  # (2 p n,), (2 p n,)
+    inside = np.zeros(period << width, dtype=bool)  # (p n,)
     for t in traps:
         for label, window in t["states"]:
-            inside[label << cells | window] = True
+            inside[(label % period) << width | window & low] = True
     return float(locks.back_closure(inside, source, target).mean())
 
 
-def reach_census(max_cells: int = 18) -> list[tuple[str, str, int, float]]:
-    """`trap_reach` for every trap of the trap modules at most `max_cells` wide whose labels count the phase modulo the
-    period: the walls of `NATURAL` and their carried traps within `WALL_DEPTHS`, the natural traps of `EXTRA_TRAPS`,
-    `LONG_TRAPS` and `LONG_LARGE`, the census traps, and the traps of `MISSED_NATURAL` and `MISSED_CENSUS` that it
-    found. Each as (module, block, cells, share)."""
-    found: list[tuple[str, dict]] = []
-    for period, module in ((10, "TenTraps"), (11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"),
-                           (14, "FourteenTraps")):
-        if period == 10:
-            entries = [("trap0000010001", d) for d in ten_distances()]
-        else:
-            entries = [(name, d) for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
-        found += [(module, carried(name, d)) for name, d in entries if 16 + d <= max_cells]
-    found += [("FarWalls", carried(name, d)) for entries in FAR_WALLS.values() for name, d in entries
-              if 16 + d <= max_cells]
-    for module, entries in (("NaturalTraps", EXTRA_TRAPS), ("NaturalTrapsLong", LONG_TRAPS),
-                            ("NaturalTrapsLongLarge", LONG_LARGE)):
-        found += [(module, extra_tables(word)) for word, _, cells, modulus in entries
-                  if cells <= max_cells and modulus == len(word)]
+def module_traps() -> list[tuple[str, dict]]:
+    """Every trap of the trap modules, as (module, tables), in the order of `coverage.trap_blocks`, and the seven of
+    `Rule30Open.Columns.MissedTraps`; the pairs of `PAIRS` are left to `pair_tables`."""
+    found: list[tuple[str, dict]] = [("WordTraps", tables(name)) for name, *_ in TRAPS]
+    found.append(("WordTraps", tables("trap001011111")))
+    found += [("NineTraps", carried("trap001011111", d)) for d in nine_distances()]
+    found.append(("NineTraps", tables("trap001010011")))
+    found += [("TenTraps", carried("trap0000010001", d)) for d in ten_distances()]
+    for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"), (14, "FourteenTraps")):
+        found += [(module, carried(name, d)) for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
+    for module, entries in (("NaturalTraps", EXTRA_TRAPS), ("NaturalTrapsLarge", LARGE_TRAPS),
+                            ("NaturalTrapsLong", LONG_TRAPS), ("NaturalTrapsLongLarge", LONG_LARGE),
+                            ("MissedTraps", MISSED_NATURAL)):
+        found += [(module, extra_tables(word)) for word, *_ in entries]
+    found += [("FarWalls", carried(name, d)) for entries in FAR_WALLS.values() for name, d in entries]
     for period, entries in CENSUS_TRAPS.items():
-        found += [(f"CensusTraps{period}", census_tables(entry)) for entry in entries if 16 + entry[3] <= max_cells]
-    found += [("CensusTrapsLarge", census_tables(entry)) for entry in CENSUS_LARGE]
-    found += [("CensusTrapsLarge15", census_tables(entry)) for entry in CENSUS_LARGE15]
-    found += [("MissedTraps", extra_tables(word)) for word, *_ in MISSED_NATURAL]
-    found += [("MissedTraps", census_tables(entry)) for entry in MISSED_CENSUS]
-    return [(module, t["word"], t["cells"], trap_reach(t))
-            for module, t in tqdm(found, desc="traps", file=sys.stderr, mininterval=10)]
+        found += [(f"CensusTraps{period}", census_tables(entry)) for entry in entries]
+    for module, entries in (("CensusTrapsLarge", CENSUS_LARGE), ("CensusTrapsLarge15", CENSUS_LARGE15),
+                            ("MissedTraps", MISSED_CENSUS)):
+        found += [(module, census_tables(entry)) for entry in entries]
+    return found
 
 
-def miss_tables(t: dict) -> dict:
-    """A closed set of windows apart from the trap, as tables (`relabeled_tables`): at the least width w at which some
-    node of the game cannot reach the trap's states cut to their first w cells, the least strongly connected component
-    of those nodes that no move leaves. A right half whose first w cells are in it keeps them in it, whatever the cells
-    beyond do, so it never enters the trap. The trap's labels must count the phase modulo the block's period."""
+def reach_census(width: int = 18) -> list[tuple[str, str, int, float]]:
+    """`trap_reach` at `width` cells for every trap of the trap modules (`module_traps`), each cut to its first `width`
+    cells when it is wider, and for the two traps of each block of `PAIRS` together: (module, block, cells, share)."""
+    rows = [(module, t["word"], t["cells"], trap_reach(t, width=width))
+            for module, t in tqdm(module_traps(), desc="traps", file=sys.stderr, mininterval=10)]
+    for block in PAIRS:
+        pair = pair_tables(block)
+        rows.append(("TrapPairs", block, pair[0]["cells"], trap_reach(*pair, width=width)))
+    return rows
+
+
+def miss_tables(t: dict, max_width: int = 20) -> dict:
+    """A closed set of windows apart from the trap, as tables (`relabeled_tables`): at the least width w, up to
+    `max_width`, at which some node of the game cannot reach the trap's states cut to their first w cells, with the
+    phase counted modulo the block's period, the least strongly connected component of those nodes that no move leaves.
+    A right half whose first w cells are in it keeps them in it, whatever the cells beyond do, so it never enters the
+    trap."""
     word, period = t["word"], len(t["word"])
-    assert t["modulus"] == period, "labels modulo a multiple of the period"
-    for width in range(1, t["cells"] + 1):
+    for width in range(1, min(t["cells"], max_width) + 1):
         low = (1 << width) - 1
         source, target, label, _, _ = game.game_graph(word, width)  # (2 p n,), (2 p n,), (p n,)
         inside = np.zeros(period << width, dtype=bool)  # (p n,)
         for phase, window in t["states"]:
-            inside[phase << width | window & low] = True
+            inside[(phase % period) << width | window & low] = True
         out = ~locks.back_closure(inside, source, target)  # (p n,), a set of nodes that no move leaves
         if out.any():
             leaves = np.zeros(label.max() + 1, dtype=bool)  # (components,)
@@ -287,7 +296,7 @@ def miss_tables(t: dict) -> dict:
             best = min(set(label[out & ~leaves[label]].tolist()), key=lambda c: (sizes[c], c))
             members = np.flatnonzero(label == best)  # (m,)
             return relabeled_tables(word, width, {(x >> width, x & low) for x in members.tolist()})
-    raise ValueError(f"every node of the game of {word} can reach its trap")
+    raise ValueError(f"every node of the game of {word} can reach its trap up to width {max_width}")
 
 
 def pair_tables(block: str) -> list[dict]:
@@ -1358,6 +1367,61 @@ MISSED_NATURAL = [("0001101101011", 0, 16, 13), ("0010010010111", 66483644887648
                   ("0010101111111", 6991680298694716019, 16, 13), ("00001101111001", 0, 16, 14)]
 MISSED_CENSUS = [("0000010111001", "0000010111001", 0, 0), ("000001010110101", "000001010110101", 0, 0),
                  ("001001111010111", "001001111010111", 0, 0)]
+# The traps of the modules that the test of reach refutes (`reach_census` at `REACH_WIDTH` cells): some node of the
+# finite game of that width cannot reach the trap's states cut to that width, so a right half whose first cells start
+# there never enters the trap, and entry, the hypothesis of the trap's reduction, is false. By module, the blocks of
+# those traps; the seven of `MISSED_NATURAL` and `MISSED_CENSUS`, refuted in Lean, are not repeated.
+REACH_WIDTH = 20
+UNREACHED = {
+    "CensusTraps13": ["0000001100111", "0000001101001", "0000010100111", "0000011001011", "0000110011011",
+                      "0000110111001", "0000111111001", "0001000110011", "0001010100101", "0001011010101",
+                      "0001011010111", "0001011111001", "0001100011111", "0001100101001", "0001101011011",
+                      "0010100111101", "0011010100111", "0011010111111", "0011101101011", "0011101110111",
+                      "0011110111011", "0011111101111", "0101010111011", "0101011010111", "0101011111111"],
+    "CensusTraps14": ["00000001111111", "00000011010001", "00000011110111", "00000100111001", "00000110110101",
+                      "00001000011111", "00001000101101", "00001010001001", "00001010001111", "00001011000101",
+                      "00001011101111", "00001100101011", "00010011100011", "00010011111001", "00010100110111",
+                      "00010101011001", "00011011010011", "00011111110101", "00100110101101", "00100111001111",
+                      "00100111101011", "00100111111101", "00101010100111", "00101011001101", "00110011011101",
+                      "00111001111111", "00111011111011", "01010111111011", "01011011010111"],
+    "CensusTraps15": ["000000000001001", "000000010001001", "000000010010011", "000000010111001", "000000011110111",
+                      "000000100010111", "000000101011001", "000000101110001", "000000110001001", "000000110110101",
+                      "000001000010011", "000001111110101", "000010000101001", "000010001011111", "000010011000111",
+                      "000010101011001", "000010101101111", "000010110010101", "000010110101011", "000010111100101",
+                      "000010111101001", "000010111111001", "000011110011001", "000011110100111", "000100100011001",
+                      "000101001011001", "000101100111001", "000101100111101", "000101111101011", "000101111101111",
+                      "000110100111001", "000110110011111", "000110110110111", "000111010101111", "000111010111101",
+                      "000111011011001", "000111011011011", "000111011100101", "000111101101101", "000111101110011",
+                      "001001001011011", "001001011111111", "001001101111111", "001001111101111", "001010010111111",
+                      "001010011010011", "001011010010111", "001011011011111", "001100110110101", "001110011101011",
+                      "001110101111111", "001110111110101", "010110101111111", "011011101101111", "011011111101111"],
+    "ElevenTraps": ["00000001011", "00000101111", "00000110001", "00001000111", "00001001101", "00001100101",
+                    "00001101001", "00001101011", "00001101101", "00001111001", "00001111111", "00010100101",
+                    "00011010011", "00011011001", "00011100111", "00011110011", "00011111001", "00100111011",
+                    "00101101111", "00110111011", "00110111111", "00111010111", "00111011011", "01010101011",
+                    "01011101111", "01011111011", "01111011111"],
+    "FarWalls": ["000000011111", "010101111111"],
+    "FourteenTraps": ["00000000010001", "00000000110011", "00000001010111", "00000100001111", "00000101010111",
+                      "00000111001101", "00001000010001", "00001000011101", "00001100011011", "00001111010101",
+                      "00001111101011", "00010011111101", "00010101111111", "00010110010101", "00010110100101",
+                      "00011011011101", "00011110111001", "00100101100101", "00100110111111", "00101101101101",
+                      "00101110011111", "00101111101111", "00110011111111", "00110111100111", "00111001110101",
+                      "00111010011111", "00111011011101", "00111011101111", "01110111111111"],
+    "NineTraps": ["000001101", "000011001", "000100101", "000110011", "001101111", "001110111", "011101111"],
+    "TenTraps": ["0000000001", "0000000101", "0000011101", "0000100111", "0000110011", "0000111111", "0001011111",
+                 "0001111111", "0011001111", "0011111101", "0111011111"],
+    "ThirteenTraps": ["0000000100001", "0000001001101", "0000001111111", "0000011000111", "0000100101101",
+                      "0000101001001", "0000101011001", "0000101110111", "0000110011101", "0000111011011",
+                      "0000111101111", "0001001110111", "0001010001011", "0001011100111", "0001011101011",
+                      "0001111101111", "0010010100111", "0010011110101", "0010110111111", "0010111101101",
+                      "0101010101111"],
+    "TwelveTraps": ["000000010001", "000000011101", "000000101101", "000000110011", "000001000111", "000001010111",
+                    "000001011011", "000100101111", "000100111011", "000100111101", "000101001111", "000101011111",
+                    "000110011001", "000110110101", "000111001101", "000111110011", "001001100101", "001001101011",
+                    "001011010111", "001011101111", "001100111111", "001101101111", "001111111101", "010110111111",
+                    "011101111111"],
+    "WordTraps": ["01", "001"],
+}
 # Blocks of periods 13 and 14 whose locked windows of 16 cells have two bottom components, with different values of
 # column 1 at the white phases, neither of which every node of the game can reach, while every node can reach one of
 # the two (`trap_reach` on both): the natural traps of `MISSED_NATURAL` are one of each pair.
@@ -2037,7 +2101,8 @@ def main() -> None:
                         help="print the traps of CensusTrapsLarge.lean (14) or CensusTrapsLarge15.lean (15)")
     parser.add_argument("--lean-long-large", action="store_true", help="print the traps of NaturalTrapsLongLarge.lean")
     parser.add_argument("--reach", type=int, default=0,
-                        help="with a width, the share of game nodes that can reach each trap up to that width")
+                        help="with a width, the share of the nodes of the game of that width that can reach each trap "
+                             "of the trap modules, cut to that width when wider")
     parser.add_argument("--lean-missed", action="store_true",
                         help="the traps of MissedTraps, each with a closed set of windows apart from it")
     parser.add_argument("--lean-pairs", action="store_true",
@@ -2269,7 +2334,8 @@ def main() -> None:
             if share < 1:
                 print(f"{module}: {word} ({cells} cells): only {share:.4f} of the nodes can reach the trap", flush=True)
         full = sum(share == 1 for *_, share in rows)
-        print(f"{len(rows)} traps of at most {args.reach} cells; every node can reach {full} of them", flush=True)
+        print(f"{len(rows)} traps and pairs, cut to {args.reach} cells when wider; every node of the game of "
+              f"{args.reach} cells can reach {full} of them", flush=True)
     if args.lean_far:
         print(lean_far())
     if args.lean_census:

@@ -45,8 +45,15 @@ with the 60 cells of its background, and the 12 blocks are those of its columns 
 Each trap reduces its block to entry, and these are the weakest reductions here: no right half with support in cells 1
 to 4 enters any of the 12 traps within 20,000 steps from any phase (`far_entry`), as for the traps that
 [ThirteenTraps](ThirteenTraps.md) and [FourteenTraps](FourteenTraps.md) carry farthest. Entering a trap carried $d$
-columns means the $d$ columns beside the center settle into the background, which a small half does not do in that
-time. With them 113 of the 335 blocks of period 12 come down to entry ([the coverage](../../findings/columns/coverage.md)).
+columns means the $d$ columns beside the center settle into the background, which a small half does not do in that time.
+With them 113 of the 335 blocks of period 12 have a trap in Lean, and 86 a trap that passes the test of reach below
+([the coverage](../../findings/columns/coverage.md)).
+
+**The test of reach.** Cut to their first 20 cells, 2 of the 12 traps here, of 57 and 58 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
+right half whose first 20 cells start there never enters, and entry into the trap is false ([what
+failed](../../negative-results/columns/missed-traps.md)). No trap of any module passes for their two blocks, so the
+reduction is empty. The other 10 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

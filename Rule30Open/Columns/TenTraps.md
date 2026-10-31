@@ -68,6 +68,12 @@ column 1 from locking. In Lean, [TenGap](TenGap.md) checks the entries of the 2,
 the light cone: no finite configuration whose cells 9 to 3,058 are white, or 1 to 90, has a center column that repeats
 $0000010001$. Entry for every finite right half stays open, as for the kit's traps.
 
+**The test of reach.** Cut to their first 20 cells, 11 of the 25 traps here, of 26 to 46 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
+right half whose first 20 cells start there never enters, and entry into the trap is false ([what
+failed](../../negative-results/columns/missed-traps.md)). For 11 of their blocks no trap of any module passes, so the
+reduction is empty. The other 14 traps pass the test, which entry needs but does not imply.
+
 ## Relation to the kit
 
 The kit's traps are `t001` for $001$ and its ether-and-wall family for the words of period four; it has none for a block
