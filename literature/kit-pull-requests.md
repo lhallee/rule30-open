@@ -1,13 +1,15 @@
 # Open pull requests to the prize kit
 
 The kit ([Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit)) is pinned here at its main branch, commit
-932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit merged nine of its 23 open [pull
-requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its main branch, at commit
-[a6399ef](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a6399ef15ff409d4dc0c5feb119b289aa31588a4), which
-brings its catalog to 168 modules: #36, #43, #45, #46, #49, #51, #53, #54 and #56, each marked *merged* below. This
-repository is not yet pinned there, so here they are results of the kit's main branch that the pin does not include, and
-the 17 open, with #61 since, are claims. Each pull request adds Lean modules that its author reports as checked by the
-kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
+932cf8d, so a module merged there is a kit result. On October 30, 2026 the kit merged eleven of its open [pull
+requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its main branch: nine at commit
+[a6399ef](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a6399ef15ff409d4dc0c5feb119b289aa31588a4), with 168
+modules, and #50 and #58 after them, at commit
+[7beff71](https://github.com/WolframInstitute/Rule30PrizeKit/commit/7beff71ceb40e67010fd0713b1a9aecdded09ef2), which
+brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, #51, #53, #54, #56 and #58, each marked
+*merged* below. This repository is not yet pinned there, so here they are results of the kit's main branch that the pin
+does not include, and the 17 open on October 31, #61, #62 and #63 among them, are claims. Each pull request adds Lean
+modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
 request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
 ## Least periods four and three: traps for the right half
@@ -66,12 +68,13 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
 
 ## Local invariants
 
-- **#58, `Rule30GroupCocycle`.** Claims that every homogeneous one-step, local, group-valued zero-curvature connection
-  for Rule 30 is a local vertex gauge of two commuting vacuum constants, for any group, finite or not, commutative or
-  not, with the spatial and temporal supports placed independently (`arbitrary_local_supports`); it says that it proves
-  no prize problem. *Here:* if correct, it extends [the conservation laws](../negative-results/structure/conservation-laws.md)
-  from additive quantities on blocks to ordered transport in any group: Rule 30 carries no local invariant of either
-  kind beyond the trivial ones, so neither kind constrains the density of Problem 2.
+- **#58, `Rule30GroupCocycle`.** *Merged.* Claims that every homogeneous one-step, local, group-valued zero-curvature
+  connection for Rule 30 is a local vertex gauge of two commuting vacuum constants, for any group, finite or not,
+  commutative or not, with the spatial and temporal supports placed independently (`arbitrary_local_supports`); it says
+  that it proves no prize problem. *Here:* it extends [the conservation
+  laws](../negative-results/structure/conservation-laws.md) from additive quantities on blocks to ordered transport in
+  any group: Rule 30 carries no local invariant of either kind beyond the trivial ones, so neither kind constrains the
+  density of Problem 2.
 
 ## Excluding eventual periods by families of blocks
 
@@ -103,9 +106,15 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   $\lceil j/2 \rceil + 2$ updates, and into $j + 5$ or $j + 6$ within $7(\lceil j/2 \rceil + 1)$, recurrently. The
   pull request reports a partial replay by `Check.lean` and states that neither module proves escape at every width
   or that the center column is not periodic.
-- **#50, `Rule30TemporalProfiles`.** Claims facts on periodic profiles linked by the left-diagonal recurrence: a
-  periodic driver has exactly one periodic child, and a chain of them that starts white returns to white within
-  $2^{2q}$ links.
+- **#62, `Rule30GateClocks`.** Replaces the OR of the right-edge map with any two-input gate at each depth and claims,
+  for every choice of gates, that the least period of the first $n$ bits of the edge code is a power of two
+  (`prefix_period_iff`), that $2m$ more bits raise its exponent by at most $m$ plus a correction from earlier records
+  (`prefix_window_bound`), so the first $n$ bits have a period dividing $2^{B(n)}$, and that with affine gates the
+  period divides $2^r$ once $n + 1 \le 2^r$ (`affine_prefix_bound`). It extends the kit's half-rate bound
+  `Rule30RightPeriods.per_upper_half` from the OR to every gate, and claims no lower bound.
+- **#50, `Rule30TemporalProfiles`.** *Merged.* Claims facts on periodic profiles linked by the left-diagonal
+  recurrence: a periodic driver has exactly one periodic child, and a chain of them that starts white returns to white
+  within $2^{2q}$ links.
 - **#49, `Rule30PairedColumnRuns`.** *Merged.* Claims that when columns 0 and 1 both have period $P \ge 2$ from time 0
   and column 0 is black at some time, every white run left of column 0 in row 0 has length at most $2P - 2$; the
   hypotheses fail whenever there is a leftmost black cell. *Here:*
@@ -131,8 +140,13 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   the stripe front windows, a trichotomy for the preimages of a window (a clone regime with a white tail, and two
   primitive regimes, with a black tail or with the period-3 NOR wave $(100)^\infty$, `primitive_or_clone_trichotomy`,
   `backward_nor_period_three`), a classification of the primitive roots of 8 cells, and projections of the orbits of
-  wider windows onto narrower ones. It states no claim on a prize problem. *Here:* no route here uses the stripe front
-  windows.
+  wider windows onto narrower ones. It states no claim on a prize problem.
+- **#63, `Rule30ZeroBoundaryStripeCascade`.** Builds on #45 and #59: every primitive root of the first kind reaches the
+  NOR wave $(100)^\infty$ at backward step 3, the next step maps it to $(011)^\infty$ and the one after to
+  $(000101)^\infty$ (`typeI_step3_nor_wave`, `wave_011_to_period6_step0`); the backward reduction is injective, so
+  clone rays from distinct primitive roots never meet (`clone_ray_disjoint_of_primRoot`); and each of sixteen infinite
+  clone rays turns its first cell white at an even time at most $m + 45$ (`rowTail_sixteen_rays_all_odd`). It reports a
+  partial claim. *Here:* no route here uses the stripe front windows.
 - **#23, `Rule30RunBoundarySources`.** Claims that the center at time $2^{e+1} - 1$ is 1 plus, modulo 2, the
   contribution of run-boundary sources at depths beyond $e$, from an expansion through Rule 90. *Here:* it is of the same kind as
   [the Duhamel form](../findings/structure/duhamel.md), which writes the center column as a sum over adjacent black

@@ -10,7 +10,7 @@ The kit's own status table, in its
 [lean/README.md](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/README.md#status-by-period),
 summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
-kit's commit 932cf8d; the kit's main branch has since gained 27 modules from nine pull requests (a6399ef, October 30),
+kit's commit 932cf8d; the kit's main branch has since gained 29 modules from eleven pull requests (7beff71, October 30),
 and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
