@@ -332,6 +332,34 @@ def miss_tables(t: dict, max_width: int = 20) -> dict:
     raise ValueError(f"every node of the game of {word} can reach its trap up to width {max_width}")
 
 
+def reach_job(job: tuple[str, str, list[dict], int]) -> tuple[str, str, float]:
+    """`trap_reach` of one trap, or of the traps of a pair or set together, at a width: (module, name, share)."""
+    module, name, traps, width = job
+    return module, name, trap_reach(*traps, width=width)
+
+
+def wide_reach(width: int = 22, workers: int = 1) -> list[tuple[str, str, float]]:
+    """The test of reach in a wider game for the hypotheses that pass both tests at `REACH_WIDTH` cells and are not
+    carried along a chain: the traps of the natural and large census modules, the pairs of `PAIRS` and `WALL_SPLIT`,
+    and the sets of `TRAP_SETS`, in `workers` processes; those below 1 are the hypotheses of `UNREACHED_WIDE`."""
+    keep = {"NaturalTraps", "NaturalTrapsLarge", "NaturalTrapsLong", "NaturalTrapsLongLarge", "NaturalTrapsWalls",
+            "CensusTrapsLarge", "CensusTrapsLarge15"}
+    jobs = []
+    for module, name, build in module_entries():
+        if module in keep:
+            t = build()
+            if t["word"] not in UNREACHED.get(module, ()) and t["word"] not in APART.get(module, ()):
+                jobs.append((module, name, [t], width))
+    jobs += [("TrapPairs", f"pair{block}", pair_tables(block), width) for block in PAIRS
+             if block not in APART.get("TrapPairs", ())]
+    jobs += [("NaturalTrapsWalls", f"natw{block}", split_tables(block), width) for block, _ in WALL_SPLIT]
+    jobs += [("TrapSets", f"set{block}", [t for *_, t in set_tables(block)], width) for block, *_ in TRAP_SETS]
+    jobs.sort(key=lambda job: len(job[2][0]["word"]))
+    with multiprocessing.get_context("spawn").Pool(workers) as pool:
+        return list(tqdm(pool.imap(reach_job, jobs), total=len(jobs), desc="hypotheses", file=sys.stderr,
+                         mininterval=30))
+
+
 def block_apart(job: tuple[str, list[tuple[str, str, list[dict]]]]) -> list[
         tuple[str, str, int, list[tuple[int, int, int]]]]:
     """For one block and its traps or pairs, as (module, name, tables): the halves of the block's natural scan
@@ -1346,6 +1374,20 @@ def natural_coin(steps: int = 12000, limit: int = 2000) -> Iterator[tuple[str, d
             yield word, trap_coin(word, trap_member(extra_tables(word)), steps, limit)
 
 
+def natural_coin_widths(widths: tuple[tuple[int, int], ...] = ((16, 5000), (18, 2000), (20, 600))) -> Iterator[
+        tuple[str, list[float]]]:
+    """For each trap of 16 cells of `EXTRA_TRAPS`, the factor per step by which the chance of staying out falls with a
+    fair coin in the column after a game of each width, the trap taken as the windows that begin with its states
+    (`trap_nodes`): `coin_lock.period_rate`, an upper bound wherever its iteration stops, capped at the paired number
+    of steps. Yields (block, factors) one trap at a time."""
+    from computations import coin_lock
+    for word, _, cells, _ in tqdm(EXTRA_TRAPS, desc="natural traps", file=sys.stderr):
+        if cells == 16:
+            t = extra_tables(word)
+            yield word, [coin_lock.period_rate(word, trap_nodes((t,), width).reshape(len(word), 1 << width),
+                                               tolerance=1e-10, limit=limit) for width, limit in widths]
+
+
 def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> list[tuple[int, np.ndarray]]:
     """Entry steps into the period-10 wall of `count` random right halves of each length (from
     `numpy.random.default_rng(30)`, the last cell black), driven from phases 0 and 5."""
@@ -1551,6 +1593,12 @@ UNREACHED = {
 # `Rule30Open.Columns.TrapPairs` reduces each block to entry into one of its two components (`pair_tables`).
 PAIRS = ["0001101101011", "0010010010111", "0010101111111", "00001101111001"]
 
+
+# The hypotheses that pass both tests at `REACH_WIDTH` cells but fail the test of reach in the game of `WIDE_WIDTH`
+# cells (`wide_reach`, which tries the natural traps, the large census components, the pairs and the sets): by module,
+# the blocks of those traps, or of the pair of `WALL_SPLIT` for 00101101111.
+WIDE_WIDTH = 22
+UNREACHED_WIDE = {"NaturalTrapsLongLarge": ["0101011111111"], "NaturalTrapsWalls": ["00101101111", "0010011110101"]}
 
 # The traps of the modules, and the pairs, that pass the test of reach but that a half of their block's natural scan,
 # closing windows of 16 to 64 cells, never enters: at step 12,000 the half is inside a closed set apart from the trap,
@@ -2447,6 +2495,12 @@ def main() -> None:
                         help="the traps of TrapPairs, the two bottom components of each block of PAIRS")
     parser.add_argument("--lean-wall-natural", action="store_true",
                         help="the traps of NaturalTrapsWalls, natural traps for blocks whose wall traps fail")
+    parser.add_argument("--wide-reach", type=int, metavar="WORKERS",
+                        help="the test of reach at 22 cells for the natural traps, large census components, pairs and "
+                             "sets, with this many processes (about three hours with two)")
+    parser.add_argument("--natural-coin-widths", action="store_true",
+                        help="the coin's factor per step for the natural traps of 16 cells in games of 16, 18 and 20 "
+                             "cells")
     parser.add_argument("--lean-fifteen", action="store_true",
                         help="the traps of FifteenWalls, two walls of period 15 wider than 16 cells carried leftward")
     parser.add_argument("--lean-trap-sets", action="store_true",
@@ -2703,6 +2757,15 @@ def main() -> None:
         print(lean_pairs())
     if args.lean_wall_natural:
         print(lean_wall_natural())
+    if args.wide_reach:
+        rows = wide_reach(22, args.wide_reach)
+        print(f"{len(rows)} hypotheses, {sum(1 for row in rows if row[2] < 1)} fail at 22 cells")
+        for module, name, share in rows:
+            if share < 1:
+                print(f"{module} {name}: {share:.6f}")
+    if args.natural_coin_widths:
+        for word, factors in natural_coin_widths():
+            print(f"{word}: " + ", ".join(f"{f:.6f}" for f in factors))
     if args.lean_fifteen:
         print(lean_fifteen())
     if args.lean_trap_sets:

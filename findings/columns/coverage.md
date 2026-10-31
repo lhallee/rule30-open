@@ -17,7 +17,8 @@ sequence). This table counts, for each period up to 15, the primitive blocks eac
 order. A trap counts only if it passes two tests that entry needs ([what
 failed](../../negative-results/columns/missed-traps.md)): every node of the finite game of 20 cells can reach a window
 whose first cells form one of its states, cut to 20 cells when the trap is wider, and no half of the block's natural
-scan is inside a closed set apart from it.
+scan is inside a closed set apart from it; three that pass fail the first in the game of 22 cells, and do not count
+either.
 
 ## Result
 
@@ -33,9 +34,9 @@ scan is inside a closed set apart from it.
 | 8 | 30 | 3 | 0 | 5 | 0 | 22 |
 | 9 | 56 | 0 | 16 | 0 | 7 | 33 |
 | 10 | 99 | 4 | 24 | 0 | 3 | 68 |
-| 11 | 186 | 7 | 56 | 1 | 13 | 109 |
+| 11 | 186 | 7 | 55 | 2 | 13 | 109 |
 | 12 | 335 | 9 | 99 | 0 | 14 | 213 |
-| 13 | 630 | 21 | 183 | 0 | 38 | 388 |
+| 13 | 630 | 21 | 181 | 0 | 40 | 388 |
 | 14 | 1161 | 31 | 340 | 0 | 40 | 750 |
 | 15 | 2182 | 53 | 623 | 0 | 51 | 1455 |
 
@@ -76,15 +77,15 @@ $01$, of the kit's ether-and-wall family read so, fails the test; at periods 5, 
 small halves almost never enter ([trap entry](../../negative-results/columns/trap-entry.md)), and the rest is not
 reached at all. From period 9 the walls at the edges of periodic backgrounds, and at periods 10 to 12 also the closed
 sets that driven halves settle into, give traps to 23, 27, 70 and 113 blocks ([natural traps](natural-traps.md)), but
-for 7, 3, 14 and 14 of them every trap fails the test, which leaves 16, 24, 56 and 99 with a trap that passes, and
-steering alone reaches one more block, of period 11. Where the walls carried along their backgrounds' columns fail, the
+for 7, 3, 15 and 14 of them every trap fails the tests, which leaves 16, 24, 55 and 99 with a trap that passes, and
+steering alone reaches two of those of period 11. Where the walls carried along their backgrounds' columns fail, the
 natural traps of [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md) reduce 60 blocks of periods 10 to 14
 again. At periods 13 and 14 sampling gives traps to 87 and 136 blocks that nothing excludes ([natural
 traps](natural-traps.md)); the census of every locked window of 16 cells, carried by its chain, raises the count of
 blocks with some trap to 221 and 380, and at period 15, where nothing reached a block before, to 593 ([backgrounds
 periodic in time](space-time-backgrounds.md)), and two walls of its largest background wider than 16 cells raise it to
-674 ([FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md)), but 38, 40 and 51 of these have only traps that fail the
-tests, which leaves 183, 340 and 623, 28.6% to 29.3% of each period. Most traps that fail are carried ones, but two
+674 ([FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md)), but 40, 40 and 51 of these have only traps that fail the
+tests, which leaves 181, 340 and 623, 28.6% to 29.3% of each period. Most traps that fail are carried ones, but two
 walls themselves, a census component and two natural traps, all of 16 cells, pass in the game of their own width and
 fail in that of 20, where the cells after them follow the rule; the sampled halves of ten blocks split between two traps
 apart from each other, so that only entry into one of the two can hold

@@ -79,10 +79,15 @@ or 7, and one start each for six blocks of period 9.
 - **A fair coin beyond the window.** As for the period-10 wall, a fair coin in column 17 in place of the cells beyond
   brings every window into each of the 29 traps of 16 cells of [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md):
   every window can enter within 59 to 123 steps, the expected entry is at most 79 to 1,549 steps, and the chance of
-  staying out falls by a factor of 0.952 to 0.9993 per step, below $2.5 \cdot 10^{-4}$ after 12,000 steps for every
-  trap and below $10^{-11}$ for 25 of them (`natural_coin`, the power iteration capped at 2,000 periods). A constant
-  column 17 brings every window in for 8 of them, white for five and black for five. The trap slowest under the coin,
-  that of $001110111101$, is also the one Rule 30's own small halves take longest to enter, within 8,622 steps.
+  staying out falls by a factor of 0.952 to 0.9993 per step, below $2.5 \cdot 10^{-4}$ after 12,000 steps for every trap
+  and below $10^{-11}$ for 25 of them (`natural_coin`, the power iteration capped at 2,000 periods). The upper bound of
+  `coin_lock.period_rate` gives the same factors to within $3 \cdot 10^{-5}$. Moving the coin away from the window does
+  not slow it: in the games of 18 and 20 cells, with the coin in column 19 or 21 and the cells between following the
+  rule, the factor of each trap moves by at most 0.035 from its value at 16 cells, down for some traps and up for
+  others, and at 20 cells it is 0.920 to 0.9994 (`natural_coin_widths`, the iteration capped at 2,000 and 600 steps,
+  whose value bounds the factor from above). A constant column 17 brings every window in for 8 of them, white for five
+  and black for five. The trap slowest under the coin, that of $001110111101$, is also the one Rule 30's own small
+  halves take longest to enter, within 8,622 steps.
 - **Periods 13 and 14, windows of 16 cells.** Closing windows of 16 cells only (`--max-width 16`, since wider closures
   make the scan of these periods run for hours), the scan finds traps for 86 of the 630 blocks of period 13, every
   sampled start inside one for 76 of them, and for 109 of the 1,161 of period 14, every start for 105; at periods 10 to

@@ -1,5 +1,5 @@
 ---
-title: Entry into 275 of the 1,509 traps of the trap modules is false, so their reductions were empty
+title: Entry into 277 of the 1,595 traps of the trap modules is false, so their reductions were empty
 category: columns
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: refuted
 evidence: [computations/lock_chain.py, computations/locks.py, computations/game.py]
 ---
 
-# Entry into 275 of the 1,509 traps of the trap modules is false, so their reductions were empty
+# Entry into 277 of the 1,595 traps of the trap modules is false, so their reductions were empty
 
 **Question.** Each trap module reduces a block to entry, the statement that every finitely supported right half driven
 by the block eventually enters the trap (`WTrap.Absorption` of [WordTraps](../../Rule30Open/Columns/WordTraps.md)). The
@@ -23,7 +23,7 @@ is narrower than $w$, the cells after it follow the rule instead of taking any v
 its own width and fail in a wider one. `trap_reach` in [computations/lock_chain.py](../../computations/lock_chain.py)
 computes the share of the nodes of the game of $w$ cells that can reach a trap, with the phase counted modulo the
 block's period, as `WTrap.Absorption` compares labels. `reach_census` runs it at 20 cells on every trap of the trap
-modules (`module_traps`), 1,509 traps, and on the ten pairs of [TrapPairs](../../Rule30Open/Columns/TrapPairs.md)
+modules (`module_traps`), 1,595 traps, and on the ten pairs of [TrapPairs](../../Rule30Open/Columns/TrapPairs.md)
 and [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), each pair together. For the seven traps of
 MissedTraps, and for seven more failing traps of six modules, a half started among the nodes that cannot reach was also
 run directly with the rule for 20,000 steps, to check the encoding: each stayed among them and never entered. A second
@@ -70,6 +70,13 @@ wall or a census component, is apart from. For each of the 29 blocks the block's
 are inside together pass the test of reach at 20 cells, and [TrapSets](../../Rule30Open/Columns/TrapSets.md) reduces
 the block to entry into one of them, so the count of blocks left with no trap that passes stays 168.
 
+The test only grows stricter with the width. In the game of 22 cells, of the 252 hypotheses that pass both tests at
+20 cells and are not carried along a chain, the natural traps, the large census components, the pairs and the sets,
+three fail, with 99.984% to 99.994% of the nodes able to reach (`wide_reach`, `UNREACHED_WIDE`): the pair of
+$00101101111$ in NaturalTrapsWalls, and the natural traps of 16 cells of $0010011110101$ in NaturalTrapsWalls and
+$0101011111111$ in [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md). Their three blocks are
+left with no hypothesis that passes, which makes 171.
+
 **Where it stops, and why.** Four different failures.
 
 - *A carried trap fixes the columns to the wall.* A trap carried $d$ columns from a wall, or from a census component,
@@ -101,7 +108,7 @@ the block to entry into one of them, so the count of blocks left with no trap th
   nodes that can reach one are 0.56% to 2.52% of the game (`python -m computations.locks --reach <block> --width 18`,
   or `--repeat 2`). The census components carried to these blocks one or two columns fail the same way.
 
-**What it means.** For 168 blocks every reduction is a true theorem with a false hypothesis, and [the coverage
+**What it means.** For 171 blocks every reduction is a true theorem with a false hypothesis, and [the coverage
 table](../../findings/columns/coverage.md) now counts a block as reduced only when one of its traps passes the test at
 20 cells. The test is a probabilistic one, that of [the coin beyond the window](../../findings/columns/coin-lock.md): a
 trap passes at $w$ cells exactly when, with a fair coin in column $w + 1$, every window of $w$ cells reaches it with
@@ -131,6 +138,10 @@ python -m computations.lock_chain --halves-apart
 python -m computations.lock_chain --apart-census 3
 ```
 
+```bash
+python -m computations.lock_chain --wide-reach 2
+```
+
 The census of every trap in the game of 20 cells, about four hours with one process; the halves of the natural scans
 in traps apart from those of NaturalTrapsWalls, about ten minutes; and from every trap and pair that passes the test of
-reach, about an hour with three processes.
+reach, about an hour with three processes; and the test in the game of 22 cells, about two and a half hours with two.

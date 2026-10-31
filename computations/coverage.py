@@ -69,13 +69,15 @@ def trap_blocks() -> dict[str, str]:
 
 
 def refuted_blocks() -> set[str]:
-    """The blocks of `trap_blocks` whose every trap is refuted: it fails the test of reach (`lock_chain.UNREACHED`), so
-    some node of the finite game of `lock_chain.REACH_WIDTH` cells cannot reach it, or a half of the block's natural scan
-    is inside a closed set apart from it (`lock_chain.APART`); either way entry into it is false and its reduction
-    empty. The kit's `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test of reach
+    """The blocks of `trap_blocks` whose every trap is refuted: it fails the test of reach (`lock_chain.UNREACHED`),
+    so some node of the finite game of `lock_chain.REACH_WIDTH` cells cannot reach it, or a half of the block's
+    natural scan is inside a closed set apart from it (`lock_chain.APART`), or it fails the test of reach in the game
+    of 22 cells (`lock_chain.UNREACHED_WIDE`); either way entry into it is false and its reduction empty. The kit's
+    `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test of reach
     ([reach of the kit's conjectures](../findings/columns/kit-absorption-reach.md))."""
-    passing = {block for block, module in module_blocks() if block not in lock_chain.UNREACHED.get(module, ())
-               and block not in lock_chain.APART.get(module, ())}
+    refuted = (lock_chain.UNREACHED, lock_chain.APART, lock_chain.UNREACHED_WIDE)
+    passing = {block for block, module in module_blocks()
+               if not any(block in found.get(module, ()) for found in refuted)}
     return set(trap_blocks()) - passing
 
 

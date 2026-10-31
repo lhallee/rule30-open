@@ -1581,8 +1581,9 @@ def test_period_rate() -> None:
     """`coin_lock.period_rate` where the power iteration of `decay_rate` oscillates: for the kit's block 0000000001 at
     width 13, two eigenvalues of one period of the coin step share the largest modulus, and the rate equals that of a
     power iteration shifted by the identity, which converges; for the certificates of 0011 and 0111 at width 16 the
-    rates are 0.99823 and 0.98251; and `locks.growth` gives the locked share and growth rate of 0111 at width 13 that
-    `locks.profile` gives."""
+    rates are 0.99823 and 0.98251; `locks.growth` gives the locked share and growth rate of 0111 at width 13 that
+    `locks.profile` gives; and for a trap that some window cannot reach the factor is 1, not the 0 that a vector gone to
+    0 on some windows would give."""
     from computations import coin_lock, locks
     from scipy.sparse.linalg import LinearOperator, eigs
     block = "0000000001"
@@ -1611,6 +1612,14 @@ def test_period_rate() -> None:
     # `locks.growth`, the profile without the steering sequence: for 0111 at width 13 the share and rate of the table
     share, rate = locks.growth("0111", 13)
     assert round(share, 4) == 0.0584 and round(rate, 6) == 1.969279
+    # the factor is below 1 exactly when every window can reach the trap: the natural trap of 0001111110011 passes the
+    # test of reach in the game of 16 cells and fails in that of 17, where windows that never enter leave the iteration
+    # 0 elsewhere and the bound is the step's own, 1
+    from computations import lock_chain
+    t = lock_chain.extra_tables("0001111110011")
+    rates = [coin_lock.period_rate("0001111110011", lock_chain.trap_nodes((t,), w).reshape(13, 1 << w),
+                                   tolerance=1e-10, limit=3000) for w in (16, 17)]
+    assert rates[0] < 1 == rates[1] and lock_chain.trap_reach(t, width=17) < 1
 
 
 def test_locks() -> None:
@@ -2573,7 +2582,8 @@ def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of
     16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
-    rule; and `coverage.refuted_blocks` holds the 168 blocks of periods 2 to 15 with no trap that passes, 01 among them
+    rule; the natural trap of 0010011110101 passes in the game of 20 cells and fails in that of 22 (`UNREACHED_WIDE`);
+    and `coverage.refuted_blocks` holds the 171 blocks of periods 2 to 15 with no trap that passes, 01 among them
     and 001, which keeps the kit's t001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
@@ -2589,8 +2599,11 @@ def test_unreached() -> None:
     assert "0001111110011" in lock_chain.UNREACHED["NaturalTrapsLong"] and natural["cells"] == 16
     assert lock_chain.trap_reach(natural) == 1 > lock_chain.trap_reach(natural, width=17)
     refuted = coverage.refuted_blocks()
-    assert len(refuted) == 168 and "01" in refuted and "001" not in refuted
-    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 3), (11, 14), (12, 14), (13, 38),
+    wide = lock_chain.extra_tables("0010011110101")
+    assert "0010011110101" in lock_chain.UNREACHED_WIDE["NaturalTrapsWalls"] and lock_chain.WIDE_WIDTH == 22
+    assert lock_chain.trap_reach(wide, width=20) == 1 > lock_chain.trap_reach(wide, width=22)
+    assert len(refuted) == 171 and "01" in refuted and "001" not in refuted
+    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 3), (11, 15), (12, 14), (13, 40),
                                                                 (14, 40), (15, 51)]
 
 

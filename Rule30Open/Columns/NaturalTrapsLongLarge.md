@@ -51,7 +51,8 @@ entry into one of two traps. Entry for every finite right half stays open, as fo
 **The test of reach.** In the game of 20 cells, where the cells after the trap's 16 follow the rule instead of taking
 any value, every trap here passes the test of [MissedTraps](MissedTraps.md): every node can reach a window whose first
 16 cells form a state of the trap ([what failed](../../negative-results/columns/missed-traps.md)). Entry needs this but
-is not implied by it.
+is not implied by it. In the game of 22 cells the trap of $0101011111111$ fails it, with 99.984% of the nodes able to
+reach, so entry into it is false and its reduction empty; the other 11 pass there.
 
 ## Relation to the kit
 

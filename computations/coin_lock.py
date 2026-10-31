@@ -174,7 +174,9 @@ def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle:
     `settle` steps) or `limit` steps pass, its vector x is positive on every window outside the certificate, and the
     largest ratio of the step's image of x to x there bounds the spectral radius from above (Collatz and Wielandt).
     Twice it bounds the growth of the number of sequences that stay out, which is 0 or at least 1 for a matrix of 0s
-    and 1s, so a bound below 1/2 gives 0."""
+    and 1s, so a bound below 1/2 gives 0. When x has underflowed to 0 on some window outside the certificate, as it
+    does when some windows never enter and others enter fast, the ratios do not bound the radius, and the step's own
+    bound of 1 is returned: it averages over the coin, so its radius is at most 1."""
     # member: (period, 2^W)
     period, size = member.shape
     successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
@@ -189,7 +191,11 @@ def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle:
             bar.update()
     image = coin_step(word, member, values, successors)  # (period, 2^W)
     outside = ~member  # (period, 2^W)
-    bound = float((image[outside] / values[outside]).max()) if outside.any() else 0.0
+    if not outside.any():
+        return 0.0
+    if (values[outside] <= 0).any():
+        return 1.0
+    bound = float((image[outside] / values[outside]).max())
     return bound if bound >= 0.5 else 0.0
 
 

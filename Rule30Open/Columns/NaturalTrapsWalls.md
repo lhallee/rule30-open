@@ -94,8 +94,10 @@ blocks of [TrapPairs](TrapPairs.md) are.
 Each trap reduces its block to entry. For 47 of the 54 blocks every one of the 31 halves of the scan is inside the trap
 at step 12,000; for 5 more, 26 to 30 of them; for $00111011011$ and $00001111001$, 10 and 3. The 60 blocks count among
 those reduced to entry into a trap that passes the test, in [the coverage table](../../findings/columns/coverage.md).
-Passing the test is necessary for entry, not sufficient: entry for every finite right half stays open, as for the kit's
-traps.
+The test only grows stricter with the width: in the game of 22 cells the trap of $0010011110101$ and the pair of
+$00101101111$ fail it, with 99.992% and 99.994% of the nodes able to reach, so entry into either is false too ([what
+failed](../../negative-results/columns/missed-traps.md)); the other 53 traps and five pairs pass there. Passing the test
+is necessary for entry, not sufficient: entry for every finite right half stays open, as for the kit's traps.
 
 ## Relation to the kit
 
