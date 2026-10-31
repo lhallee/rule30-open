@@ -182,7 +182,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   proves in its own encoding (`Rule30ZeroBoundaryStripe.stripe_absorb`); every rational
   point with a head and period of at most 64 cells together, 2,592 of them, is preperiodic and falls onto a stripe or
   the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
-  ether, which the window automaton at the top of the defect does not do at 5, 8 or 10 cells, where it has a cycle
+  ether, which the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain; no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
   a fixed lag removes none of its moves, since it does not restrict the cells above the lag (in Lean,
   [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)), so
@@ -372,7 +372,7 @@ In order of the assessment above.
    requests ([kit-pull-requests.md](literature/kit-pull-requests.md)) until each is merged or closed.
 5. **Period two, Problems 2 and 3: the open statements at their sharpest.**
    - *Period two.* (R) on ether tails is what the computations leave; it needs every defect on the ether to have a
-     bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5, 8 and 10 cells at the top
+     bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5, 8, 10 and 12 cells at the top
      cannot certify that, with or without $K$ ([ether fronts](negative-results/period-two/ether-front-windows.md),
      [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)); entry into the 13-cell closed strips suffices and is the mirror
      of the kit's `Absorption` for the ether. Next: a statement about the region between the wall and the top that

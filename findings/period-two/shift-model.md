@@ -133,7 +133,8 @@ domains and the defects that heal into them. A proof covers the rationals whose 
    `--front 10`; `front_rate` counts a pass through the node for a lost top as a step). The automaton for $w = 8$ has
    a cycle of positive gain: its longest walk of 20,000 steps gains 4,381, and a walk with no positive cycle gains at
    most one less than the 3,588 nodes, since no edge gains more than 1 (`--front 8 --rounds 20000`). So does the automaton
-   for $w = 10$: 90,000 steps gain 15,757 on 14,340 nodes (`--front 10 --rounds 90000`, about 40 s). So the bound allows the top to rise without limit, and the stall
+   for $w = 10$: 90,000 steps gain 15,757 on 14,340 nodes (`--front 10 --rounds 90000`, about 40 s), and for
+   $w = 12$: 400,000 steps gain 63,643 on 57,348 nodes (`--front 12 --rounds 400000`, about 12 minutes). So the bound allows the top to rise without limit, and the stall
    is a property of the cells below the window that this bound does not see.
    Two more facts limit this route ([ether fronts](../../negative-results/period-two/ether-front-windows.md)): no
    strip of 12 cells or fewer below the top is closed under every input from below, and the condition of $K$ removes

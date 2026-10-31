@@ -1,5 +1,5 @@
 ---
-title: Windows of 5, 8 and 10 cells at the top of a defect on the ether do not bound it, with or without the condition of K
+title: Windows of 5, 8, 10 and 12 cells at the top of a defect on the ether do not bound it, with or without the condition of K
 category: period-two
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: barrier
 evidence: [computations/held_shift.py, computations/background_halves.py]
 ---
 
-# Windows of 5, 8 and 10 cells at the top of a defect on the ether do not bound it, with or without the condition of K
+# Windows of 5, 8, 10 and 12 cells at the top of a defect on the ether do not bound it, with or without the condition of K
 
 **Idea.** Conjecture (R) of [the shift model](../../findings/period-two/shift-model.md) says that every rational point
 of $K$ has an eventually periodic itinerary. For a point whose tail is the ether, item 5 there reduces this to a bounded
@@ -15,7 +15,7 @@ top of the defect, the highest cell where $H^t(U)$ differs from the ether. The i
 object that follows the cells next to it: an automaton on a window at the top, a strip below the top that the rule
 keeps, or either one strengthened by the condition of $K$ (bit 0 of $H^t(U)$ is 1 at every odd $t$).
 
-**Where it stops.** The window automaton at 5, 8 and 10 cells has a certified cycle of positive gain,
+**Where it stops.** The window automaton at 5, 8, 10 and 12 cells has a certified cycle of positive gain,
 no strip of 12 cells or fewer is closed, and the condition of $K$ at a fixed lag changes no transition.
 
 - **The window automaton has a cycle of positive gain.** `front_rate` follows the top and the 7 cells below it
@@ -23,7 +23,9 @@ no strip of 12 cells or fewer is closed, and the condition of $K$ at a fixed lag
   simple path and cycles; no edge gains more than 1, so a walk with no cycle of positive gain gains at most 3,587, one
   less than the 3,588 nodes. So the automaton lets the top rise without limit (`--front 8 --rounds 20000`). The same
   certificate holds at window 5, where 2,500 steps gain 706 on 452 nodes. At window 10, 90,000 steps gain
-  15,757 on 14,340 nodes (`--front 10 --rounds 90000`, about 40 s).
+  15,757 on 14,340 nodes (`--front 10 --rounds 90000`, about 40 s), and at window 12,
+  400,000 steps gain 63,643 on 57,348 nodes (`--front 12 --rounds 400000`, about 12 minutes on one core). Every
+  window below the 13 cells of the closed strips therefore lets the top rise without limit.
 - **No narrow strip below the top is closed.** By the mirror that turns $H$ into Rule 30, a strip of cells just below
   the top on the ether of $H$ is a strip right of a column of the ether of Rule 30. `background_halves.wall_set` finds
   no set of such strips that the rule keeps for every input from beyond at widths 1 to 12, beside any of the 7 columns.
