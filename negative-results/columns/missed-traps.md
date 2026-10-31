@@ -91,7 +91,14 @@ cells on which column 1 is fixed at the white phases. Every node can reach the l
 `fo0_31`, and each carried trap is apart from its lock as a whole, so [WideWalls](../../Rule30Open/Columns/WideWalls.md)
 refutes entry into each of the two from the other and reduces the three blocks to entry into one of the two, which
 passes; only 0.22% of the nodes can reach the lock beside `fw1_103`. The other 29 blocks are left with no hypothesis
-that passes, which makes 200, $001011$ among them, so no block of period 6 keeps a trap that passes.
+that passes, which makes 200, $001011$ among them, so no block of period 6 keeps a trap that passes. More traps do not
+change that. The chains of the seeds with a long run of 1s, of periods 12 to 48 with a locked window of 5 cells and 12
+to 24 with one of 9, reach $001011$ four times (`scan_block` with `SCAN6`, `--scan6`): in `trap001011` and in traps of
+33, 35 and 154 cells. Their first 22 cells are one set of twelve windows, two at each phase, the background's columns
+beside the block, so every node of the game of 20 cells can reach each of the four and only 0.11% of the game of 22
+cells can, and no one of them is apart from another. Nor is there a trap of 22 cells or fewer: no node of the game of
+$001011$ at 20 or 22 cells is locked, with the phase counted modulo 6 or 12 (`locks.mixed_nodes`, [window
+locks](window-locks.md)).
 
 **Where it stops, and why.** Five different failures.
 
@@ -152,13 +159,14 @@ stricter at every larger width: traps that pass at their own width fail at 20 ce
 more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
 `S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
 ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 26 cells, and
-`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 183 are checked in Lean: the
+`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 184 are checked in Lean: the
 seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17 cells
 ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), the ten single traps of five pairs of NaturalTrapsWalls, the
-48 of ApartTraps, `trap001fifteen` in Traps001, and twelve of the carried traps that fail at 22 cells in ReachRefuted
-and three in WideWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a
-closed set apart from the trap (`miss_tables`), and `not_absorption_back` of ReachRefuted any whose reaching nodes the
-kernel can hold.
+48 of ApartTraps, `trap001fifteen` in Traps001, twelve of the carried traps that fail at 22 cells in ReachRefuted and
+three in WideWalls, and `trap001011` in [SixRefuted](../../Rule30Open/Columns/SixRefuted.md), from the 28,666 nodes of
+the game of 22 cells that can reach it; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the
+others, given a closed set apart from the trap (`miss_tables`), and `not_absorption_back` of ReachRefuted any whose
+reaching nodes the kernel can hold.
 
 **Reproduce.**
 

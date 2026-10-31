@@ -80,6 +80,7 @@ public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.Columns.Traps001
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.WideWalls
+public import Rule30Open.Columns.SixRefuted
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf

@@ -11,12 +11,14 @@ keeps the column beyond the window off that sequence forever, as `Rule30Open.Col
 words of period four.
 
 `lock_info` computes the locked nodes as the complement of the nodes that can reach both values at one phase, and
-whether every node can reach them. `survey` runs it on every primitive block of the given periods.
+whether every node can reach them; `mixed_nodes` computes that complement backward, for wider games. `survey` runs
+`lock_info` on every primitive block of the given periods.
 
     python -m computations.locks --periods 4,8,10,11,12 --width 13 --workers 3   # about 3 min
     python -m computations.locks --profile --workers 3   # adds about 2 min
     python -m computations.locks --lean --workers 3   # the entries of LockBlocks11 and LockBlocks12
     python -m computations.locks --periods 2,3,5,6,7,9 --census 13,16 --workers 3   # no locked node, about 2 min
+    python -m computations.locks --periods 6 --census 20,22 --repeat 2 --wide   # none modulo 12 either, about 15 min
     python -m computations.locks --white 4,5,6,7,8,9,10,11,12,13,14,15,16 --workers 3   # white runs, about 40 min
     python -m computations.locks --reach 0000010111001 --width 18   # the share of nodes that can reach a lock, 20 s
 """
@@ -136,22 +138,46 @@ def steerable(block: str, width: int) -> bool:
     return bool(locked.any() and reach.all())
 
 
-def has_lock(block: str, width: int) -> bool:
-    """Whether some node of the game at this width is locked."""
+def mixed_nodes(block: str, width: int) -> np.ndarray:
+    """The nodes that can reach both values of the left column at one phase, the complement of `lock_info`'s locked
+    nodes, found backward from each white phase's nodes by `back_search`: one byte per node and no list of moves, for
+    games of 20 cells and more. It stops once every node is mixed, which for a block without a locked node is often
+    after its first white phase."""
+    period, size = len(block), 1 << width
+    c = np.array([int(bit) for bit in block], dtype=np.uint8)  # (p,)
+    first = (np.arange(size) & 1).astype(np.uint8)  # (n,), cell 1 of each window
+    mixed = np.zeros(period * size, dtype=bool)  # (p n,)
+    for ph in np.flatnonzero(c == 0):  # at a black phase the block alone fixes the left column
+        left = c[(ph + 1) % period] ^ first  # (n,), the left column at this white phase
+        both = np.ones(period * size, dtype=bool)  # (p n,)
+        for value in (0, 1):
+            seed = np.zeros(period * size, dtype=bool)  # (p n,)
+            seed[ph * size:(ph + 1) * size] = left == value
+            both &= back_search(block, width, seed)
+        mixed |= both
+        if mixed.all():
+            break
+    return mixed  # (p n,)
+
+
+def has_lock(block: str, width: int, wide: bool = False) -> bool:
+    """Whether some node of the game at this width is locked, by `lock_info`, or by `mixed_nodes` when `wide`."""
+    if wide:
+        return not bool(mixed_nodes(block, width).all())
     locked, _ = lock_info(block, width)  # (p n,)
     return bool(locked.any())
 
 
-def lock_census(periods: list[int], widths: list[int], repeat: int = 1, workers: int = 1) -> dict[tuple[int, int],
-                                                                                                    list[str]]:
+def lock_census(periods: list[int], widths: list[int], repeat: int = 1, workers: int = 1,
+                wide: bool = False) -> dict[tuple[int, int], list[str]]:
     """For each period and width, the primitive blocks b of that period whose game for b repeated `repeat` times has a
-    locked node. A lock for the repeated block makes the column left of the repeating one eventually periodic with
-    `repeat` times the period of b, which Jen's theorem forbids as well."""
+    locked node (`has_lock`, with `wide` as given). A lock for the repeated block makes the column left of the
+    repeating one eventually periodic with `repeat` times the period of b, which Jen's theorem forbids as well."""
     found = {}
     for period in periods:
         blocks = game.necklaces(period)
         for width in widths:
-            task = functools.partial(has_lock, width=width)
+            task = functools.partial(has_lock, width=width, wide=wide)
             repeated = [block * repeat for block in blocks]
             progress = functools.partial(tqdm, total=len(blocks), desc=f"period {period}, width {width}",
                                          file=sys.stderr, mininterval=5)
@@ -326,6 +352,8 @@ def main() -> None:
     parser.add_argument("--white", help="also give, over these widths, the shortest white run that steers each block")
     parser.add_argument("--lean-white", action="store_true", help="with --white, print the entries of LockWhite")
     parser.add_argument("--repeat", type=int, default=1, help="with --census, play the game for each block repeated")
+    parser.add_argument("--wide", action="store_true",
+                        help="with --census, search backward (`mixed_nodes`), for widths of 20 cells and more")
     parser.add_argument("--family", help="instead, with --census, the blocks of a family such as '0^k 11101', k = 0..12")
     parser.add_argument("--mixed", help="instead print, for these blocks at --width, the fewest phases with both values")
     parser.add_argument("--reach", help="instead print, for these blocks at --width, repeated --repeat times, the locked "
@@ -353,7 +381,7 @@ def main() -> None:
     if args.census:
         for period in periods:
             for width in [int(w) for w in args.census.split(",")]:
-                blocks = lock_census([period], [width], args.repeat, args.workers)[(period, width)]
+                blocks = lock_census([period], [width], args.repeat, args.workers, args.wide)[(period, width)]
                 print(f"period {period}, repeated {args.repeat} times, width {width}: {len(game.necklaces(period))} "
                       f"blocks, {len(blocks)} with a locked node" + (f": {', '.join(blocks)}" if blocks else ""),
                       flush=True)

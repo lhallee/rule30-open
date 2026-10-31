@@ -24,7 +24,8 @@ on the periods without a locked window at widths 16 and 18, and on periods 2 and
 with a multiple of $P$ contradicts Jen's theorem as well, so it also ran the game for blocks repeated, with the phase
 counted modulo a multiple of $P$: modulo the least common multiple of $P$ and 4, the period of the kit's ether, for
 every period, and modulo 10 and 21 for the periods of the partial locks of [the locking
-simulation](../../findings/columns/period-four-locking.md).
+simulation](../../findings/columns/period-four-locking.md). In games of 20 cells and more, `mixed_nodes` finds the same
+windows backward from each phase's windows, one byte per node and without the game's list of moves.
 
 **Outcome.**
 
@@ -35,7 +36,8 @@ simulation](../../findings/columns/period-four-locking.md).
   two](../period-two/absorption-route.md)). The six blocks of period 5 have none modulo 10 up to width 16 or modulo 20
   up to width 18; $01$, $001$ and $011$ have none modulo 14 and 21 up to width 16; $001$ and $011$ none modulo 12 and
   the blocks of period 6 none modulo 12 up to width 16, those of period 7 none modulo 28 up to width 16, and those of
-  period 9 none modulo 36 at width 13.
+  period 9 none modulo 36 at width 13. $001011$, the block of period 6 with a trap, has none modulo 6 or 12 at widths
+  20 and 22 either (`mixed_nodes`).
 - The controls find locks where they exist. At width 13, 1 of the 3 primitive blocks of period 4 has a locked window, 8
   of the 30 of period 8, 9 of the 99 of period 10, 22 of the 186 of period 11 and 32 of the 335 of period 12; at width
   16 all three of period 4 have one. Both constant blocks lock, since the game excludes them ([the game
@@ -92,6 +94,7 @@ python -m computations.locks --periods 5 --census 13,16 --repeat 2
 python -m computations.locks --periods 2 --census 16,18,19,20 --repeat 2
 python -m computations.locks --periods 3,7 --census 13,16 --repeat 4
 python -m computations.locks --periods 6 --census 13,16 --repeat 2
+python -m computations.locks --periods 6 --census 20,22 --repeat 2 --wide   # and with --repeat 1
 python -m computations.locks --periods 9 --census 13 --repeat 4 --workers 2
 python -m computations.locks --periods 4,8,10,11,12 --census 13 --workers 3
 python -m computations.locks --census 13 --family '0^k 11101'   # also '00 1^k 01' and '0^k 101'

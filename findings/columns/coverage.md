@@ -82,12 +82,12 @@ $0001001101$ ([what failed](../../negative-results/columns/missed-traps.md)).
 
 The reach is uneven in the period. Every block of period 1, 3 and 4 but $011$ is excluded or reduced, while the trap for
 $01$, of the kit's ether-and-wall family read so, fails the test; at periods 5, 6 and 7 one block each has a trap, which
-small halves almost never enter ([trap entry](../../negative-results/columns/trap-entry.md)), and the one of period 6
-fails the test in the game of 22 cells; the rest is not reached at all. From period 9 the walls at the edges of periodic
-backgrounds, and at periods 10 to 12 also the closed sets that driven halves settle into, give traps to 23, 27, 70 and
-113 blocks ([natural traps](natural-traps.md)), but for 7, 4, 17 and 17 of them every trap fails the tests, which leaves
-16, 23, 53 and 96 with a trap that passes, and steering alone reaches two of those of period 11. Where the walls carried
-along their backgrounds' columns fail, the natural traps of
+small halves almost never enter ([trap entry](../../negative-results/columns/trap-entry.md)), and the four of period 6,
+which share their first 22 cells, fail the test in the game of 22 cells; the rest is not reached at all. From period 9
+the walls at the edges of periodic backgrounds, and at periods 10 to 12 also the closed sets that driven halves settle
+into, give traps to 23, 27, 70 and 113 blocks ([natural traps](natural-traps.md)), but for 7, 4, 17 and 17 of them
+every trap fails the tests, which leaves 16, 23, 53 and 96 with a trap that passes, and steering alone reaches two of
+those of period 11. Where the walls carried along their backgrounds' columns fail, the natural traps of
 [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md) reduce 60 blocks of periods 10 to 14 again. At
 periods 13 and 14 sampling gives traps to 87 and 136 blocks that nothing excludes ([natural traps](natural-traps.md));
 the census of every locked window of 16 cells, carried by its chain, raises the count of blocks with some trap to 221

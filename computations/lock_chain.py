@@ -57,6 +57,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
+    python -m computations.lock_chain --lean-six   # the same for trap001011, the only trap of period 6, at 22 cells
     python -m computations.lock_chain --lean-wide-walls   # walls of 22 cells beside traps carried far, in Lean
     python -m computations.lock_chain --apart-pairs   # traps of one block that refute each other
     python -m computations.lock_chain --chain-apart   # chain locks of long-run seeds apart from traps in Lean
@@ -64,6 +65,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-apart-traps   # their refutations and pair reductions, in Lean
     python -m computations.lock_chain --scan001   # long-run seeds whose chains reach 001, about 11 min
     python -m computations.lock_chain --scan001-wider   # periods 36 to 48, and 27 to 33 at width 9
+    python -m computations.lock_chain --scan6   # the same for 001011, with each trap's test of reach, about 17 min
     python -m computations.lock_chain --lean-traps001   # four traps for 001 pairwise apart, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
     python -m computations.lock_chain --lean-fifteen   # the traps of FifteenWalls, two walls of period 15 carried
@@ -1428,22 +1430,30 @@ def traps001_tables() -> list[tuple[str, dict]]:
 
 
 # The seeds that `scan001` tries: periods, the width of the locked window and the most cells outside the run of 1s; the
-# second list goes on to longer periods, and wider windows, and takes about an hour.
+# second list goes on to longer periods, and wider windows, and takes about an hour. `SCAN6` is the same for 001011, the
+# one block of period 6 with a trap, and takes about 13 minutes.
 SCAN001 = (([15, 18, 21, 24, 27, 30, 33], 5, 12), ([15, 18, 21, 24], 9, 15))
 SCAN001_WIDER = (([36, 39, 42, 45, 48], 5, 12), ([27, 30, 33], 9, 15))
+SCAN6 = (([12, 18, 24, 30, 36, 42, 48], 5, 12), ([12, 18, 24], 9, 15))
 
 
-def scan001(depth: int = 3000, plans: tuple = SCAN001) -> list[tuple[str, str, int, int]]:
-    """The seeds with a long run of 1s whose chain has a column 001 within `depth` (`short_scan` with each `rest` and
-    width of `plans`, by default 12 at width 5 for periods 15 to 33 and 15 at width 9 for periods 15 to 24): (seed, lock
-    values, lock width, distance), each seed and its values once, with the narrower lock when both widths find it."""
-    found = {}
+def scan_block(block: str, depth: int = 3000, plans: tuple = SCAN001) -> list[tuple[str, str, int, int]]:
+    """The seeds with a long run of 1s whose chain has a column `block`, a least rotation, within `depth`
+    (`short_scan` with each `rest` and width of `plans`): (seed, lock values, lock width, distance), each seed and its
+    values once, with the narrower lock when both widths find it."""
+    period, found = len(block), {}
     for periods, width, rest in plans:
         for seed, entries in short_scan(periods, width, depth, rest=rest).items():
             for values, hits in entries:
-                if 3 in hits and hits[3][1] == "001":
-                    found.setdefault((seed, values), (width, hits[3][0]))
+                if period in hits and hits[period][1] == block:
+                    found.setdefault((seed, values), (width, hits[period][0]))
     return [(seed, values, width, distance) for (seed, values), (width, distance) in found.items()]
+
+
+def scan001(depth: int = 3000, plans: tuple = SCAN001) -> list[tuple[str, str, int, int]]:
+    """`scan_block` for 001, by default with periods 15 to 33 at width 5 (`rest` 12) and 15 to 24 at width 9 (`rest`
+    15)."""
+    return scan_block("001", depth, plans)
 
 
 def lean_winset(name: str, word: str, width: int, rows: list[list[int]], piece: int = 0) -> str:
@@ -1744,6 +1754,13 @@ def lean_back_module(piece: int = 1 << 16, part: int = 1024) -> str:
         else:
             out.append(lean_fwd(f"fwd_{name}", name, fwd_tables((t,), width), cut_rows((t,), width), piece))
     return "\n".join(out)
+
+
+def lean_six(piece: int = 1 << 16, part: int = 1024) -> str:
+    """The declarations of `Rule30Open.Columns.SixRefuted`: the windows of `WIDE_WIDTH` cells that can reach
+    `trap001011` of `Rule30Open.Columns.WordTraps` (`back_tables`), checked closed under predecessors, and the
+    refutation of entry into it (`lean_back`)."""
+    return lean_back("back_trap001011", "trap001011", back_tables((tables("trap001011"),), WIDE_WIDTH), piece, part)
 
 
 def lean_trap(name: str) -> str:
@@ -3085,6 +3102,8 @@ def main() -> None:
     parser.add_argument("--lean-traps001", action="store_true",
                         help="the two more traps for 001 of Rule30Open.Columns.Traps001, and the refutations")
     parser.add_argument("--scan001", action="store_true", help="the long-run seeds whose chains reach 001")
+    parser.add_argument("--scan6", action="store_true",
+                        help="the long-run seeds whose chains reach 001011, with each trap's test of reach")
     parser.add_argument("--scan001-wider", action="store_true",
                         help="the same for longer periods and wider windows, about an hour")
     parser.add_argument("--lean-apart-traps", action="store_true",
@@ -3097,6 +3116,8 @@ def main() -> None:
                         help="every two traps of one block in Lean, one holding a closed set apart from the other")
     parser.add_argument("--lean-wide-walls", action="store_true",
                         help="the walls of Rule30Open.Columns.WideWalls, of 22 cells, beside traps carried far")
+    parser.add_argument("--lean-six", action="store_true",
+                        help="the windows that can reach trap001011 at 22 cells, refuting entry, in Lean")
     parser.add_argument("--lean-back", action="store_true",
                         help="the sets of Rule30Open.Columns.ReachRefuted, from the windows that can reach each trap")
     parser.add_argument("--lean-refuted", action="store_true",
@@ -3369,6 +3390,9 @@ def main() -> None:
         print(lean_fifteen())
     if args.lean_trap_sets:
         print(lean_trap_sets())
+    if args.lean_six:
+        print(lean_six())
+        return
     if args.lean_back:
         print(lean_back_module())
         return
@@ -3384,6 +3408,19 @@ def main() -> None:
             print(f"{seed} (lock values {values}, width {width}): 001 at distance {distance}, a trap of {t['cells']} "
                   f"cells, labels modulo {t['modulus']}, {len(t['states'])} states; a closed set of its states apart "
                   f"from {', '.join(apart) if apart else 'none of the four'}, and from all four, of {every}")
+        return
+    if args.scan6:
+        cuts = []
+        for seed, values, width, distance in scan_block("001011", plans=SCAN6):
+            t = trap_tables(seed, width, distance, values)
+            cuts.append(trap_nodes((t,), WIDE_WIDTH))  # (p n,)
+            near, wide = trap_reach(t, width=REACH_WIDTH), trap_reach(t, width=WIDE_WIDTH)
+            print(f"{seed} (lock values {values}, width {width}): 001011 at distance {distance}, a trap of "
+                  f"{t['cells']} cells, labels modulo {t['modulus']}, {len(t['states'])} states, cut to {WIDE_WIDTH} "
+                  f"cells {int(cuts[-1].sum())} nodes; the share of nodes that can reach it, {near:.6f} in the game "
+                  f"of {REACH_WIDTH} cells and {wide:.6f} in that of {WIDE_WIDTH}", flush=True)
+        print(f"the {len(cuts)} traps cut to {WIDE_WIDTH} cells are "
+              f"{'one set of nodes' if all((c == cuts[0]).all() for c in cuts) else 'not one set'}")
         return
     if args.lean_apart_traps:
         print(lean_apart_traps())

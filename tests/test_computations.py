@@ -1695,6 +1695,20 @@ def test_locks() -> None:
     assert not all(ends[(start, 26)] for start in range(period))
 
 
+def test_mixed_nodes() -> None:
+    """`locks.mixed_nodes`, found backward by predecessor arithmetic, against `locks.lock_info`, found along the game's
+    list of moves: the same locked nodes for blocks with locks (0111 and 00011101 at 13 cells, 0001 at 16) and without
+    (001011, alone and repeated, at 13 cells); and no locked node for 001011 at 18 cells, modulo 6 or 12."""
+    from computations import locks
+    for block, width in (("0111", 13), ("00011101", 13), ("0001", 16), ("001011", 13), ("001011001011", 13)):
+        locked, _ = locks.lock_info(block, width)  # (p n,)
+        assert (locked == ~locks.mixed_nodes(block, width)).all()
+        assert locks.has_lock(block, width, wide=True) == bool(locked.any())
+    assert int((~locks.mixed_nodes("0001", 16)).sum()) == 2611
+    assert locks.lock_census([6], [18], repeat=2, wide=True) == {(6, 18): []}
+    assert not locks.has_lock("001011", 18, wide=True)
+
+
 def test_lock_breaks() -> None:
     """`right_half.lock_breaks` against the right half stepped as 64-bit words by `absorption.step_rows`: driven by
     01111, start 2 holds column 1 with period 10 at the white times from step 6,000 until step 13,000."""
@@ -2742,6 +2756,34 @@ def test_chain_family_01111() -> None:
             row = ((row << 1) | int("01111"[(label + step) % 5])) ^ (row | (row >> 1))
 
 
+def test_scan_six() -> None:
+    """The long-run seeds of period 12 whose chains reach 001011 (`scan_block` with the first plan of `SCAN6` cut to
+    period 12) give `trap001011` of WordTraps and traps of 33 and 35 cells, and the seed of period 24 with a lock of 9
+    cells one of 154: each a lock by `is_lock`; read from the states, their first 22 cells are one set of 12 nodes, two
+    at each phase, which `trap_nodes` finds as well; no one of the four is apart from another (`apart_closed`); and no
+    node of the game of 20 cells, with the phase counted modulo 6 or 12, is locked (`locks.has_lock`)."""
+    from computations import lock_chain, locks
+
+    found = lock_chain.scan_block("001011", plans=(([12], 5, 12),))
+    assert sorted(distance for *_, distance in found) == [24, 28, 30]
+    traps = [lock_chain.trap_tables(seed, width, distance, values) for seed, values, width, distance in found]
+    traps.append(lock_chain.trap_tables("001110011111111111111011", 9, 145, "110000000000000000000000"))
+    assert sorted((t["cells"], t["modulus"], len(t["states"])) for t in traps) == [
+        (29, 12, 116), (33, 12, 110), (35, 12, 114), (154, 24, 1721)]
+    w = lock_chain.tables("trap001011")
+    assert any(set(t["states"]) == set(w["states"]) for t in traps)
+    mask = (1 << 22) - 1
+    cuts = [{(label % 6, window & mask) for label, window in t["states"]} for t in traps]
+    assert all(cut == cuts[0] for cut in cuts) and len(cuts[0]) == 12
+    assert sorted(phase for phase, _ in cuts[0]) == [phase for phase in range(6) for _ in range(2)]
+    nodes = lock_chain.trap_nodes((traps[0],), 22)  # (6 2^22,)
+    assert set(np.flatnonzero(nodes).tolist()) == {(phase << 22) | window for phase, window in cuts[0]}
+    assert not any(lock_chain.apart_closed(a, b).any() for a in traps for b in traps)
+    assert all(t["word"] == "001011" and lock_chain.is_lock("001011" * (t["modulus"] // 6), t["states"], t["cells"])
+               for t in traps)
+    assert not any(locks.has_lock("001011" * repeat, 20, wide=True) for repeat in (1, 2))
+
+
 def test_back_tables() -> None:
     """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
     order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the
@@ -2761,6 +2803,28 @@ def test_back_tables() -> None:
     assert all(inside[(label % period) << 8 | window & 255] for label, window in t["states"])
     l0, w0 = s["miss"]
     assert not inside[l0 << 8 | w0]
+
+
+def test_six_refuted() -> None:
+    """`lean_six` gives the declarations of `Rule30Open.Columns.SixRefuted`. Its set, the nodes of the game of 22 cells
+    for 001011 that can reach `trap001011`, 28,666, against `successors`, forward: no node outside it has a move into
+    it, the trap's states cut to 22 cells are in it, and the white window at phase 0 is not."""
+    from computations import lock_chain
+
+    t = lock_chain.tables("trap001011")
+    s = lock_chain.back_tables((t,), 22)
+    assert sum(len(row) for row in s["rows"]) == 28666 and s["miss"] == (0, 0)
+    inside = np.zeros(6 << 22, dtype=bool)  # (6 2^22,)
+    for label, row in enumerate(s["rows"]):
+        inside[[label << 22 | w for w in row]] = True
+    outside = np.flatnonzero(~inside).astype(np.uint64)  # (m,)
+    for start in range(0, outside.size, 1 << 22):
+        after = lock_chain.successors("001011", 22, outside[start:start + (1 << 22)])  # (2, k)
+        assert not inside[after.astype(np.int64)].any()
+    assert all(inside[(label % 6) << 22 | window & ((1 << 22) - 1)] for label, window in t["states"])
+    assert not inside[0]
+    lean = (ROOT / "Rule30Open" / "Columns" / "SixRefuted.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_six() in lean
 
 
 def test_module_entries() -> None:

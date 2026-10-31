@@ -103,7 +103,10 @@ carried 160 to 1,131 cells, give ten traps of 165 to 1,136 cells apart from it (
 failed](../../negative-results/columns/missed-traps.md)), so $01111$ comes down to entry into some trap of the block
 ([Traps001](Traps001.md)). In the game of 22 cells `trap001011`, of 29 cells, fails as well, with 0.11% of the nodes
 able to reach it ([what failed](../../negative-results/columns/missed-traps.md)), so the reduction of $001011$, the only
-block of period 6 with a trap, is empty; the other four pass.
+block of period 6 with a trap, is empty; [SixRefuted](SixRefuted.md) checks that refutation in Lean. The chains of
+seeds with a long run of 1s give $001011$ three more traps, of 33, 35 and 154 cells, but their first 22 cells are those
+of `trap001011`, twelve windows fixed by the label, so they fail the same way, and no window of up to 22 cells is
+locked for the block; the other four traps pass.
 
 ## Relation to the kit
 
