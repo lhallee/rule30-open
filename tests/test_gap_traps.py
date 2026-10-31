@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from computations.gap_traps import (forbidden_words, forced_entry, greatest_trap, necklace_blocks, readings,
-                                    step_windows, word_entropy)
+from computations.gap_traps import (escape_readings, forbidden_words, forced_entry, greatest_trap, necklace_blocks,
+                                    readings, step_windows, word_entropy)
 
 
 def naive_step(w: int, width: int, center: int, beyond: int) -> int:
@@ -105,3 +105,23 @@ def test_word_entropy() -> None:
     words = ("00", "010", "01110", "011110")
     counts = [sum(1 for x in range(1 << n) if not any(w in format(x, f"0{n}b") for w in words)) for n in (12, 16)]
     assert abs(np.log2(counts[1] / counts[0]) / 4 - word_entropy(words)) < 0.02
+
+
+def test_escape_readings_matches_naive() -> None:
+    block, width, words = "011", 6, ("000",)
+    good = greatest_trap(block, width, words)
+    forced = forced_entry(good, block, width)
+    keep = 2
+    out = {(p, w, s) for p, w, s in zip(*np.nonzero(~forced))}
+
+    def nexts(p: int, w: int, s: int) -> list[tuple[int, int, int]]:
+        s2 = ((s << 1) | (w & 1)) & ((1 << keep) - 1) if block[p] == "0" else s
+        return [((p + 1) % 3, naive_step(w, width, int(block[p]), x), s2) for x in (0, 1)]
+
+    while True:
+        new = {st for st in out if any(n in out for n in nexts(*st))}
+        if new == out:
+            break
+        out = new
+    expected = {w & 1 for p, w, s in out if block[p] == "0"}
+    assert escape_readings(good, forced, block, width) == expected and len(out) > 0

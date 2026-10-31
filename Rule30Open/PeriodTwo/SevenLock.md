@@ -4,7 +4,7 @@ category: period-two
 problems: [1]
 status: proved
 lean: Rule30Open.PeriodTwo.SevenLock
-headline: [lock_ok, win_lock_forever, u_periodic_of_lock, not_finSupp_Psi_of_lock, no_alternating_of_lock, no_alternating_lock_example]
+headline: [sevenLock_check, sevenLock_forever, sevenLock_periodic, sevenLock_not_finSupp_Psi, no_alternating_of_sevenLock, no_alternating_sevenLock_example]
 kit: new
 kit_modules: [Rule30PeriodTwoSideways, Rule30Ether, Rule30StripCertificates, Rule30EtherThreeReach]
 evidence: [computations/gate_census.py]
@@ -25,17 +25,17 @@ Write $u_R(s)$ for column 1 at the white step $2s + 1$ of the right half $R$ dri
 (the kit's `u R`), and $\Psi_R$ for the one left half that keeps the center alternating against $R$ (the kit's
 `Psi R`). A window is the list of columns 1 to 32 at a step, coded as a 32-bit number, bit $i$ for column $i + 1$.
 
-- `lock_ok`: the lock, seven classes $C_0, \dots, C_6$ of 22, 22, 24, 34, 37, 32 and 24 windows. Every window of
+- `sevenLock_check`: the lock, seven classes $C_0, \dots, C_6$ of 22, 22, 24, 34, 37, 32 and 24 windows. Every window of
   $C_k$ reads `lockWord k` in column 1, the $k$-th letter of $0101000$, and two steps later, for each of the four
   values that column 33 can hold at the two steps, it is a window of $C_{k+1 \bmod 7}$. The kernel checks this.
-- `win_lock_forever`: if the window of $R$ at an odd step $t_0$ is in $C_k$, then the window at $t_0 + 2n$ is in
+- `sevenLock_forever`: if the window of $R$ at an odd step $t_0$ is in $C_k$, then the window at $t_0 + 2n$ is in
   $C_{k + n \bmod 7}$ for every $n$.
-- `u_periodic_of_lock`: then $u_R(s_0 + n)$ is the letter $k + n \bmod 7$ of $0101000$, where $t_0 = 2s_0 + 1$, so
+- `sevenLock_periodic`: then $u_R(s_0 + n)$ is the letter $k + n \bmod 7$ of $0101000$, where $t_0 = 2s_0 + 1$, so
   $u_R$ is eventually periodic with period 7.
-- `not_finSupp_Psi_of_lock`: then $\Psi_R$ has infinitely many black cells.
-- `no_alternating_of_lock`: no finite configuration whose center reads $1, 0, 1, 0, \dots$ from time 0 has its columns
+- `sevenLock_not_finSupp_Psi`: then $\Psi_R$ has infinitely many black cells.
+- `no_alternating_of_sevenLock`: no finite configuration whose center reads $1, 0, 1, 0, \dots$ from time 0 has its columns
   1 to 32 in the lock at an odd step.
-- `no_alternating_lock_example`: no finite configuration whose cells $1, 2, \dots$ read $1\,0\,0\,1\,0\,1\,1\,1\,1$
+- `no_alternating_sevenLock_example`: no finite configuration whose cells $1, 2, \dots$ read $1\,0\,0\,1\,0\,1\,1\,1\,1$
   and then only white keeps its center alternating from time 0, whatever its left half; its columns enter $C_4$ at
   step 29 (`example_enters`).
 

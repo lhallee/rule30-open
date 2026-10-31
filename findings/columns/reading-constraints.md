@@ -20,7 +20,9 @@ periodic, and for most blocks they never are. They are, however, constrained:
   readings carry 0.135 to 0.586 bits per reading in place of 1.
 - For **8 more blocks**, among them $011$, every right half of up to 10 cells enters a closed set of windows on which
   the readings avoid such a list, within 37 to 792 steps; for $011$ every right half of up to 16 cells does, within 104
-  steps. For these the entry is not forced: some inputs from beyond column 14 keep a window out forever.
+  steps. For these the entry is not forced: some inputs from beyond column 14 keep a window out forever. A shorter
+  list is forced for seven of them, and for $011$ forbidding two adjacent white readings is forced up to readings that
+  stay white.
 
 Each block of the first kind therefore reduces, with no hypothesis on the right half, to a statement about the left
 half alone with constrained free bits: no finite left half keeps column $-1$ equal to the block's pattern with its free
@@ -82,6 +84,25 @@ The other 23 blocks:
 "Entry forced" is a statement about every state of width 14, so about every right half, finite or not. The census
 column is about right halves of up to 10 cells, all phases, within 4,000 steps.
 
+For the eight blocks without forced entry, a shorter list taken from the learned words is forced (`escape_readings`
+and `forced_layers`, by `--words ... --forced`):
+
+| block | forced words | entropy | within |
+|---|---|---:|---:|
+| $00111$ | $111$, $0000$, $1011$ | 0.694 | 22 steps |
+| $01011$ | $111$, $1011$, $1100$ | 0.743 | 13 steps |
+| $000001$ | $1010$ | 0.913 | 4 steps |
+| $001111$ | $00$, $0110$ | 0.597 | 18 steps |
+| $010111$ | $11$ | 0.694 | 4 steps |
+| $0011011$ | $00$ | 0.694 | 32 steps |
+| $011$ | $00$, unless every later reading is white | 0.694 | (below) |
+
+For $011$ the list $00$ is not entered from 28 of the 98,304 states of width 14, and every input sequence that keeps a
+state out reads white at every later white step, so its readings are eventually constant, which masked Jen excludes.
+For $0011111$ none of the lists tried ($11$; $11, 1001$; all five learned words) is forced, and the paths that stay out
+read both colors. So 22 of the 23 blocks have a set of words of entropy below 1 that every right half falls into, or
+that only halves with constant readings escape.
+
 ## Two examples
 
 - **$001$.** Write the white steps as $a_i, b_i$ (the center reads $0, 0, 1$). The kit proves that column 1 is
@@ -119,6 +140,8 @@ python -m computations.gap_traps --survey 7 --width 14 --cells 10   # the 39 blo
 python -m computations.gap_traps --block 001 --width 14 --forced   # forced within 46 steps
 python -m computations.gap_traps --block 001 --width 13 --words 11 1001 00100 10001 --forced   # within 30 steps
 python -m computations.gap_traps --block 011 --width 16 --words 00 010 01110 011110 --cells 16   # every half enters
+python -m computations.gap_traps --block 011 --width 14 --words 00 --forced   # escaping paths read only white
+python -m computations.gap_traps --block 00111 --width 14 --words 111 0000 1011 --forced   # forced within 22 steps
 ```
 
 The forced column of the table comes from `--block <b> --width 14 --forced` for each block, a few seconds to about a

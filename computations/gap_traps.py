@@ -139,6 +139,30 @@ def forced_layers(good: np.ndarray, block: str, width: int) -> tuple[np.ndarray,
         depth += 1
 
 
+def escape_readings(good: np.ndarray, forced: np.ndarray, block: str, width: int) -> set[int]:
+    """The readings at the white steps of the states from which some input sequence stays out of the trap forever:
+    the greatest set of states outside `forced` in which every state has a successor. A path that never enters the
+    trap stays in it, so if this set is {0} (or {1}) every half that never enters has constant readings from some step
+    on, which masked Jen excludes."""
+    period, n, sufs = good.shape
+    windows = np.arange(n, dtype=np.int64)  # (n,)
+    nxt = [[step_windows(windows, width, int(block[p]), x) for x in (0, 1)] for p in range(period)]
+    out = ~forced  # (period, n, sufs)
+    while True:
+        new = out.copy()
+        for p in range(period):
+            q = (p + 1) % period
+            if block[p] == "0":
+                s_new = ((np.arange(sufs)[None, :] << 1) | (windows & 1)[:, None]) & (sufs - 1)  # (n, sufs)
+            else:
+                s_new = np.broadcast_to(np.arange(sufs)[None, :], (n, sufs))
+            new[p] &= out[q][nxt[p][0][:, None], s_new] | out[q][nxt[p][1][:, None], s_new]
+        if np.array_equal(new, out):
+            break
+        out = new
+    return {int(w & 1) for p in range(period) if block[p] == "0" for w in np.flatnonzero(out[p].any(axis=1))}
+
+
 def census(block: str, width: int, words: tuple[str, ...], cells: int, phase: int, steps: int) -> np.ndarray:
     """The first step at which each right half below 2^cells is in the trap, with its true last readings, or -1."""
     good = greatest_trap(block, width, words)  # (period, 2^width, sufs)
@@ -219,8 +243,12 @@ def main() -> None:
                 f"(phase, window) pairs at width {args.width}")
         if size and args.forced:
             forced, depth = forced_layers(good, block, args.width)
-            line += (f"; entry forced from every state within {depth} steps" if forced.all() else
-                     f"; entry not forced from {int((~forced).sum())} of {forced.size} states")
+            if forced.all():
+                line += f"; entry forced from every state within {depth} steps"
+            else:
+                escape = escape_readings(good, forced, block, args.width)
+                line += (f"; entry not forced from {int((~forced).sum())} of {forced.size} states, whose escaping "
+                         f"paths read {sorted(escape)} at the white steps")
         if size and args.cells:
             results = []
             for phase in range(len(block)):

@@ -292,4 +292,37 @@ theorem no_alternating_lock_example (x : Int → Bool) (hfin : FinConfig x) (hx 
 
 end SevenLock
 
+/-! ### The headline results, in the namespace `Rule30Open` -/
+
+open SevenLock
+
+/-- The kernel check that the 195 windows of the lock form 7 classes, each sent into the next by every double step. -/
+theorem sevenLock_check : lockCheck = true := lock_ok
+
+/-- A window of the lock at an odd time stays in the lock, class `k + n` after `n` double steps. -/
+theorem sevenLock_forever (R : Nat → Bool) {t0 k : Nat} (h0 : t0 % 2 = 1) (hw : inCls k (win R t0) = true) :
+    ∀ n, inCls ((k + n) % 7) (win R (t0 + 2 * n)) = true :=
+  win_lock_forever R h0 hw
+
+/-- The lock makes column `1` at the white steps eventually periodic. -/
+theorem sevenLock_periodic (R : Nat → Bool) {s0 k : Nat} (hw : inCls k (win R (2 * s0 + 1)) = true) :
+    EventuallyPeriodic (u R) :=
+  u_periodic_of_lock R hw
+
+/-- The lock excludes period two against `R`. -/
+theorem sevenLock_not_finSupp_Psi (R : Nat → Bool) {s0 k : Nat} (hw : inCls k (win R (2 * s0 + 1)) = true) :
+    ¬ FinSupp (Psi R) :=
+  not_finSupp_Psi_of_lock R hw
+
+/-- No finite configuration with an alternating center enters the lock. -/
+theorem no_alternating_of_sevenLock (x : Int → Bool) (hfin : FinConfig x) (hx : ∀ t, evol x t 0 = altCol t)
+    (s0 k : Nat) : inCls k (seg (fun i => evol x (2 * s0 + 1) ((i : Int) + 1)) 32) = false :=
+  no_alternating_of_lock x hfin hx s0 k
+
+/-- No finite configuration whose center alternates from time `0` has the cells `1, 2, …` reading
+`1 0 0 1 0 1 1 1 1` and then white at time `0`. -/
+theorem no_alternating_sevenLock_example (x : Int → Bool) (hfin : FinConfig x) (hx : ∀ t, evol x t 0 = altCol t) :
+    ¬ ∀ p : Nat, 1 ≤ p → x (p : Int) = exampleHalf p :=
+  no_alternating_lock_example x hfin hx
+
 end Rule30Open
