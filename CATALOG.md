@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-100 Lean modules with 448 headline theorems, 42 findings (proved on paper,
-computed or conjectured) and 40 negative results. Prize problem 1 asks whether the center column
+101 Lean modules with 451 headline theorems, 42 findings (proved on paper,
+computed or conjectured) and 41 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 81 | 23 | 11 |
+| [Columns](#columns) | 82 | 23 | 12 |
 | [Period two](#period-two) | 6 | 7 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -135,6 +135,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Traps for 24 more blocks of period 15, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge15.md) | [`Columns.CensusTrapsLarge15`](Rule30Open/Columns/CensusTrapsLarge15.lean) | `censusTrapsLarge15_check`, `censusTrapsLarge15_blocks`, `censusLarge15_absorption_excludes` | 1 | not in the kit |
 | [A periodic column and any observable that closes the strip to its right](Rule30Open/Columns/ClosingObservable.md) | [`Columns.ClosingObservable`](Rule30Open/Columns/ClosingObservable.lean) | `closing_observable`, `affine_observable`, `center_xor`, `center_masked_two`, `center_parity` | 1 | extends a kit result |
 | [Counts of black cells move left by at most a factor of three](Rule30Open/Columns/ColumnTransfer.md) | [`Columns.ColumnTransfer`](Rule30Open/Columns/ColumnTransfer.lean) | `transfer`, `transfer_white`, `iterate`, `transfer_right`, `transfer_right_white`, `iterate_right`, `center_lower` | 2 | not in the kit |
+| [For 001 the left half only has to fail for free bits whose runs of 0s have length at least 2 and runs of 1s at least 3](Rule30Open/Columns/ConstrainedLeft001.md) | [`Columns.ConstrainedLeft001`](Rule30Open/Columns/ConstrainedLeft001.lean) | `not_eventually_001_of_C3r`, `center_not_eventually_001_of_C3r`, `c3r_of_c3s` | 1 | extends a kit result |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
 | [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
 | [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |
@@ -224,6 +225,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Kind | Problems |
 |---|---|---|
+| [Constraining the free bits of column -1 by the right half lowers the entropy of the left-half statements for 001 and 011, and no finite left game closes](negative-results/columns/constrained-left-halves.md) | dead end | 1 |
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
 | [Jen's theorem on farther columns, or on periods longer than the block's, does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
 | [Entry into 360 of the 1,595 traps of the trap modules is false, so their reductions were empty](negative-results/columns/missed-traps.md) | refuted | 1 |

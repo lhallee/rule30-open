@@ -77,7 +77,8 @@ that column 1 reads at the second white step, where it is not eventually constan
 certificates express; it holds for every right half, not only finite ones, and its form for rows is for every row
 whose center repeats $001$. The kit's `Rule30EtherThreeLeft.col_m1_001` says that for the single seed column $-1$ at
 these steps is the complement of column 1; with it, column $-1$ at these steps avoids $101$, $010$ and $0110$ from the
-14th reading on. That corollary is not stated in Lean here.
+14th reading on. [ConstrainedLeft001](ConstrainedLeft001.md) uses the result in Lean to reduce $001$ to a left
+statement with constrained free bits.
 
 The certificate data are the greatest closed set and its layers of forced entry, computed by
 [three_runs.py](../../computations/three_runs.py) as `greatest_trap` and `forced_layers` of

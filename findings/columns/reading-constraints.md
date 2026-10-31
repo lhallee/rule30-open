@@ -132,7 +132,10 @@ left statement with constrained free bits is still of the kind of the problem (a
 produce a sequence from an uncountable set of positive entropy), so this narrows the problem and does not close it.
 The forced cases are finite computations of a few million states each and can be checked by a kernel. For $001$ the
 kernel checks one: [ThreeRuns](../../Rule30Open/Columns/ThreeRuns.md) proves that column 1 at the second white step
-avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half.
+avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half. [ConstrainedLeft001](../../Rule30Open/Columns/ConstrainedLeft001.md)
+reduces $001$ in Lean to the left statement with those free bits, and [the constrained left
+halves](../../negative-results/columns/constrained-left-halves.md) shows why no finite left game closes it: halves with
+periodic free bits are eventually periodic in space and dense among the solutions.
 
 ## Reproduce
 
