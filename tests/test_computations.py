@@ -2414,27 +2414,113 @@ def test_kit_reach() -> None:
     assert lock_chain.t001_reach(14) == 1.0
 
 
+def test_trap_reach_lifted() -> None:
+    """`trap_reach` at widths below, at and above the trap's own, against a direct search: the nodes of the game,
+    built cell by cell with the rule, from which some values of the cell beyond reach a node whose first cells, as many
+    as the trap has, form a state with the label modulo the period; on random sets of states of small blocks."""
+    import random
+    from computations import lock_chain
+
+    def direct(word: str, states: set[tuple[int, int]], cells: int, width: int) -> float:
+        p, cut = len(word), min(cells, width)
+        wanted = {(label % p, window & ((1 << cut) - 1)) for label, window in states}
+        moves = {}
+        for phase in range(p):
+            for window in range(1 << width):
+                column = [int(word[phase])] + [(window >> i) & 1 for i in range(width)]  # columns 0 to width
+                ends = []
+                for free in (0, 1):
+                    c = column + [free]
+                    new = [c[i - 1] ^ (c[i] | c[i + 1]) for i in range(1, width + 1)]
+                    ends.append(((phase + 1) % p, sum(bit << i for i, bit in enumerate(new))))
+                moves[(phase, window)] = ends
+        reached = {node for node in moves if (node[0], node[1] & ((1 << cut) - 1)) in wanted}
+        grown = True
+        while grown:
+            grown = False
+            for node, ends in moves.items():
+                if node not in reached and any(end in reached for end in ends):
+                    reached.add(node)
+                    grown = True
+        return len(reached) / len(moves)
+
+    rng = random.Random(1)
+    for _ in range(12):
+        word = rng.choice(["001", "0001", "00111", "0101"])
+        cells = rng.randint(2, 5)
+        states = {(rng.randrange(2 * len(word)), rng.randrange(1 << cells)) for _ in range(rng.randint(1, 4))}
+        t = {"word": word, "cells": cells, "states": sorted(states)}
+        for width in range(max(cells - 1, 1), cells + 4):
+            assert lock_chain.trap_reach(t, width=width) == pytest.approx(direct(word, states, cells, width), abs=1e-12)
+
+
 def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
-    and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells, while a natural trap
-    of 16 cells passes; and `coverage.refuted_blocks` holds the 226 blocks of periods 2 to 15 with no trap that passes,
-    01 among them and 001, which keeps the kit's t001, not."""
+    and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of
+    16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
+    rule; and `coverage.refuted_blocks` holds the 173 blocks of periods 2 to 15 with no trap that passes, 01 among them
+    and 001, which keeps the kit's t001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())
-    assert lock_chain.REACH_WIDTH == 20 and sum(len(v) for v in lock_chain.UNREACHED.values()) == 233
+    assert lock_chain.REACH_WIDTH == 20 and sum(len(v) for v in lock_chain.UNREACHED.values()) == 240
     assert all((block, module) in held for module, blocks in lock_chain.UNREACHED.items() for block in blocks)
     assert {"01", "001"} == set(lock_chain.UNREACHED["WordTraps"])
     assert lock_chain.trap_reach(lock_chain.tables("trap01"), width=16) < 1
     assert lock_chain.trap_reach(lock_chain.tables("trap001fifteen"), width=16) < 1
     ten = lock_chain.carried("trap0000010001", 10)
     assert ten["word"] in lock_chain.UNREACHED["TenTraps"] and lock_chain.trap_reach(ten, width=12) < 1
-    natural = lock_chain.extra_tables(lock_chain.LONG_TRAPS[0][0])  # 16 cells
-    assert "NaturalTrapsLong" not in lock_chain.UNREACHED and lock_chain.trap_reach(natural) == 1
+    natural = lock_chain.extra_tables("0001111110011")  # 16 cells
+    assert "0001111110011" in lock_chain.UNREACHED["NaturalTrapsLong"] and natural["cells"] == 16
+    assert lock_chain.trap_reach(natural) == 1 > lock_chain.trap_reach(natural, width=17)
     refuted = coverage.refuted_blocks()
-    assert len(refuted) == 226 and "01" in refuted and "001" not in refuted
-    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 11), (11, 27), (12, 27), (13, 43),
-                                                                (14, 55), (15, 55)]
+    assert len(refuted) == 173 and "01" in refuted and "001" not in refuted
+    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 3), (11, 14), (12, 14), (13, 38),
+                                                                (14, 40), (15, 56)]
+
+
+def test_wall_natural() -> None:
+    """The traps of NaturalTrapsWalls: each of `WALL_NATURAL` is a lock by `is_lock` for its block, with labels modulo
+    the period; its half, driven by the block with `step`, has its window in the trap at step 12,000; its block is one
+    whose only traps, walls carried to it, fail the test of reach; for each block of `WALL_SPLIT`, its two traps are
+    locks, with labels modulo their own multiple of the period, apart from each other at the narrower width, so a half
+    inside either never enters the other, and every node of the game of 18 cells can reach one of the two; three halves
+    of the scan of 000000101101 are inside its second trap, apart from the first (`halves_apart`); and
+    `lean_wall_natural` is the text of the module."""
+    from computations import coverage, lock_chain
+    walls = {"TenTraps", "ElevenTraps", "TwelveTraps", "ThirteenTraps", "FourteenTraps"}
+    held: dict[str, set[str]] = {}
+    for block, module in coverage.module_blocks():
+        held.setdefault(block, set()).add(module)
+    assert len(lock_chain.WALL_NATURAL) == 54 and len(lock_chain.WALL_SPLIT) == 6
+    for word, start, cells, modulus in lock_chain.WALL_NATURAL:
+        t = lock_chain.extra_tables(word)
+        assert (t["word"], t["cells"], t["modulus"]) == (word, cells, len(word)) and cells <= 18
+        assert lock_chain.is_lock(word, t["states"], cells)
+        row = start << 1  # bit 0 the block's column, bit i column i
+        for s in range(12000):
+            row = step((row & ~1) | int(word[s % len(word)]))
+        assert (12000 % len(word), (row >> 1) & ((1 << cells) - 1)) in {(lab % len(word), w) for lab, w in t["states"]}
+    for word, _ in lock_chain.WALL_SPLIT:
+        pair = lock_chain.split_tables(word)
+        assert all(lock_chain.is_lock(word * (t["modulus"] // len(word)), t["states"], t["cells"]) for t in pair)
+        cut = min(t["cells"] for t in pair)
+        sets = [{(lab % len(word), w & ((1 << cut) - 1)) for lab, w in t["states"]} for t in pair]
+        assert not sets[0] & sets[1] and lock_chain.trap_reach(*pair, width=18) == 1
+    for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT:
+        others = held[word] - {"NaturalTrapsWalls"}
+        assert others and others <= walls and all(word in lock_chain.UNREACHED[m] for m in others)
+    for word in ("0000110011", "00001101011", "000000110011"):
+        assert lock_chain.trap_reach(lock_chain.extra_tables(word)) == 1
+    # the trap of 17 cells of 000000101101 passes the test of reach at 20 cells, but three halves of its scan are inside
+    # the trap of 26 cells, apart from it, and the other 27 inside it
+    first, second = lock_chain.split_tables("000000101101")
+    apart = lock_chain.halves_apart(first)
+    assert sorted((cells, size) for _, cells, _, size, away in apart if away) == [(26, 116)] * 3
+    assert all(not away and (cells, size) == (17, 150) for _, cells, _, size, away in apart if (cells, size) != (26, 116))
+    assert len(apart) == 30 and len(second["states"]) == 116
+    assert lock_chain.lean_wall_natural() in (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsWalls.lean").read_text(
+        encoding="utf-8")
 
 
 def test_trap_pairs() -> None:

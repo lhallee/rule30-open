@@ -51,8 +51,10 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-census-large 14   # the traps of CensusTrapsLarge, in parts; 15 too
     python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
     python -m computations.lock_chain --reach 18   # which traps every window of 18 cells can reach, cut to 18 cells
+    python -m computations.lock_chain --halves-apart   # halves of the natural scans apart from NaturalTrapsWalls' traps
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
+    python -m computations.lock_chain --lean-wall-natural   # the traps of NaturalTrapsWalls
     python -m computations.lock_chain --t001-reach 24   # every node of the game of 001 can reach t001, about 2 min
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
@@ -223,22 +225,32 @@ def classify(found: dict[str, list[tuple[list[str], str]]], depth: int) -> tuple
 
 
 def trap_reach(*traps: dict, width: int | None = None) -> float:
-    """The share of the nodes of the finite game of the traps' block at `width` cells (the traps' own width if None or
-    less), with the phase counted modulo the block's period as `WTrap.Absorption` compares labels, from which some
-    values of the cell beyond the window lead into the traps' states cut to their first `width` cells. Every finitely
-    supported right half enters one of the traps only if this is 1 at every width: the nodes that cannot reach the cut
+    """The share of the nodes of the finite game of the traps' block at `width` cells (the widest trap's width if None),
+    with the phase counted modulo the block's period as `WTrap.Absorption` compares labels, from which some values of
+    the cell beyond the window lead into the traps' states: each trap cut to its first `width` cells when it is wider,
+    and when it is narrower, the windows whose first cells form a state, whatever the cells after them. Every finitely
+    supported right half enters one of the traps only if this is 1 at every width: the nodes that cannot reach the
     states form a set that no move leaves, so a half whose first cells start there never has them in a state, and such
     a set at one width gives one at every larger width, the windows that begin with its nodes."""
-    word, cells = traps[0]["word"], traps[0]["cells"]
-    assert all((t["word"], t["cells"]) == (word, cells) for t in traps), "one block and width"
-    period, width = len(word), cells if width is None else min(width, cells)
-    low = (1 << width) - 1
+    word = traps[0]["word"]
+    assert all(t["word"] == word for t in traps), "one block"
+    width = max(t["cells"] for t in traps) if width is None else width
     source, target = game.moves(word, width)  # (2 p n,), (2 p n,)
+    return float(locks.back_closure(trap_nodes(traps, width), source, target).mean())
+
+
+def trap_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
+    """The nodes of the game of `width` cells, a label modulo the block's period and a window, that are in one of the
+    traps: whose first cells, as many as the trap has up to `width`, form a state of it with that label."""
+    period = len(traps[0]["word"])
     inside = np.zeros(period << width, dtype=bool)  # (p n,)
     for t in traps:
+        cut = min(width, t["cells"])
+        mine = np.zeros((period, 1 << cut), dtype=bool)  # (p, 2^cut), a label and the first `cut` cells
         for label, window in t["states"]:
-            inside[(label % period) << width | window & low] = True
-    return float(locks.back_closure(inside, source, target).mean())
+            mine[label % period, window & ((1 << cut) - 1)] = True
+        inside |= np.tile(mine, (1, 1 << (width - cut))).reshape(-1)  # (p n,), any cells after the first `cut`
+    return inside
 
 
 def module_traps() -> list[tuple[str, dict]]:
@@ -253,7 +265,7 @@ def module_traps() -> list[tuple[str, dict]]:
         found += [(module, carried(name, d)) for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
     for module, entries in (("NaturalTraps", EXTRA_TRAPS), ("NaturalTrapsLarge", LARGE_TRAPS),
                             ("NaturalTrapsLong", LONG_TRAPS), ("NaturalTrapsLongLarge", LONG_LARGE),
-                            ("MissedTraps", MISSED_NATURAL)):
+                            ("NaturalTrapsWalls", WALL_NATURAL), ("MissedTraps", MISSED_NATURAL)):
         found += [(module, extra_tables(word)) for word, *_ in entries]
     found += [("FarWalls", carried(name, d)) for entries in FAR_WALLS.values() for name, d in entries]
     for period, entries in CENSUS_TRAPS.items():
@@ -266,29 +278,29 @@ def module_traps() -> list[tuple[str, dict]]:
 
 def reach_census(width: int = 18) -> list[tuple[str, str, int, float]]:
     """`trap_reach` at `width` cells for every trap of the trap modules (`module_traps`), each cut to its first `width`
-    cells when it is wider, and for the two traps of each block of `PAIRS` together: (module, block, cells, share)."""
+    cells when it is wider and taken as the windows that begin with its states when it is narrower, and for the two
+    traps of each block of `PAIRS` or `WALL_SPLIT` together: (module, block, cells, share)."""
     rows = [(module, t["word"], t["cells"], trap_reach(t, width=width))
             for module, t in tqdm(module_traps(), desc="traps", file=sys.stderr, mininterval=10)]
     for block in PAIRS:
         pair = pair_tables(block)
         rows.append(("TrapPairs", block, pair[0]["cells"], trap_reach(*pair, width=width)))
+    for block, _ in WALL_SPLIT:
+        pair = split_tables(block)
+        rows.append(("NaturalTrapsWalls", block, max(t["cells"] for t in pair), trap_reach(*pair, width=width)))
     return rows
 
 
 def miss_tables(t: dict, max_width: int = 20) -> dict:
     """A closed set of windows apart from the trap, as tables (`relabeled_tables`): at the least width w, up to
-    `max_width`, at which some node of the game cannot reach the trap's states cut to their first w cells, with the
-    phase counted modulo the block's period, the least strongly connected component of those nodes that no move leaves.
-    A right half whose first w cells are in it keeps them in it, whatever the cells beyond do, so it never enters the
-    trap."""
-    word, period = t["word"], len(t["word"])
-    for width in range(1, min(t["cells"], max_width) + 1):
+    `max_width`, at which some node of the game cannot reach the trap's nodes (`trap_nodes`), with the phase counted
+    modulo the block's period, the least strongly connected component of those nodes that no move leaves. A right half
+    whose first w cells are in it keeps them in it, whatever the cells beyond do, so it never enters the trap."""
+    word = t["word"]
+    for width in range(1, max_width + 1):
         low = (1 << width) - 1
         source, target, label, _, _ = game.game_graph(word, width)  # (2 p n,), (2 p n,), (p n,)
-        inside = np.zeros(period << width, dtype=bool)  # (p n,)
-        for phase, window in t["states"]:
-            inside[(phase % period) << width | window & low] = True
-        out = ~locks.back_closure(inside, source, target)  # (p n,), a set of nodes that no move leaves
+        out = ~locks.back_closure(trap_nodes((t,), width), source, target)  # (p n,), a set no move leaves
         if out.any():
             leaves = np.zeros(label.max() + 1, dtype=bool)  # (components,)
             leaves[label[source][label[source] != label[target]]] = True
@@ -1368,9 +1380,10 @@ MISSED_NATURAL = [("0001101101011", 0, 16, 13), ("0010010010111", 66483644887648
 MISSED_CENSUS = [("0000010111001", "0000010111001", 0, 0), ("000001010110101", "000001010110101", 0, 0),
                  ("001001111010111", "001001111010111", 0, 0)]
 # The traps of the modules that the test of reach refutes (`reach_census` at `REACH_WIDTH` cells): some node of the
-# finite game of that width cannot reach the trap's states cut to that width, so a right half whose first cells start
-# there never enters the trap, and entry, the hypothesis of the trap's reduction, is false. By module, the blocks of
-# those traps; the seven of `MISSED_NATURAL` and `MISSED_CENSUS`, refuted in Lean, are not repeated.
+# finite game of that width cannot reach a window whose first cells form a state of the trap, cut to that width when
+# the trap is wider, so a right half whose first cells start there never enters the trap, and entry, the hypothesis of
+# the trap's reduction, is false. By module, the blocks of those traps; the seven of `MISSED_NATURAL` and
+# `MISSED_CENSUS`, refuted in Lean, are not repeated.
 REACH_WIDTH = 20
 UNREACHED = {
     "CensusTraps13": ["0000001100111", "0000001101001", "0000010100111", "0000011001011", "0000110011011",
@@ -1380,21 +1393,22 @@ UNREACHED = {
                       "0011110111011", "0011111101111", "0101010111011", "0101011010111", "0101011111111"],
     "CensusTraps14": ["00000001111111", "00000011010001", "00000011110111", "00000100111001", "00000110110101",
                       "00001000011111", "00001000101101", "00001010001001", "00001010001111", "00001011000101",
-                      "00001011101111", "00001100101011", "00010011100011", "00010011111001", "00010100110111",
-                      "00010101011001", "00011011010011", "00011111110101", "00100110101101", "00100111001111",
-                      "00100111101011", "00100111111101", "00101010100111", "00101011001101", "00110011011101",
-                      "00111001111111", "00111011111011", "01010111111011", "01011011010111"],
+                      "00001011101111", "00001100101001", "00001100101011", "00010011100011", "00010011111001",
+                      "00010100110111", "00010101011001", "00011011010011", "00011111110101", "00100110101101",
+                      "00100111001111", "00100111101011", "00100111111101", "00101010100111", "00101011001101",
+                      "00110011011101", "00111001111111", "00111011111011", "01010111111011", "01011011010111"],
     "CensusTraps15": ["000000000001001", "000000010001001", "000000010010011", "000000010111001", "000000011110111",
                       "000000100010111", "000000101011001", "000000101110001", "000000110001001", "000000110110101",
                       "000001000010011", "000001111110101", "000010000101001", "000010001011111", "000010011000111",
                       "000010101011001", "000010101101111", "000010110010101", "000010110101011", "000010111100101",
                       "000010111101001", "000010111111001", "000011110011001", "000011110100111", "000100100011001",
                       "000101001011001", "000101100111001", "000101100111101", "000101111101011", "000101111101111",
-                      "000110100111001", "000110110011111", "000110110110111", "000111010101111", "000111010111101",
-                      "000111011011001", "000111011011011", "000111011100101", "000111101101101", "000111101110011",
-                      "001001001011011", "001001011111111", "001001101111111", "001001111101111", "001010010111111",
-                      "001010011010011", "001011010010111", "001011011011111", "001100110110101", "001110011101011",
-                      "001110101111111", "001110111110101", "010110101111111", "011011101101111", "011011111101111"],
+                      "000110010110101", "000110100111001", "000110110011111", "000110110110111", "000111010101111",
+                      "000111010111101", "000111011011001", "000111011011011", "000111011100101", "000111101101101",
+                      "000111101110011", "001001001011011", "001001011111111", "001001101111111", "001001111101111",
+                      "001010010111111", "001010011010011", "001011010010111", "001011011011111", "001100110110101",
+                      "001110011101011", "001110101111111", "001110111110101", "010110101111111", "011011101101111",
+                      "011011111101111"],
     "ElevenTraps": ["00000001011", "00000101111", "00000110001", "00001000111", "00001001101", "00001100101",
                     "00001101001", "00001101011", "00001101101", "00001111001", "00001111111", "00010100101",
                     "00011010011", "00011011001", "00011100111", "00011110011", "00011111001", "00100111011",
@@ -1407,19 +1421,20 @@ UNREACHED = {
                       "00011011011101", "00011110111001", "00100101100101", "00100110111111", "00101101101101",
                       "00101110011111", "00101111101111", "00110011111111", "00110111100111", "00111001110101",
                       "00111010011111", "00111011011101", "00111011101111", "01110111111111"],
+    "NaturalTrapsLong": ["0001111110011", "0010011010111"],
     "NineTraps": ["000001101", "000011001", "000100101", "000110011", "001101111", "001110111", "011101111"],
-    "TenTraps": ["0000000001", "0000000101", "0000011101", "0000100111", "0000110011", "0000111111", "0001011111",
-                 "0001111111", "0011001111", "0011111101", "0111011111"],
+    "TenTraps": ["0000000001", "0000000101", "0000011101", "0000100111", "0000110011", "0000111111", "0001010111",
+                 "0001011111", "0001111111", "0011001111", "0011111101", "0111011111"],
     "ThirteenTraps": ["0000000100001", "0000001001101", "0000001111111", "0000011000111", "0000100101101",
                       "0000101001001", "0000101011001", "0000101110111", "0000110011101", "0000111011011",
                       "0000111101111", "0001001110111", "0001010001011", "0001011100111", "0001011101011",
-                      "0001111101111", "0010010100111", "0010011110101", "0010110111111", "0010111101101",
-                      "0101010101111"],
+                      "0001110010011", "0001111101111", "0010010100111", "0010011110101", "0010110111111",
+                      "0010111101101", "0101010101111"],
     "TwelveTraps": ["000000010001", "000000011101", "000000101101", "000000110011", "000001000111", "000001010111",
-                    "000001011011", "000100101111", "000100111011", "000100111101", "000101001111", "000101011111",
-                    "000110011001", "000110110101", "000111001101", "000111110011", "001001100101", "001001101011",
-                    "001011010111", "001011101111", "001100111111", "001101101111", "001111111101", "010110111111",
-                    "011101111111"],
+                    "000001011011", "000010011111", "000100101111", "000100111011", "000100111101", "000101001111",
+                    "000101011111", "000110011001", "000110110101", "000111001101", "000111110011", "001001100101",
+                    "001001101011", "001011010111", "001011101111", "001100111111", "001101101111", "001111111101",
+                    "010110111111", "011101111111"],
     "WordTraps": ["01", "001"],
 }
 # Blocks of periods 13 and 14 whose locked windows of 16 cells have two bottom components, with different values of
@@ -1429,12 +1444,72 @@ UNREACHED = {
 PAIRS = ["0001101101011", "0010010010111", "0010101111111", "00001101111001"]
 
 
+# Natural traps for blocks of periods 10 to 14 whose only traps, walls carried to them, fail the test of reach
+# (`UNREACHED`): from the natural scans, the smallest closed set of windows that a sampled half driven by the block is
+# inside at step 12,000, when it passes the test at 20 cells and no half of the scan is inside a closed set apart from
+# it, in the form of `EXTRA_TRAPS`. Checked in `Rule30Open.Columns.NaturalTrapsWalls`, those of more than 3,000 states
+# in parts.
+WALL_NATURAL = [("0000000001", 0, 16, 10), ("0000000101", 0, 16, 10), ("0000011101", 0, 16, 10),
+                ("0000110011", 0, 16, 10), ("0001111111", 0, 16, 10), ("0011001111", 0, 16, 10),
+                ("0011111101", 0, 16, 10), ("0111011111", 0, 16, 10), ("00000001011", 0, 16, 11),
+                ("00001001101", 0, 16, 11), ("00001101001", 0, 16, 11), ("00001101011", 0, 16, 11),
+                ("00001101101", 0, 18, 11), ("00001111001", 12475343592431589197, 16, 11), ("00001111111", 0, 16, 11),
+                ("00111010111", 0, 16, 11), ("00111011011", 12828593127923856452, 17, 11), ("01010101011", 0, 16, 11),
+                ("01011111011", 0, 16, 11), ("01111011111", 0, 16, 11), ("000000010001", 0, 16, 12),
+                ("000000011101", 0, 16, 12), ("000000110011", 0, 16, 12), ("000001010111", 0, 16, 12),
+                ("000100111101", 4728953243656014532, 16, 12), ("000101011111", 0, 16, 12), ("000111001101", 0, 16, 12),
+                ("001011101111", 0, 16, 12), ("001100111111", 0, 16, 12), ("001111111101", 0, 16, 12),
+                ("010110111111", 0, 16, 12), ("011101111111", 0, 16, 12), ("0000001001101", 0, 16, 13),
+                ("0000011000111", 0, 16, 13), ("0000111011011", 0, 16, 13), ("0001111101111", 0, 16, 13),
+                ("0010011110101", 0, 16, 13), ("0010110111111", 0, 16, 13), ("0101010101111", 0, 16, 13),
+                ("00000000010001", 0, 16, 14), ("00000000110011", 0, 16, 14), ("00000001010111", 0, 16, 14),
+                ("00000100001111", 0, 16, 14), ("00000111001101", 0, 16, 14), ("00001000010001", 0, 16, 14),
+                ("00001100011011", 0, 16, 14), ("00010011111101", 0, 16, 14), ("00010101111111", 0, 16, 14),
+                ("00100101100101", 0, 16, 14), ("00100110111111", 0, 16, 14), ("00101111101111", 0, 16, 14),
+                ("00110011111111", 0, 16, 14), ("00110111100111", 0, 16, 14), ("01110111111111", 0, 16, 14)]
+
+# Blocks of the same kind whose sampled halves settle into two closed sets apart from each other, so that entry into
+# either alone is false, while every node of the game of 20 cells can reach one of the two: the block and its two
+# traps, the narrower first, each as (start, cells, modulus) of `EXTRA_TRAPS`. `NaturalTrapsWalls` reduces each block
+# to entry into one of the two (`split_tables`).
+WALL_SPLIT = [("0001010111", [(6648364488764846871, 19, 10), (0, 20, 10)]),
+              ("00101101111", [(0, 16, 11), (12828593127923856452, 19, 11)]),
+              ("000000101101", [(0, 17, 12), (12828593127923856452, 26, 12)]),
+              ("000010011111", [(6991680298694716019, 16, 12), (0, 18, 24)]),
+              ("0000001111111", [(0, 16, 13), (15376576670725646791, 25, 13)]),
+              ("00101101101101", [(0, 16, 14), (1252019101295043734, 32, 14)])]
+
+
 def extra_tables(word: str) -> dict:
-    """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS`, `LONG_TRAPS`, `LONG_LARGE` or `MISSED_NATURAL` for the block, as
-    tables (`natural_tables`)."""
+    """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS`, `LONG_TRAPS`, `LONG_LARGE`, `MISSED_NATURAL` or `WALL_NATURAL` for
+    the block, as tables (`natural_tables`)."""
     _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS + LONG_TRAPS + LONG_LARGE
-                                    + MISSED_NATURAL if entry[0] == word)
+                                    + MISSED_NATURAL + WALL_NATURAL if entry[0] == word)
     return natural_tables(word, start, 12000, cells, modulus)
+
+
+def split_tables(word: str) -> list[dict]:
+    """The two traps of `WALL_SPLIT` for the block, as tables (`natural_tables`)."""
+    _, traps = next(entry for entry in WALL_SPLIT if entry[0] == word)
+    return [natural_tables(word, start, 12000, cells, modulus) for start, cells, modulus in traps]
+
+
+def halves_apart(t: dict, steps: int = 20000) -> list[tuple[int, int, int, int, bool]]:
+    """For each half of the natural scan of the trap's block (`natural_scan`) that is inside a natural trap, that trap
+    and whether it is apart from `t`: no state of it, cut to the narrower of the two widths, with its label modulo the
+    period, is a state of `t` so cut. A half inside a trap apart from `t` never enters `t`. As (half, cells, modulus,
+    size, apart)."""
+    from computations import right_half
+    word, period = t["word"], len(t["word"])
+    starts = right_half.random_starts(30, 64)
+    out = []
+    for k, time, cells, modulus, size in natural_scan(word, steps)[1]:
+        other = natural_tables(word, starts[k], time, cells, modulus)
+        cut = (1 << min(cells, t["cells"])) - 1
+        mine = {(label % period, window & cut) for label, window in t["states"]}
+        out.append((k, cells, modulus, size, not mine & {(label % period, window & cut)
+                                                        for label, window in other["states"]}))
+    return out
 
 
 def lean_extra(entries: list[tuple[str, int, int, int]] | None = None) -> str:
@@ -1443,6 +1518,21 @@ def lean_extra(entries: list[tuple[str, int, int, int]] | None = None) -> str:
     return "\n".join(lean_entry(extra_tables(word), f"nat{word}")
                      + f"\ntheorem nat{word}_check : nat{word}.check = true := by decide +kernel\n"
                      for word, *_ in (EXTRA_TRAPS if entries is None else entries))
+
+
+def lean_wall_natural(part: int = 1024, piece: int = 1 << 16) -> str:
+    """The traps of `Rule30Open.Columns.NaturalTrapsWalls`, one per entry of `WALL_NATURAL` and two per entry of
+    `WALL_SPLIT` (`natw<block>_0` and `_1`): each with its kernel check, or, above 3,000 states, in parts
+    (`lean_parts`)."""
+    traps = [(f"natw{word}", extra_tables(word)) for word, *_ in WALL_NATURAL]
+    traps += [(f"natw{word}_{index}", t) for word, _ in WALL_SPLIT for index, t in enumerate(split_tables(word))]
+    out = []
+    for name, t in traps:
+        if len(t["states"]) > 3000:
+            out.append(lean_parts(t, name, part, piece))
+        else:
+            out.append(lean_entry(t, name) + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n")
+    return "\n".join(out)
 
 
 def lean_large(part: int = 1024, piece: int = 1 << 16) -> str:
@@ -2107,6 +2197,10 @@ def main() -> None:
                         help="the traps of MissedTraps, each with a closed set of windows apart from it")
     parser.add_argument("--lean-pairs", action="store_true",
                         help="the traps of TrapPairs, the two bottom components of each block of PAIRS")
+    parser.add_argument("--lean-wall-natural", action="store_true",
+                        help="the traps of NaturalTrapsWalls, natural traps for blocks whose wall traps fail")
+    parser.add_argument("--halves-apart", action="store_true",
+                        help="for each trap of NaturalTrapsWalls, the halves of its natural scan in traps apart from it")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
     parser.add_argument("--lean-long", action="store_true", help="print the trap entries of NaturalTrapsLong.lean")
     parser.add_argument("--long-entry", action="store_true",
@@ -2350,6 +2444,14 @@ def main() -> None:
               f"states cut to the width is at least {min(shares):.6f}", flush=True)
     if args.lean_pairs:
         print(lean_pairs())
+    if args.lean_wall_natural:
+        print(lean_wall_natural())
+    if args.halves_apart:
+        traps = [extra_tables(word) for word, *_ in WALL_NATURAL]
+        traps += [t for word, _ in WALL_SPLIT for t in split_tables(word)]
+        for t in tqdm(traps, desc="traps", file=sys.stderr, mininterval=10):
+            apart = [(k, cells, size) for k, cells, _, size, away in halves_apart(t) if away]
+            print(f"{t['word']} ({t['cells']} cells, {len(t['states'])} states): {len(apart)} halves apart {apart}")
     if args.lean_long_large:
         print(lean_long_large())
     if args.lean_wall_gaps:

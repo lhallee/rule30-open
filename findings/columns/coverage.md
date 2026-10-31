@@ -15,7 +15,8 @@ enters a set of windows that keeps the cell beside the column fixed at the white
 or a reduction by steering (once the center repeats the block, a column beyond the window never reads one fixed
 sequence). This table counts, for each period up to 15, the primitive blocks each way reaches, each block once, in that
 order. A trap counts only if it passes the test of reach at 20 cells, which entry needs: every node of the finite game
-of 20 cells can reach its states cut to 20 cells ([what failed](../../negative-results/columns/missed-traps.md)).
+of 20 cells can reach a window whose first cells form one of its states, cut to 20 cells when the trap is wider ([what
+failed](../../negative-results/columns/missed-traps.md)).
 
 ## Result
 
@@ -30,12 +31,12 @@ of 20 cells can reach its states cut to 20 cells ([what failed](../../negative-r
 | 7 | 18 | 0 | 1 | 0 | 0 | 17 |
 | 8 | 30 | 3 | 0 | 5 | 0 | 22 |
 | 9 | 56 | 0 | 16 | 0 | 7 | 33 |
-| 10 | 99 | 4 | 17 | 5 | 5 | 68 |
-| 11 | 186 | 7 | 44 | 8 | 18 | 109 |
-| 12 | 335 | 9 | 86 | 9 | 18 | 213 |
-| 13 | 630 | 21 | 178 | 0 | 43 | 388 |
-| 14 | 1161 | 31 | 328 | 0 | 52 | 750 |
-| 15 | 2182 | 53 | 538 | 0 | 55 | 1536 |
+| 10 | 99 | 4 | 24 | 0 | 3 | 68 |
+| 11 | 186 | 7 | 56 | 1 | 13 | 109 |
+| 12 | 335 | 9 | 99 | 0 | 14 | 213 |
+| 13 | 630 | 21 | 183 | 0 | 38 | 388 |
+| 14 | 1161 | 31 | 340 | 0 | 40 | 750 |
+| 15 | 2182 | 53 | 537 | 0 | 56 | 1536 |
 
 - **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
   block up to period 20 is excluded in Lean, by the kit or here.
@@ -54,7 +55,8 @@ of 20 cells can reach its states cut to 20 cells ([what failed](../../negative-r
   [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md),
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
   [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md),
-  [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose four blocks need entry into one of two traps, and
+  [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose four blocks need entry into one of two traps,
+  [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six of whose blocks need the same, and
   [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
   Of these traps only those that pass the test of reach at 20 cells count, as do the kit's `t001` and its
   ether-and-wall family, behind PeriodFourCertificate ([reach of the kit's conjectures](kit-absorption-reach.md)).
@@ -70,14 +72,18 @@ $01$, of the kit's ether-and-wall family read so, fails the test; at periods 5, 
 small halves almost never enter ([trap entry](../../negative-results/columns/trap-entry.md)), and the rest is not
 reached at all. From period 9 the walls at the edges of periodic backgrounds, and at periods 10 to 12 also the closed
 sets that driven halves settle into, give traps to 23, 27, 70 and 113 blocks ([natural traps](natural-traps.md)), but
-for 7, 10, 26 and 27 of them every trap is one carried along its background's columns and fails the test, which leaves
-16, 17, 44 and 86 with a trap that passes, and steering alone reaches 5, 8 and 9 blocks of periods 10 to 12. At periods
-13 and 14 sampling gives traps to 87 and 136 blocks that nothing excludes ([natural traps](natural-traps.md)); the
-census of every locked window of 16 cells, carried by its chain, raises the count of blocks with some trap to 221 and
-380, and at period 15, where nothing reached a block before, to 593 ([backgrounds periodic in
-time](space-time-backgrounds.md)), but 43, 52 and 55 of these have only traps that fail the test, which leaves 178, 328
-and 538, between a quarter and three tenths of each period. Every trap the modules hold that fails is a carried one; the
-natural traps and the census components that are not carried all pass. Every reduction still needs its open step, entry
+for 7, 3, 14 and 14 of them every trap fails the test, which leaves 16, 24, 56 and 99 with a trap that passes, and
+steering alone reaches one more block, of period 11. Where the walls carried along their backgrounds' columns fail, the
+natural traps of [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md) reduce 60 blocks of periods 10 to 14
+again. At periods 13 and 14 sampling gives traps to 87 and 136 blocks that nothing excludes ([natural
+traps](natural-traps.md)); the census of every locked window of 16 cells, carried by its chain, raises the count of
+blocks with some trap to 221 and 380, and at period 15, where nothing reached a block before, to 593 ([backgrounds
+periodic in time](space-time-backgrounds.md)), but 38, 40 and 56 of these have only traps that fail the test, which
+leaves 183, 340 and 537, 24.6% to 29.3% of each period. Most traps that fail are carried ones, but two walls themselves,
+a census component and two natural traps, all of 16 cells, pass in the game of their own width and fail in that of 20,
+where the cells after them follow the rule; and the sampled halves of ten blocks split between two traps apart from
+each other, so that only entry into one of the two can hold ([TrapPairs](../../Rule30Open/Columns/TrapPairs.md),
+[NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md)). Every reduction still needs its open step, entry
 for every finite half or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the 747
 blocks of period at most 12. Period 8 has no wall wider than 16 cells: its traps are the window locks of 13 cells of its
 eight blocks that have one, which every sampled half enters, three of them excluded by the game and five reduced by
@@ -91,5 +97,5 @@ python -m computations.coverage --max-period 15
 
 It takes about ten minutes: the game at widths 6, 10 and 14 for each block, and the block lists of the trap modules
 from [computations/lock_chain.py](../../computations/lock_chain.py), with the traps that fail the test of reach
-(`UNREACHED`, from `python -m computations.lock_chain --reach 20`, about three hours), and of the LockBlocks modules
+(`UNREACHED`, from `python -m computations.lock_chain --reach 20`, about four hours), and of the LockBlocks modules
 from their Lean sources.

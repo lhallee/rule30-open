@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-81 Lean modules with 350 headline theorems, 30 findings (proved on paper,
+82 Lean modules with 356 headline theorems, 30 findings (proved on paper,
 computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 68 | 17 | 9 |
+| [Columns](#columns) | 69 | 17 | 9 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -142,11 +142,12 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [One word in a column beside the center forces the period-four lock, for each of the three words](Rule30Open/Columns/LockWord.md) | [`Columns.LockWord`](Rule30Open/Columns/LockWord.lean) | `lockWord_column`, `family_contra`, `lock_0001`, `lock_0011`, `lock_0111`, `center_lock_0001`, `center_lock_0011`, `center_lock_0111`, `center_not_0001_of_word`, `center_not_0011_of_word`, `center_not_0111_of_word` | 1 | not in the kit |
 | [Runs of nine 1s rule out a periodic column](Rule30Open/Columns/LongRuns.md) | [`Columns.LongRuns`](Rule30Open/Columns/LongRuns.lean) | `wall_check`, `long_runs_column`, `center_long_runs` | 1 | independent proof of a kit result |
 | [An eventual period of the center column needs T + P of at least 65,518](Rule30Open/Columns/LongWindow.md) | [`Columns.LongWindow`](Rule30Open/Columns/LongWindow.lean) | `center_eq_big`, `factor_new`, `transient_add_period_ge_65518` | 1 | extends a kit result |
-| [Seven checked traps of periods 13 to 15 that some finitely supported right half never enters](Rule30Open/Columns/MissedTraps.md) | [`Columns.MissedTraps`](Rule30Open/Columns/MissedTraps.lean) | `not_absorption`, `missedTraps_check`, `missedTraps_not_absorption` | 1 | not in the kit |
+| [Seven checked traps of periods 13 to 15 that some finitely supported right half never enters](Rule30Open/Columns/MissedTraps.md) | [`Columns.MissedTraps`](Rule30Open/Columns/MissedTraps.lean) | `not_absorption`, `not_absorption_wide`, `missedTraps_check`, `missedTraps_not_absorption` | 1 | not in the kit |
 | [Traps for 34 more blocks of periods 10 to 12, the closed sets that driven right halves settle into](Rule30Open/Columns/NaturalTraps.md) | [`Columns.NaturalTraps`](Rule30Open/Columns/NaturalTraps.lean) | `naturalTraps_check`, `naturalTraps_blocks`, `natural_absorption_excludes` | 1 | not in the kit |
 | [A trap of 61,857 states for the block 00010001011 of period 11, checked in parts](Rule30Open/Columns/NaturalTrapsLarge.md) | [`Columns.NaturalTrapsLarge`](Rule30Open/Columns/NaturalTrapsLarge.lean) | `allRange_cover`, `nat00010001011_check`, `not_eventually_00010001011_of_trap` | 1 | not in the kit |
 | [Traps for 70 blocks of periods 13 and 14, the closed sets that driven right halves settle into](Rule30Open/Columns/NaturalTrapsLong.md) | [`Columns.NaturalTrapsLong`](Rule30Open/Columns/NaturalTrapsLong.lean) | `naturalTrapsLong_check`, `naturalTrapsLong_blocks`, `naturalLong_absorption_excludes` | 1 | not in the kit |
 | [The natural traps of 12 more blocks of periods 13 and 14, of 3,295 to 18,132 states, checked in parts](Rule30Open/Columns/NaturalTrapsLongLarge.md) | [`Columns.NaturalTrapsLongLarge`](Rule30Open/Columns/NaturalTrapsLongLarge.lean) | `naturalTrapsLongLarge_check`, `naturalTrapsLongLarge_blocks`, `naturalLongLarge_absorption_excludes` | 1 | not in the kit |
+| [Natural traps for 60 blocks of periods 10 to 14 whose wall traps fail the test of reach](Rule30Open/Columns/NaturalTrapsWalls.md) | [`Columns.NaturalTrapsWalls`](Rule30Open/Columns/NaturalTrapsWalls.lean) | `naturalTrapsWalls_check`, `naturalTrapsWalls_blocks`, `naturalWalls_absorption_excludes`, `natw00101101111_excludes`, `natw00101101111_0_not_absorption` | 1 | not in the kit |
 | [Traps for 22 of the 56 blocks of period 9, from two walls of period nine that driven right halves enter](Rule30Open/Columns/NineTraps.md) | [`Columns.NineTraps`](Rule30Open/Columns/NineTraps.lean) | `nineTraps_check`, `nineTraps_blocks`, `nine_absorption_excludes`, `trap001010011_check`, `not_eventually_001010011_of_absorption` | 1 | not in the kit |
 | [Right halves white on their first 91,129 to 201,172 cells enter the walls of period 9](Rule30Open/Columns/NineWhite.md) | [`Columns.NineWhite`](Rule30Open/Columns/NineWhite.lean) | `highRightW_of_entry`, `white_first_wall`, `white_first_wall_eight`, `white_second_wall`, `white_second_wall_zero` | 1 | not in the kit |
 | [The period-four certificates are traps, and entry into one excludes its word](Rule30Open/Columns/PeriodFourCertificate.md) | [`Columns.PeriodFourCertificate`](Rule30Open/Columns/PeriodFourCertificate.lean) | `cert0001_check`, `cert0011_check`, `cert0111_check`, `not_eventually_0001_of_certificate`, `not_eventually_0011_of_certificate`, `not_eventually_0111_of_certificate` | 1 | not in the kit |
@@ -195,7 +196,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
 | [Jen's theorem on farther columns, or on periods longer than the block's, does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
-| [Entry into 240 of the 1,459 traps of the trap modules is false, so their reductions were empty](negative-results/columns/missed-traps.md) | refuted | 1 |
+| [Entry into 247 of the 1,509 traps of the trap modules is false, so their reductions were empty](negative-results/columns/missed-traps.md) | refuted | 1 |
 | [Driven by 011, the right half does not settle next to the center](negative-results/columns/period-three-011.md) | no signal | 1 |
 | [No row of up to 24 cells has a column that repeats from time 0](negative-results/columns/periodic-from-start.md) | no signal | 1 |
 | [Periodic orbits on rings of up to 25 cells explain the finite game's failure only for the alternating block](negative-results/columns/ring-orbits.md) | no signal | 1 |

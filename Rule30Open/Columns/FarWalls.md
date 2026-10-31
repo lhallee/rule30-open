@@ -49,11 +49,11 @@ columns means the $d$ columns beside the center settle into the background, whic
 With them 113 of the 335 blocks of period 12 have a trap in Lean, and 86 a trap that passes the test of reach below
 ([the coverage](../../findings/columns/coverage.md)).
 
-**The test of reach.** Cut to their first 20 cells, 2 of the 12 traps here, of 57 and 58 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). No trap of any module passes for their two blocks, so the
-reduction is empty. The other 10 traps pass the test, which entry needs but does not imply.
+**The test of reach.** In the game of 20 cells, 2 of the 12 traps here, of 57 and 58 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For both of their blocks no trap of any module
+passes, so the reduction is empty. The other 10 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

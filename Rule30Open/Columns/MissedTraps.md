@@ -4,7 +4,7 @@ category: columns
 problems: [1]
 status: proved
 lean: Rule30Open.Columns.MissedTraps
-headline: [not_absorption, missedTraps_check, missedTraps_not_absorption]
+headline: [not_absorption, not_absorption_wide, missedTraps_check, missedTraps_not_absorption]
 kit: new
 kit_modules: [Rule30EtherThree, Rule30Ether]
 evidence: [computations/lock_chain.py]
@@ -18,9 +18,10 @@ some node of the finite game cannot reach the trap. The nodes that cannot form a
 cell beyond the window does, and a right half that starts there stays there. Checking every trap of at most 16 cells in
 the trap modules this way (`trap_reach`) finds seven, of 228, that some node cannot reach at their own width. This
 module checks each of the seven as a trap and refutes entry into it, so their reductions held only because their
-hypothesis was false. The trap modules no longer list them. Cut to their first 20 cells, 233 wider traps that the
-modules still hold fail the same test ([what failed](../../negative-results/columns/missed-traps.md)), and
-`not_absorption` applies to each of them as well, given a closed set apart from it.
+hypothesis was false. The trap modules no longer list them. In the game of 20 cells, 240 traps that the modules still
+hold fail the same test ([what failed](../../negative-results/columns/missed-traps.md)), and `not_absorption`, or
+`not_absorption_wide` for a closed set wider than the trap, applies to each of them as well, given a closed set apart
+from it.
 
 | block | trap from | states | nodes of the 16-cell game that can reach it | cut width | closed set |
 |---|---|---|---|---|---|
@@ -39,7 +40,9 @@ modules still hold fail the same test ([what failed](../../negative-results/colu
    the next label. Nothing is asked of the first cell, so a closed set need not be locked. `S.apart C` says that no
    state of `C`, cut to its first `S.K` cells, is a state of `S` whose label reads the same phase of the block.
 2. **The refutation** (`not_absorption`). Let $C$ be a trap and $S$ a closed set for the same block, with
-   $S.K \le C.K$, $S$ apart from $C$, and at least one state. Then $\lnot\,$`C.Absorption`.
+   $S.K \le C.K$, $S$ apart from $C$, and at least one state. Then $\lnot\,$`C.Absorption`. The same holds for a
+   closed set at least as wide as the trap (`not_absorption_wide`), apart from it in the sense of `WTrap.apartWide`: no
+   state of $S$, cut to its first $C.K$ cells, is a state of $C$ whose label reads the same phase.
 3. **The traps** (`missedTraps`, `missedTraps_check`, `missedTraps_blocks`). Seven labelled traps `WTrap` of 16 cells,
    with labels modulo the period, each passing the check of [WordTraps](WordTraps.md): the natural traps of
    $0001101101011$, $0010010010111$, $0010101111111$ (period 13) and $00001101111001$ (period 14), and the census
@@ -59,7 +62,9 @@ $S$ with the next label. So at every time the first $w$ cells are a state of $S$
 Now suppose entry: at some time $t_1$ the first $C.K$ cells are a state $i$ of $C$ whose label reads the phase of
 $t_1$. Cut to $w$ cells, that state is the window of the state of $S$ at $t_1$, since both describe cells $1, \dots, w$
 at $t_1$, and the two labels read the same phase. This is a pair that `apart` excludes, so entry fails for $x$ and
-$\varphi$. `not_absorption` is this argument; the kernel checks closure and separation for each of the seven sets.
+$\varphi$. `not_absorption` is this argument; the kernel checks closure and separation for each of the seven sets. When
+$S$ is the wider, the state of $S$ at $t_1$, cut to $C.K$ cells, is the state of $C$, a pair that `apartWide` excludes
+(`not_absorption_wide`).
 
 Each set comes from the game (`miss_tables` in [computations/lock_chain.py](../../computations/lock_chain.py)). Cut the
 trap's states to their first $w$ cells, for $w = 1, 2, \dots$, and take the least $w$ at which some node of the game of
@@ -79,9 +84,12 @@ of the two: entry into one of two traps passes the test that entry into either a
 width: from the white window no locked node of 16 cells can be reached at all (`locks.lock_info`), so no trap of 16
 cells with labels modulo the period can be entered by the white right half.
 
-The test is necessary, not sufficient: the traps that pass it still need entry proved. Cut to 20 cells it refutes 233
-more traps of the modules, all carried ones, while every natural trap passes
-([what failed](../../negative-results/columns/missed-traps.md)).
+The test is necessary, not sufficient: the traps that pass it still need entry proved. In the game of 20 cells it
+refutes 240 more traps of the modules, most of them carried ones, but also two walls and two natural traps of 16 cells
+that pass in the game of their own width ([what failed](../../negative-results/columns/missed-traps.md)). Where the
+sampled halves of a block split between two natural traps apart from each other, each trap is a closed set apart from
+the other, and `not_absorption` and `not_absorption_wide` refute entry into each alone
+([NaturalTrapsWalls](NaturalTrapsWalls.md)).
 
 ## Relation to the kit
 
@@ -94,7 +102,8 @@ searched, 23 and 24 cells ([reach of the kit's conjectures](../../findings/colum
 
 ## Lean
 
-`Rule30Open.Columns.MissedTraps`: `WTrap.closedOK`, `WTrap.closedCheck`, `WTrap.apart`, `not_absorption`; the traps
+`Rule30Open.Columns.MissedTraps`: `WTrap.closedOK`, `WTrap.closedCheck`, `WTrap.apart`, `not_absorption`,
+`WTrap.apartWide`, `not_absorption_wide`; the traps
 `nat<block>` and `cen<block>` with `_check`, the closed sets `miss<block>` with `_closed` and `_apart`, and
 `<trap>_not_absorption`; the list `missedTraps` with `missedTraps_check`, `missedTraps_blocks` and
 `missedTraps_not_absorption`. The tables come from `python -m computations.lock_chain --lean-missed`. The kernel checks

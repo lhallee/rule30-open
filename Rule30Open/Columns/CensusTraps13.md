@@ -61,12 +61,12 @@ the latest at step 17,918; some pairs enter 37 more, carried up to 31 columns; a
 of 16 cells, which [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) checks. Entry for every finite right half stays
 open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, 25 of the 124 traps here, of 19 to 105 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). For 22 of their blocks no trap of any module passes, so the
-reduction is empty; the other 3 keep a natural trap that passes. The other 99 traps pass the test, which entry needs but
-does not imply.
+**The test of reach.** In the game of 20 cells, 25 of the 124 traps here, of 19 to 105 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For 22 of their blocks no trap of any module
+passes, so the reduction is empty; the other 3 keep a natural trap of [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md)
+that passes. The other 99 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

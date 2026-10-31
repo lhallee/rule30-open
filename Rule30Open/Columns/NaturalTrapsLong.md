@@ -50,9 +50,13 @@ open, as for the kit's traps. The blocks whose traps have more than 3,000 states
 are left out here and checked in parts: 22 in [CensusTrapsLarge](CensusTrapsLarge.md), where the trap is a component of
 the census of locked windows, and 12 in [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md).
 
-**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
-every node of the finite game of 20 cells can reach the trap's states so cut ([what
-failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+**The test of reach.** In the game of 16 cells every node can reach each of the 70 traps, but in the game of 20 cells,
+where the cells after the trap's 16 follow the rule instead of taking any value, two of them fail the test of
+[MissedTraps](MissedTraps.md), those of $0001111110011$ and $0010011010111$, with 98.02% and 99.92% of the nodes able to
+reach: a right half whose first 20 cells start among the others never enters, and entry into the trap is false ([what
+failed](../../negative-results/columns/missed-traps.md)). The trap of $0001111110011$ fails already in the game of 17
+cells. For both blocks no trap of any module passes, so the reduction is empty. The other 68 traps pass the test, which
+entry needs but does not imply.
 
 ## Relation to the kit
 

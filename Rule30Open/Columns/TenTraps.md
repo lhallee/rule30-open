@@ -68,11 +68,13 @@ column 1 from locking. In Lean, [TenGap](TenGap.md) checks the entries of the 2,
 the light cone: no finite configuration whose cells 9 to 3,058 are white, or 1 to 90, has a center column that repeats
 $0000010001$. Entry for every finite right half stays open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, 11 of the 25 traps here, of 26 to 46 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). For 11 of their blocks no trap of any module passes, so the
-reduction is empty. The other 14 traps pass the test, which entry needs but does not imply.
+**The test of reach.** In the game of 20 cells, 12 of the 25 traps here, of 19 to 46 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For 3 of their blocks no trap of any module
+passes, so the reduction is empty; the other 9 are reduced instead by natural traps of
+[NaturalTrapsWalls](NaturalTrapsWalls.md) that pass, one of them to entry into one of two. The other 13 traps pass the
+test, which entry needs but does not imply.
 
 ## Relation to the kit
 

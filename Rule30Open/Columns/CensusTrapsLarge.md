@@ -48,9 +48,10 @@ reduction.
 
 Each trap reduces its block to entry. Entry for every finite right half stays open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
-every node of the finite game of 20 cells can reach the trap's states so cut ([what
-failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
+**The test of reach.** In the game of 20 cells, where the cells after the trap's 16 follow the rule instead of taking
+any value, every trap here passes the test of [MissedTraps](MissedTraps.md): every node can reach a window whose first
+16 cells form a state of the trap ([what failed](../../negative-results/columns/missed-traps.md)). Entry needs this but
+is not implied by it.
 
 ## Relation to the kit
 

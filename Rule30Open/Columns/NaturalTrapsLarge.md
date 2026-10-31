@@ -51,8 +51,8 @@ phases, enters it within 12,584 steps, a median of 2,386 (`extra_entry`). Entry 
 as for the kit's traps. The two remedies apply to any trap: a larger one, as natural scans at longer periods may find,
 needs only more parts.
 
-**The test of reach.** Cut to their first 20 cells, every trap here passes the test of [MissedTraps](MissedTraps.md):
-every node of the finite game of 20 cells can reach the trap's states so cut ([what
+**The test of reach.** In the game of 20 cells every trap here passes the test of [MissedTraps](MissedTraps.md): every
+node can reach a window whose first cells form a state of the trap, cut to 20 cells when the trap is wider ([what
 failed](../../negative-results/columns/missed-traps.md)). Entry needs this but is not implied by it.
 
 ## Relation to the kit

@@ -19,6 +19,8 @@ is checked as a trap and its entry refuted.
 * `not_absorption`: a closed set for the block of a trap, no wider than it and apart from it, refutes entry into it.
   The right half whose first cells are the set's state `0`, white beyond, driven from the phase of that state's label,
   keeps its first cells in the set, whatever the cells beyond them do.
+* `WTrap.apartWide`, `not_absorption_wide`: the same for a closed set at least as wide as the trap, apart from it when
+  no state of the set, cut to the trap's width, is a state of the trap whose label reads the same phase.
 * `nat<block>`, `cen<block>`, with `_check`: the seven traps. `miss<block>`, with `_closed` and `_apart`: for each, the
   least strongly connected set that no move leaves among the nodes of the game that cannot reach the trap cut to the
   least width at which such nodes exist, of 7 to 13 cells and 128 to 2,446 states.
@@ -55,6 +57,12 @@ def closedCheck : Bool :=
 def apart (D : WTrap) : Bool :=
   Rule30EtherThree.allBelowT (fun i => Rule30EtherThree.allBelowT (fun j =>
     !(D.st i % 2 ^ C.K == C.st j && D.lab i % D.b.length == C.lab j % C.b.length)) C.n) D.n
+
+/-- No state of `C`, cut to the first `D.K` cells, is a state of the trap `D` whose label reads the same phase: the
+separation of `apart` for a closed set `C` at least as wide as the trap. -/
+def apartWide (D : WTrap) : Bool :=
+  Rule30EtherThree.allBelowT (fun i => Rule30EtherThree.allBelowT (fun j =>
+    !(C.st j % 2 ^ D.K == D.st i && D.lab i % D.b.length == C.lab j % C.b.length)) C.n) D.n
 
 end WTrap
 
@@ -128,6 +136,80 @@ theorem not_absorption (C S : WTrap) (hS : S.closedCheck = true) (hb : S.b = C.b
     · rw [Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le (Nat.mod_lt _ (Nat.two_pow_pos _))
           (Nat.pow_le_pow_right (by decide) (by omega))),
         Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le (hlt j) (Nat.pow_le_pow_right (by decide) (by omega)))]
+  have hphase : C.lab i % C.b.length = S.lab j % S.b.length := by
+    rw [hlab, Nat.mod_mod_of_dvd _ hdvd, hb, ← hph, Nat.add_comm t1 (S.lab 0)]
+  have h := Rule30EtherThree.allBelowT_spec (Rule30EtherThree.allBelowT_spec hap i hi) j hj
+  simp [hcut, hphase] at h
+
+/-- **A closed set at least as wide as a trap, apart from it, refutes entry into it**: `not_absorption` for a closed
+set `S` of at least `C.K` cells, with no state of `S`, cut to `C.K` cells, a state of `C` (`apartWide`). The same right
+half keeps its first `S.K` cells in `S`, so its first `C.K` cells are never a state of `C`. -/
+theorem not_absorption_wide (C S : WTrap) (hS : S.closedCheck = true) (hb : S.b = C.b) (hK : C.K ≤ S.K)
+    (hap : S.apartWide C = true) (h0 : 0 < S.n) : ¬ C.Absorption := by
+  intro hA
+  unfold WTrap.closedCheck at hS
+  rw [Bool.and_eq_true, decide_eq_true_eq] at hS
+  obtain ⟨hm, hall⟩ := hS
+  have hdvd : S.b.length ∣ S.m := Nat.dvd_of_mod_eq_zero hm
+  have hok : ∀ j, j < S.n → S.lab j < S.m ∧ S.edgeOK j false = true ∧ S.edgeOK j true = true := by
+    intro j hj
+    have h := Rule30EtherThree.allBelowT_spec hall j hj
+    unfold WTrap.closedOK at h
+    simp only [Bool.and_eq_true, decide_eq_true_eq] at h
+    exact ⟨h.1.1, h.1.2, h.2⟩
+  have hedge : ∀ j, j < S.n → ∀ z : Bool, S.nxt j z < S.n ∧
+      S.st (S.nxt j z) = GameMask.move S.K (col S.b (S.lab j)) z (S.st j) ∧
+      S.lab (S.nxt j z) = (S.lab j + 1) % S.m := by
+    intro j hj z
+    have h : S.edgeOK j z = true := by
+      cases z
+      · exact (hok j hj).2.1
+      · exact (hok j hj).2.2
+    unfold WTrap.edgeOK at h
+    simp only [Bool.and_eq_true, decide_eq_true_eq, beq_iff_eq] at h
+    exact ⟨h.1.1, h.1.2, h.2⟩
+  have hlt : ∀ j, S.st j < 2 ^ S.K := fun j => Nat.mod_lt _ (Nat.two_pow_pos _)
+  -- The right half: state `0` of `S`, white beyond.
+  let x : Nat → Bool := fun q => decide (1 ≤ q) && (S.st 0).testBit (q - 1)
+  have hfin : ∀ q, S.K < q → x q = false := by
+    intro q hq
+    show (decide (1 ≤ q) && (S.st 0).testBit (q - 1)) = false
+    rw [Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le (hlt 0) (Nat.pow_le_pow_right (by decide) (by omega))),
+      Bool.and_false]
+  obtain ⟨t1, i, hi, hph, hr⟩ := hA x S.K hfin (S.lab 0)
+  let c : Nat → Bool := fun t => C.b.getD ((t + S.lab 0) % C.b.length) false
+  -- Its first `S.K` cells stay in `S`.
+  have inv : ∀ s, ∃ j, j < S.n ∧ Rule30EtherThree.EncF (Rule30Ether.drv c x) S.K s 0 (S.st j) ∧
+      S.lab j = (S.lab 0 + s) % S.m := by
+    intro s
+    induction s with
+    | zero =>
+      refine ⟨0, h0, ⟨hlt 0, fun k hk => ?_⟩, by rw [Nat.add_zero, Nat.mod_eq_of_lt (hok 0 h0).1]⟩
+      rw [Rule30Ether.drv_init c x (0 + 1 + k) (by omega)]
+      show _ = (decide (1 ≤ 0 + 1 + k) && (S.st 0).testBit (0 + 1 + k - 1))
+      rw [decide_eq_true (by omega), Bool.true_and, show 0 + 1 + k - 1 = k by omega]
+    | succ s ih =>
+      obtain ⟨j, hj, henc, hlab⟩ := ih
+      obtain ⟨hn, hst, hl⟩ := hedge j hj (Rule30Ether.drv c x s (0 + 1 + S.K))
+      refine ⟨_, hn, ?_, ?_⟩
+      · have hcol : col S.b (S.lab j) = Rule30Ether.drv c x s 0 := by
+          rw [Rule30Ether.drv_col0]
+          show col S.b (S.lab j) = C.b.getD ((s + S.lab 0) % C.b.length) false
+          unfold col
+          rw [bit_eq_getD, hlab, Nat.mod_mod_of_dvd _ hdvd, hb, Nat.add_comm (S.lab 0) s]
+        rw [hst, GameMask.move_eq, hcol]
+        exact Rule30EtherThree.encF_step (Rule30Ether.drv_isR30 c x) henc
+      · rw [hl, hlab, Nat.mod_add_mod, Nat.add_assoc]
+  obtain ⟨j, hj, henc, hlab⟩ := inv t1
+  -- That state of `S`, cut to `C.K` cells, is the state of the trap, with a label of the same phase.
+  have hcut : S.st j % 2 ^ C.K = C.st i := by
+    apply Nat.eq_of_testBit_eq
+    intro k
+    by_cases hk : k < C.K
+    · rw [Nat.testBit_mod_two_pow, decide_eq_true hk, Bool.true_and, henc.2 k (by omega), hr.2 k hk]
+    · rw [Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le (Nat.mod_lt _ (Nat.two_pow_pos _))
+          (Nat.pow_le_pow_right (by decide) (by omega))),
+        Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le hr.1 (Nat.pow_le_pow_right (by decide) (by omega)))]
   have hphase : C.lab i % C.b.length = S.lab j % S.b.length := by
     rw [hlab, Nat.mod_mod_of_dvd _ hdvd, hb, ← hph, Nat.add_comm t1 (S.lab 0)]
   have h := Rule30EtherThree.allBelowT_spec (Rule30EtherThree.allBelowT_spec hap i hi) j hj

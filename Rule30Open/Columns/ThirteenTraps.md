@@ -49,11 +49,13 @@ The walls of 5,088 and 13,904 states reach 37 more blocks within 40 columns, fro
 repeat, but their carried traps would take about 4 MB of tables, and they are left out. Entry for every finite right
 half stays open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, 21 of the 53 traps here, of 17 to 69 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). For 21 of their blocks no trap of any module passes, so the
-reduction is empty. The other 32 traps pass the test, which entry needs but does not imply.
+**The test of reach.** In the game of 20 cells, 22 of the 53 traps here, of 16 to 69 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For 14 of their blocks no trap of any module
+passes, so the reduction is empty; the other 8 are reduced instead by natural traps of
+[NaturalTrapsWalls](NaturalTrapsWalls.md) that pass. The other 31 traps pass the test, which entry needs but does not
+imply.
 
 ## Relation to the kit
 

@@ -54,11 +54,11 @@ halves has been run at this period; at periods 13 and 14 small halves enter the 
 those carried far ([CensusTraps13](CensusTraps13.md), [CensusTraps14](CensusTraps14.md)). Entry for every finite right
 half stays open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, 55 of the 569 traps here, of 18 to 115 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). For 55 of their blocks no trap of any module passes, so the
-reduction is empty. The other 514 traps pass the test, which entry needs but does not imply.
+**The test of reach.** In the game of 20 cells, 56 of the 569 traps here, of 16 to 115 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For 56 of their blocks no trap of any module
+passes, so the reduction is empty. The other 513 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

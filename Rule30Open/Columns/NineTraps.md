@@ -87,11 +87,11 @@ cells, from 91,129 to 201,172. So entry for every finite half has partial suppor
 001](../../findings/columns/t001-census.md)). The other 34 blocks of period 9 have no trap found. Entry for every finite
 right half stays open, as for the kit's traps.
 
-**The test of reach.** Cut to their first 20 cells, 7 of the 22 traps here, of 53 to 64 cells, fail the test of
-[MissedTraps](MissedTraps.md): some node of the finite game of 20 cells cannot reach the trap's states so cut, so a
-right half whose first 20 cells start there never enters, and entry into the trap is false ([what
-failed](../../negative-results/columns/missed-traps.md)). For 7 of their blocks no trap of any module passes, so the
-reduction is empty. The other 15 traps pass the test, which entry needs but does not imply.
+**The test of reach.** In the game of 20 cells, 7 of the 22 traps here, of 53 to 64 cells, fail the test of
+[MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
+cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
+false ([what failed](../../negative-results/columns/missed-traps.md)). For 7 of their blocks no trap of any module
+passes, so the reduction is empty. The other 15 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 
