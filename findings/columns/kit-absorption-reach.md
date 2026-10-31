@@ -16,9 +16,9 @@ the cell beyond does, and a right half that starts there never enters. That test
 periods 13 to 15 ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)). Neither of the kit's conjectures fails it at
 any width that can be searched:
 
-- **The family**, for $0001$, $0011$ and $0111$ with the kit's alignments: at every width $w$ from 1 to 25, every node
-  of the game of $w$ cells, with the phase modulo 4, can reach a window that is the first $w$ cells of a member. At 25
-  cells those windows are 84,392, 351,593 and 450,000 nodes of the 134,217,728.
+- **The family**, for $0001$, $0011$ and $0111$ with the kit's alignments: at every width $w$ from 1 to 26, every node
+  of the game of $w$ cells, with the phase modulo 4, can reach a window that is the first $w$ cells of a member. At 26
+  cells those windows are 168,769, 703,143 and 899,978 nodes of the 268,435,456.
 - **`t001`**, for $001$, with the phase modulo 3 as `AbsorptionT` compares it: at every width from 1 to 26, every node
   of the game can reach the states of `t001` cut to $w$ cells, at 26 cells all 201,326,592. Columns 1 to 38 of `t001`
   are functions of the label modulo 21, so up to 38 cells the cut trap is 21 windows, one for each label, the columns
@@ -40,7 +40,7 @@ source, cut to $w$ cells, each with its label modulo 3.
 
 A test at one width covers every smaller one. If some node of the game of $w$ cells cannot reach the cut set, the
 windows of $w' > w$ cells that begin with such a node form a set that no move leaves either, and it contains no window
-of $w'$ cells that is the start of a member. So the results are: every node of the game of 25 cells reaches the family,
+of $w'$ cells that is the start of a member. So the results are: every node of the game of 26 cells reaches the family,
 and every node of the game of 26 cells reaches `t001`. `test_kit_reach` checks that `game.moves` gives the moves of
 `game.game_graph`, that `family_cut` holds every window that `family_depth`, on whole rows, puts in the family with a
 wall that ends inside it, and the tests at 14 cells; `test_predecessors` checks `locks.predecessors` against
@@ -49,7 +49,7 @@ wall that ends inside it, and the tests at 14 cells; `test_predecessors` checks 
 ## What it means
 
 A counterexample to either conjecture of the simplest kind, a right half whose first few cells start in a set of
-windows that no move leaves and that misses every member, has to be wider than 25 cells for the family and 26 for
+windows that no move leaves and that misses every member, has to be wider than 26 cells for the family and for
 `t001`. For the seven traps of [MissedTraps](../../Rule30Open/Columns/MissedTraps.md) such sets have 7 to 13 cells.
 The kit's own single certificates `S0001`, `S0011` and `S0111` are refuted differently, by halves that stay in deeper
 members of the family forever (`Rule30Ether.never_enters_S0001` and the two after it), which this test does not see
@@ -59,11 +59,11 @@ whether the true cells beyond the window ever steer a half in is the open questi
 ## Reproduce
 
 ```bash
-python -m computations.absorption reach --width 25
+python -m computations.absorption reach --width 26
 ```
 
 ```bash
 python -m computations.lock_chain --t001-reach 26
 ```
 
-About twenty minutes and eleven minutes, most of it at the widest game, where the search holds a byte for each node.
+About forty-five minutes and eleven, most of it at the widest game, where the search holds a byte for each node.

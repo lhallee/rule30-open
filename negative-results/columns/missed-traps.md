@@ -118,7 +118,7 @@ never brings in, and each half apart is one that the true rule supplies. The tes
 stricter at every larger width: traps that pass at their own width fail at 20 cells, so wider games would likely refute
 more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
 `S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
-ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 25 and 26 cells.
+ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 26 cells.
 Of the refutations here 119 are checked in Lean: the seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17
 cells ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), and the ten single traps of five pairs of
 NaturalTrapsWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a

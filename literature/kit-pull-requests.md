@@ -8,7 +8,7 @@ modules, and #50 and #58 after them, at commit
 [7beff71](https://github.com/WolframInstitute/Rule30PrizeKit/commit/7beff71ceb40e67010fd0713b1a9aecdded09ef2), which
 brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, #51, #53, #54, #56 and #58, each marked
 *merged* below. This repository is not yet pinned there, so here they are results of the kit's main branch that the pin
-does not include, and the 17 open on October 31, #61, #62 and #63 among them, are claims. Each pull request adds Lean
+does not include, and the 21 open on October 31, #61 to #67 among them, are claims. Each pull request adds Lean
 modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
 request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
@@ -25,6 +25,18 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   `t001` for the word $001$ cannot have temporal period 21 in every column, and that the adjacent-pair values at any two
   columns of the trap differ at arbitrarily late times. *Here:* exclusion through `t001` needs only entry
   ([EmptyRight](../Rule30Open/Columns/EmptyRight.md), `emptyRight_001`); this concerns the trap's interior.
+
+- **#65, `Rule30Ether.Lock` and `Rule30EtherWallWitness`.** Claims a hypothesis weaker than `Absorption`, `Lock w`:
+  every finitely supported right half driven by $w$ has column 1 eventually periodic at the white times, or some
+  column eventually periodic. For the kit's alignments `Absorption` implies it (`lock_of_absorption`), and it still
+  excludes $w$ for every transient (`lock_excludes`), so the locks of $0001$, $0011$ and $0111$ would exclude least
+  period four (`least_period_four_of_lock`). It also glues the ether, of spatial period 7, as a left half to a finite
+  right half so that the center repeats $w$ from time 0, for the three words and for the alternating one
+  (`period_four_left_periodic_right_finite`, `alt_left_periodic_right_finite`), so a proof has to use the finiteness
+  of the left half. `Lock` is stated open for the three words. *Here:* entry into any trap of the trap modules, or
+  into one of a set of them ([TrapPairs](../Rule30Open/Columns/TrapPairs.md)), implies the block's lock, so `Lock` is
+  the weakest hypothesis of the kind the trap modules reduce blocks to; a refuted trap does not refute it, since the
+  closed set that refutes a trap can be a lock itself ([what failed](../negative-results/columns/missed-traps.md)).
 
 ## Period two
 
@@ -49,6 +61,22 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   resets is stated as open, and the pull request says that no prize problem is proved. *Here:* it extends #47 and #52
   from periodic futures to any future with recurrent resets; the open step is the same left row as in [the white right
   half](../findings/period-two/white-right-half.md).
+- **#64, `Rule30GateTrap`.** A closed set of 829 windows of 16 cells for the gate of the right half driven by the
+  alternating column, under the double step, inside which the black cells of column 1 come 3 or 5 double steps apart;
+  the white half enters it at time 293. Claims that a new statement `Q01Gap`, implied by the kit's `Q01`
+  (`Q01Gap_of_Q01`), gives `CQ01Empty` (`CQ01Empty_of_Q01Gap`). `Q01Gap` is stated open, and 96% of a sample of random
+  finite right halves enter the set, which is not proved. *Here:* the white right half's gate is the object of
+  [WhiteRightHalf](../Rule30Open/PeriodTwo/WhiteRightHalf.md).
+- **#66, `Q01_iff_integer`.** Restates `Q01` as: every natural number reaches an even number under some iterate of
+  $G = F \circ F$, with $F(Y) = (Y \gg 1) \oplus (Y \lor (Y \ll 1))$. *Here:* this is the map $H$ of [the held
+  column](../Rule30Open/PeriodTwo/HeldColumn.md), where period two needs some $U > 0$ with $H^{2s+1}(U)$ odd for every
+  $s$, and no integer below $2^{52}$ has that property ([the left half alone](../findings/period-two/left-half-alone.md)).
+- **#67, `Rule30ZeroBoundaryPeriodLanes`.** States `QP P` for every $P$: no start of the zero-driven left half with a
+  leftmost black cell keeps column $-1$ black at every $P$th step. Claims that it excludes $(0^{P-1}1)^\infty$ for
+  every transient (`not_eventuallyWord_oneBlack_of_QP`), that `QP 2` is the kit's `Q01` and `QP 3` its `Q001`, that
+  `QP 4` gives the kit's `C3` for $0001$, and a bit-sliced checker for bounded starts (`qP_of_chunks`); `QP P` is
+  stated open for every $P \ge 2$. *Here:* [LeftLatch](../Rule30Open/Columns/LeftLatch.md) states one condition of
+  the same kind for every block of every period.
 - **#53, `Rule30ResetFreeThree` and four more modules.** *Merged.* Claims that every nonzero finite row of the kit's
   zero-boundary evolution, beside a column held white, contains a word $0\,1^{3m+1}\,0$ in one of its first three rows,
   with two rows not enough, and that a tail avoiding these words for five rows is eventually of period five. *Here:* no
@@ -157,6 +185,13 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
 
 ## Runs of the center column
 
+- **#66, `Rule30BlackRuns`, self-shielded.** Claims sharper forms of the kit's Theorems B and D on the black runs of an
+  eventual period: a black run of $9j$ leaves $(01)^j$ in columns 1 to $2j$, which moves right without reading the
+  cells beyond and keeps column 1 fixed by the center for $4j$ steps, so a black run of $r$ in a period of $P$ needs
+  $9 \lceil (P - r)/4 \rceil \le r$ (`no_black_run_quarter`), and a word $1^r u$ needs $r \ge 9$ when
+  $1 \le |u| \le 4$ and $r \ge 18$ when $|u| \le 8$. *Here:* [WallSegments](../Rule30Open/Columns/WallSegments.md)
+  and [WideWall](../Rule30Open/Columns/WideWall.md) use runs of nine 1s the same way, through the cells beside the
+  column.
 - **#46, `Rule30BlackRunErosion`, `Rule30WhiteSpacing` and five more modules.** *Merged.* Claims that a black run of
   length $L$ starting at time $a \ge 16$ satisfies $5L + 18\,\ell(a) \le 3a + 51$ and a white run starting at $a \ge
   256$ satisfies $L + 6\,\ell(a) \le a + 17$, with $\ell(a) = \lfloor \log_2 \log_2 a \rfloor$; the slope $3/5$ is

@@ -25,7 +25,7 @@ that `Rule30Open.Columns.EmptyRight` checks in the kernel.
     python -m computations.absorption starts --steps 12000   # the 31 starts of the locking finding
     python -m computations.absorption census --cells 14 --words 0101   # the alternating center: few halves enter
     python -m computations.absorption shield --count 300 --steps 3000   # the ether on columns 1 to 120, random beyond
-    python -m computations.absorption reach --width 25   # every node of the game can reach the family, about 20 min
+    python -m computations.absorption reach --width 26   # every node of the game can reach the family, about 45 min
 """
 
 from __future__ import annotations

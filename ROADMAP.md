@@ -120,7 +120,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   word of a few hundred values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one
   sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings every window into the family, so a center that
   repeats the word keeps that column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). No set of
-  windows of up to 25 cells that no move leaves misses the family, nor one of up to 26 cells the kit's `t001` for $001$
+  windows of up to 26 cells that no move leaves misses the family, nor one of up to 26 cells the kit's `t001` for $001$
   ([reach of the kit's conjectures](findings/columns/kit-absorption-reach.md)): the test that refutes entry into seven
   traps of periods 13 to 15 ([MissedTraps](Rule30Open/Columns/MissedTraps.md)) finds nothing against either. Open:
   attraction for halves with at least three black cells among the first $G$ columns, one of them among columns 1 to 30,
