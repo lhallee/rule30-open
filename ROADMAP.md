@@ -23,7 +23,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
-| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part) |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
@@ -189,6 +189,14 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   bounding it is the mirror of the kit's `Absorption` for the ether
   ([ether fronts](negative-results/period-two/ether-front-windows.md)); the forced bits are dense polynomials of
   full degree, which rules out a sparse certificate ([forced bits](negative-results/period-two/forced-bits-dense.md)).
+  The right half comes down to three closed sets: every right half of up to 20 cells, in both phases, enters within
+  4,190 steps the gap trap of the kit's `Rule30GateTrap` (on its main branch, after the pinned commit), on which the
+  black cells of column 1 come 3 or 5 white steps apart and the kit's open `Q01Gap` would exclude it, or the kit's
+  ether-and-wall family, or a lock of period seven, 195 windows of 32 columns on which column 1 repeats $0101000$
+  ([the census](findings/period-two/gate-census.md)). The last two exclude period two outright, and the lock does so in
+  Lean for every half that enters it, whatever lies beyond column 32 ([SevenLock](Rule30Open/PeriodTwo/SevenLock.md)),
+  so `Q01Gap` alone would exclude every configuration whose right half has at most 20 cells when its center starts to
+  alternate.
   The structure of this shift and the aperiodic itinerary of a positive integer in it are in Lean
   ([ShiftModel](Rule30Open/PeriodTwo/ShiftModel.md)). Condrey's proof for a constant center does not extend: only the
   uniqueness of the left half carries over, the forced left half is not a finite-state function of the right half, and
@@ -371,6 +379,9 @@ In order of the assessment above.
    current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull
    requests ([kit-pull-requests.md](literature/kit-pull-requests.md)) until each is merged or closed.
 5. **Period two, Problems 2 and 3: the open statements at their sharpest.**
+   - *Period two, the right half.* Every finite right half entering the gap trap, the kit's ether family or the lock of
+     period seven ([the census](findings/period-two/gate-census.md)) would leave the left statement `Q01Gap` alone; the
+     census reaches 20 cells, and wider locks, or a test of reach for the three sets together, are next.
    - *Period two.* (R) on ether tails is what the computations leave; it needs every defect on the ether to have a
      bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5, 8, 10 and 12 cells at the top
      cannot certify that, with or without $K$ ([ether fronts](negative-results/period-two/ether-front-windows.md),

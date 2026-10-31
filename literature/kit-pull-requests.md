@@ -68,8 +68,11 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   alternating column, under the double step, inside which the black cells of column 1 come 3 or 5 double steps apart;
   the white half enters it at time 293. Claims that a new statement `Q01Gap`, implied by the kit's `Q01`
   (`Q01Gap_of_Q01`), gives `CQ01Empty` (`CQ01Empty_of_Q01Gap`). `Q01Gap` is stated open, and 96% of a sample of random
-  finite right halves enter the set, which is not proved. *Here:* the white right half's gate is the object of
-  [WhiteRightHalf](../Rule30Open/PeriodTwo/WhiteRightHalf.md).
+  finite right halves enter the set, which is not proved. Merged (e5e1728), after the commit pinned here. *Here:* the
+  white right half's gate is the object of [WhiteRightHalf](../Rule30Open/PeriodTwo/WhiteRightHalf.md); every right half
+  of up to 20 cells enters the gap trap (computed as the greatest such set, which holds the 829 windows), the kit's
+  ether family or a lock of period seven ([the census](../findings/period-two/gate-census.md),
+  [SevenLock](../Rule30Open/PeriodTwo/SevenLock.md)).
 - **#66, `Q01_iff_integer`.** Restates `Q01` as: every natural number reaches an even number under some iterate of
   $G = F \circ F$, with $F(Y) = (Y \gg 1) \oplus (Y \lor (Y \ll 1))$. *Here:* this is the map $H$ of [the held
   column](../Rule30Open/PeriodTwo/HeldColumn.md), where period two needs some $U > 0$ with $H^{2s+1}(U)$ odd for every
