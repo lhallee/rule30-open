@@ -2613,6 +2613,70 @@ def test_coin_entries() -> None:
         assert (first >= 0).all() and abs(first.mean() - exact) < 0.05 * exact
 
 
+def test_apart_closed() -> None:
+    """`lock_chain.apart_closed` for the two traps of 001 and for the natural trap and the wall trap of `00001111111`,
+    against the largest closed set computed from the rule cell by cell instead of the successor tables; and the right
+    half of a state of `trap001fifteen`, stepped under Rule 30 itself, stays in it and out of `t001` for 3,000 steps."""
+    from computations import lock_chain
+
+    def step(window: int, center: int, beyond: int, width: int) -> int:
+        row = [center] + [(window >> i) & 1 for i in range(width)] + [beyond]
+        return sum((row[i - 1] ^ (row[i] | row[i + 1])) << (i - 1) for i in range(1, width + 1))
+
+    def closed_apart(a: dict, b: dict) -> set:
+        period, k = len(b["word"]), min(a["cells"], b["cells"])
+        cut = {(label % period, w & ((1 << k) - 1)) for label, w in a["states"]}
+        alive = {(label, w) for label, w in b["states"] if (label % period, w & ((1 << k) - 1)) not in cut}
+        while True:
+            kept = {(label, w) for label, w in alive
+                    if all(((label + 1) % b["modulus"], step(w, int(b["word"][label % period]), z, b["cells"])) in alive
+                           for z in (0, 1))}
+            if kept == alive:
+                return alive
+            alive = kept
+
+    entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
+    t001, fifteen = lock_chain.kit_t001(), entries[("WordTraps", "trap001fifteen")]()
+    natural, wall = entries[("NaturalTrapsWalls", "natw00001111111")](), entries[("ElevenTraps", "el0_19")]()
+    for a, b in ((t001, fifteen), (fifteen, t001), (natural, wall), (wall, natural)):
+        got = {s for s, keep in zip(b["states"], lock_chain.apart_closed(a, b)) if keep}
+        assert got == closed_apart(a, b)
+    assert lock_chain.apart_closed(t001, fifteen).all() and lock_chain.apart_closed(fifteen, t001).all()
+    assert lock_chain.apart_closed(natural, wall).all() and lock_chain.apart_closed(wall, natural).any()
+    inside = set(fifteen["states"])
+    kit = {(w, label % 3) for label, w in t001["states"]}
+    label, row = fifteen["states"][0]
+    for t in range(3000):
+        assert ((label + t) % 15, row & ((1 << 52) - 1)) in inside
+        assert (row & ((1 << 47) - 1), (label + t) % 3) not in kit
+        row = ((row << 1) | int("001"[(label + t) % 3])) ^ (row | (row >> 1))
+
+
+def test_traps001() -> None:
+    """The four traps for 001 of `Rule30Open.Columns.Traps001`: each a lock by `is_lock`, with the phase modulo its
+    labels' modulus, each apart as a whole from each other (`apart_closed`), and the right half of state 0 of each,
+    stepped under Rule 30 itself for 2,000 steps, inside it and never in a state of another, cut to that one's width,
+    at a label of the same phase; `lean_traps001` gives the declarations of the module."""
+    from computations import lock_chain
+
+    traps = lock_chain.traps001_tables()
+    assert [(name, t["cells"], t["modulus"], len(t["states"])) for name, t in traps] == [
+        ("t001W", 47, 21, 815), ("trap001fifteen", 52, 15, 153), ("trap001b", 144, 21, 879),
+        ("trap001c", 304, 21, 258)]
+    for name, t in traps:
+        assert t["word"] == "001" and lock_chain.is_lock("001" * (t["modulus"] // 3), t["states"], t["cells"])
+        assert all(lock_chain.apart_closed(c, t).all() for other, c in traps if other != name)
+        inside = set(t["states"])
+        cuts = [(c["cells"], {(label % 3, w) for label, w in c["states"]}) for other, c in traps if other != name]
+        label, row = t["states"][0]
+        for step in range(2000):
+            assert ((label + step) % t["modulus"], row & ((1 << t["cells"]) - 1)) in inside
+            assert all(((label + step) % 3, row & ((1 << k) - 1)) not in cut for k, cut in cuts)
+            row = ((row << 1) | int("001"[(label + step) % 3])) ^ (row | (row >> 1))
+    lean = (ROOT / "Rule30Open" / "Columns" / "Traps001.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_traps001() in lean
+
+
 def test_back_tables() -> None:
     """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
     order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the

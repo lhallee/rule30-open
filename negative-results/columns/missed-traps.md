@@ -60,8 +60,9 @@ trap that passes, the natural scans give traps that pass for 60 of them, checked
 period 15 wider than 16 cells give traps that pass to 5 blocks of CensusTraps15 left so, checked in
 [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md). The blocks left with no trap that passes number 168: one of
 period 2, $01$, and 7, 3, 14, 14, 38, 40 and 51 of periods 9 to 15. For $001$ the kit's `t001` still passes, at every
-width up to 26 ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)), but the second
-trap for $001$ of WordTraps, 52 cells wide, is a closed set apart from it, so entry into `t001` alone is false
+width up to 26 ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)), but the second trap
+for $001$ of WordTraps, 52 cells wide, is a closed set apart from it, so entry into `t001` alone is false, and two more,
+of 144 and 304 cells, make entry into one of any three of the four false
 ([Traps001](../../Rule30Open/Columns/Traps001.md)).
 
 The second test refutes 28 more traps, and one pair, that pass the first (`APART`): 2 of ElevenTraps, 1 of

@@ -15,7 +15,7 @@ enters
 a strip of 47 columns that repeats with period 21, on which column 1 at the center's white times is a function of the
 label. Masked Jen forbids that column to be periodic in a finite configuration, so $001$ is excluded once every finite
 half enters (`AbsorptionT t001`; as stated it is false, since a half that starts in a second trap stays out
-([Traps001](../../Rule30Open/Columns/Traps001.md)), and entry into one of the two is open), and
+([Traps001](../../Rule30Open/Columns/Traps001.md)), and so is entry into one of any three of four such traps), and
 [HighThree](../../Rule30Open/Columns/HighThree.md) proves entry for every half white on its first 1,317 cells. For $011$
 the kit has only a statement about the left half, `C3w`, and no trap. Does the right half driven by $011$ settle into
 anything that would give $011$ the same route?

@@ -80,9 +80,10 @@ because the trap is wide.
 No small half stays out, but entry for every finite half, the kit's `AbsorptionT t001`, is false: a half of 52 cells
 that starts inside the second trap for $001$ of [WordTraps](../../Rule30Open/Columns/WordTraps.md), with labels modulo
 15, stays in it and never enters `t001` ([Traps001](../../Rule30Open/Columns/Traps001.md), in Lean). No half of the
-census does that, and the route for $001$ becomes entry into one of the two traps, which is open. The census also shows
-why the route is hard in Lean: entry under $001$ is two orders of magnitude slower and far more spread out than under
-the words of period four, where every half of 20 cells enters within 1,959 steps ([the absorption
+census does that. Two more traps for $001$, of 144 and 304 cells, make entry into one of any three of the four false
+too, and the route for $001$ becomes entry into one of the four, or into some trap of $001$, which is open. The census
+also shows why the route is hard in Lean: entry under $001$ is two orders of magnitude slower and far more spread out
+than under the words of period four, where every half of 20 cells enters within 1,959 steps ([the absorption
 census](absorption-census.md)), and a kernel check of one slow half costs a computation of the size of
 [LongWindow](../../Rule30Open/Columns/LongWindow.md). The light cone of HighThree turns each entry at step $t$ into
 entry for every half that agrees on cells $1, \dots, t + 47$, which for the slow halves asks for a white stretch of more

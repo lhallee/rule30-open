@@ -95,9 +95,10 @@ there never enters, and entry into the trap is false ([what failed](../../negati
 [RefutedTraps](RefutedTraps.md) checks the refutation for `trap01` in Lean. The block $001$ keeps the kit's `t001`,
 which passes the test at every width up to 26 ([reach of the kit's
 conjectures](../../findings/columns/kit-absorption-reach.md)), but `t001` and `trap001fifteen` are closed sets apart
-from each other, so entry into either alone is false, and $001$ comes down to entry into one of the two
-([Traps001](Traps001.md)); for $01$ no trap here passes, so its reduction is empty.
-The other five traps pass the test, which entry needs but does not imply.
+from each other, so entry into either alone is false, and with two more traps entry into one of any three of the four is
+false too, so $001$ comes down to entry into one of the four, or into some trap of $001$ ([Traps001](Traps001.md)); for
+$01$ no trap here passes, so its reduction is empty. The other five traps pass the test, which entry needs but does not
+imply.
 
 ## Relation to the kit
 

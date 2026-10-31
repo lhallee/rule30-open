@@ -24,7 +24,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{52}$ fails |
-| 1 | Least period three | open | $001$ through entry into one of two traps, since entry into the kit's alone is false (Lean), $011$ through the left half |
+| 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 277 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game or from where sampled halves settle |
@@ -163,9 +163,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   first 1,317 cells enters `t001`, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half
   of up to ten cells enters, but a median of about 16,000 steps in and the latest at step 186,490, at the rate a fair
   coin beyond the trap's 47 cells predicts ([the census](findings/columns/t001-census.md)), so a census in Lean is out
-  of reach. Entry into `t001` alone, the kit's `AbsorptionT t001`, is false, and $001$ comes down to entry into one of
-  two traps ([Traps001](Rule30Open/Columns/Traps001.md)). `t001` is the lock of a block of period 21 with twelve 1s in a
-  row carried 38 columns left, and a second trap of the same kind, 52 cells with labels modulo 15, is in Lean ([lock
+  of reach. Entry into `t001` alone, the kit's `AbsorptionT t001`, is false, and so is entry into one of any three of
+  four traps for $001$ pairwise apart, so $001$ comes down to entry into one of the four, or into some trap of $001$
+  ([Traps001](Rule30Open/Columns/Traps001.md)). `t001` is the lock of a block of period 21 with twelve 1s in a row
+  carried 38 columns left, and a second trap of the same kind, 52 cells with labels modulo 15, is in Lean ([lock
   chains](findings/columns/lock-chains.md), [WordTraps](Rule30Open/Columns/WordTraps.md)). For $011$ the right half
   never settles next to the center, so no trap of that kind appears ([the word
   011](negative-results/columns/period-three-011.md)), no chain found holds it, and the route is the kit's left-only

@@ -55,6 +55,9 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
+    python -m computations.lock_chain --apart-pairs   # traps of one block that refute each other
+    python -m computations.lock_chain --scan001   # long-run seeds whose chains reach 001, about 11 min
+    python -m computations.lock_chain --lean-traps001   # four traps for 001 pairwise apart, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
     python -m computations.lock_chain --lean-fifteen   # the traps of FifteenWalls, two walls of period 15 carried
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
@@ -1377,6 +1380,131 @@ def fwd_tables(traps: tuple[dict, ...], width: int) -> dict:
     return relabeled_tables(word, width, {(int(k) >> width, int(k) & low) for k in away[label == best].tolist()})
 
 
+def kit_t001() -> dict:
+    """The kit's trap `t001` for 001 as tables (`relabeled_tables`): 815 states of 47 cells, labels modulo 21."""
+    return relabeled_tables("001" * 7, 47, {(label, strip) for strip, label in t001_states()})
+
+
+# Two more traps for 001, chain locks of seeds of period 21 with a long run of 1s that `short_scan` finds (`rest` 15 at
+# width 9 and `rest` 12 at width 5, periods 15 to 33): name in `Rule30Open.Columns.Traps001`, seed, the seed's lock
+# width, the distance and the seed's lock values. With the kit's `t001` and `trap001fifteen` they are four traps
+# pairwise apart (`apart_closed`); the scans' other traps for 001 lie inside the lift of the one of 304 cells.
+TRAPS_001 = [("trap001b", "010111111111111110111", 9, 135, "000000000000000000000"),
+             ("trap001c", "000000101110111111111", 5, 299, "011111000000000000000")]
+
+
+def traps001_tables() -> list[tuple[str, dict]]:
+    """The four traps for 001 pairwise apart, by their names in `Rule30Open.Columns.Traps001`: the kit's `t001`
+    (`t001W`), `trap001fifteen` and the two of `TRAPS_001`."""
+    out = [("t001W", kit_t001()), ("trap001fifteen", tables("trap001fifteen"))]
+    return out + [(name, trap_tables(seed, width, distance, values)) for name, seed, width, distance, values in TRAPS_001]
+
+
+def scan001(depth: int = 3000) -> list[tuple[str, str, int, int]]:
+    """The seeds with a long run of 1s, of periods 15 to 33, whose chain has a column 001 within `depth` (`short_scan`
+    with `rest` 12 at width 5 for periods 15 to 33 and `rest` 15 at width 9 for periods 15 to 24): (seed, lock values,
+    lock width, distance), each seed and its values once, with the narrower lock when both widths find it."""
+    found = {}
+    for periods, width, rest in (([15, 18, 21, 24, 27, 30, 33], 5, 12), ([15, 18, 21, 24], 9, 15)):
+        for seed, entries in short_scan(periods, width, depth, rest=rest).items():
+            for values, hits in entries:
+                if 3 in hits and hits[3][1] == "001":
+                    found.setdefault((seed, values), (width, hits[3][0]))
+    return [(seed, values, width, distance) for (seed, values), (width, distance) in found.items()]
+
+
+def lean_winset(name: str, word: str, width: int, rows: list[list[int]], piece: int = 0) -> str:
+    """A set of windows of `Rule30Open.Columns.ReachRefuted` (`WinSet`): each label's windows in increasing order."""
+    block = ", ".join("true" if c == "1" else "false" for c in word)
+    sizes = ", ".join(str(len(row)) for row in rows)
+    packed = ", ".join(lean_number(sum(w << (width * i) for i, w in enumerate(row)), piece) for row in rows)
+    return (f"def {name} : WinSet :=\n  {{ b := [{block}], K := {width},\n    sizes := [{sizes}],\n"
+            f"    rows := [{packed}] }}\n")
+
+
+def lean_traps001(piece: int = 1 << 16) -> str:
+    """The declarations of `Rule30Open.Columns.Traps001` for the two traps of `TRAPS_001`: each with its kernel check;
+    for each of the four traps for 001 and each other, the other's states cut to the narrower width (`cut_rows`), that
+    they hold its states and that the first trap avoids them; and, for each of the four, the refutation of entry into
+    one of the other three (`not_absorption_some_fwd`)."""
+    traps = traps001_tables()
+    out = []
+    for name, t in traps[2:]:
+        out.append(lean_entry(t, name, piece) + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n")
+    for name, t in traps:
+        if name not in ("t001W", "trap001fifteen"):
+            out.append(f"theorem {name}_closed : {name}.closedCheck = true := by decide +kernel\n")
+    for s_name, s in traps:
+        others = [(c_name, c) for c_name, c in traps if c_name != s_name]
+        for c_name, c in others:
+            width = min(s["cells"], c["cells"])
+            cert = f"cert_{s_name}_{c_name}"
+            out.append(f"/-- The states of `{c_name}` cut to {width} cells, by label. -/\n"
+                       + lean_winset(cert, c["word"], width, cut_rows((c,), width), piece)
+                       + f"\ntheorem {cert}_holds : {cert}.holds {c_name} = true := by\n  decide +kernel\n\n"
+                       f"theorem {cert}_avoids : {cert}.avoids {s_name} = true := by\n  decide +kernel\n")
+        names = ", ".join(c_name for c_name, _ in others)
+        cases = "\n".join(f"  · exact ⟨cert_{s_name}_{c_name}, rfl, rfl, by decide, by decide,\n"
+                          f"      cert_{s_name}_{c_name}_holds, cert_{s_name}_{c_name}_avoids⟩" for c_name, _ in others)
+        listed = ", ".join(f"`{c_name}`" for c_name, _ in others)
+        out.append(f"/-- **Entry into one of {listed} is false**: the right half of state 0 of\n"
+                   f"`{s_name}` never enters any. -/\n"
+                   f"theorem {s_name}_not_absorption_some : ¬ WTrap.AbsorptionSome [{names}] := by\n"
+                   f"  refine not_absorption_some_fwd _ {s_name} {s_name}_closed (by decide) ?_\n"
+                   f"  simp only [List.mem_cons, List.not_mem_nil, or_false]\n"
+                   f"  rintro C (rfl | rfl | rfl)\n{cases}\n")
+    return "\n".join(out)
+
+
+def block_traps() -> dict[str, list[tuple[str, str, dict]]]:
+    """Every trap checked in Lean, by block, as (module, name of its declaration, tables): the traps of
+    `module_entries`, the two of each block of `PAIRS` (`Rule30Open.Columns.TrapPairs`) and of `WALL_SPLIT`
+    (`Rule30Open.Columns.NaturalTrapsWalls`), the natural traps of `TRAP_SETS` (`Rule30Open.Columns.TrapSets`), and the
+    kit's `t001` (`t001W` of `Rule30Open.Columns.Traps001`)."""
+    found: dict[str, list[tuple[str, str, dict]]] = {}
+    entries = [(module, name, build()) for module, name, build in module_entries()]
+    entries += [("TrapPairs", f"pair{block}_{k}", t) for block in PAIRS for k, t in enumerate(pair_tables(block))]
+    entries += [("NaturalTrapsWalls", f"natw{word}_{k}", t) for word, _ in WALL_SPLIT
+                for k, t in enumerate(split_tables(word))]
+    entries += [entry for block, *_ in TRAP_SETS for entry in set_tables(block) if entry[0] == "TrapSets"]
+    entries.append(("Traps001", "t001W", kit_t001()))
+    for module, name, t in tqdm(entries, desc="traps", file=sys.stderr, leave=False):
+        found.setdefault(t["word"], []).append((module, name, t))
+    return found
+
+
+def apart_closed(a: dict, b: dict) -> np.ndarray:
+    """The states of the trap `b` in its largest subset that every move, under both values of the cell beyond, keeps
+    inside, among the states whose windows, cut to the narrower of the two traps, are not those of a state of the trap
+    `a` whose label reads the same phase: a mask over b's states. When it is not empty, a right half started in one of
+    them stays in the subset and never enters `a`."""
+    period, k = len(b["word"]), min(a["cells"], b["cells"])
+    mask = (1 << k) - 1
+    cut = {(label % period, window & mask) for label, window in a["states"]}
+    alive = np.array([(label % period, window & mask) not in cut for label, window in b["states"]])  # (n,)
+    moves = np.array(b["successors"]).reshape(-1, 2)  # (n, 2)
+    while True:
+        kept = alive & alive[moves[:, 0]] & alive[moves[:, 1]]  # (n,)
+        if (kept == alive).all():
+            return alive  # (n,)
+        alive = kept
+
+
+def apart_pairs() -> list[tuple[str, tuple[str, str], tuple[str, str], int]]:
+    """For every two traps of one block among `block_traps`, a closed set of states of one apart from the other
+    (`apart_closed`), which refutes entry into the other: (block, (module, name) refuted, (module, name) of the trap
+    that holds the set, its number of states) for each such ordered pair."""
+    out = []
+    for block, traps in sorted(block_traps().items()):
+        for ma, na, a in traps:
+            for mb, nb, b in traps:
+                if (ma, na) != (mb, nb):
+                    size = int(apart_closed(a, b).sum())
+                    if size:
+                        out.append((block, (ma, na), (mb, nb), size))
+    return out
+
+
 def lean_fwd(name: str, trap: str, s: dict, rows: list[list[int]], piece: int = 0) -> str:
     """The declarations of `Rule30Open.Columns.ReachRefuted` for a closed set `s` apart from the trap `trap` of another
     module (`fwd_tables`): the set with its check that it is closed, the trap's states cut to its width (`cut_rows`),
@@ -2667,6 +2795,11 @@ def main() -> None:
                         help="the traps of FifteenWalls, two walls of period 15 wider than 16 cells carried leftward")
     parser.add_argument("--lean-trap-sets", action="store_true",
                         help="the natural traps of TrapSets, for blocks whose every trap a sampled half stays apart from")
+    parser.add_argument("--lean-traps001", action="store_true",
+                        help="the two more traps for 001 of Rule30Open.Columns.Traps001, and the refutations")
+    parser.add_argument("--scan001", action="store_true", help="the long-run seeds whose chains reach 001")
+    parser.add_argument("--apart-pairs", action="store_true",
+                        help="every two traps of one block in Lean, one holding a closed set apart from the other")
     parser.add_argument("--lean-back", action="store_true",
                         help="the sets of Rule30Open.Columns.ReachRefuted, from the windows that can reach each trap")
     parser.add_argument("--lean-refuted", action="store_true",
@@ -2940,6 +3073,21 @@ def main() -> None:
         print(lean_trap_sets())
     if args.lean_back:
         print(lean_back_module())
+        return
+    if args.lean_traps001:
+        print(lean_traps001())
+        return
+    if args.scan001:
+        for seed, values, width, distance in scan001():
+            t = trap_tables(seed, width, distance, values)
+            print(f"{seed} (lock values {values}, width {width}): 001 at distance {distance}, a trap of {t['cells']} "
+                  f"cells, labels modulo {t['modulus']}, {len(t['states'])} states")
+        return
+    if args.apart_pairs:
+        found = apart_pairs()
+        for block, (ma, na), (mb, nb), size in found:
+            print(f"{block}: {mb}.{nb} holds a closed set of {size} states apart from {ma}.{na}")
+        print(f"{len(found)} ordered pairs, {len({refuted for _, refuted, _, _ in found})} traps refuted")
         return
     if args.lean_refuted:
         print(lean_refuted())
