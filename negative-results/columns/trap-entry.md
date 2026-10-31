@@ -117,11 +117,13 @@ to 18 cells from locking at periods 5, 6 and 7 is not the absence of a trap: wid
 period. The obstruction is dynamical. Driven by these blocks, the right half next to the center almost never settles:
 column 1 repeats at the white times for none of the 301 halves under the words of period 6 and 7, and under $01111$ only
 for a while, and the small halves enter the Lean traps only from next to them or in one late event, so for these blocks
-the reduction to entry has almost no computational support; its hypothesis may well be false. Period 9 shows that this
-is not a matter of the period alone: there two walls exist that about one small half in nine and one in fourteen enter
-within 50,000 steps, with entries still coming at the end, as under $001$. From period 10 on driven halves settle often:
-about a quarter of the blocks of period 10, 11 and 12 have traps that random halves enter, and at period 10 every right
-half of up to eight cells enters the edge of one background within 3,042 steps ([natural
+the reduction to entry has almost no computational support; its hypothesis may well be false. For two of the traps it
+is: `trap001011` fails the test of reach in the game of 22 cells, and wider traps of $01111$, locks of seeds with long
+runs of 1s carried hundreds of cells, are apart from `trap01111` ([what failed](missed-traps.md)). Period 9 shows that
+this is not a matter of the period alone: there two walls exist that about one small half in nine and one in fourteen
+enter within 50,000 steps, with entries still coming at the end, as under $001$. From period 10 on driven halves settle
+often: about a quarter of the blocks of period 10, 11 and 12 have traps that random halves enter, and at period 10 every
+right half of up to eight cells enters the edge of one background within 3,042 steps ([natural
 traps](../../findings/columns/natural-traps.md)). The runs cover only small halves and 50,000 steps: entry later, or by
 larger halves, is not excluded, and `t001` shows that entry can take $10^5$ steps.
 

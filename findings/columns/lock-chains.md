@@ -117,12 +117,18 @@ phase. A bottom component of a block's game is a strongly connected set of locke
    | $000100101$ | 9 | $0^6\,1^9\,0\,1\,1$ | 18 | 162 | 171 | 1,384 |
 
    The first is the kit's family for $01$ (item 4). The others are new: the census of window locks found none for these
-   blocks because it stopped at 16 and 18 cells and counted the phase modulo the period or a small multiple of it.
-   Every seed but $0\,1^7$ has a run of at least nine 1s. The scan found columns of a shorter period of periods 2, 3, 5,
-   6, 7, 8, 9 and 10, none of period 4, so no second wall for the ether of period four, and none holding $011$; the
-   locks for a block of period 9 here count the phase modulo 18, and item 10 gives the wall of period 9 itself.
-   [WordTraps](../../Rule30Open/Columns/WordTraps.md) checks in Lean the traps for $01$, $001$, $01111$, $001011$,
-   $0011101$ and $001011101$.
+   blocks because it stopped at 16 and 18 cells and counted the phase modulo the period or a small multiple of it. Every
+   seed but $0\,1^7$ has a run of at least nine 1s. The scan found columns of a shorter period of periods 2, 3, 5, 6, 7,
+   8, 9 and 10, none of period 4, so no second wall for the ether of period four, and none holding $011$. Seeds with a
+   run of at least nine 1s and at most 12 other cells, of periods 16 to 40 with a locked window of 5 cells, give no
+   column of period 4 either, and 44 of them give the alternating word $01$, at distances 152 to 1,558
+   (`--short 16,20,24,28,32,36,40 --width 5 --rest 12`). With these and the seeds of periods 15 to 24 with at most 15
+   other cells and a locked window of 9 cells, seven seeds, of periods 15 and 21, reach $001$, which has four traps
+   pairwise apart ([Traps001](../../Rule30Open/Columns/Traps001.md), `--scan001`), while the seeds of periods 36 to 48
+   give no column of a shorter period within 3,000 columns, and those of periods 27 to 33 with a locked window of 9
+   cells none of period 3 (`--scan001-wider`); the locks for a block of period 9 here count the phase modulo 18, and
+   item 10 gives the wall of period 9 itself. [WordTraps](../../Rule30Open/Columns/WordTraps.md) checks in Lean the
+   traps for $01$, $001$, $01111$, $001011$, $0011101$ and $001011101$.
 8. **The kit's strip certificates.** The kit's strip-certificate table has 15 words of length 8 to 12 and its two rank
    certificates are for $0^6\,1\,1$ and $0^9\,1\,0\,1$; all 17 are in these chains, at distances 0 to 7: the distances
    0, 1, 2, 3 and 6 of the chains of $0\,1^{P-1}$, the seed $0\,1\,0\,1^{P-3}$, and $0^9\,1\,0\,1$ at distance 7 of the

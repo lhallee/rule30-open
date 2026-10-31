@@ -46,19 +46,22 @@ trusted, and [WordTraps](WordTraps.md)'s `absorption_excludes` gives each reduct
 Within 120 columns the two chains hold 118 and 116 blocks of period 15 with 15 distinct rotations. Of the 103 that no
 module held, or whose every trap was refuted, the carried trap at the block's first distance passes both tests of
 [MissedTraps](MissedTraps.md) for 86 ([what failed](../../negative-results/columns/missed-traps.md)): every node of the
-game of 20 cells can reach it cut to 20 cells, and no half of the block's natural scan is inside a closed set apart
-from it (`block_apart`). The other 17 fail the test of reach. Of the 86, 81 are blocks that no module held and 5 are
-blocks whose traps were all refuted.
+game of 20 cells can reach it cut to 20 cells, and no half of the block's natural scan is inside a closed set apart from
+it (`block_apart`). The other 17 fail the test of reach. Of the 86, 81 are blocks that no module held and 5 are blocks
+whose traps were all refuted. In the game of 22 cells two of the 86 fail, `fw0_110` and `fw1_103`, with 0.17% and
+99.995% of the nodes able to reach them ([what failed](../../negative-results/columns/missed-traps.md)); the nodes that
+cannot reach `fw1_103` hold a lock of 166 windows of 22 cells that only 0.22% of the nodes can reach in turn, and
+neither block keeps a hypothesis that passes.
 
 ## What it covers
 
 Each trap reduces its block to entry. The evidence for entry is thin: for 81 of the 86 blocks no half of the scan, the
 white half and 30 random ones driven for 20,000 steps, locks column 1 at all, so entry rests on the two tests alone, as
-it does for many traps carried far. For the other 5 every half that locks is inside a trap that meets this one. The 86
-blocks count among those reduced to entry into a trap that passes, in [the coverage
-table](../../findings/columns/coverage.md). For 3 of them the census trap of the block, which fails the test of reach,
-is apart from the trap here, so entry into this trap alone is false and the block comes down to entry into one of the
-two ([ApartTraps](ApartTraps.md)). Entry for every finite right half stays open.
+it does for many traps carried far. For the other 5 every half that locks is inside a trap that meets this one. The 84
+blocks whose trap passes in the game of 22 cells as well count among those reduced to entry into a trap that passes, in
+[the coverage table](../../findings/columns/coverage.md). For 3 of them the census trap of the block, which fails the
+test of reach, is apart from the trap here, so entry into this trap alone is false and the block comes down to entry
+into one of the two ([ApartTraps](ApartTraps.md)). Entry for every finite right half stays open.
 
 ## Relation to the kit
 

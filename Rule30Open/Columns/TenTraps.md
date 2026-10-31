@@ -74,7 +74,13 @@ cells when the trap is wider, so a right half whose first 20 cells start there n
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of seven of them in Lean. For 3 of their blocks no trap of any module passes, so the reduction is empty; the
 other 9 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass, one of them to
-entry into one of two. The other 13 traps pass the test, which entry needs but does not imply.
+entry into one of two; for 4 of those the carried trap here is apart from the natural trap, so entry into the natural
+trap alone is false and the block comes down to entry into one of the two ([ApartTraps](ApartTraps.md)). The other 13
+traps pass the test, which entry needs but does not imply. Entry into `ten1`, of $0001001101$, is false all the same: a
+lock carried 578 cells along the chain of a seed with a long run of 1s is a trap of 583 cells apart from it ([what
+failed](../../negative-results/columns/missed-traps.md)). Of the 13 traps that pass at 20 cells, one fails in the game
+of 22 cells, `ten15`, with 0.048% of the nodes able to reach it ([what
+failed](../../negative-results/columns/missed-traps.md)), and its block keeps no trap that passes.
 
 ## Relation to the kit
 

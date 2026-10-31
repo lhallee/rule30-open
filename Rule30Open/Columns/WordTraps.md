@@ -98,7 +98,12 @@ conjectures](../../findings/columns/kit-absorption-reach.md)), but `t001` and `t
 from each other, so entry into either alone is false, and with two more traps entry into one of any three of the four is
 false too, so $001$ comes down to entry into one of the four, or into some trap of $001$ ([Traps001](Traps001.md)); for
 $01$ no trap here passes, so its reduction is empty. The other five traps pass the test, which entry needs but does not
-imply.
+imply. Entry into `trap01111`, the trap for $01111$, is false all the same: the locks of seeds with long runs of 1s,
+carried 160 to 1,131 cells, give ten traps of 165 to 1,136 cells apart from it ([what
+failed](../../negative-results/columns/missed-traps.md)), so $01111$ comes down to entry into some trap of the block
+([Traps001](Traps001.md)). In the game of 22 cells `trap001011`, of 29 cells, fails as well, with 0.11% of the nodes
+able to reach it ([what failed](../../negative-results/columns/missed-traps.md)), so the reduction of $001011$, the only
+block of period 6 with a trap, is empty; the other four pass.
 
 ## Relation to the kit
 

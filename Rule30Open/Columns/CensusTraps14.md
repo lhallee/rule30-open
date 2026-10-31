@@ -59,10 +59,15 @@ finite right half stays open, as for the kit's traps.
 cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of seven of them in Lean. For 27 of their blocks no trap of any module passes, so the reduction is empty; the
-other 3 keep a natural trap of [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) that passes. The other 202 traps pass
-the test, which entry needs but does not imply. For one of the traps that pass, a half of its block's natural scan,
-closing windows of 16 to 64 cells, is inside a closed set apart from the trap, so entry into it is false too, and
-[TrapSets](TrapSets.md) reduces the block to entry into one of several traps.
+other 3 keep a natural trap of [NaturalTrapsLongLarge](NaturalTrapsLongLarge.md) that passes, though for 3 of them the
+census trap here is apart from the natural trap, so those blocks come down to entry into one of the two
+([ApartTraps](ApartTraps.md)). The other 202 traps pass the test, which entry needs but does not imply. For one of the
+traps that pass, a half of its block's natural scan, closing windows of 16 to 64 cells, is inside a closed set apart
+from the trap, so entry into it is false too, and [TrapSets](TrapSets.md) reduces the block to entry into one of several
+traps. Of the 201 traps that pass both tests at 20 cells, five fail in the game of 22 cells, `cen00000110101111`,
+`cen00111010101111`, `cen00111110110111`, `cen00111111011011` and `cen00000110111001`, with 0.0028% to 21% of the nodes
+able to reach them ([what failed](../../negative-results/columns/missed-traps.md)); [ReachRefuted](ReachRefuted.md)
+refutes entry into the first in Lean from the few nodes that can, and the five blocks keep no trap that passes.
 
 ## Relation to the kit
 

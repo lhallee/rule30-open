@@ -1,5 +1,5 @@
 ---
-title: Entry into 325 of the 1,595 traps of the trap modules is false, so their reductions were empty
+title: Entry into 360 of the 1,595 traps of the trap modules is false, so their reductions were empty
 category: columns
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: refuted
 evidence: [computations/lock_chain.py, computations/locks.py, computations/game.py]
 ---
 
-# Entry into 325 of the 1,595 traps of the trap modules is false, so their reductions were empty
+# Entry into 360 of the 1,595 traps of the trap modules is false, so their reductions were empty
 
 **Question.** Each trap module reduces a block to entry, the statement that every finitely supported right half driven
 by the block eventually enters the trap (`WTrap.Absorption` of [WordTraps](../../Rule30Open/Columns/WordTraps.md)). The
@@ -80,6 +80,19 @@ $00101101111$ in NaturalTrapsWalls, and the natural traps of 16 cells of $001001
 $0101011111111$ in [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md). Their three blocks are
 left with no hypothesis that passes, which makes 171.
 
+The run above left out the traps carried along a chain, which fail more often. Of the 1,106 that pass both tests at 20
+cells, 32 fail in the game of 22 cells (`wide_reach_carried`), of 29 to 140 cells: none of the 235 of at most 22 cells,
+and 3.1% to 5.3% of the wider ones, in ranges of width from 23 to 40 cells to 101 to 140. For 26 of them 0.0011% to 0.8%
+of the nodes can reach the trap, and [ReachRefuted](../../Rule30Open/Columns/ReachRefuted.md) refutes entry into the
+eight with the fewest, 544 to 4,449 nodes, from those nodes, in Lean (`not_absorption_back`). For two, 1.5% and 21% can,
+`cen001001011011011` of CensusTraps15 and `cen00000110111001` of CensusTraps14. For four, `el0_33`, `fo0_30`, `fo0_31`
+and `fw1_103`, all but 0.005% to 0.08% can, and the nodes that cannot hold a lock of 130 to 225 windows of 22 cells on
+which column 1 is fixed at the white phases. Every node can reach the locks beside `el0_33`, `fo0_30` and `fo0_31`, and
+each carried trap is apart from its lock as a whole, so [WideWalls](../../Rule30Open/Columns/WideWalls.md) refutes entry
+into each of the two from the other and reduces the three blocks to entry into one of the two, which passes; only 0.22%
+of the nodes can reach the lock beside `fw1_103`. The other 29 blocks are left with no hypothesis that passes, which
+makes 200, $001011$ among them, so no block of period 6 keeps a trap that passes.
+
 **Where it stops, and why.** Five different failures.
 
 - *A carried trap fixes the columns to the wall.* A trap carried $d$ columns from a wall, or from a census component,
@@ -119,9 +132,16 @@ left with no hypothesis that passes, which makes 171.
   Lean). Each of their blocks keeps entry into one of its two traps, which passes the test because one of the two does,
   so the count of blocks left with no hypothesis that passes does not change. The kit's `t001` fails the same way,
   against the second trap for $001$, and with two more traps for $001$ entry into one of any three of four is false
-  ([Traps001](../../Rule30Open/Columns/Traps001.md)).
+  ([Traps001](../../Rule30Open/Columns/Traps001.md)). The chains of seeds with a run of at least nine 1s, of periods 16
+  to 40, give wider traps still, of 119 to 1,513 cells, and three of them refute traps that passed: `trap01111` of
+  WordTraps, the only trap of the only block of period 5 reached, is apart from ten such traps of 165 to 1,136 cells,
+  and of the 20 traps of $01111$ these chains and WordTraps give, 13 are pairwise apart (`--chain-family 01111`); the
+  natural trap of $0000000101$ from twelve of 119 to 1,513 cells; and the wall trap `ten1` of $0001001101$ from one of
+  583 cells (`chain_apart`). So entry into a fixed list of traps can be refuted by a wider trap of the block, and the
+  hypothesis that no such trap refutes is entry into some trap of the block (`WTrap.AbsorptionAny` of
+  [Traps001](../../Rule30Open/Columns/Traps001.md)), which a block with a trap that passes keeps.
 
-**What it means.** For 171 blocks every reduction is a true theorem with a false hypothesis, and [the coverage
+**What it means.** For 200 blocks every reduction is a true theorem with a false hypothesis, and [the coverage
 table](../../findings/columns/coverage.md) now counts a block as reduced only when one of its traps passes the test at
 20 cells. The test is a probabilistic one, that of [the coin beyond the window](../../findings/columns/coin-lock.md): a
 trap passes at $w$ cells exactly when, with a fair coin in column $w + 1$, every window of $w$ cells reaches it with
@@ -132,11 +152,13 @@ stricter at every larger width: traps that pass at their own width fail at 20 ce
 more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
 `S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
 ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 26 cells, and
-`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 168 are checked in Lean: the
+`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 179 are checked in Lean: the
 seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17 cells
 ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), the ten single traps of five pairs of NaturalTrapsWalls, the
-48 of ApartTraps, and `trap001fifteen` in Traps001; `not_absorption` and `not_absorption_wide` of MissedTraps would
-check any of the others, given a closed set apart from the trap (`miss_tables`).
+48 of ApartTraps, `trap001fifteen` in Traps001, and eight of the carried traps that fail at 22 cells in ReachRefuted and
+three in WideWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a
+closed set apart from the trap (`miss_tables`), and `not_absorption_back` of ReachRefuted any whose reaching nodes the
+kernel can hold.
 
 **Reproduce.**
 
@@ -156,6 +178,11 @@ python -m computations.lock_chain --apart-census 3
 python -m computations.lock_chain --wide-reach 2
 ```
 
-The census of every trap in the game of 20 cells, about four hours with one process; the halves of the natural scans
-in traps apart from those of NaturalTrapsWalls, about ten minutes; and from every trap and pair that passes the test of
-reach, about an hour with three processes; and the test in the game of 22 cells, about two and a half hours with two.
+```bash
+python -m computations.lock_chain --wide-reach-carried 3
+```
+
+The census of every trap in the game of 20 cells, about four hours with one process; the halves of the natural scans in
+traps apart from those of NaturalTrapsWalls, about ten minutes; and from every trap and pair that passes the test of
+reach, about an hour with three processes; the test in the game of 22 cells, about two and a half hours with two; and
+the same for the carried traps, about five hours with three.

@@ -92,7 +92,7 @@ right half stays open, as for the kit's traps.
 cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of one of them in Lean. For 7 of their blocks no trap of any module passes, so the reduction is empty. The
-other 15 traps pass the test, which entry needs but does not imply.
+other 15 traps pass the test, which entry needs but does not imply. All 15 pass in the game of 22 cells too.
 
 ## Relation to the kit
 

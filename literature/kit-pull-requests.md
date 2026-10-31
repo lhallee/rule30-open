@@ -8,7 +8,7 @@ modules, and #50 and #58 after them, at commit
 [7beff71](https://github.com/WolframInstitute/Rule30PrizeKit/commit/7beff71ceb40e67010fd0713b1a9aecdded09ef2), which
 brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, #51, #53, #54, #56 and #58, each marked
 *merged* below. This repository is not yet pinned there, so here they are results of the kit's main branch that the pin
-does not include, and the 21 open on October 31, #61 to #67 among them, are claims. Each pull request adds Lean
+does not include, and the 23 open on October 31, #61 to #69 among them, are claims. Each pull request adds Lean
 modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
 request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
@@ -27,16 +27,19 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   ([EmptyRight](../Rule30Open/Columns/EmptyRight.md), `emptyRight_001`); this concerns the trap's interior.
 
 - **#65, `Rule30Ether.Lock` and `Rule30EtherWallWitness`.** Claims a hypothesis weaker than `Absorption`, `Lock w`:
-  every finitely supported right half driven by $w$ has column 1 eventually periodic at the white times, or some
-  column eventually periodic. For the kit's alignments `Absorption` implies it (`lock_of_absorption`), and it still
-  excludes $w$ for every transient (`lock_excludes`), so the locks of $0001$, $0011$ and $0111$ would exclude least
-  period four (`least_period_four_of_lock`). It also glues the ether, of spatial period 7, as a left half to a finite
-  right half so that the center repeats $w$ from time 0, for the three words and for the alternating one
-  (`period_four_left_periodic_right_finite`, `alt_left_periodic_right_finite`), so a proof has to use the finiteness
-  of the left half. `Lock` is stated open for the three words. *Here:* entry into any trap of the trap modules, or
-  into one of a set of them ([TrapPairs](../Rule30Open/Columns/TrapPairs.md)), implies the block's lock, so `Lock` is
-  the weakest hypothesis of the kind the trap modules reduce blocks to; a refuted trap does not refute it, since the
-  closed set that refutes a trap can be a lock itself ([what failed](../negative-results/columns/missed-traps.md)).
+  every finitely supported right half driven by $w$ has column 1 eventually periodic at the white times, or some column
+  eventually periodic. For the kit's alignments `Absorption` implies it (`lock_of_absorption`), and it still excludes
+  $w$ for every transient (`lock_excludes`), so the locks of $0001$, $0011$ and $0111$ would exclude least period four
+  (`least_period_four_of_lock`). It also glues the ether, of spatial period 7, as a left half to a finite right half so
+  that the center repeats $w$ from time 0, for the three words and for the alternating one
+  (`period_four_left_periodic_right_finite`, `alt_left_periodic_right_finite`), so a proof has to use the finiteness of
+  the left half. `Lock` is stated open for the three words. *Here:* entry into any trap of the trap modules, or into one
+  of a set of them ([TrapPairs](../Rule30Open/Columns/TrapPairs.md)), implies the block's lock, so `Lock` is the weakest
+  hypothesis of the kind the trap modules reduce blocks to; a refuted trap does not refute it, since the closed set that
+  refutes a trap can be a lock itself ([what failed](../negative-results/columns/missed-traps.md)). For $001$ that is
+  what happens: the kit's `AbsorptionT t001` is false, refuted by a second trap for $001$, and so is entry into one of
+  any three of four traps for $001$ pairwise apart, while `Lock` for $001$ stands
+  ([Traps001](../Rule30Open/Columns/Traps001.md)).
 
 ## Period two
 
@@ -140,6 +143,15 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   (`prefix_window_bound`), so the first $n$ bits have a period dividing $2^{B(n)}$, and that with affine gates the
   period divides $2^r$ once $n + 1 \le 2^r$ (`affine_prefix_bound`). It extends the kit's half-rate bound
   `Rule30RightPeriods.per_upper_half` from the OR to every gate, and claims no lower bound.
+- **#69, `Rule30EtherGrounding`.** In the frame of the rightmost black cell, claims that the one-in-four ether cannot
+  eventually hold two adjacent columns at fixed distances behind the edge, for every row, depth, spatial and temporal
+  phase and starting time, without a common temporal period (`no_moving_ether_pair`, carried through the edge map
+  `Rule30FrozenRuler.edge_evol`): a property of the pair closed under going back is carried by a checked local step to
+  the edge, whose constant black column contradicts it; `ether_step` checks that the two-sided ether exists. It states
+  alternating tails, rigidity at one edge in general and Problem 1 as open. *Here:* the counterpart at the right edge,
+  for one pattern, of the rigidity of two adjacent columns at the left edge
+  ([AdjacentColumns](../Rule30Open/Columns/AdjacentColumns.md)); the trap modules here need the ether beside the center
+  column, not behind the edge.
 - **#50, `Rule30TemporalProfiles`.** *Merged.* Claims facts on periodic profiles linked by the left-diagonal
   recurrence: a periodic driver has exactly one periodic child, and a chain of them that starts white returns to white
   within $2^{2q}$ links.
@@ -197,3 +209,16 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   256$ satisfies $L + 6\,\ell(a) \le a + 17$, with $\ell(a) = \lfloor \log_2 \log_2 a \rfloor$; the slope $3/5$ is
   credited to the earlier prize submission R30-20261025-0554f7. *Here:* the roadmap's run bounds for Problem 2; a bound
   linear in $a$ gives no positive density.
+
+## The cost of the center cell
+
+- **#68, `Rule30Problem3Bounds`.** Claims, for a deterministic one-tape Turing machine started with its head on cell 0,
+  that a run of $t$ steps reads only cells $0, \dots, t - 1$ of the input (`run_eq_of_init_eq_lt`), so a machine that
+  computes a function within $k$ steps on an input $n \ge 2^{k-1}$ gives the function the same value at every
+  $n + u\,2^k$ (`computes_const_on_dyadic_ray`); with Problem 1, any machine computing the center column takes more than
+  $k$ steps on inputs beyond every bound, for every $k$ (`time_unbounded_of_problem1`), and without it, by a computation
+  of the first 99 rows, at least $k + 1$ steps on every input $n \ge 2^{k-1}$ for $k \le 4$ and $\log_2 n + 2$ steps for
+  $n < 16$ (`log2_succ_succ_le_time_lt_16`). A reviewer's comment proposes the unconditional form for $k \le 13$, not
+  yet in the pull request. *Here:* bounds of the order of the input's length, for one model, against the linear bound
+  Problem 3 asks; [the barrier](../negative-results/complexity/problem-three-barrier.md) says why the gap is the whole
+  problem, and the converse direction, Problem 3 implying Problem 1, is in the kit's equivalent forms.

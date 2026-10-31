@@ -2615,18 +2615,21 @@ def test_coin_entries() -> None:
 
 def test_apart_closed() -> None:
     """`lock_chain.apart_closed` for the two traps of 001 and for the natural trap and the wall trap of `00001111111`,
-    against the largest closed set computed from the rule cell by cell instead of the successor tables; and the right
-    half of a state of `trap001fifteen`, stepped under Rule 30 itself, stays in it and out of `t001` for 3,000 steps."""
+    and for `trap001c` against the list of the first two, against the largest closed set computed from the rule cell by
+    cell instead of the successor tables; and the right half of a state of `trap001fifteen`, stepped under Rule 30
+    itself, stays in it and out of `t001` for 3,000 steps."""
     from computations import lock_chain
 
     def step(window: int, center: int, beyond: int, width: int) -> int:
         row = [center] + [(window >> i) & 1 for i in range(width)] + [beyond]
         return sum((row[i - 1] ^ (row[i] | row[i + 1])) << (i - 1) for i in range(1, width + 1))
 
-    def closed_apart(a: dict, b: dict) -> set:
-        period, k = len(b["word"]), min(a["cells"], b["cells"])
-        cut = {(label % period, w & ((1 << k) - 1)) for label, w in a["states"]}
-        alive = {(label, w) for label, w in b["states"] if (label % period, w & ((1 << k) - 1)) not in cut}
+    def closed_apart(a: dict | list[dict], b: dict) -> set:
+        period, alive = len(b["word"]), set(b["states"])
+        for c in a if isinstance(a, list) else [a]:
+            k = min(c["cells"], b["cells"])
+            cut = {(label % period, w & ((1 << k) - 1)) for label, w in c["states"]}
+            alive = {(label, w) for label, w in alive if (label % period, w & ((1 << k) - 1)) not in cut}
         while True:
             kept = {(label, w) for label, w in alive
                     if all(((label + 1) % b["modulus"], step(w, int(b["word"][label % period]), z, b["cells"])) in alive
@@ -2638,7 +2641,8 @@ def test_apart_closed() -> None:
     entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
     t001, fifteen = lock_chain.kit_t001(), entries[("WordTraps", "trap001fifteen")]()
     natural, wall = entries[("NaturalTrapsWalls", "natw00001111111")](), entries[("ElevenTraps", "el0_19")]()
-    for a, b in ((t001, fifteen), (fifteen, t001), (natural, wall), (wall, natural)):
+    third = dict(lock_chain.traps001_tables())["trap001c"]
+    for a, b in ((t001, fifteen), (fifteen, t001), (natural, wall), (wall, natural), ([t001, fifteen], third)):
         got = {s for s, keep in zip(b["states"], lock_chain.apart_closed(a, b)) if keep}
         assert got == closed_apart(a, b)
     assert lock_chain.apart_closed(t001, fifteen).all() and lock_chain.apart_closed(fifteen, t001).all()
@@ -2693,6 +2697,49 @@ def test_apart_traps() -> None:
     assert all((block, "ApartTraps") in held for block, *_ in lock_chain.APART_TRAPS)
     lean = (ROOT / "Rule30Open" / "Columns" / "ApartTraps.lean").read_text(encoding="utf-8")
     assert lock_chain.lean_apart_traps() in lean
+
+
+def test_chain_trap_01111() -> None:
+    """The lock of 5 cells of the seed `00000001101111111111`, carried 160 cells, is a trap of 165 cells for `01111`,
+    with labels modulo 20, a lock by `is_lock`, apart as a whole from `trap01111` of WordTraps and it from it
+    (`apart_closed`); the right half of its state 0, stepped under Rule 30 itself for 3,000 steps, stays in it and never
+    has its first 107 cells in a state of `trap01111` at a label of the same phase."""
+    from computations import lock_chain
+
+    seed, distance = "00000001101111111111", 160
+    found = lock_chain.short_scan([20], 5, 3000, rest=12)
+    values = next(v for v, hits in found[seed] if hits.get(5) == (distance, "01111"))
+    t, w = lock_chain.trap_tables(seed, 5, distance, values), lock_chain.tables("trap01111")
+    assert (t["word"], t["cells"], t["modulus"], len(t["states"])) == ("01111", 165, 20, 197)
+    assert lock_chain.is_lock("01111" * 4, t["states"], 165)
+    assert lock_chain.apart_closed(w, t).all() and lock_chain.apart_closed(t, w).all()
+    inside, other = set(t["states"]), {(label % 5, window) for label, window in w["states"]}
+    label, row = t["states"][0]
+    for step in range(3000):
+        assert ((label + step) % 20, row & ((1 << 165) - 1)) in inside
+        assert ((label + step) % 5, row & ((1 << 107) - 1)) not in other
+        row = ((row << 1) | int("01111"[(label + step) % 5])) ^ (row | (row >> 1))
+
+
+def test_chain_family_01111() -> None:
+    """`chain_family` for `01111` with `trap01111` of WordTraps: the chains of the long-run seeds of periods 20 and 40,
+    the multiples of 5 among 16 to 40, give 19 more traps of 103 to 1,136 cells, each a lock by `is_lock`, and 13 of
+    the 20 are pairwise apart; two of the family, stepped under Rule 30 itself from state 0 of each, stay out of the
+    other's states for 2,000 steps."""
+    from computations import lock_chain
+
+    traps, family = lock_chain.chain_family("01111", periods=(20, 40), lean=[("trap01111",
+                                                                            lock_chain.tables("trap01111"))])
+    assert len(traps) == 20 and len(family) == 13
+    assert sorted(t["cells"] for name, t in traps if name != "trap01111")[::18] == [103, 1136]
+    assert all(lock_chain.is_lock("01111" * (t["modulus"] // 5), t["states"], t["cells"]) for _, t in traps)
+    (_, a), (_, b) = traps[family[0]], traps[family[1]]
+    for start, other in ((a, b), (b, a)):
+        cut = {(label % 5, w) for label, w in other["states"]}
+        label, row = start["states"][0]
+        for step in range(2000):
+            assert ((label + step) % 5, row & ((1 << other["cells"]) - 1)) not in cut
+            row = ((row << 1) | int("01111"[(label + step) % 5])) ^ (row | (row >> 1))
 
 
 def test_back_tables() -> None:
@@ -2832,9 +2879,10 @@ def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of
     16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
-    rule; the natural trap of 0010011110101 passes in the game of 20 cells and fails in that of 22 (`UNREACHED_WIDE`);
-    and `coverage.refuted_blocks` holds the 171 blocks of periods 2 to 15 with no trap that passes, 01 among them
-    and 001, which keeps the four traps of Traps001, not."""
+    rule; the natural trap of 0010011110101 passes in the game of 20 cells and fails in that of 22 (`UNREACHED_WIDE`),
+    whose 35 entries are each the block of a trap or pair of their module; and `coverage.refuted_blocks` holds the 200
+    blocks of periods 2 to 15 with no trap that passes, 01 and 001011 among them and 001, which keeps the four traps
+    of Traps001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())
@@ -2852,9 +2900,67 @@ def test_unreached() -> None:
     wide = lock_chain.extra_tables("0010011110101")
     assert "0010011110101" in lock_chain.UNREACHED_WIDE["NaturalTrapsWalls"] and lock_chain.WIDE_WIDTH == 22
     assert lock_chain.trap_reach(wide, width=20) == 1 > lock_chain.trap_reach(wide, width=22)
-    assert len(refuted) == 171 and "01" in refuted and "001" not in refuted
-    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 3), (11, 15), (12, 14), (13, 40),
-                                                                (14, 40), (15, 51)]
+    assert sum(len(v) for v in lock_chain.UNREACHED_WIDE.values()) == 35
+    assert all((block, module) in held for module, blocks in lock_chain.UNREACHED_WIDE.items() for block in blocks)
+    assert len(refuted) == 200 and {"01", "001011"} <= refuted and "001" not in refuted
+    assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (6, 1), (9, 7), (10, 4), (11, 17), (12, 17),
+                                                                (13, 45), (14, 46), (15, 62)]
+
+
+def test_reach_wide_carried() -> None:
+    """The trap of `001011` in WordTraps, 29 cells carried along its chain, passes the test of reach at 21 cells and
+    fails at 22, where 28,666 of the 6 * 2^22 nodes can reach it: checked against `locks.back_closure` over
+    `game.moves`, and the nodes that cannot reach form a set that no move leaves, with the moves recomputed cell by cell
+    from the rule on a sample; the least part of them that no move leaves (`fwd_tables`) has 416,425 nodes."""
+    from computations import lock_chain, locks
+
+    t = next(b() for m, n, b in lock_chain.module_entries() if (m, n) == ("WordTraps", "trap001011"))
+    assert (t["word"], t["cells"]) == ("001011", 29)
+    assert lock_chain.trap_reach(t, width=21) == 1.0
+    reach = lock_chain.reach_nodes((t,), 22)  # (6 2^22,)
+    assert int(reach.sum()) == 28666
+    source, target = game.moves("001011", 22)
+    assert (locks.back_closure(lock_chain.trap_nodes((t,), 22), source, target) == reach).all()
+    assert not (~reach[source] & reach[target]).any()
+    rng = np.random.default_rng(2)
+    for node in rng.choice(np.flatnonzero(~reach), size=300, replace=False).tolist():
+        phase, window = divmod(node, 1 << 22)
+        cells = [int("001011"[phase])] + [(window >> i) & 1 for i in range(22)]
+        for free in (0, 1):
+            row = cells + [free]
+            new = sum((row[i - 1] ^ (row[i] | row[i + 1])) << (i - 1) for i in range(1, 23))
+            assert not reach[((phase + 1) % 6 << 22) + new]
+    s = lock_chain.fwd_tables((t,), 22)
+    assert len(s["states"]) == 416425
+    keys = np.array(sorted((label % 6) << 22 | w for label, w in s["states"]), dtype=np.uint64)  # (416425,)
+    assert np.isin(lock_chain.successors("001011", 22, keys), keys).all()
+    assert not reach[keys.astype(np.int64)].any()
+
+
+def test_wide_walls() -> None:
+    """Each wall of `WIDE_WALLS` is a lock by `is_lock` for its block, closed under both values of the cell beyond by the
+    moves of `successors`, and every node of the game of 22 cells can reach it (`trap_reach`); it shares no window of
+    22 cells, at a label of the same phase, with the carried trap it refutes, so no node of the wall can reach that
+    trap; the carried trap is apart from the wall as a whole (`apart_closed`); and `lean_wide_walls` gives the
+    declarations of `Rule30Open.Columns.WideWalls`."""
+    from computations import lock_chain
+
+    entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
+    assert len(lock_chain.WIDE_WALLS) == 3
+    for module, name in lock_chain.WIDE_WALLS:
+        t, wall = entries[(module, name)](), lock_chain.wide_wall(module, name)
+        word, period = wall["word"], len(wall["word"])
+        assert word == t["word"] and wall["cells"] == lock_chain.WIDE_WIDTH == 22
+        nodes = [(label, window) for label, window in wall["states"]]
+        assert lock_chain.is_lock(word * (wall["modulus"] // period), nodes, 22)
+        keys = np.array(sorted((label % period) << 22 | w for label, w in nodes), dtype=np.uint64)  # (states,)
+        assert np.isin(lock_chain.successors(word, 22, keys), keys).all()
+        assert lock_chain.trap_reach(wall, width=22) == 1.0
+        cut = {(label % period, window & ((1 << 22) - 1)) for label, window in t["states"]}
+        assert not cut & {(label % period, window) for label, window in nodes}
+        assert lock_chain.apart_closed(wall, t).all()
+    lean = (ROOT / "Rule30Open" / "Columns" / "WideWalls.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_wide_walls() in lean
 
 
 def test_wall_natural() -> None:

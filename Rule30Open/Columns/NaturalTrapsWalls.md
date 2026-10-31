@@ -100,8 +100,10 @@ failed](../../negative-results/columns/missed-traps.md)); the other 53 traps and
 is necessary for entry, not sufficient. For 40 of the 54 traps it is not enough: the carried wall trap of the same
 block, 27 to 85 cells wide and wider than the games tested, is apart from the natural trap, so a half that starts in the
 wall trap never enters the natural one and entry into the natural trap alone is false; each of those blocks comes down
-to entry into one of its two traps ([ApartTraps](ApartTraps.md)). Entry into one of them for every finite right half
-stays open, as for the kit's traps.
+to entry into one of its two traps ([ApartTraps](ApartTraps.md)). The trap of $0000000101$ is refuted the same way by
+twelve locks of seeds with long runs of 1s, carried 114 to 1,508 cells ([what
+failed](../../negative-results/columns/missed-traps.md)). Entry into one of them for every finite right half stays open,
+as for the kit's traps.
 
 ## Relation to the kit
 

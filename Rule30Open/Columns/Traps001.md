@@ -82,7 +82,10 @@ locked window, carried leftward cell by cell through the columns the rule determ
 nine 1s and at most 12 other cells, of periods 15 to 33, with a locked window of 5 cells, and those with at most 15
 other cells, of periods 15 to 24, with one of 9 cells, the chains reach $001$ from seven seeds: those of the four traps
 and three more, which give traps of 359, 365 and 392 cells with labels modulo 21. None of these three has a part that no
-move leaves apart from `trap001c` (`apart_closed`), so they do not refute entry into one of the four.
+move leaves apart from `trap001c` (`apart_closed`), so they do not refute entry into one of the four. Longer periods
+give none: no seed of periods 36 to 48 with a locked window of 5 cells and at most 12 other cells has a column of a
+shorter period within 3,000 columns, and of the seeds of periods 27 to 33 with one of 9 cells and at most 15 other
+cells, 240 have one and none has $001$ (`--scan001-wider`).
 
 ## What it means
 
@@ -91,7 +94,7 @@ ten cells, from each phase ([the census for 001](../../findings/columns/t001-cen
 the trap predicts, so none of them starts in another trap; the test of reach for `t001` passes in every game up to 26
 cells ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)), games too narrow to hold any
 of the other three. Entry into one of the four traps is open, and a fifth trap apart from all four would refute it in
-turn; the chains of other seeds may hold one. Entry into some trap of $001$, which no further trap can refute, is the
+turn; the chains of the seeds tried hold none. Entry into some trap of $001$, which no further trap can refute, is the
 statement this route can rest on, and the weaker `Lock` that the kit's pull request #65 proposes follows from it ([the
 kit's pull requests](../../literature/kit-pull-requests.md)).
 
@@ -118,10 +121,15 @@ python -m computations.lock_chain --scan001
 ```
 
 ```bash
+python -m computations.lock_chain --scan001-wider
+```
+
+```bash
 python -m computations.lock_chain --lean-traps001
 ```
 
-The scan of seeds whose chains reach $001$ takes about 11 minutes; the tables of `trap001b`, `trap001c` and the
-twelve sets take a second. `test_traps001` checks that the four traps are pairwise apart and closed by the rule on
-whole windows, that a half started in each, stepped under Rule 30 itself, stays in it and out of the other three, and
+The scan of seeds whose chains reach $001$ takes about 11 minutes, and the wider one about an hour, each printing, for
+every chain trap, which of the four traps a closed set of its states is apart from; the tables of `trap001b`, `trap001c`
+and the twelve sets take a second. `test_traps001` checks that the four traps are pairwise apart and closed by the rule
+on whole windows, that a half started in each, stepped under Rule 30 itself, stays in it and out of the other three, and
 that the generated declarations are those of the module.

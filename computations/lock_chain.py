@@ -51,13 +51,19 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-census-large 14   # the traps of CensusTrapsLarge, in parts; 15 too
     python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
     python -m computations.lock_chain --reach 18   # which traps every window of 18 cells can reach, cut to 18 cells
+    python -m computations.lock_chain --wide-reach 2   # the test of reach at 22 cells: natural traps, pairs, sets
+    python -m computations.lock_chain --wide-reach-carried 3   # the same for the traps carried along a chain
     python -m computations.lock_chain --halves-apart   # halves of the natural scans apart from NaturalTrapsWalls' traps
     python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
+    python -m computations.lock_chain --lean-wide-walls   # walls of 22 cells beside traps carried far, in Lean
     python -m computations.lock_chain --apart-pairs   # traps of one block that refute each other
+    python -m computations.lock_chain --chain-apart   # chain locks of long-run seeds apart from traps in Lean
+    python -m computations.lock_chain --chain-family 01111   # a block's traps from those chains, pairwise apart
     python -m computations.lock_chain --lean-apart-traps   # their refutations and pair reductions, in Lean
     python -m computations.lock_chain --scan001   # long-run seeds whose chains reach 001, about 11 min
+    python -m computations.lock_chain --scan001-wider   # periods 36 to 48, and 27 to 33 at width 9
     python -m computations.lock_chain --lean-traps001   # four traps for 001 pairwise apart, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
     python -m computations.lock_chain --lean-fifteen   # the traps of FifteenWalls, two walls of period 15 carried
@@ -289,8 +295,8 @@ def trap_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
 def module_entries() -> list[tuple[str, str, functools.partial]]:
     """Every trap of the trap modules and the seven of `Rule30Open.Columns.MissedTraps`, as (module, the name of its
     declaration in Lean, a function that builds its tables), in the order of `coverage.trap_blocks`; the pairs of
-    `PAIRS` and `WALL_SPLIT` are left to `pair_tables` and `split_tables`. The wall of period 9 at distance 0 is
-    `trap001011111` of `Rule30Open.Columns.WordTraps`."""
+    `PAIRS` and `WALL_SPLIT` are left to `pair_tables` and `split_tables`, and the walls of `WIDE_WALLS`, each one of a
+    pair, to `wide_wall`. The wall of period 9 at distance 0 is `trap001011111` of `Rule30Open.Columns.WordTraps`."""
     found = [("WordTraps", name, functools.partial(tables, name)) for name, *_ in TRAPS]
     found.append(("WordTraps", "trap001011111", functools.partial(tables, "trap001011111")))
     found += [("NineTraps", f"nine{d}" if d else "trap001011111", functools.partial(carried, "trap001011111", d))
@@ -386,6 +392,24 @@ def wide_reach(width: int = 22, workers: int = 1) -> list[tuple[str, str, float]
     jobs.sort(key=lambda job: len(job[2][0]["word"]))
     with multiprocessing.get_context("spawn").Pool(workers) as pool:
         return list(tqdm(pool.imap(reach_job, jobs), total=len(jobs), desc="hypotheses", file=sys.stderr,
+                         mininterval=30))
+
+
+def wide_reach_carried(width: int = 22, workers: int = 1) -> list[tuple[str, str, float]]:
+    """The test of reach in a wider game for the traps that `wide_reach` leaves out, those carried along a chain: every
+    trap of `module_entries` outside the natural and large census modules and `Rule30Open.Columns.MissedTraps` that
+    passes both tests at `REACH_WIDTH` cells, in `workers` processes; those below 1 are the carried traps of
+    `UNREACHED_WIDE`. About five hours in three processes at 22 cells."""
+    skip = {"NaturalTraps", "NaturalTrapsLarge", "NaturalTrapsLong", "NaturalTrapsLongLarge", "NaturalTrapsWalls",
+            "CensusTrapsLarge", "CensusTrapsLarge15", "MissedTraps"}
+    jobs = []
+    for module, name, build in module_entries():
+        if module not in skip:
+            t = build()
+            if t["word"] not in UNREACHED.get(module, ()) and t["word"] not in APART.get(module, ()):
+                jobs.append((module, name, [t], width))
+    with multiprocessing.get_context("spawn").Pool(workers) as pool:
+        return list(tqdm(pool.imap(reach_job, jobs), total=len(jobs), desc="carried traps", file=sys.stderr,
                          mininterval=30))
 
 
@@ -1323,7 +1347,7 @@ def lean_back(name: str, trap: str, s: dict, piece: int = 0, part: int = 512) ->
     rows = ",\n      ".join(lean_number(sum(w << (cells * i) for i, w in enumerate(row)), piece) for row in s["rows"])
     total = sum(len(row) for row in s["rows"])
     l0, w0 = s["miss"]
-    out = [f"/-- The windows of {cells} cells from which the trap `{trap}` can be reached, by label: {total} of the "
+    out = [f"/-- The windows of {cells} cells from which the trap `{trap}` can be reached, by label: {total:,} of the "
            f"{period << cells:,} nodes of the game. -/\n"
            f"def {name} : WinSet :=\n  {{ b := [{block}], K := {cells},\n    sizes := [{sizes}],\n"
            f"    rows := [{rows}] }}\n"]
@@ -1403,12 +1427,18 @@ def traps001_tables() -> list[tuple[str, dict]]:
     return out + [(name, trap_tables(seed, width, distance, values)) for name, seed, width, distance, values in TRAPS_001]
 
 
-def scan001(depth: int = 3000) -> list[tuple[str, str, int, int]]:
-    """The seeds with a long run of 1s, of periods 15 to 33, whose chain has a column 001 within `depth` (`short_scan`
-    with `rest` 12 at width 5 for periods 15 to 33 and `rest` 15 at width 9 for periods 15 to 24): (seed, lock values,
-    lock width, distance), each seed and its values once, with the narrower lock when both widths find it."""
+# The seeds that `scan001` tries: periods, the width of the locked window and the most cells outside the run of 1s; the
+# second list goes on to longer periods, and wider windows, and takes about an hour.
+SCAN001 = (([15, 18, 21, 24, 27, 30, 33], 5, 12), ([15, 18, 21, 24], 9, 15))
+SCAN001_WIDER = (([36, 39, 42, 45, 48], 5, 12), ([27, 30, 33], 9, 15))
+
+
+def scan001(depth: int = 3000, plans: tuple = SCAN001) -> list[tuple[str, str, int, int]]:
+    """The seeds with a long run of 1s whose chain has a column 001 within `depth` (`short_scan` with each `rest` and
+    width of `plans`, by default 12 at width 5 for periods 15 to 33 and 15 at width 9 for periods 15 to 24): (seed, lock
+    values, lock width, distance), each seed and its values once, with the narrower lock when both widths find it."""
     found = {}
-    for periods, width, rest in (([15, 18, 21, 24, 27, 30, 33], 5, 12), ([15, 18, 21, 24], 9, 15)):
+    for periods, width, rest in plans:
         for seed, entries in short_scan(periods, width, depth, rest=rest).items():
             for values, hits in entries:
                 if 3 in hits and hits[3][1] == "001":
@@ -1450,6 +1480,48 @@ def apart_refuted() -> dict[str, list[str]]:
     for block, module, *_ in APART_TRAPS:
         found.setdefault(module, []).append(block)
     return found
+
+
+def chain_apart(periods: tuple[int, ...] = (16, 20, 24, 28, 32, 36, 40), width: int = 5, rest: int = 12,
+                depth: int = 3000) -> list[tuple[str, str, int, str, str, int]]:
+    """The chain locks of the seeds with a long run of 1s (`short_scan` with `rest`) whose chain reaches a block with a
+    trap in Lean (`block_traps`), each a trap of that block (`trap_tables`), that are apart as a whole from a trap of
+    the block in Lean (`apart_closed`), so that entry into that trap is false: (block, seed, distance, module, name,
+    cells of the chain trap)."""
+    blocks = block_traps()
+    out = []
+    for seed, entries in short_scan(list(periods), width, depth, rest=rest).items():
+        for values, hits in entries:
+            for distance, word in hits.values():
+                if word not in blocks:
+                    continue
+                t = trap_tables(seed, width, distance, values)
+                for module, name, lean in blocks[word]:
+                    if apart_closed(lean, t).all():
+                        out.append((word, seed, distance, module, name, t["cells"]))
+    return out
+
+
+def chain_family(block: str, periods: tuple[int, ...] = (16, 20, 24, 28, 32, 36, 40), width: int = 5, rest: int = 12,
+                 depth: int = 3000, lean: list[tuple[str, dict]] | None = None) -> tuple[list[tuple[str, dict]],
+                                                                                         list[int]]:
+    """The traps of `block` in Lean (`lean`, or those of `block_traps`) and the chain locks of the seeds with a long run
+    of 1s that reach it (`short_scan` with `rest`), each as (name, tables); and a family of them pairwise apart as
+    wholes (`apart_closed` both ways), chosen greedily from those apart from the most others, as indices."""
+    if lean is None:
+        lean = [(name, t) for _, name, t in block_traps().get(block, [])]
+    traps = list(lean)
+    traps += [(f"chain{seed}@{distance}", trap_tables(seed, width, distance, values))
+              for seed, entries in short_scan(list(periods), width, depth, rest=rest).items()
+              for values, hits in entries for distance, word in hits.values() if word == block]
+    n = len(traps)
+    apart = [[i != j and bool(apart_closed(traps[j][1], traps[i][1]).all()) for j in range(n)] for i in range(n)]
+    mutual = [[apart[i][j] and apart[j][i] for j in range(n)] for i in range(n)]
+    family: list[int] = []
+    for i in sorted(range(n), key=lambda i: (-sum(mutual[i]), i)):
+        if all(mutual[i][j] for j in family):
+            family.append(i)
+    return traps, family
 
 
 def lean_check_names() -> set[str]:
@@ -1547,15 +1619,17 @@ def block_traps() -> dict[str, list[tuple[str, str, dict]]]:
     return found
 
 
-def apart_closed(a: dict, b: dict) -> np.ndarray:
+def apart_closed(a: dict | list[dict], b: dict) -> np.ndarray:
     """The states of the trap `b` in its largest subset that every move, under both values of the cell beyond, keeps
     inside, among the states whose windows, cut to the narrower of the two traps, are not those of a state of the trap
-    `a` whose label reads the same phase: a mask over b's states. When it is not empty, a right half started in one of
-    them stays in the subset and never enters `a`."""
-    period, k = len(b["word"]), min(a["cells"], b["cells"])
-    mask = (1 << k) - 1
-    cut = {(label % period, window & mask) for label, window in a["states"]}
-    alive = np.array([(label % period, window & mask) not in cut for label, window in b["states"]])  # (n,)
+    `a` whose label reads the same phase, or of any trap of `a` when it is a list: a mask over b's states. When it is
+    not empty, a right half started in one of them stays in the subset and never enters `a`, or any of them."""
+    period = len(b["word"])
+    alive = np.ones(len(b["states"]), dtype=bool)  # (n,)
+    for other in a if isinstance(a, list) else [a]:
+        mask = (1 << min(other["cells"], b["cells"])) - 1
+        cut = {(label % period, window & mask) for label, window in other["states"]}
+        alive &= np.array([(label % period, window & mask) not in cut for label, window in b["states"]])  # (n,)
     moves = np.array(b["successors"]).reshape(-1, 2)  # (n, 2)
     while True:
         kept = alive & alive[moves[:, 0]] & alive[moves[:, 1]]  # (n,)
@@ -1598,8 +1672,63 @@ def lean_fwd(name: str, trap: str, s: dict, rows: list[list[int]], piece: int = 
             f"theorem {name}_avoids : {name}_cut.avoids {name} = true := by decide +kernel\n\n"
             f"/-- **Some finitely supported right half driven by `{s['word']}` never enters `{trap}`.** -/\n"
             f"theorem {trap}_not_absorption_fwd : ¬ {trap}.Absorption :=\n"
-            f"  not_absorption_fwd _ {name} {name}_cut {name}_closed rfl rfl (by decide) (by decide) {name}_holds "
-            f"{name}_avoids (by decide)\n")
+            f"  not_absorption_fwd _ {name} {name}_cut {name}_closed rfl rfl (by decide) (by decide)\n"
+            f"    {name}_holds {name}_avoids (by decide)\n")
+
+
+@functools.lru_cache(maxsize=None)
+def wide_wall(module: str, name: str) -> dict:
+    """The wall of `WIDE_WALLS` found for the carried trap `name` of `module`: the least closed set among the nodes of
+    the game of `WIDE_WIDTH` cells that cannot reach it (`fwd_tables`), on which column 1 is fixed at the white phases,
+    so a trap of the same block."""
+    t = next(build() for m, n, build in module_entries() if (m, n) == (module, name))
+    return fwd_tables((t,), WIDE_WIDTH)
+
+
+def lean_wide_walls(piece: int = 1 << 16) -> str:
+    """The declarations of `Rule30Open.Columns.WideWalls` after its header: for each entry of `WIDE_WALLS`, the wall
+    with its kernel check and the refutation of entry into the carried trap from it (`lean_fwd`); the refutation of
+    entry into the wall from the carried trap, which is apart from it as a whole (`apart_closed`); and the reduction of
+    the block to entry into one of the two. Then the list of the walls, its check and its blocks."""
+    entries = {(m, n): b for m, n, b in module_entries()}
+    checks = lean_check_names()
+    out, names = [], []
+    for module, name in WIDE_WALLS:
+        t, wall = entries[(module, name)](), wide_wall(module, name)
+        assert apart_closed(wall, t).all()
+        word, cert, wide = t["word"], f"wide_{name}_apart", f"wide_{name}"
+        names.append(wide)
+        block = ", ".join("true" if c == "1" else "false" for c in word)
+        closed = f"WTrap.closedCheck_of_check _ {name}_check" if name in checks else "by decide +kernel"
+        check_name = f"exact {name}_check" if name in checks else "decide +kernel"
+        out.append(lean_fwd(wide, name, wall, cut_rows((t,), WIDE_WIDTH), piece)
+                   + f"\ntheorem {wide}_check : {wide}.check = true := by decide +kernel\n\n"
+                   f"theorem {name}_closed_wide : {name}.closedCheck = true :=\n  {closed}\n\n"
+                   f"/-- The states of `{wide}`, by label. -/\n"
+                   + lean_winset(cert, word, WIDE_WIDTH, cut_rows((wall,), WIDE_WIDTH), piece)
+                   + f"\ntheorem {cert}_holds : {cert}.holds {wide} = true := by\n  decide +kernel\n\n"
+                   f"theorem {cert}_avoids : {cert}.avoids {name} = true := by\n  decide +kernel\n\n"
+                   f"/-- **Entry into `{wide}` is false**: the right half of state 0 of `{name}` never enters it. -/\n"
+                   f"theorem {wide}_not_absorption : ¬ {wide}.Absorption :=\n"
+                   f"  not_absorption_fwd _ {name} {cert} {name}_closed_wide rfl rfl (by decide)\n"
+                   f"    (by decide) {cert}_holds {cert}_avoids (by decide)\n\n"
+                   f"/-- The carried trap and the wall of `{word}`. -/\n"
+                   f"def widePair_{word} : List WTrap := [{name}, {wide}]\n\n"
+                   f"/-- **`{word}` reduced to entry into the carried trap or its wall.** -/\n"
+                   f"theorem widePair_{word}_excludes (hA : WTrap.AbsorptionSome widePair_{word}) :\n"
+                   f"    ¬ Rule30StripCertificates.EventuallyWord\n      [{block}] := by\n"
+                   f"  refine absorption_some_excludes _ widePair_{word} ?_ ?_ hA <;>\n"
+                   f"    simp only [widePair_{word}, List.mem_cons, List.not_mem_nil, or_false] <;> "
+                   f"rintro C (rfl | rfl)\n"
+                   f"  · rfl\n  · rfl\n  · {check_name}\n  · exact {wide}_check\n")
+    blocks = ",\n     ".join("[" + ", ".join("true" if c == "1" else "false" for c in wide_wall(m, n)["word"]) + "]"
+                               for m, n in WIDE_WALLS)
+    checks_list = ", ".join(f"{wall}_check" for wall in names)
+    out.append(f"/-- The walls. -/\ndef wideWalls : List WTrap :=\n  [{', '.join(names)}]\n\n"
+               f"theorem wideWalls_check : wideWalls.all WTrap.check = true := by\n"
+               f"  simp only [wideWalls, List.all_cons, List.all_nil, Bool.and_true, {checks_list}]\n\n"
+               f"theorem wideWalls_blocks : wideWalls.map WTrap.b =\n    [{blocks}] := rfl\n")
+    return "\n".join(out)
 
 
 def lean_back_module(piece: int = 1 << 16, part: int = 1024) -> str:
@@ -1938,15 +2067,39 @@ UNREACHED = {
 PAIRS = ["0001101101011", "0010010010111", "0010101111111", "00001101111001"]
 
 
-# The hypotheses that pass both tests at `REACH_WIDTH` cells but fail the test of reach in the game of `WIDE_WIDTH`
-# cells (`wide_reach`, which tries the natural traps, the large census components, the pairs and the sets): by module,
-# the blocks of those traps, or of the pair of `WALL_SPLIT` for 00101101111.
 # Traps that fail the test of reach and whose refutation `Rule30Open.Columns.ReachRefuted` checks: module, the trap's
 # name in Lean, the width, and the kind, "back" from the windows that can reach the trap (`back_tables`) or "fwd" from
 # a closed set apart from it (`fwd_tables`).
-REACH_REFUTED = [("MissedTraps", "cen000001010110101", 8, "back")]
+REACH_REFUTED = [("MissedTraps", "cen000001010110101", 8, "back"), ("TwelveTraps", "tw0_40", 22, "back"),
+                 ("ElevenTraps", "el1_22", 22, "back"), ("CensusTraps14", "cen00000110101111", 22, "back"),
+                 ("CensusTraps13", "cen0000010000111", 22, "back"), ("FourteenTraps", "fo0_46", 22, "back"),
+                 ("CensusTraps15", "cen000011110101001", 22, "back"), ("CensusTraps15", "cen000011011110111", 22, "back"),
+                 ("CensusTraps15", "cen000100101010101", 22, "back")]
 WIDE_WIDTH = 22
-UNREACHED_WIDE = {"NaturalTrapsLongLarge": ["0101011111111"], "NaturalTrapsWalls": ["00101101111", "0010011110101"]}
+# Walls of 22 cells: traps carried along a background's columns that fail the test of reach at `WIDE_WIDTH` cells
+# while most nodes can reach them, by module and name in Lean. For each, the least closed set among the nodes that
+# cannot (`wide_wall`) has column 1 fixed at the white phases, every node can reach it, and it and the carried trap
+# are apart as wholes; `Rule30Open.Columns.WideWalls` checks it and reduces the block to entry into one of the two.
+WIDE_WALLS = [("ElevenTraps", "el0_33"), ("FourteenTraps", "fo0_30"), ("FourteenTraps", "fo0_31")]
+# The hypotheses that pass both tests at `REACH_WIDTH` cells but fail the test of reach in the game of `WIDE_WIDTH`
+# cells (`wide_reach`, which tries the natural traps, the large census components, the pairs and the sets, and
+# `wide_reach_carried`, which tries the traps carried along a chain): by module, the blocks of those traps, or of the
+# pair of `WALL_SPLIT` for 00101101111.
+UNREACHED_WIDE = {
+    "CensusTraps13": ["0000001011101", "0000010000111", "0001101011001", "0010100101101"],
+    "CensusTraps14": ["00000110101111", "00000110111001", "00111010101111", "00111110110111", "00111111011011"],
+    "CensusTraps15": ["000010001000101", "000011011110111", "000011110101001", "000100101010101", "000101001001001",
+                      "000111000111001", "001001011011011", "001001111001111", "010110111011011"],
+    "ElevenTraps": ["00001011001", "00001100111", "00100100101"],
+    "FifteenWalls": ["000010101011001", "000010110010101"],
+    "FourteenTraps": ["00010100100011", "00111011110101", "01010101111011"],
+    "NaturalTrapsLongLarge": ["0101011111111"],
+    "NaturalTrapsWalls": ["00101101111", "0010011110101"],
+    "TenTraps": ["0101111011"],
+    "ThirteenTraps": ["0010010011101"],
+    "TwelveTraps": ["000010101011", "000100110101", "000101100111"],
+    "WordTraps": ["001011"],
+}
 
 # The traps of the modules, and the pairs, that pass the test of reach but that a half of their block's natural scan,
 # closing windows of 16 to 64 cells, never enters: at step 12,000 the half is inside a closed set apart from the trap,
@@ -2917,6 +3070,9 @@ def main() -> None:
     parser.add_argument("--wide-reach", type=int, metavar="WORKERS",
                         help="the test of reach at 22 cells for the natural traps, large census components, pairs and "
                              "sets, with this many processes (about three hours with two)")
+    parser.add_argument("--wide-reach-carried", type=int, metavar="WORKERS",
+                        help="the test of reach at 22 cells for the traps carried along a chain, with this many "
+                             "processes (about five hours with three)")
     parser.add_argument("--natural-coin-widths", action="store_true",
                         help="the coin's factor per step for the natural traps of 16 cells in games of 16, 18 and 20 "
                              "cells")
@@ -2927,10 +3083,18 @@ def main() -> None:
     parser.add_argument("--lean-traps001", action="store_true",
                         help="the two more traps for 001 of Rule30Open.Columns.Traps001, and the refutations")
     parser.add_argument("--scan001", action="store_true", help="the long-run seeds whose chains reach 001")
+    parser.add_argument("--scan001-wider", action="store_true",
+                        help="the same for longer periods and wider windows, about an hour")
     parser.add_argument("--lean-apart-traps", action="store_true",
                         help="the refutations and pair reductions of Rule30Open.Columns.ApartTraps")
+    parser.add_argument("--chain-family", default="",
+                        help="the traps of a block from the chains of long-run seeds, and a family pairwise apart")
+    parser.add_argument("--chain-apart", action="store_true",
+                        help="the chain locks of long-run seeds of periods 16 to 40 apart from a trap in Lean")
     parser.add_argument("--apart-pairs", action="store_true",
                         help="every two traps of one block in Lean, one holding a closed set apart from the other")
+    parser.add_argument("--lean-wide-walls", action="store_true",
+                        help="the walls of Rule30Open.Columns.WideWalls, of 22 cells, beside traps carried far")
     parser.add_argument("--lean-back", action="store_true",
                         help="the sets of Rule30Open.Columns.ReachRefuted, from the windows that can reach each trap")
     parser.add_argument("--lean-refuted", action="store_true",
@@ -3189,12 +3353,13 @@ def main() -> None:
         print(lean_pairs())
     if args.lean_wall_natural:
         print(lean_wall_natural())
-    if args.wide_reach:
-        rows = wide_reach(22, args.wide_reach)
-        print(f"{len(rows)} hypotheses, {sum(1 for row in rows if row[2] < 1)} fail at 22 cells")
-        for module, name, share in rows:
-            if share < 1:
-                print(f"{module} {name}: {share:.6f}")
+    for workers, census in ((args.wide_reach, wide_reach), (args.wide_reach_carried, wide_reach_carried)):
+        if workers:
+            rows = census(22, workers)
+            print(f"{len(rows)} hypotheses, {sum(1 for row in rows if row[2] < 1)} fail at 22 cells")
+            for module, name, share in rows:
+                if share < 1:
+                    print(f"{module} {name}: {share:.6f}")
     if args.natural_coin_widths:
         for word, factors in natural_coin_widths():
             print(f"{word}: " + ", ".join(f"{f:.6f}" for f in factors))
@@ -3208,14 +3373,32 @@ def main() -> None:
     if args.lean_traps001:
         print(lean_traps001())
         return
-    if args.scan001:
-        for seed, values, width, distance in scan001():
+    if args.scan001 or args.scan001_wider:
+        four = traps001_tables()
+        for seed, values, width, distance in scan001(plans=SCAN001_WIDER if args.scan001_wider else SCAN001):
             t = trap_tables(seed, width, distance, values)
+            apart = [name for name, other in four if apart_closed(other, t).any()]
+            every = int(apart_closed([other for _, other in four], t).sum())
             print(f"{seed} (lock values {values}, width {width}): 001 at distance {distance}, a trap of {t['cells']} "
-                  f"cells, labels modulo {t['modulus']}, {len(t['states'])} states")
+                  f"cells, labels modulo {t['modulus']}, {len(t['states'])} states; a closed set of its states apart "
+                  f"from {', '.join(apart) if apart else 'none of the four'}, and from all four, of {every}")
         return
     if args.lean_apart_traps:
         print(lean_apart_traps())
+        return
+    if args.chain_family:
+        traps, family = chain_family(args.chain_family)
+        for name, t in traps:
+            print(f"{name}: {t['cells']} cells, labels modulo {t['modulus']}, {len(t['states'])} states")
+        print(f"{len(traps)} traps for {args.chain_family}; {len(family)} pairwise apart: "
+              f"{', '.join(traps[i][0] for i in family)}")
+        return
+    if args.chain_apart:
+        found = chain_apart()
+        for block, seed, distance, module, name, cells in found:
+            print(f"{block}: the lock of {seed} carried {distance} cells, a trap of {cells} cells, is apart from "
+                  f"{module}.{name}")
+        print(f"{len(found)} chain traps; traps refuted: {sorted({(m, n) for _, _, _, m, n, _ in found})}")
         return
     if args.apart_pairs:
         found = apart_pairs()
@@ -3225,6 +3408,9 @@ def main() -> None:
         print("APART_TRAPS:")
         for entry in apart_traps(found):
             print(f"    {entry},")
+        return
+    if args.lean_wide_walls:
+        print(lean_wide_walls())
         return
     if args.lean_refuted:
         print(lean_refuted())

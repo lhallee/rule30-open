@@ -52,9 +52,14 @@ cells when the trap is wider, so a right half whose first 20 cells start there n
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of 13 of them in Lean. For 12 of their blocks no trap of any module passes, so the reduction is empty; the
 other 14 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass, two of them to
-entry into one of two. The other 57 traps pass the test, which entry needs but does not imply. For one of the traps that
-pass, a half of its block's natural scan, closing windows of 16 to 64 cells, is inside a closed set apart from the trap,
-so entry into it is false too, and [TrapSets](TrapSets.md) reduces the block to entry into one of several traps.
+entry into one of two; for 9 of those the carried trap here is apart from the natural trap, so entry into the natural
+trap alone is false and the block comes down to entry into one of the two ([ApartTraps](ApartTraps.md)). The other 57
+traps pass the test, which entry needs but does not imply. For one of the traps that pass, a half of its block's natural
+scan, closing windows of 16 to 64 cells, is inside a closed set apart from the trap, so entry into it is false too, and
+[TrapSets](TrapSets.md) reduces the block to entry into one of several traps. Of the 56 traps that pass both tests at 20
+cells, three fail in the game of 22 cells, `tw0_40`, `tw1_30` and `tw1_19`, with 0.0011% to 0.044% of the nodes able to
+reach them ([what failed](../../negative-results/columns/missed-traps.md)); [ReachRefuted](ReachRefuted.md) refutes
+entry into `tw0_40` in Lean from the few nodes that can, and the three blocks keep no trap that passes.
 
 ## Relation to the kit
 

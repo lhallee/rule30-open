@@ -50,10 +50,17 @@ kit's traps.
 cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of 15 of them in Lean. For 13 of their blocks no trap of any module passes, so the reduction is empty; the
-other 16 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass. The other 72 traps
-pass the test, which entry needs but does not imply. For two of the traps that pass, a half of the block's natural scan,
-closing windows of 16 to 64 cells, is inside a closed set apart from the trap, so entry into each is false too, and
-[TrapSets](TrapSets.md) reduces their blocks to entry into one of several traps.
+other 16 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass; for 13 of those
+the carried trap here is apart from the natural trap, so entry into the natural trap alone is false and the block comes
+down to entry into one of the two ([ApartTraps](ApartTraps.md)). The other 72 traps pass the test, which entry needs but
+does not imply. For two of the traps that pass, a half of the block's natural scan, closing windows of 16 to 64 cells,
+is inside a closed set apart from the trap, so entry into each is false too, and [TrapSets](TrapSets.md) reduces their
+blocks to entry into one of several traps. Of the 70 traps that pass both tests at 20 cells, three fail in the game of
+22 cells, `fo0_46`, `fo0_30` and `fo0_31`, with 0.0069% to 99.95% of the nodes able to reach them ([what
+failed](../../negative-results/columns/missed-traps.md)): [ReachRefuted](ReachRefuted.md) refutes entry into `fo0_46` in
+Lean from the few nodes that can, and its block keeps no trap that passes; the nodes that cannot reach `fo0_30` or
+`fo0_31` hold a wall of 22 cells apart from it, so [WideWalls](WideWalls.md) reduces each of their blocks to entry into
+one of two.
 
 ## Relation to the kit
 
