@@ -2827,6 +2827,33 @@ def test_six_refuted() -> None:
     assert lock_chain.lean_six() in lean
 
 
+def test_own_locks() -> None:
+    """`own_components`, found among the locked nodes alone, against `bottom_components`, which builds the game's list
+    of moves, for 0111 at 13 cells and 0001 at 16; for `00100111011` of `WIDE_CENSUS`, whose traps in the trap modules
+    all fail, one bottom component at 20 cells, of 138 states, a lock by `is_lock` that every node of the games of 20
+    and 22 cells can reach; its carried trap `el0_14` of `CENSUS_APART`, of 30 cells, apart from it by its windows cut
+    to 20 cells, compared directly, and by `apart_closed` both ways; and every block of `WIDE_CENSUS` is one whose
+    traps all fail, which the coverage counts as such until the blocks are checked in Lean."""
+    from computations import coverage, lock_chain
+
+    for block, width in (("0111", 13), ("0001", 16)):
+        mine = [members.tolist() for members in lock_chain.own_components(block, width)]
+        assert sorted(mine) == sorted(sorted(c.tolist()) for c in lock_chain.bottom_components(block, width))
+    block = "00100111011"
+    assert block in lock_chain.WIDE_CENSUS and block in lock_chain.UNREACHED["ElevenTraps"]
+    [t] = lock_chain.own_tables(block, 20)
+    assert (t["word"], t["cells"], t["modulus"], len(t["states"])) == (block, 20, 11, 138)
+    assert lock_chain.is_lock(block, t["states"], 20)
+    assert lock_chain.trap_reach(t, width=20) == 1.0 == lock_chain.trap_reach(t, width=22)
+    [(module, name)] = lock_chain.CENSUS_APART[block]
+    c = next(build() for m, n, build in lock_chain.module_entries() if (m, n) == (module, name))
+    assert (c["word"], c["cells"], len(c["states"])) == (block, 30, 313)
+    cut = {(label % 11, window & ((1 << 20) - 1)) for label, window in c["states"]}
+    assert not cut & {(label % 11, window) for label, window in t["states"]}
+    assert lock_chain.apart_closed([t], c).all() and lock_chain.apart_closed(c, t).all()
+    assert set(lock_chain.CENSUS_APART) <= set(lock_chain.WIDE_CENSUS) <= coverage.refuted_blocks()
+
+
 def test_module_entries() -> None:
     """`lock_chain.module_entries`: 1,595 traps, each named by a declaration `def <name> : WTrap` of its module's Lean
     file, the wall of period 9 at distance 0 by that of WordTraps; the names are distinct within a module; and the

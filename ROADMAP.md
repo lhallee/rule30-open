@@ -264,7 +264,12 @@ In order of the assessment above.
      ([NaturalTrapsWalls](Rule30Open/Columns/NaturalTrapsWalls.md)), the walls that the few windows missing a carried
      trap settle into ([WideWalls](Rule30Open/Columns/WideWalls.md)), sets of several traps
      ([TrapSets](Rule30Open/Columns/TrapSets.md)), and the kit's `Lock`, the weakest hypothesis of the kind ([the kit's
-     pull requests](literature/kit-pull-requests.md#least-periods-four-and-three-traps-for-the-right-half)).
+     pull requests](literature/kit-pull-requests.md#least-periods-four-and-three-traps-for-the-right-half)). The
+     block's own locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks of periods 11 and 13
+     ([own locks](findings/columns/own-locks.md)); next, the apartness check for the nine blocks not yet compared
+     (`census_apart`), the module `Rule30Open.Columns.WideCensus` from `lean_wide_census`, counting the blocks in
+     `coverage.py`, the 22-cell traps of $0010011110101$, and the census at periods 14 and 15, where it already finds
+     blocks with locks every window can reach.
    - *Period 16.* Traps from the three backgrounds with walls at period 16, of 216, 325 and 2,032 cells, whose chains
      hold 1,365 of the 4,080 blocks, and wider windows for the backgrounds without walls of 16 cells.
    - *Classes of halves.* For the walls with Lean classes of entering halves ([TenGap](Rule30Open/Columns/TenGap.md),

@@ -58,6 +58,9 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
     python -m computations.lock_chain --lean-six   # the same for trap001011, the only trap of period 6, at 22 cells
+    python -m computations.lock_chain --own-census 20 --workers 2   # locks of 20 cells of blocks whose traps all fail
+    python -m computations.lock_chain --lean-wide-census   # their bottom components as traps, in Lean
+    python -m computations.lock_chain --census-apart   # the other traps of their blocks against them
     python -m computations.lock_chain --lean-wide-walls   # walls of 22 cells beside traps carried far, in Lean
     python -m computations.lock_chain --apart-pairs   # traps of one block that refute each other
     python -m computations.lock_chain --chain-apart   # chain locks of long-run seeds apart from traps in Lean
@@ -1741,6 +1744,166 @@ def lean_wide_walls(piece: int = 1 << 16) -> str:
     return "\n".join(out)
 
 
+def own_components(block: str, width: int) -> list[np.ndarray]:
+    """The bottom components of the locked nodes of the game of `block` at `width` cells (`locks.mixed_nodes`), found
+    along the moves among the locked nodes alone, which no move leaves: each a set of nodes, phase * 2^width + window,
+    in increasing order, that no move leaves and on which column 1 is fixed at the white phases, so a trap of `width`
+    cells; ordered by their least node."""
+    nodes = np.flatnonzero(~locks.mixed_nodes(block, width))  # (k,), increasing
+    if not nodes.size:
+        return []
+    after = successors(block, width, nodes.astype(np.uint64)).astype(np.int64)  # (2, k)
+    source = np.tile(np.arange(nodes.size), 2)  # (2 k,)
+    target = np.searchsorted(nodes, after.reshape(-1))  # (2 k,), the moves of locked nodes stay locked
+    graph = csr_matrix((np.ones(source.size, dtype=np.int8), (source, target)), shape=(nodes.size, nodes.size))
+    _, label = connected_components(graph, directed=True, connection="strong")  # (k,)
+    leaves = np.zeros(label.max() + 1, dtype=bool)  # (components,)
+    leaves[label[source][label[source] != label[target]]] = True
+    found = [nodes[label == c] for c in range(label.max() + 1) if not leaves[c]]  # each (members,)
+    return sorted(found, key=lambda members: int(members[0]))
+
+
+def own_tables(block: str, width: int) -> list[dict]:
+    """`own_components` as traps (`relabeled_tables`), with labels modulo the block's period."""
+    low = (1 << width) - 1
+    return [relabeled_tables(block, width, {(int(k) >> width, int(k) & low) for k in members.tolist()})
+            for members in own_components(block, width)]
+
+
+def own_job(item: tuple[str, int]) -> tuple[str, int, float | None]:
+    """For one block and width: the number of locked nodes of its game (`locks.mixed_nodes`) and, when there are any,
+    the share of nodes that can reach one (`locks.back_search`)."""
+    block, width = item
+    locked = ~locks.mixed_nodes(block, width)  # (p n,)
+    count = int(locked.sum())
+    return block, count, float(locks.back_search(block, width, locked.copy()).mean()) if count else None
+
+
+def own_census(blocks: list[str], width: int, workers: int = 1) -> list[tuple[str, int, float | None]]:
+    """`own_job` for every block of `blocks` at `width` cells, in `workers` processes: the blocks whose game has locked
+    nodes that every node can reach have a trap of `width` cells, or a set of them (`own_tables`), that passes the
+    test of reach at that width."""
+    items = [(block, width) for block in blocks]
+    with multiprocessing.get_context("spawn").Pool(workers) as pool:
+        return list(tqdm(pool.imap(own_job, items), total=len(items), desc="blocks", file=sys.stderr, mininterval=30))
+
+
+def own_check(block: str, widths: tuple[int, ...] = (20, 22)) -> tuple[int | None, list[tuple[int, list[int], float,
+                                                                                               int]]]:
+    """For a block whose locked nodes at the first width every node can reach (`own_census`): at each width in turn,
+    its traps there (`own_tables`), their numbers of states, the share of nodes of the game of `WIDE_WIDTH` cells that
+    can reach one of them (`trap_reach`), and the halves of the block's natural scan inside a natural trap apart from
+    all of them (`block_apart`); and the first width at which the share is 1 and no half is apart, or None."""
+    rows, chosen = [], None
+    for width in widths:
+        traps = own_tables(block, width)
+        share = trap_reach(*traps, width=WIDE_WIDTH)
+        apart = len(block_apart((block, [("WideCensus", f"wc{block}", traps)]))[0][3])
+        rows.append((width, [len(t["states"]) for t in traps], share, apart))
+        if share == 1.0 and not apart:
+            chosen = width
+            break
+    return chosen, rows
+
+
+# Blocks of periods 10 to 13 whose traps in the trap modules all fail (`coverage.refuted_blocks`) and whose game of 20
+# cells has locked nodes that every node can reach (`own_census`), each with the width at which the bottom components of
+# its locked nodes (`own_tables`) pass the test of reach in the game of 22 cells and the test of halves apart
+# (`own_check`): 20 cells, or 22 where those of 20 cells miss some node of the game of 22 cells. They are not yet
+# checked in Lean, so the coverage does not count them; `lean_wide_census` writes the declarations that would.
+WIDE_CENSUS = {"00000110001": 20, "00100111011": 20, "00101101111": 22, "0000101011001": 20, "0000110011101": 22,
+               "0001001110111": 22, "0001010001011": 20, "0001010100101": 20, "0001011100111": 20,
+               "0001110010011": 22, "0001111110011": 20, "0010011010111": 20, "0010111101101": 20,
+               "0101011111111": 22}
+
+
+def census_apart() -> list[tuple[str, str, str, int, list[int]]]:
+    """For each block of `WIDE_CENSUS` and each other trap of the block checked in Lean (`block_traps`): the block, the
+    other trap's module and name, the number of states of its largest closed set apart from all of the block's traps at
+    its width (`own_tables`, `apart_closed`), and for each of those traps the number of states of its largest closed
+    set apart from the other trap. A first number above 0 refutes entry into one of the block's traps; the others
+    refute entry into the other trap."""
+    others = block_traps()
+    out = []
+    for block, width in WIDE_CENSUS.items():
+        traps = own_tables(block, width)
+        out += [(block, module, name, int(apart_closed(traps, b).sum()), [int(apart_closed(b, t).sum()) for t in traps])
+                for module, name, b in others.get(block, [])]
+    return out
+
+
+# Blocks of `WIDE_CENSUS` with a trap of the trap modules whose whole set of states is apart from all of the block's
+# own traps (`census_apart`), among the first five blocks, the only ones compared so far: the module and name of each.
+# Entry into one of the own traps alone is false, so the block comes down to entry into one of the own traps or these;
+# `lean_wide_census` refutes the first with the first such trap (`not_absorption_some_fwd`) and reduces the block to
+# the second.
+CENSUS_APART: dict[str, list[tuple[str, str]]] = {"00000110001": [("ElevenTraps", "el0_27")],
+                                                  "00100111011": [("ElevenTraps", "el0_14")],
+                                                  "0001010001011": [("ThirteenTraps", "th0_7")]}
+
+
+def lean_wide_census(part: int = 1024, piece: int = 1 << 16) -> str:
+    """The declarations of a module `Rule30Open.Columns.WideCensus` after its header (that of `WideWalls`, importing
+    `Traps001` and the modules of the traps of `CENSUS_APART`): for each block of `WIDE_CENSUS`, its own traps at its
+    width (`own_tables`), each with its kernel check, in parts (`lean_parts`) above 3,000 states; for a block of
+    `CENSUS_APART`, that its first other trap is closed, each own trap's states as a set of windows (`cut_rows`) that
+    holds them and that the other trap avoids, and the refutation of entry into one of the own traps
+    (`not_absorption_some_fwd`); and the list of the own traps and the other traps with the reduction of the block to
+    entry into one of them (`absorption_some_excludes`)."""
+    entries = {(module, name): build for module, name, build in module_entries()}
+    checks = lean_check_names()
+    out = []
+    for word, width in WIDE_CENSUS.items():
+        traps = own_tables(word, width)
+        names = [f"wc{word}_{k}" for k in range(len(traps))]
+        for name, t in zip(names, traps):
+            if len(t["states"]) > 3000:
+                out.append(lean_parts(t, name, part, piece))
+            else:
+                out.append(lean_entry(t, name) + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n")
+        block = ", ".join("true" if c == "1" else "false" for c in word)
+        sizes = ", ".join(f"`{name}` ({len(t['states']):,} states)" for name, t in zip(names, traps))
+        others = [other for _, other in CENSUS_APART.get(word, [])]
+        if others:
+            module, other = CENSUS_APART[word][0]
+            c = entries[(module, other)]()
+            assert c["word"] == word and apart_closed(traps, c).all()
+            cut = min(width, c["cells"])
+            closed = f"WTrap.closedCheck_of_check _ {other}_check" if other in checks else "by decide +kernel"
+            out.append(f"theorem wcapart_{other}_closed : {other}.closedCheck = true :=\n  {closed}\n")
+            for name, t in zip(names, traps):
+                out.append(f"/-- The states of `{name}` cut to {cut} cells, by label. -/\n"
+                           + lean_winset(f"{name}_cut", word, cut, cut_rows((t,), cut), piece)
+                           + f"\ntheorem {name}_cut_holds : {name}_cut.holds {name} = true := by\n  decide +kernel\n\n"
+                           f"theorem {name}_cut_avoids : {name}_cut.avoids {other} = true := by\n  decide +kernel\n")
+            cases = "\n".join(f"  · exact ⟨{name}_cut, rfl, rfl, by decide, by decide, {name}_cut_holds,\n"
+                              f"      {name}_cut_avoids⟩" for name in names)
+            out.append(f"/-- The traps of {width} cells of `{word}`: {sizes}. -/\n"
+                       f"def wc{word}_own : List WTrap := [{', '.join(names)}]\n\n"
+                       f"/-- **Entry into one of the traps of {width} cells of `{word}` is false**: the right half of "
+                       f"state 0 of\n`{other}` never enters any. -/\n"
+                       f"theorem wc{word}_not_absorption_some : ¬ WTrap.AbsorptionSome wc{word}_own := by\n"
+                       f"  refine not_absorption_some_fwd _ {other} wcapart_{other}_closed (by decide) ?_\n"
+                       f"  simp only [wc{word}_own, List.mem_cons, List.not_mem_nil, or_false]\n"
+                       f"  rintro C ({' | '.join('rfl' for _ in names)})\n{cases}\n")
+        listed = names + others
+        quoted = ", ".join(f"`{other}`" for other in others)
+        what = f"its traps of {width} cells" + (f" and {quoted}" if others else "")
+        out.append(f"/-- The traps of {width} cells of `{word}`: {sizes}"
+                   + (f"; and {quoted}, apart from them" if others else "") + ". -/\n"
+                   f"def wc{word} : List WTrap := [{', '.join(listed)}]\n\n"
+                   f"/-- **`{word}` reduced to entry into one of {what}.** -/\n"
+                   f"theorem wc{word}_excludes (hA : WTrap.AbsorptionSome wc{word}) :\n"
+                   f"    ¬ Rule30StripCertificates.EventuallyWord\n      [{block}] := by\n"
+                   f"  refine absorption_some_excludes _ wc{word} ?_ ?_ hA <;>\n"
+                   f"    simp only [wc{word}, List.mem_cons, List.not_mem_nil, or_false] <;> "
+                   f"rintro C ({' | '.join('rfl' for _ in listed)})\n"
+                   + "".join("  · rfl\n" for _ in listed)
+                   + "".join(f"  · exact {n}_check\n" if n in names or n in checks else "  · decide +kernel\n"
+                             for n in listed))
+    return "\n".join(out)
+
+
 def lean_back_module(piece: int = 1 << 16, part: int = 1024) -> str:
     """The declarations of `Rule30Open.Columns.ReachRefuted` after its general part: for each entry of
     `REACH_REFUTED`, the windows that can reach the trap (`back_tables`, `lean_back`) or a closed set apart from it
@@ -3116,6 +3279,12 @@ def main() -> None:
                         help="every two traps of one block in Lean, one holding a closed set apart from the other")
     parser.add_argument("--lean-wide-walls", action="store_true",
                         help="the walls of Rule30Open.Columns.WideWalls, of 22 cells, beside traps carried far")
+    parser.add_argument("--own-census", type=int, default=0,
+                        help="at this width, the locked nodes of the blocks whose traps all fail, and their reach")
+    parser.add_argument("--lean-wide-census", action="store_true",
+                        help="the locks of 20 or 22 cells of the blocks of WIDE_CENSUS and their reductions, in Lean")
+    parser.add_argument("--census-apart", action="store_true",
+                        help="the other traps of the blocks of WIDE_CENSUS, each against their locks of 20 or 22 cells")
     parser.add_argument("--lean-six", action="store_true",
                         help="the windows that can reach trap001011 at 22 cells, refuting entry, in Lean")
     parser.add_argument("--lean-back", action="store_true",
@@ -3390,6 +3559,34 @@ def main() -> None:
         print(lean_fifteen())
     if args.lean_trap_sets:
         print(lean_trap_sets())
+    if args.own_census:
+        from computations import coverage
+        blocks = sorted(coverage.refuted_blocks() | set(WIDE_CENSUS), key=lambda b: (len(b), b))
+        for block, count, share in own_census(blocks, args.own_census, args.workers):
+            if not count:
+                continue
+            print(f"{block}: {count:,} locked nodes at {args.own_census} cells, {share:.6f} of the nodes can reach "
+                  f"one", flush=True)
+            if share == 1.0:
+                chosen, rows = own_check(block, (args.own_census, args.own_census + 2))
+                for width, sizes, reach, apart in rows:
+                    print(f"  traps of {width} cells, of {', '.join(f'{n:,}' for n in sizes)} states: "
+                          f"{reach:.6f} of the game of {WIDE_WIDTH} cells can reach one, {apart} halves apart from "
+                          f"all", flush=True)
+                print(f"  {'width ' + str(chosen) if chosen else 'no width passes'}", flush=True)
+        print(f"{len(blocks)} blocks", flush=True)
+        return
+    if args.lean_wide_census:
+        print(lean_wide_census())
+        return
+    if args.census_apart:
+        found = census_apart()
+        for block, module, name, size, back in found:
+            print(f"{block}: {module}.{name} holds {size} states apart from all of its locks, which hold "
+                  f"{', '.join(str(n) for n in back)} apart from it", flush=True)
+        print(f"{len(found)} other traps, {sum(size > 0 for *_, size, _ in found)} holding a closed set apart from "
+              f"all of the block's locks", flush=True)
+        return
     if args.lean_six:
         print(lean_six())
         return
