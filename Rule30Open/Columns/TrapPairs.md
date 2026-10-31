@@ -68,7 +68,9 @@ finite right half stays open, as entry does for the kit's traps.
 **The test of reach.** In the game of 20 cells as well, where the cells after the traps' 16 follow the rule instead of
 taking any value, every node can reach a window whose first 16 cells form a state of one of the two traps of each pair,
 as the test of [MissedTraps](MissedTraps.md) needs ([what failed](../../negative-results/columns/missed-traps.md)).
-Entry into one of the two needs this but is not implied by it.
+Entry into one of the two needs this but is not implied by it. A half of the natural scan of $0001101101011$, closing
+windows of 16 to 64 cells, is inside a closed set of 21 cells apart from both of its traps, so entry into one of the two
+is false for that block, and [TrapSets](TrapSets.md) reduces it to entry into one of three.
 
 ## Relation to the kit
 

@@ -72,6 +72,7 @@ public import Rule30Open.Columns.MissedTraps
 public import Rule30Open.Columns.TrapPairs
 public import Rule30Open.Columns.NaturalTrapsWalls
 public import Rule30Open.Columns.RefutedTraps
+public import Rule30Open.Columns.TrapSets
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.PeriodTwo.HeldColumn

@@ -5,8 +5,9 @@ For each period: the primitive blocks; those excluded outright, by the finite ga
 reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
 `FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge`, `NaturalTrapsLong`, `NaturalTrapsLongLarge`, `FarWalls`,
 `CensusTraps13`, `CensusTraps14`, `CensusTraps15`, `CensusTrapsLarge`, `CensusTrapsLarge15`, `TrapPairs`,
-`NaturalTrapsWalls` and `PeriodFourCertificate`, and the kit's `t001` for 001), counting only traps that pass the test
-of reach (`lock_chain.UNREACHED`); those that a steering sequence of the `LockBlocks` modules
+`NaturalTrapsWalls`, `TrapSets` and `PeriodFourCertificate`, and the kit's `t001` for 001), counting only traps that
+pass the test of reach (`lock_chain.UNREACHED`) and that no half of the natural scan stays apart from
+(`lock_chain.APART`); those that a steering sequence of the `LockBlocks` modules
 reduces to a condition on column 14; and the rest, which no method here reaches.
 
     python -m computations.coverage --max-period 15   # about ten minutes
@@ -51,6 +52,7 @@ def module_blocks() -> list[tuple[str, str]]:
     found += [(block, "CensusTrapsLarge15") for block, *_ in lock_chain.CENSUS_LARGE15]
     found += [(block, "TrapPairs") for block in lock_chain.PAIRS]
     found += [(word, "NaturalTrapsWalls") for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT]
+    found += [(block, "TrapSets") for block, *_ in lock_chain.TRAP_SETS]
     found += [(word, "PeriodFourCertificate") for word in ("0001", "0011", "0111")]
     return found
 
@@ -65,11 +67,13 @@ def trap_blocks() -> dict[str, str]:
 
 
 def refuted_blocks() -> set[str]:
-    """The blocks of `trap_blocks` whose every trap fails the test of reach (`lock_chain.UNREACHED`): some node of the
-    finite game of `lock_chain.REACH_WIDTH` cells cannot reach the trap cut to that width, so entry into it is false and
-    its reduction empty. The kit's `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test
+    """The blocks of `trap_blocks` whose every trap is refuted: it fails the test of reach (`lock_chain.UNREACHED`), so
+    some node of the finite game of `lock_chain.REACH_WIDTH` cells cannot reach it, or a half of the block's natural scan
+    is inside a closed set apart from it (`lock_chain.APART`); either way entry into it is false and its reduction
+    empty. The kit's `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test of reach
     ([reach of the kit's conjectures](../findings/columns/kit-absorption-reach.md))."""
-    passing = {block for block, module in module_blocks() if block not in lock_chain.UNREACHED.get(module, ())}
+    passing = {block for block, module in module_blocks() if block not in lock_chain.UNREACHED.get(module, ())
+               and block not in lock_chain.APART.get(module, ())}
     return set(trap_blocks()) - passing
 
 

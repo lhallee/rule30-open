@@ -1,5 +1,5 @@
 ---
-title: Entry into 247 of the 1,509 traps of the trap modules is false, so their reductions were empty
+title: Entry into 275 of the 1,509 traps of the trap modules is false, so their reductions were empty
 category: columns
 problems: [1]
 status: negative
@@ -7,7 +7,7 @@ kind: refuted
 evidence: [computations/lock_chain.py, computations/locks.py, computations/game.py]
 ---
 
-# Entry into 247 of the 1,509 traps of the trap modules is false, so their reductions were empty
+# Entry into 275 of the 1,509 traps of the trap modules is false, so their reductions were empty
 
 **Question.** Each trap module reduces a block to entry, the statement that every finitely supported right half driven
 by the block eventually enters the trap (`WTrap.Absorption` of [WordTraps](../../Rule30Open/Columns/WordTraps.md)). The
@@ -27,8 +27,10 @@ modules (`module_traps`), 1,509 traps, and on the ten pairs of [TrapPairs](../..
 and [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), each pair together. For the seven traps of
 MissedTraps, and for seven more failing traps of six modules, a half started among the nodes that cannot reach was also
 run directly with the rule for 20,000 steps, to check the encoding: each stayed among them and never entered. A second
-test applies to a natural trap: a half of the natural scan that is inside a closed set apart from the trap never enters
-it (`halves_apart`).
+test asks more of a trap that passes the first: a half of its block's natural scan, the white half or a random one of 64
+cells driven by the block, that is inside a closed set apart from the trap at step 12,000 never enters it
+(`halves_apart`). `apart_census` runs it on every trap and pair that passes the first test, 1,272 of them in 1,265
+blocks, with one scan per block closing windows of 16 to 64 cells.
 
 **Outcome.** At their own width, up to 16 cells, seven traps fail: those of
 [MissedTraps](../../Rule30Open/Columns/MissedTraps.md), which proves in Lean that entry into each is false, with a
@@ -58,6 +60,14 @@ left with no trap that passes, the natural scans give traps that pass for 60 of 
 blocks left with no trap that passes number 173: one of period 2, $01$, and 7, 3, 14, 14, 38, 40 and 56 of periods 9
 to 15. For $001$ the kit's `t001` still passes, at every width up to 24 ([reach of the kit's
 conjectures](../../findings/columns/kit-absorption-reach.md)).
+
+The second test refutes 28 more traps, and one pair, that pass the first (`APART`): 2 of ElevenTraps, 1 of
+TwelveTraps, 6 of ThirteenTraps, 2 of FourteenTraps, 1 of NaturalTrapsLong, 1 each of CensusTraps13 and CensusTraps14,
+14 of CensusTraps15, and the pair of $0001101101011$ in TrapPairs. For 18 of their blocks no half that the scan finds
+in a trap is in the module's: the halves settle into closed sets of 21 to 42 cells that the module's trap, a carried
+wall or a census component, is apart from. For each of the 29 blocks the block's traps and the natural traps its halves
+are inside together pass the test of reach at 20 cells, and [TrapSets](../../Rule30Open/Columns/TrapSets.md) reduces
+the block to entry into one of them, so the count of blocks left with no trap that passes stays 173.
 
 **Where it stops, and why.** Four different failures.
 
@@ -116,5 +126,10 @@ python -m computations.lock_chain --reach 20
 python -m computations.lock_chain --halves-apart
 ```
 
+```bash
+python -m computations.lock_chain --apart-census 3
+```
+
 The census of every trap in the game of 20 cells, about four hours with one process; the halves of the natural scans
-in traps apart from those of NaturalTrapsWalls, about ten minutes.
+in traps apart from those of NaturalTrapsWalls, about ten minutes; and from every trap and pair that passes the test of
+reach, about an hour with three processes.

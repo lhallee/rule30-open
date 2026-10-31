@@ -14,9 +14,10 @@ three ways: an exclusion outright, a reduction to entry into a trap (if every fi
 enters a set of windows that keeps the cell beside the column fixed at the white phases, masked Jen excludes the block),
 or a reduction by steering (once the center repeats the block, a column beyond the window never reads one fixed
 sequence). This table counts, for each period up to 15, the primitive blocks each way reaches, each block once, in that
-order. A trap counts only if it passes the test of reach at 20 cells, which entry needs: every node of the finite game
-of 20 cells can reach a window whose first cells form one of its states, cut to 20 cells when the trap is wider ([what
-failed](../../negative-results/columns/missed-traps.md)).
+order. A trap counts only if it passes two tests that entry needs ([what
+failed](../../negative-results/columns/missed-traps.md)): every node of the finite game of 20 cells can reach a window
+whose first cells form one of its states, cut to 20 cells when the trap is wider, and no half of the block's natural
+scan is inside a closed set apart from it.
 
 ## Result
 
@@ -56,14 +57,16 @@ failed](../../negative-results/columns/missed-traps.md)).
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
   [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md),
   [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose four blocks need entry into one of two traps,
-  [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six of whose blocks need the same, and
+  [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six of whose blocks need the same,
+  [TrapSets](../../Rule30Open/Columns/TrapSets.md), whose 29 blocks need entry into one of several traps, and
   [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
-  Of these traps only those that pass the test of reach at 20 cells count, as do the kit's `t001` and its
-  ether-and-wall family, behind PeriodFourCertificate ([reach of the kit's conjectures](kit-absorption-reach.md)).
+  Of these traps only those that pass both tests count (`lock_chain.UNREACHED`, `lock_chain.APART`), as do the kit's
+  `t001` and its ether-and-wall family, behind PeriodFourCertificate, which pass the test of reach ([reach of the kit's
+  conjectures](kit-absorption-reach.md)).
 - **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
   companions that no trap that passes reaches.
-- **Only refuted traps**: blocks whose every trap fails the test of reach (`lock_chain.UNREACHED`), so that entry into
-  each is false and its reduction empty ([what failed](../../negative-results/columns/missed-traps.md)).
+- **Only refuted traps**: blocks whose every trap fails one of the tests, so that entry into each is false and its
+  reduction empty ([what failed](../../negative-results/columns/missed-traps.md)).
 
 ## What it means
 
@@ -81,9 +84,11 @@ blocks with some trap to 221 and 380, and at period 15, where nothing reached a 
 periodic in time](space-time-backgrounds.md)), but 38, 40 and 56 of these have only traps that fail the test, which
 leaves 183, 340 and 537, 24.6% to 29.3% of each period. Most traps that fail are carried ones, but two walls themselves,
 a census component and two natural traps, all of 16 cells, pass in the game of their own width and fail in that of 20,
-where the cells after them follow the rule; and the sampled halves of ten blocks split between two traps apart from
-each other, so that only entry into one of the two can hold ([TrapPairs](../../Rule30Open/Columns/TrapPairs.md),
-[NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md)). Every reduction still needs its open step, entry
+where the cells after them follow the rule; the sampled halves of ten blocks split between two traps apart from each
+other, so that only entry into one of the two can hold ([TrapPairs](../../Rule30Open/Columns/TrapPairs.md),
+[NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md)); and for 29 blocks some halves settle into closed
+sets of 21 to 42 cells apart from every single trap, so that only entry into one of several can hold
+([TrapSets](../../Rule30Open/Columns/TrapSets.md)). Every reduction still needs its open step, entry
 for every finite half or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the 747
 blocks of period at most 12. Period 8 has no wall wider than 16 cells: its traps are the window locks of 13 cells of its
 eight blocks that have one, which every sampled half enters, three of them excluded by the game and five reduced by

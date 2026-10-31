@@ -55,7 +55,9 @@ cells when the trap is wider, so a right half whose first 20 cells start there n
 false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
 refutation of 13 of them in Lean. For 14 of their blocks no trap of any module passes, so the reduction is empty; the
 other 8 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass. The other 31 traps
-pass the test, which entry needs but does not imply.
+pass the test, which entry needs but does not imply. For six of the traps that pass, a half of the block's natural scan,
+closing windows of 16 to 64 cells, is inside a closed set apart from the trap, so entry into each is false too, and
+[TrapSets](TrapSets.md) reduces their blocks to entry into one of several traps.
 
 ## Relation to the kit
 

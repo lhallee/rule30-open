@@ -2505,6 +2505,30 @@ def test_refuted_traps() -> None:
         encoding="utf-8")
 
 
+def test_trap_sets() -> None:
+    """`lock_chain.APART` and `TRAP_SETS`: each listed block is one of a trap or pair of its module; each block of the 29
+    sets has every other trap refuted, by `UNREACHED` or `APART`; for 0000110110001 the scan's one half that locks is
+    inside a natural trap of 30 cells apart from `th0_45` (`halves_apart`), that trap is a lock by `is_lock`, and every
+    node of the game of 18 cells can reach one of the set's two traps; and `lean_trap_sets` is the text of the module."""
+    from computations import coverage, lock_chain
+    held = set(coverage.module_blocks())
+    assert all((block, module) in held for module, blocks in lock_chain.APART.items() for block in blocks)
+    assert sum(len(v) for v in lock_chain.APART.values()) == 29 and len(lock_chain.TRAP_SETS) == 29
+    for block, *_ in lock_chain.TRAP_SETS:
+        others = {m for b, m in held if b == block} - {"TrapSets"}
+        assert others and all(block in lock_chain.UNREACHED.get(m, ()) or block in lock_chain.APART.get(m, ())
+                              for m in others)
+    block = "0000110110001"
+    traps = lock_chain.set_tables(block)
+    assert [(m, n) for m, n, _ in traps] == [("ThirteenTraps", "th0_45"), ("TrapSets", f"sets{block}_0")]
+    apart = lock_chain.halves_apart(traps[0][2])
+    assert [(cells, size, away) for _, cells, _, size, away in apart] == [(30, 162, True)]
+    natural = traps[1][2]
+    assert (natural["cells"], len(natural["states"])) == (30, 162) and lock_chain.is_lock(block, natural["states"], 30)
+    assert lock_chain.trap_reach(*[t for *_, t in traps], width=18) == 1
+    assert lock_chain.lean_trap_sets() in (ROOT / "Rule30Open" / "Columns" / "TrapSets.lean").read_text(encoding="utf-8")
+
+
 def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of

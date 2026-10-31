@@ -52,7 +52,9 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
     python -m computations.lock_chain --reach 18   # which traps every window of 18 cells can reach, cut to 18 cells
     python -m computations.lock_chain --halves-apart   # halves of the natural scans apart from NaturalTrapsWalls' traps
+    python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
+    python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
     python -m computations.lock_chain --lean-wall-natural   # the traps of NaturalTrapsWalls
@@ -270,9 +272,10 @@ def module_entries() -> list[tuple[str, str, functools.partial]]:
         walls = {name: k for k, name in enumerate(WALLS[period])}
         found += [(module, f"{prefix}{walls[name]}_{d}", functools.partial(carried, name, d))
                   for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
-    for module, entries, prefix in (("NaturalTraps", EXTRA_TRAPS, "nat"), ("NaturalTrapsLarge", LARGE_TRAPS, "nat"),
-                                    ("NaturalTrapsLong", LONG_TRAPS, "nat"), ("NaturalTrapsLongLarge", LONG_LARGE, "nat"),
-                                    ("NaturalTrapsWalls", WALL_NATURAL, "natw"), ("MissedTraps", MISSED_NATURAL, "nat")):
+    naturals = (("NaturalTraps", EXTRA_TRAPS, "nat"), ("NaturalTrapsLarge", LARGE_TRAPS, "nat"),
+                ("NaturalTrapsLong", LONG_TRAPS, "nat"), ("NaturalTrapsLongLarge", LONG_LARGE, "nat"),
+                ("NaturalTrapsWalls", WALL_NATURAL, "natw"), ("MissedTraps", MISSED_NATURAL, "nat"))
+    for module, entries, prefix in naturals:
         found += [(module, f"{prefix}{word}", functools.partial(extra_tables, word)) for word, *_ in entries]
     found += [("FarWalls", f"far{period}_{d}", functools.partial(carried, name, d))
               for period, entries in FAR_WALLS.items() for name, d in entries]
@@ -324,6 +327,49 @@ def miss_tables(t: dict, max_width: int = 20) -> dict:
             members = np.flatnonzero(label == best)  # (m,)
             return relabeled_tables(word, width, {(x >> width, x & low) for x in members.tolist()})
     raise ValueError(f"every node of the game of {word} can reach its trap up to width {max_width}")
+
+
+def block_apart(job: tuple[str, list[tuple[str, str, list[dict]]]]) -> list[
+        tuple[str, str, int, list[tuple[int, int, int]]]]:
+    """For one block and its traps or pairs, as (module, name, tables): the halves of the block's natural scan
+    (`natural_scan`, windows of 16 to 64 cells) and, for each trap or pair, those inside a natural trap apart from it or
+    from both traps of the pair, as (module, name, halves inside some natural trap, [(half, cells, states)])."""
+    from computations import right_half
+    block, entries = job
+    starts = right_half.random_starts(30, 64)
+    period = len(block)
+    halves = [(k, natural_tables(block, starts[k], time, cells, modulus)) for k, time, cells, modulus, _ in
+              natural_scan(block, 20000)[1]]
+
+    def apart(t: dict, u: dict) -> bool:
+        cut = (1 << min(t["cells"], u["cells"])) - 1
+        mine = {(label % period, window & cut) for label, window in t["states"]}
+        return not mine & {(label % period, window & cut) for label, window in u["states"]}
+
+    return [(module, name, len(halves), [(k, u["cells"], len(u["states"])) for k, u in halves
+                                         if all(apart(t, u) for t in traps)]) for module, name, traps in entries]
+
+
+def apart_census(workers: int = 1) -> list[tuple[str, str, int, list[tuple[int, int, int]]]]:
+    """`block_apart` for every trap of the trap modules that passes the test of reach (`module_entries` less
+    `UNREACHED` and `Rule30Open.Columns.MissedTraps`), and for the pairs of `PAIRS` and `WALL_SPLIT`, one scan per
+    block, in `workers` processes: the entries with some half apart are the traps of `APART`."""
+    jobs: dict[str, list[tuple[str, str, list[dict]]]] = {}
+    for module, name, build in module_entries():
+        if module == "MissedTraps" or (name.startswith("cen") and name[3:] in UNREACHED.get(module, ())):
+            continue
+        t = build()
+        if t["word"] not in UNREACHED.get(module, ()):
+            jobs.setdefault(t["word"], []).append((module, name, [t]))
+    for block in PAIRS:
+        jobs.setdefault(block, []).append(("TrapPairs", f"pair{block}", pair_tables(block)))
+    for block, _ in WALL_SPLIT:
+        jobs.setdefault(block, []).append(("NaturalTrapsWalls", f"natw{block}", split_tables(block)))
+    items = sorted(jobs.items(), key=lambda job: (len(job[0]), job[0]))
+    with multiprocessing.get_context("spawn").Pool(workers) as pool:
+        rows = list(tqdm(pool.imap(block_apart, items), total=len(items), desc="blocks", file=sys.stderr,
+                         mininterval=30))
+    return [row for found in rows for row in found]
 
 
 def refuted_entries(max_width: int = 17, max_states: int = 2000, max_pairs: int = 300_000) -> list[
@@ -1500,6 +1546,61 @@ UNREACHED = {
 PAIRS = ["0001101101011", "0010010010111", "0010101111111", "00001101111001"]
 
 
+# The traps of the modules, and the pairs, that pass the test of reach but that a half of their block's natural scan,
+# closing windows of 16 to 64 cells, never enters: at step 12,000 the half is inside a closed set apart from the trap,
+# or from both traps of a pair (`halves_apart`), so entry is false. By module, the blocks of those traps.
+APART = {
+    "CensusTraps13": ["0001010101001"],
+    "CensusTraps14": ["00100110111101"],
+    "CensusTraps15": ["000000110011101", "000000111101001", "000001101011101", "000010001000111", "000011100100111",
+                      "000100010100011", "000100100010111", "000100101100111", "000100111001011", "000110101001001",
+                      "000111010011101", "000111011110011", "000111110101101", "000111111011101"],
+    "ElevenTraps": ["00001000101", "00110100111"],
+    "FourteenTraps": ["00000100100111", "00001011101001"],
+    "NaturalTrapsLong": ["00001011100111"],
+    "ThirteenTraps": ["0000010101101", "0000100001011", "0000110110001", "0001011110111", "0001110101101",
+                      "0011011011011"],
+    "TrapPairs": ["0001101101011"],
+    "TwelveTraps": ["000001110101"],
+}
+
+# Blocks whose every trap in the trap modules, and pair, is refuted by a half apart (`APART`), reduced instead to entry
+# into one of a set of traps: the block's traps in the modules by name (`named_tables`), and the natural traps its
+# halves are inside that none of those is, each as (start, cells, modulus) of `EXTRA_TRAPS`. Every node of the game of
+# 20 cells can reach one of them, and every half of the scan is inside one. Checked in `Rule30Open.Columns.TrapSets`.
+TRAP_SETS = [("00001000101", [("ElevenTraps", "el0_5")], [(18429370810410311795, 22, 11)]),
+             ("00110100111", [("ElevenTraps", "el1_0")], [(4728953243656014532, 21, 11)]),
+             ("000001110101", [("TwelveTraps", "tw0_22")], [(4728953243656014532, 22, 12)]),
+             ("0000010101101", [("ThirteenTraps", "th0_41")], [(4728953243656014532, 23, 13)]),
+             ("0000100001011", [("ThirteenTraps", "th0_21")], [(12828593127923856452, 25, 13)]),
+             ("0000110110001", [("ThirteenTraps", "th0_45")], [(13784866300695777546, 30, 13)]),
+             ("0001010101001", [("CensusTraps13", "cen0001010101001")], [(6648364488764846871, 22, 13)]),
+             ("0001011110111", [("ThirteenTraps", "th0_31")], [(4728953243656014532, 30, 26)]),
+             ("0001101101011", [("TrapPairs", "pair0001101101011_0"), ("TrapPairs", "pair0001101101011_1")],
+              [(18429370810410311795, 21, 13)]),
+             ("0001110101101", [("ThirteenTraps", "th0_8")], [(12828593127923856452, 21, 13)]),
+             ("0011011011011", [("ThirteenTraps", "th0_12")], [(8432205463714238596, 25, 13)]),
+             ("00000100100111", [("FourteenTraps", "fo0_33")], [(0, 22, 14), (6648364488764846871, 27, 14)]),
+             ("00001011100111", [("NaturalTrapsLong", "nat00001011100111")], [(13505850817731016314, 24, 14)]),
+             ("00001011101001", [("FourteenTraps", "fo0_58")], [(4728953243656014532, 23, 14)]),
+             ("00100110111101", [("CensusTraps14", "cen00100110111101")], [(0, 26, 14)]),
+             ("000000110011101", [("CensusTraps15", "cen000000110011101")],
+              [(0, 28, 15), (12131907666976161055, 42, 15)]),
+             ("000000111101001", [("CensusTraps15", "cen000000111101001")],
+              [(12828593127923856452, 24, 15), (16965863739456413490, 30, 15)]),
+             ("000001101011101", [("CensusTraps15", "cen000001101011101")], [(6648364488764846871, 37, 15)]),
+             ("000010001000111", [("CensusTraps15", "cen000010001000111")], [(6117052809311358181, 39, 15)]),
+             ("000011100100111", [("CensusTraps15", "cen000011100100111")], [(0, 32, 15)]),
+             ("000100010100011", [("CensusTraps15", "cen000100010100011")], [(12828593127923856452, 30, 15)]),
+             ("000100100010111", [("CensusTraps15", "cen000100100010111")], [(6648364488764846871, 33, 15)]),
+             ("000100101100111", [("CensusTraps15", "cen000100101100111")], [(4728953243656014532, 38, 15)]),
+             ("000100111001011", [("CensusTraps15", "cen000100111001011")], [(16492533075233650793, 36, 15)]),
+             ("000110101001001", [("CensusTraps15", "cen000110101001001")], [(17333691585517767718, 26, 15)]),
+             ("000111010011101", [("CensusTraps15", "cen000111010011101")], [(12828593127923856452, 31, 15)]),
+             ("000111011110011", [("CensusTraps15", "cen000111011110011")], [(4728953243656014532, 29, 15)]),
+             ("000111110101101", [("CensusTraps15", "cen000111110101101")], [(12828593127923856452, 37, 15)]),
+             ("000111111011101", [("CensusTraps15", "cen000111111011101")], [(0, 27, 15)])]
+
 # Natural traps for blocks of periods 10 to 14 whose only traps, walls carried to them, fail the test of reach
 # (`UNREACHED`): from the natural scans, the smallest closed set of windows that a sampled half driven by the block is
 # inside at step 12,000, when it passes the test at 20 cells and no half of the scan is inside a closed set apart from
@@ -1574,6 +1675,43 @@ def lean_extra(entries: list[tuple[str, int, int, int]] | None = None) -> str:
     return "\n".join(lean_entry(extra_tables(word), f"nat{word}")
                      + f"\ntheorem nat{word}_check : nat{word}.check = true := by decide +kernel\n"
                      for word, *_ in (EXTRA_TRAPS if entries is None else entries))
+
+
+def named_tables(module: str, name: str) -> dict:
+    """The trap that `module_entries` names `name` in `module`, or a trap of a pair of `TrapPairs` (`pair<block>_<k>`)
+    or `NaturalTrapsWalls` (`natw<block>_<k>`), as tables."""
+    if module == "TrapPairs":
+        block, index = name[4:].split("_")
+        return pair_tables(block)[int(index)]
+    if module == "NaturalTrapsWalls" and name.count("_") == 1:
+        block, index = name[4:].split("_")
+        return split_tables(block)[int(index)]
+    return next(build() for m, n, build in module_entries() if (m, n) == (module, name))
+
+
+def set_tables(block: str) -> list[tuple[str, str, dict]]:
+    """The traps of the entry of `TRAP_SETS` for the block, as (module, name, tables): the traps of the trap modules by
+    name (`named_tables`), then the natural traps, named `sets<block>_<k>` in `Rule30Open.Columns.TrapSets`."""
+    _, named, natural = next(entry for entry in TRAP_SETS if entry[0] == block)
+    out = [(module, name, named_tables(module, name)) for module, name in named]
+    out += [("TrapSets", f"sets{block}_{k}", natural_tables(block, start, 12000, cells, modulus))
+            for k, (start, cells, modulus) in enumerate(natural)]
+    return out
+
+
+def lean_trap_sets(part: int = 1024, piece: int = 1 << 16) -> str:
+    """The natural traps of `Rule30Open.Columns.TrapSets`, those of each entry of `TRAP_SETS`: each with its kernel
+    check, or, above 3,000 states, in parts (`lean_parts`)."""
+    out = []
+    for block, _, _ in TRAP_SETS:
+        for module, name, t in set_tables(block):
+            if module != "TrapSets":
+                continue
+            if len(t["states"]) > 3000:
+                out.append(lean_parts(t, name, part, piece))
+            else:
+                out.append(lean_entry(t, name) + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n")
+    return "\n".join(out)
 
 
 def lean_wall_natural(part: int = 1024, piece: int = 1 << 16) -> str:
@@ -2255,8 +2393,13 @@ def main() -> None:
                         help="the traps of TrapPairs, the two bottom components of each block of PAIRS")
     parser.add_argument("--lean-wall-natural", action="store_true",
                         help="the traps of NaturalTrapsWalls, natural traps for blocks whose wall traps fail")
+    parser.add_argument("--lean-trap-sets", action="store_true",
+                        help="the natural traps of TrapSets, for blocks whose every trap a sampled half stays apart from")
     parser.add_argument("--lean-refuted", action="store_true",
                         help="the closed sets of RefutedTraps, which refute entry into traps of UNREACHED in Lean")
+    parser.add_argument("--apart-census", type=int, metavar="WORKERS",
+                        help="the traps and pairs that pass the test of reach but that a half of the natural scan stays "
+                             "apart from, with this many processes (about an hour with three)")
     parser.add_argument("--halves-apart", action="store_true",
                         help="for each trap of NaturalTrapsWalls, the halves of its natural scan in traps apart from it")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
@@ -2504,8 +2647,16 @@ def main() -> None:
         print(lean_pairs())
     if args.lean_wall_natural:
         print(lean_wall_natural())
+    if args.lean_trap_sets:
+        print(lean_trap_sets())
     if args.lean_refuted:
         print(lean_refuted())
+    if args.apart_census:
+        rows = apart_census(args.apart_census)
+        print(f"{len(rows)} traps or pairs, {sum(1 for row in rows if row[3])} with a half apart")
+        for module, name, halves, away in rows:
+            if away:
+                print(f"{module} {name}: {len(away)} of {halves} halves apart {away}")
     if args.halves_apart:
         traps = [extra_tables(word) for word, *_ in WALL_NATURAL]
         traps += [t for word, _ in WALL_SPLIT for t in split_tables(word)]

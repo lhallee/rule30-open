@@ -56,7 +56,9 @@ where the cells after the trap's 16 follow the rule instead of taking any value,
 reach: a right half whose first 20 cells start among the others never enters, and entry into the trap is false ([what
 failed](../../negative-results/columns/missed-traps.md)). The trap of $0001111110011$ fails already in the game of 17
 cells. For both blocks no trap of any module passes, so the reduction is empty. The other 68 traps pass the test, which
-entry needs but does not imply.
+entry needs but does not imply. For one of the traps that pass, a half of its block's natural scan, closing windows of
+16 to 64 cells, is inside a closed set apart from the trap, so entry into it is false too, and [TrapSets](TrapSets.md)
+reduces the block to entry into one of several traps.
 
 ## Relation to the kit
 
