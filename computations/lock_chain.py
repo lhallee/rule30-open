@@ -52,6 +52,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-long-large   # the traps of NaturalTrapsLongLarge, in parts
     python -m computations.lock_chain --reach 18   # which traps every window of 18 cells can reach, cut to 18 cells
     python -m computations.lock_chain --halves-apart   # halves of the natural scans apart from NaturalTrapsWalls' traps
+    python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
     python -m computations.lock_chain --lean-wall-natural   # the traps of NaturalTrapsWalls
@@ -253,27 +254,41 @@ def trap_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
     return inside
 
 
-def module_traps() -> list[tuple[str, dict]]:
-    """Every trap of the trap modules, as (module, tables), in the order of `coverage.trap_blocks`, and the seven of
-    `Rule30Open.Columns.MissedTraps`; the pairs of `PAIRS` are left to `pair_tables`."""
-    found: list[tuple[str, dict]] = [("WordTraps", tables(name)) for name, *_ in TRAPS]
-    found.append(("WordTraps", tables("trap001011111")))
-    found += [("NineTraps", carried("trap001011111", d)) for d in nine_distances()]
-    found.append(("NineTraps", tables("trap001010011")))
-    found += [("TenTraps", carried("trap0000010001", d)) for d in ten_distances()]
-    for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"), (14, "FourteenTraps")):
-        found += [(module, carried(name, d)) for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
-    for module, entries in (("NaturalTraps", EXTRA_TRAPS), ("NaturalTrapsLarge", LARGE_TRAPS),
-                            ("NaturalTrapsLong", LONG_TRAPS), ("NaturalTrapsLongLarge", LONG_LARGE),
-                            ("NaturalTrapsWalls", WALL_NATURAL), ("MissedTraps", MISSED_NATURAL)):
-        found += [(module, extra_tables(word)) for word, *_ in entries]
-    found += [("FarWalls", carried(name, d)) for entries in FAR_WALLS.values() for name, d in entries]
+def module_entries() -> list[tuple[str, str, functools.partial]]:
+    """Every trap of the trap modules and the seven of `Rule30Open.Columns.MissedTraps`, as (module, the name of its
+    declaration in Lean, a function that builds its tables), in the order of `coverage.trap_blocks`; the pairs of
+    `PAIRS` and `WALL_SPLIT` are left to `pair_tables` and `split_tables`. The wall of period 9 at distance 0 is
+    `trap001011111` of `Rule30Open.Columns.WordTraps`."""
+    found = [("WordTraps", name, functools.partial(tables, name)) for name, *_ in TRAPS]
+    found.append(("WordTraps", "trap001011111", functools.partial(tables, "trap001011111")))
+    found += [("NineTraps", f"nine{d}" if d else "trap001011111", functools.partial(carried, "trap001011111", d))
+              for d in nine_distances()]
+    found.append(("NineTraps", "trap001010011", functools.partial(tables, "trap001010011")))
+    found += [("TenTraps", f"ten{d}", functools.partial(carried, "trap0000010001", d)) for d in ten_distances()]
+    for period, module, prefix in ((11, "ElevenTraps", "el"), (12, "TwelveTraps", "tw"), (13, "ThirteenTraps", "th"),
+                                   (14, "FourteenTraps", "fo")):
+        walls = {name: k for k, name in enumerate(WALLS[period])}
+        found += [(module, f"{prefix}{walls[name]}_{d}", functools.partial(carried, name, d))
+                  for name, d, _ in wall_distances(period, WALL_DEPTHS[period])]
+    for module, entries, prefix in (("NaturalTraps", EXTRA_TRAPS, "nat"), ("NaturalTrapsLarge", LARGE_TRAPS, "nat"),
+                                    ("NaturalTrapsLong", LONG_TRAPS, "nat"), ("NaturalTrapsLongLarge", LONG_LARGE, "nat"),
+                                    ("NaturalTrapsWalls", WALL_NATURAL, "natw"), ("MissedTraps", MISSED_NATURAL, "nat")):
+        found += [(module, f"{prefix}{word}", functools.partial(extra_tables, word)) for word, *_ in entries]
+    found += [("FarWalls", f"far{period}_{d}", functools.partial(carried, name, d))
+              for period, entries in FAR_WALLS.items() for name, d in entries]
     for period, entries in CENSUS_TRAPS.items():
-        found += [(f"CensusTraps{period}", census_tables(entry)) for entry in entries]
+        found += [(f"CensusTraps{period}", f"cen{entry[0]}", functools.partial(census_tables, entry))
+                  for entry in entries]
     for module, entries in (("CensusTrapsLarge", CENSUS_LARGE), ("CensusTrapsLarge15", CENSUS_LARGE15),
                             ("MissedTraps", MISSED_CENSUS)):
-        found += [(module, census_tables(entry)) for entry in entries]
+        found += [(module, f"cen{entry[0]}", functools.partial(census_tables, entry)) for entry in entries]
     return found
+
+
+def module_traps() -> list[tuple[str, dict]]:
+    """Every trap of the trap modules, as (module, tables), in the order of `coverage.trap_blocks`, and the seven of
+    `Rule30Open.Columns.MissedTraps` (`module_entries`); the pairs of `PAIRS` are left to `pair_tables`."""
+    return [(module, build()) for module, _, build in module_entries()]
 
 
 def reach_census(width: int = 18) -> list[tuple[str, str, int, float]]:
@@ -309,6 +324,47 @@ def miss_tables(t: dict, max_width: int = 20) -> dict:
             members = np.flatnonzero(label == best)  # (m,)
             return relabeled_tables(word, width, {(x >> width, x & low) for x in members.tolist()})
     raise ValueError(f"every node of the game of {word} can reach its trap up to width {max_width}")
+
+
+def refuted_entries(max_width: int = 17, max_states: int = 2000, max_pairs: int = 300_000) -> list[
+        tuple[str, str, dict, dict]]:
+    """The traps of `UNREACHED` whose refutation `Rule30Open.Columns.RefutedTraps` checks in Lean, as (module, name,
+    tables, closed set): those that fail the test of reach at a width up to `max_width`, where `miss_tables` gives a
+    closed set apart from the trap of at most `max_states` states, with at most `max_pairs` pairs of a state of the trap
+    and one of the set for the kernel to compare."""
+    out = []
+    for module, name, build in tqdm(module_entries(), desc="refuted", file=sys.stderr, mininterval=10):
+        if module not in UNREACHED or (name.startswith("cen") and name[3:] not in UNREACHED[module]):
+            continue
+        t = build()
+        if t["word"] not in UNREACHED[module]:
+            continue
+        try:
+            s = miss_tables(t, max_width)
+        except ValueError:
+            continue
+        if len(s["states"]) <= max_states and len(s["states"]) * len(t["states"]) <= max_pairs:
+            out.append((module, name, t, s))
+    return out
+
+
+def lean_refuted(entries: list[tuple[str, str, dict, dict]] | None = None) -> str:
+    """The closed sets of `Rule30Open.Columns.RefutedTraps`, one per entry of `refuted_entries`: each with the checks
+    that it is closed and apart from the trap, and the refutation of entry into the trap, by `not_absorption`, or by
+    `not_absorption_wide` when the set is wider than the trap."""
+    out = []
+    for module, name, t, s in refuted_entries() if entries is None else entries:
+        away, wide = f"away_{name}", s["cells"] > t["cells"]
+        body = lean_entry(s, away).split("\n", 1)[1]
+        apart, refute = ("apartWide", "not_absorption_wide") if wide else ("apart", "not_absorption")
+        out.append(f"/-- A closed set apart from `{name}` of {module}: windows of {s['cells']} cells, labels modulo "
+                   f"{s['modulus']}, {len(s['states'])} states. -/\n{body}\n"
+                   f"theorem {away}_closed : {away}.closedCheck = true := by decide +kernel\n\n"
+                   f"theorem {away}_apart : {away}.{apart} {name} = true := by decide +kernel\n\n"
+                   f"/-- **Some finitely supported right half driven by `{t['word']}` never enters `{name}`.** -/\n"
+                   f"theorem {name}_not_absorption : ¬ {name}.Absorption :=\n"
+                   f"  {refute} _ {away} {away}_closed rfl (by decide) {away}_apart (by decide)\n")
+    return "\n".join(out)
 
 
 def pair_tables(block: str) -> list[dict]:
@@ -2199,6 +2255,8 @@ def main() -> None:
                         help="the traps of TrapPairs, the two bottom components of each block of PAIRS")
     parser.add_argument("--lean-wall-natural", action="store_true",
                         help="the traps of NaturalTrapsWalls, natural traps for blocks whose wall traps fail")
+    parser.add_argument("--lean-refuted", action="store_true",
+                        help="the closed sets of RefutedTraps, which refute entry into traps of UNREACHED in Lean")
     parser.add_argument("--halves-apart", action="store_true",
                         help="for each trap of NaturalTrapsWalls, the halves of its natural scan in traps apart from it")
     parser.add_argument("--lean-extra", action="store_true", help="print the trap entries of NaturalTraps.lean")
@@ -2446,6 +2504,8 @@ def main() -> None:
         print(lean_pairs())
     if args.lean_wall_natural:
         print(lean_wall_natural())
+    if args.lean_refuted:
+        print(lean_refuted())
     if args.halves_apart:
         traps = [extra_tables(word) for word, *_ in WALL_NATURAL]
         traps += [t for word, _ in WALL_SPLIT for t in split_tables(word)]

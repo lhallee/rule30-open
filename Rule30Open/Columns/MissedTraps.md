@@ -21,7 +21,7 @@ module checks each of the seven as a trap and refutes entry into it, so their re
 hypothesis was false. The trap modules no longer list them. In the game of 20 cells, 240 traps that the modules still
 hold fail the same test ([what failed](../../negative-results/columns/missed-traps.md)), and `not_absorption`, or
 `not_absorption_wide` for a closed set wider than the trap, applies to each of them as well, given a closed set apart
-from it.
+from it; [RefutedTraps](RefutedTraps.md) applies it to 102.
 
 | block | trap from | states | nodes of the 16-cell game that can reach it | cut width | closed set |
 |---|---|---|---|---|---|

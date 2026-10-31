@@ -2458,6 +2458,53 @@ def test_trap_reach_lifted() -> None:
             assert lock_chain.trap_reach(t, width=width) == pytest.approx(direct(word, states, cells, width), abs=1e-12)
 
 
+def test_module_entries() -> None:
+    """`lock_chain.module_entries`: 1,509 traps, each named by a declaration `def <name> : WTrap` of its module's Lean
+    file, the wall of period 9 at distance 0 by that of WordTraps; the names are distinct within a module; and the
+    builders of three carried traps give the walls carried to the distances their names say."""
+    from computations import lock_chain
+    entries = lock_chain.module_entries()
+    assert len(entries) == 1509
+    columns = ROOT / "Rule30Open" / "Columns"
+    names: dict[str, set[str]] = {}
+    for module in {m for m, _, _ in entries}:
+        names[module] = set(re.findall(r"^def ([A-Za-z0-9_]+) : WTrap", (columns / f"{module}.lean").read_text(
+            encoding="utf-8"), re.M))
+    words = set(re.findall(r"^def ([A-Za-z0-9_]+) : WTrap", (columns / "WordTraps.lean").read_text(encoding="utf-8"),
+                           re.M))
+    for module, name, _ in entries:
+        assert name in names[module] or (module == "NineTraps" and name == "trap001011111" and name in words)
+    for module in names:
+        listed = [name for m, name, _ in entries if m == module]
+        assert len(listed) == len(set(listed))
+    picks = {("TenTraps", "ten10"): ("trap0000010001", 10), ("ThirteenTraps", "th0_3"): (lock_chain.WALLS[13][0], 3),
+             ("FarWalls", "far12_41"): ("trap001011100111", 41)}
+    for module, name, build in entries:
+        if (module, name) in picks:
+            assert build() == lock_chain.carried(*picks[(module, name)])
+
+
+def test_refuted_traps() -> None:
+    """The closed set of RefutedTraps for `nine15`, the period-9 wall carried 15 columns: `miss_tables` gives 21 windows
+    of 2 cells with labels modulo 9; stepped with the rule cell by cell, under both values of cell 3, each goes to one of
+    them with the next label; none is the first two cells of a state of the trap with a label of the same phase; and
+    `lean_refuted` writes it as the module does."""
+    from computations import lock_chain
+    t = lock_chain.carried("trap001011111", 15)
+    s = lock_chain.miss_tables(t)
+    assert (t["word"], s["cells"], s["modulus"], len(s["states"])) == ("001101111", 2, 9, 21)
+    states = set(s["states"])
+    for label, window in states:
+        c0, c1, c2 = int(t["word"][label % 9]), window & 1, (window >> 1) & 1
+        for c3 in (0, 1):
+            moved = (c0 ^ (c1 | c2)) | ((c1 ^ (c2 | c3)) << 1)
+            assert ((label + 1) % 9, moved) in states
+    assert not {(label % 9, window & 3) for label, window in t["states"]} & {(label % 9, w) for label, w in states}
+    entry = ("NineTraps", "nine15", t, s)
+    assert lock_chain.lean_refuted([entry]) in (ROOT / "Rule30Open" / "Columns" / "RefutedTraps.lean").read_text(
+        encoding="utf-8")
+
+
 def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of

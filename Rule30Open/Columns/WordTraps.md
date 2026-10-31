@@ -92,7 +92,8 @@ period: the other blocks of period 5, 6, 7 and 9 have no trap found.
 [MissedTraps](MissedTraps.md), `trap01` for $01$ and `trap001fifteen` for $001$: some node cannot reach a window whose
 first cells form a state of the trap, cut to 20 cells when the trap is wider, so a right half whose first 20 cells start
 there never enters, and entry into the trap is false ([what failed](../../negative-results/columns/missed-traps.md)).
-The block $001$ keeps the kit's `t001`, which passes the test at every width up to 24 ([reach of the kit's
+[RefutedTraps](RefutedTraps.md) checks the refutation for `trap01` in Lean. The block $001$ keeps the kit's `t001`,
+which passes the test at every width up to 24 ([reach of the kit's
 conjectures](../../findings/columns/kit-absorption-reach.md)); for $01$ no trap here passes, so its reduction is empty.
 The other five traps pass the test, which entry needs but does not imply.
 

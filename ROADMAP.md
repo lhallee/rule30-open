@@ -289,24 +289,25 @@ In order of the assessment above.
    [CensusTrapsLarge15](Rule30Open/Columns/CensusTrapsLarge15.md)). Entry needs at least that every node of the finite
    game can reach the trap, and that is false for 247 traps: seven at their own width of 16 cells, refuted in Lean
    ([MissedTraps](Rule30Open/Columns/MissedTraps.md)), and 240 still in the modules in the game of 20 cells ([what
-   failed](negative-results/columns/missed-traps.md)). Most are traps carried along a background's columns; seven, of
-   16 to 19 cells, pass in the game of their own width, where the cell beyond takes any value, and fail in that of 20,
+   failed](negative-results/columns/missed-traps.md)). Most are traps carried along a background's columns; seven, of 16
+   to 19 cells, pass in the game of their own width, where the cell beyond takes any value, and fail in that of 20,
    where the cells after them follow the rule, among them two walls and two natural traps. The sampled halves of ten
    blocks split between two traps apart from each other, and these come down to entry into one of the two
    ([TrapPairs](Rule30Open/Columns/TrapPairs.md), [NaturalTrapsWalls](Rule30Open/Columns/NaturalTrapsWalls.md), which
-   refutes entry into each trap alone of five of its six pairs in Lean with `not_absorption_wide`); for three of these
-   blocks only the halves show it, the test of reach at 20 cells passing; from the white window of the other
-   three blocks of MissedTraps no locked window of 16 to 18 cells can be reached. Natural traps that pass reduce 60 of
-   the blocks whose wall traps fail ([NaturalTrapsWalls](Rule30Open/Columns/NaturalTrapsWalls.md)). With the failures
-   taken out, a quarter to three tenths of each of periods 12 to 15 comes down to entry into a trap that passes ([the
+   refutes entry into each trap alone of five of its six pairs in Lean with `not_absorption_wide`), and
+   [RefutedTraps](Rule30Open/Columns/RefutedTraps.md) checks the refutation of 102 of the 240 in Lean; for three of
+   these blocks only the halves show it, the test of reach at 20 cells passing; from the white window of the other three
+   blocks of MissedTraps no locked window of 16 to 18 cells can be reached. Natural traps that pass reduce 60 of the
+   blocks whose wall traps fail ([NaturalTrapsWalls](Rule30Open/Columns/NaturalTrapsWalls.md)). With the failures taken
+   out, a quarter to three tenths of each of periods 12 to 15 comes down to entry into a trap that passes ([the
    coverage](findings/columns/coverage.md)). With windows of 18 cells, periods 10 to 12 have more locks but their chains
    hold the same blocks, and the backgrounds without a wall of 16 cells still have none. The census at period 16 finds
    three backgrounds with walls, of 216, 325 and 2,032 cells, whose chains hold 1,365 of the 4,080 blocks. Next: traps
    for the 173 blocks whose traps all fail, built so that every window of 20 cells can reach them; the test of reach in
-   wider games, which only refutes more, natural traps among them; Lean refutations for the 240, with `not_absorption`
-   and `not_absorption_wide`; traps for period 16; and at
-   widths well past 18 for the backgrounds without walls, as the walls of period 9 are 43 cells wide; wider
-   classes of halves for that edge, such as every half of twelve cells, as
+   wider games, which only refutes more, natural traps among them; Lean refutations for the 138 of the 240 that
+   [RefutedTraps](Rule30Open/Columns/RefutedTraps.md) does not check, with `not_absorption` and `not_absorption_wide`;
+   traps for period 16; and at widths well past 18 for the backgrounds without walls, as the walls of period 9 are 43
+   cells wide; wider classes of halves for that edge, such as every half of twelve cells, as
    [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569 values of column 17
    that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md) does for period four; the walls of
    periods 11 and 12 are carried in Lean too ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md),

@@ -49,10 +49,10 @@ for every finite right half stays open, as for the kit's traps.
 **The test of reach.** In the game of 20 cells, 26 of the 83 traps here, of 16 to 56 cells, fail the test of
 [MissedTraps](MissedTraps.md): some node cannot reach a window whose first cells form a state of the trap, cut to 20
 cells when the trap is wider, so a right half whose first 20 cells start there never enters, and entry into the trap is
-false ([what failed](../../negative-results/columns/missed-traps.md)). For 12 of their blocks no trap of any module
-passes, so the reduction is empty; the other 14 are reduced instead by natural traps of
-[NaturalTrapsWalls](NaturalTrapsWalls.md) that pass, two of them to entry into one of two. The other 57 traps pass the
-test, which entry needs but does not imply.
+false ([what failed](../../negative-results/columns/missed-traps.md)). [RefutedTraps](RefutedTraps.md) checks the
+refutation of 13 of them in Lean. For 12 of their blocks no trap of any module passes, so the reduction is empty; the
+other 14 are reduced instead by natural traps of [NaturalTrapsWalls](NaturalTrapsWalls.md) that pass, two of them to
+entry into one of two. The other 57 traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
 

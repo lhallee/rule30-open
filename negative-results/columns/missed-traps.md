@@ -92,13 +92,19 @@ conjectures](../../findings/columns/kit-absorption-reach.md)).
 
 **What it means.** The reductions of 173 blocks were true theorems with false hypotheses, and [the coverage
 table](../../findings/columns/coverage.md) now counts a block as reduced only when one of its traps passes the test at
-20 cells. The test is necessary, not sufficient, and stricter at every larger width: traps that pass at their own width
-fail at 20 cells, so wider games would likely refute more traps, natural ones among them. The kit met the same failure
-for its period-four certificates `S0001`, `S0011` and `S0111` (`Rule30Ether.never_enters_S0001` and the two after it)
-and states its absorption conjecture for the whole ether-and-wall family instead of one certificate; that family, and
-the kit's `t001`, pass the test at 23 and 24 cells. Of the refutations here the seven of MissedTraps and the ten
-single traps of five pairs of NaturalTrapsWalls are checked in Lean; `not_absorption` and `not_absorption_wide` of
-MissedTraps would check any of the others, given a closed set apart from the trap (`miss_tables`).
+20 cells. The test is a probabilistic one, that of [the coin beyond the window](../../findings/columns/coin-lock.md): a
+trap passes at $w$ cells exactly when, with a fair coin in column $w + 1$, every window of $w$ cells reaches it with
+probability 1, since in the finite game a node that can reach it does so with a chance bounded below within a bounded
+time, and a node that cannot never does. Each refuted trap is a counterexample of that kind, a set of windows the coin
+never brings in, and each half apart is one that the true rule supplies. The test is necessary, not sufficient, and
+stricter at every larger width: traps that pass at their own width fail at 20 cells, so wider games would likely refute
+more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
+`S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
+ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 23 and 24 cells.
+Of the refutations here 119 are checked in Lean: the seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17
+cells ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), and the ten single traps of five pairs of
+NaturalTrapsWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a
+closed set apart from the trap (`miss_tables`).
 
 **Reproduce.**
 
