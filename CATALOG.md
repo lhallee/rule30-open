@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-99 Lean modules with 443 headline theorems, 42 findings (proved on paper,
+100 Lean modules with 448 headline theorems, 42 findings (proved on paper,
 computed or conjectured) and 39 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 80 | 23 | 11 |
+| [Columns](#columns) | 81 | 23 | 11 |
 | [Period two](#period-two) | 6 | 7 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -177,6 +177,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No finite configuration whose cells 9 to 3,058 are white has a center column that repeats 0000010001](Rule30Open/Columns/TenGap.md) | [`Columns.TenGap`](Rule30Open/Columns/TenGap.lean) | `prefixRightW_of_entry`, `gapRightW_of_entries`, `ten_gap`, `ten_white` | 1 | not in the kit |
 | [Traps for 25 blocks of period 10, from one background of period ten whose edge driven right halves enter](Rule30Open/Columns/TenTraps.md) | [`Columns.TenTraps`](Rule30Open/Columns/TenTraps.lean) | `tenTraps_check`, `tenTraps_blocks`, `ten_absorption_excludes` | 1 | not in the kit |
 | [Traps for 53 of the 630 blocks of period 13, from a wall of period thirteen carried leftward](Rule30Open/Columns/ThirteenTraps.md) | [`Columns.ThirteenTraps`](Rule30Open/Columns/ThirteenTraps.lean) | `thirteenTraps_check`, `thirteenTraps_blocks`, `thirteen_absorption_excludes` | 1 | not in the kit |
+| [Under a center column repeating 001, column 1 at the second white step has 1-runs of length at least 2 and 0-runs of length at least 3](Rule30Open/Columns/ThreeRuns.md) | [`Columns.ThreeRuns`](Rule30Open/Columns/ThreeRuns.lean) | `three_runs`, `three_runs_evolve`, `no_010_time`, `no_101_time`, `no_1001_time` | 1 | not in the kit |
 | [Four blocks of periods 13 and 14 reduced to entry into one of two traps](Rule30Open/Columns/TrapPairs.md) | [`Columns.TrapPairs`](Rule30Open/Columns/TrapPairs.lean) | `absorption_some_excludes`, `pair0001101101011_excludes`, `pair0010101111111_excludes` | 1 | not in the kit |
 | [Entry into one of several traps for 29 blocks whose sampled halves stay apart from their single traps](Rule30Open/Columns/TrapSets.md) | [`Columns.TrapSets`](Rule30Open/Columns/TrapSets.lean) | `set0001101101011_excludes`, `set0000010101101_excludes`, `set000111111011101_excludes` | 1 | not in the kit |
 | [Four traps for 001, pairwise apart, so the kit's AbsorptionT t001 is false and so is entry into one of any three](Rule30Open/Columns/Traps001.md) | [`Columns.Traps001`](Rule30Open/Columns/Traps001.lean) | `not_absorptionT_t001`, `traps001_pair_not_absorption`, `t001W_not_absorption_some`, `traps001_excludes`, `absorption_any_excludes` | 1 | not in the kit |

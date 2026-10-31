@@ -130,8 +130,9 @@ entropy, which is why no lock and no periodic trap appears for them, and why mas
 reduction moves the whole difficulty to the left half, as the kit's left-only statements do, with less to rule out. A
 left statement with constrained free bits is still of the kind of the problem (a finite left half has to fail to
 produce a sequence from an uncountable set of positive entropy), so this narrows the problem and does not close it.
-The forced cases are finite computations of a few million states each and can be checked by a kernel; the trap of
-$001$ is being formalized.
+The forced cases are finite computations of a few million states each and can be checked by a kernel. For $001$ the
+kernel checks one: [ThreeRuns](../../Rule30Open/Columns/ThreeRuns.md) proves that column 1 at the second white step
+avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half.
 
 ## Reproduce
 

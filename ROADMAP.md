@@ -386,8 +386,9 @@ In order of the assessment above.
 5. **Period two, Problems 2 and 3: the open statements at their sharpest.**
    - *Reading constraints in Lean.* The forced sets of words of [reading
      constraints](findings/columns/reading-constraints.md), from every state for 15 blocks of period 3 to 7, are
-     finite checks of a few million states; a kernel certificate for $001$ first, then left statements with constrained
-     free bits for those blocks.
+     finite checks of a few million states. For $001$ the kernel checks the run constraint at the second white step
+     ([ThreeRuns](Rule30Open/Columns/ThreeRuns.md)); certificates for the other 14 blocks, then left statements with
+     constrained free bits, are next.
    - *Period two, the right half.* Every finite right half entering the gap trap, the kit's ether family or the lock of
      period seven ([the census](findings/period-two/gate-census.md)) would leave the left statement `Q01Gap` alone; the
      census reaches 20 cells, and wider locks, or a test of reach for the three sets together, are next.

@@ -78,6 +78,7 @@ public import Rule30Open.Columns.ReachRefuted
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.Columns.Traps001
+public import Rule30Open.Columns.ThreeRuns
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable
