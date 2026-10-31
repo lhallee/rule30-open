@@ -53,10 +53,12 @@ blocks whose traps were all refuted.
 ## What it covers
 
 Each trap reduces its block to entry. The evidence for entry is thin: for 81 of the 86 blocks no half of the scan, the
-white half and 30 random ones driven for 20,000 steps, locks column 1 at all, so entry rests on the two tests alone,
-as it does for many traps carried far. For the other 5 every half that locks is inside a trap that meets this one. The
-86 blocks count among those reduced to entry into a trap that passes, in [the coverage
-table](../../findings/columns/coverage.md). Entry for every finite right half stays open.
+white half and 30 random ones driven for 20,000 steps, locks column 1 at all, so entry rests on the two tests alone, as
+it does for many traps carried far. For the other 5 every half that locks is inside a trap that meets this one. The 86
+blocks count among those reduced to entry into a trap that passes, in [the coverage
+table](../../findings/columns/coverage.md). For 3 of them the census trap of the block, which fails the test of reach,
+is apart from the trap here, so entry into this trap alone is false and the block comes down to entry into one of the
+two ([ApartTraps](ApartTraps.md)). Entry for every finite right half stays open.
 
 ## Relation to the kit
 

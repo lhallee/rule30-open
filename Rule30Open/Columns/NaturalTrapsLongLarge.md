@@ -52,7 +52,9 @@ entry into one of two traps. Entry for every finite right half stays open, as fo
 any value, every trap here passes the test of [MissedTraps](MissedTraps.md): every node can reach a window whose first
 16 cells form a state of the trap ([what failed](../../negative-results/columns/missed-traps.md)). Entry needs this but
 is not implied by it. In the game of 22 cells the trap of $0101011111111$ fails it, with 99.984% of the nodes able to
-reach, so entry into it is false and its reduction empty; the other 11 pass there.
+reach, so entry into it is false and its reduction empty; the other 11 pass there. For 5 of them a carried census trap
+of the same block, 28 to 104 cells wide, is apart from the natural trap, so entry into the natural trap alone is false
+too, and each of those blocks comes down to entry into one of its two traps ([ApartTraps](ApartTraps.md)).
 
 ## Relation to the kit
 

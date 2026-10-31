@@ -5,10 +5,11 @@ For each period: the primitive blocks; those excluded outright, by the finite ga
 reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
 `FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge`, `NaturalTrapsLong`, `NaturalTrapsLongLarge`, `FarWalls`,
 `CensusTraps13`, `CensusTraps14`, `CensusTraps15`, `CensusTrapsLarge`, `CensusTrapsLarge15`, `FifteenWalls`,
-`TrapPairs`, `NaturalTrapsWalls`, `TrapSets` and `PeriodFourCertificate`, and the kit's `t001` for 001), counting only
-traps that pass the test of reach (`lock_chain.UNREACHED`) and that no half of the natural scan stays apart from
-(`lock_chain.APART`); those that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14;
-and the rest, which no method here reaches.
+`TrapPairs`, `NaturalTrapsWalls`, `TrapSets`, `ApartTraps` and `PeriodFourCertificate`, and the four traps for 001 of
+`Traps001`), counting only traps that pass the test of reach (`lock_chain.UNREACHED`), that no half of the natural scan
+stays apart from (`lock_chain.APART`) and that no other trap of their block is apart from (`lock_chain.APART_TRAPS`);
+those that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14; and the rest, which no
+method here reaches.
 
     python -m computations.coverage --max-period 15   # about ten minutes
 """
@@ -30,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def module_blocks() -> list[tuple[str, str]]:
     """Every block that a trap in Lean reduces to entry, each as its least rotation, with the module that holds the
     trap, once per trap, in the order of the modules."""
-    found: list[tuple[str, str]] = [("001", "the kit's t001")]
+    found: list[tuple[str, str]] = [("001", "Traps001")]
     found += [(lock_chain.tables(name)["word"], "WordTraps") for name, *_ in lock_chain.TRAPS]
     found.append((lock_chain.tables("trap001011111")["word"], "WordTraps"))
     found += [(lock_chain.carried("trap001011111", distance)["word"], "NineTraps")
@@ -55,6 +56,7 @@ def module_blocks() -> list[tuple[str, str]]:
     found += [(block, "TrapPairs") for block in lock_chain.PAIRS]
     found += [(word, "NaturalTrapsWalls") for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT]
     found += [(block, "TrapSets") for block, *_ in lock_chain.TRAP_SETS]
+    found += [(block, "ApartTraps") for block, *_ in lock_chain.APART_TRAPS]
     found += [(word, "PeriodFourCertificate") for word in ("0001", "0011", "0111")]
     return found
 
@@ -72,10 +74,11 @@ def refuted_blocks() -> set[str]:
     """The blocks of `trap_blocks` whose every trap is refuted: it fails the test of reach (`lock_chain.UNREACHED`),
     so some node of the finite game of `lock_chain.REACH_WIDTH` cells cannot reach it, or a half of the block's
     natural scan is inside a closed set apart from it (`lock_chain.APART`), or it fails the test of reach in the game
-    of 22 cells (`lock_chain.UNREACHED_WIDE`); either way entry into it is false and its reduction empty. The kit's
+    of 22 cells (`lock_chain.UNREACHED_WIDE`), or another trap of its block is apart from it (`lock_chain.APART_TRAPS`,
+    whose blocks the pairs of `ApartTraps` hold); either way entry into it is false and its reduction empty. The kit's
     `t001` and its ether-and-wall family, behind `PeriodFourCertificate`, pass the test of reach
     ([reach of the kit's conjectures](../findings/columns/kit-absorption-reach.md))."""
-    refuted = (lock_chain.UNREACHED, lock_chain.APART, lock_chain.UNREACHED_WIDE)
+    refuted = (lock_chain.UNREACHED, lock_chain.APART, lock_chain.UNREACHED_WIDE, lock_chain.apart_refuted())
     passing = {block for block, module in module_blocks()
                if not any(block in found.get(module, ()) for found in refuted)}
     return set(trap_blocks()) - passing

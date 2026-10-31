@@ -56,6 +56,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
     python -m computations.lock_chain --apart-pairs   # traps of one block that refute each other
+    python -m computations.lock_chain --lean-apart-traps   # their refutations and pair reductions, in Lean
     python -m computations.lock_chain --scan001   # long-run seeds whose chains reach 001, about 11 min
     python -m computations.lock_chain --lean-traps001   # four traps for 001 pairwise apart, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
@@ -82,8 +83,10 @@ from __future__ import annotations
 import argparse
 import functools
 import multiprocessing
+import re
 import sys
 from collections.abc import Iterator
+from pathlib import Path
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -1422,6 +1425,77 @@ def lean_winset(name: str, word: str, width: int, rows: list[list[int]], piece: 
             f"    rows := [{packed}] }}\n")
 
 
+def apart_traps(pairs: list[tuple[str, tuple[str, str], tuple[str, str], int]] | None = None) -> list[
+        tuple[str, str, str, str, str]]:
+    """The traps of the trap modules that pass the test of reach (not in `UNREACHED` or `UNREACHED_WIDE`) and of
+    halves apart (not in `APART`), outside `MissedTraps`, the pairs and the sets, that another trap of their block
+    refutes with all of its states (`apart_pairs`): (block, module, name, the other's module, its name), the first
+    such other, in the order of `block_traps`; from `pairs` when given, the result of `apart_pairs`."""
+    lists = (UNREACHED, APART, UNREACHED_WIDE)
+    found = {}
+    for block, (ma, na), (mb, nb), size in apart_pairs() if pairs is None else pairs:
+        if ma in ("MissedTraps", "TrapPairs", "TrapSets", "Traps001") or (ma, na) in found:
+            continue
+        if any(block in refuted.get(ma, ()) for refuted in lists) or re.fullmatch(r"natw[01]+_\d", na):
+            continue
+        other = named_tables(mb, nb) if mb != "Traps001" else kit_t001()
+        if size == len(other["states"]):
+            found[(ma, na)] = (block, mb, nb)
+    return [(block, ma, na, mb, nb) for (ma, na), (block, mb, nb) in found.items()]
+
+
+def apart_refuted() -> dict[str, list[str]]:
+    """The traps of `APART_TRAPS` by module, as the blocks of their traps, in the form of `UNREACHED`."""
+    found: dict[str, list[str]] = {}
+    for block, module, *_ in APART_TRAPS:
+        found.setdefault(module, []).append(block)
+    return found
+
+
+def lean_check_names() -> set[str]:
+    """The names `x` of the traps with a theorem `x_check` in the Lean modules of `Rule30Open/Columns`."""
+    root = Path(__file__).resolve().parents[1] / "Rule30Open" / "Columns"
+    found = set()
+    for path in root.glob("*.lean"):
+        found |= set(re.findall(r"^theorem (\w+)_check :", path.read_text(encoding="utf-8"), re.M))
+    return found
+
+
+def lean_apart_traps(piece: int = 1 << 16) -> str:
+    """The declarations of `Rule30Open.Columns.ApartTraps`: for each entry of `APART_TRAPS`, that the other trap is
+    closed, the refuted trap's states cut to the narrower width (`cut_rows`), that they hold its states and that the
+    other trap avoids them, the refutation of entry (`not_absorption_fwd`), and the reduction of the block to entry
+    into one of the two (`absorption_some_excludes`)."""
+    entries = {(m, n): b for m, n, b in module_entries()}
+    checks = lean_check_names()
+    out = []
+    for block, module, name, other_module, other in APART_TRAPS:
+        c, s = entries[(module, name)](), entries[(other_module, other)]()
+        assert c["word"] == block and apart_closed(c, s).all()
+        word, width, cert = c["word"], min(c["cells"], s["cells"]), f"apart_{name}"
+        block = ", ".join("true" if ch == "1" else "false" for ch in word)
+        closed = f"WTrap.closedCheck_of_check _ {other}_check" if other in checks else "by decide +kernel"
+        check_other = f"exact {other}_check" if other in checks else "decide +kernel"
+        check_name = f"exact {name}_check" if name in checks else "decide +kernel"
+        out.append(f"theorem {cert}_closed : {other}.closedCheck = true :=\n  {closed}\n\n"
+                   f"/-- The states of `{name}` cut to {width} cells, by label. -/\n"
+                   + lean_winset(cert, word, width, cut_rows((c,), width), piece)
+                   + f"\ntheorem {cert}_holds : {cert}.holds {name} = true := by\n  decide +kernel\n\n"
+                   f"theorem {cert}_avoids : {cert}.avoids {other} = true := by\n  decide +kernel\n\n"
+                   f"/-- **Entry into `{name}` is false**: the right half of state 0 of `{other}` never enters it. "
+                   f"-/\ntheorem {name}_not_absorption_apart : ¬ {name}.Absorption :=\n"
+                   f"  not_absorption_fwd _ {other} {cert} {cert}_closed rfl rfl (by decide)\n"
+                   f"    (by decide) {cert}_holds {cert}_avoids (by decide)\n\n"
+                   f"/-- The two traps of `{word}`. -/\ndef pair_{word} : List WTrap := [{other}, {name}]\n\n"
+                   f"/-- **`{word}` reduced to entry into one of its two traps.** -/\n"
+                   f"theorem pair_{word}_excludes (hA : WTrap.AbsorptionSome pair_{word}) :\n"
+                   f"    ¬ Rule30StripCertificates.EventuallyWord\n      [{block}] := by\n"
+                   f"  refine absorption_some_excludes _ pair_{word} ?_ ?_ hA <;>\n"
+                   f"    simp only [pair_{word}, List.mem_cons, List.not_mem_nil, or_false] <;> rintro C (rfl | rfl)\n"
+                   f"  · rfl\n  · rfl\n  · {check_other}\n  · {check_name}\n")
+    return "\n".join(out)
+
+
 def lean_traps001(piece: int = 1 << 16) -> str:
     """The declarations of `Rule30Open.Columns.Traps001` for the two traps of `TRAPS_001`: each with its kernel check;
     for each of the four traps for 001 and each other, the other's states cut to the narrower width (`cut_rows`), that
@@ -1891,6 +1965,61 @@ APART = {
     "TrapPairs": ["0001101101011"],
     "TwelveTraps": ["000001110101"],
 }
+
+# Traps that pass the tests of reach and of halves apart while another trap of their block, wider than the games
+# tested, holds a closed set apart from them, all of its states (`apart_closed`), so entry into each is false, and the
+# block comes down to entry into one of the two, in `Rule30Open.Columns.ApartTraps`: (block, module, name, the other
+# trap's module, its name), from `apart_traps`.
+APART_TRAPS = [
+    ("0000000001", "NaturalTrapsWalls", "natw0000000001", "TenTraps", "ten23"),
+    ("0000011101", "NaturalTrapsWalls", "natw0000011101", "TenTraps", "ten25"),
+    ("0001111111", "NaturalTrapsWalls", "natw0001111111", "TenTraps", "ten26"),
+    ("0011111101", "NaturalTrapsWalls", "natw0011111101", "TenTraps", "ten24"),
+    ("00000001011", "NaturalTrapsWalls", "natw00000001011", "ElevenTraps", "el0_20"),
+    ("00001001101", "NaturalTrapsWalls", "natw00001001101", "ElevenTraps", "el0_24"),
+    ("00001101011", "NaturalTrapsWalls", "natw00001101011", "ElevenTraps", "el0_22"),
+    ("00001111111", "NaturalTrapsWalls", "natw00001111111", "ElevenTraps", "el0_19"),
+    ("00111010111", "NaturalTrapsWalls", "natw00111010111", "ElevenTraps", "el0_11"),
+    ("01010101011", "NaturalTrapsWalls", "natw01010101011", "ElevenTraps", "el0_25"),
+    ("01011111011", "NaturalTrapsWalls", "natw01011111011", "ElevenTraps", "el0_21"),
+    ("01111011111", "NaturalTrapsWalls", "natw01111011111", "ElevenTraps", "el0_26"),
+    ("000000010001", "NaturalTrapsWalls", "natw000000010001", "TwelveTraps", "tw1_40"),
+    ("000000011101", "NaturalTrapsWalls", "natw000000011101", "TwelveTraps", "tw1_34"),
+    ("000000110011", "NaturalTrapsWalls", "natw000000110011", "TwelveTraps", "tw1_38"),
+    ("000100111101", "NaturalTrapsWalls", "natw000100111101", "TwelveTraps", "tw2_13"),
+    ("000111001101", "NaturalTrapsWalls", "natw000111001101", "TwelveTraps", "tw2_14"),
+    ("001100111111", "NaturalTrapsWalls", "natw001100111111", "TwelveTraps", "tw1_39"),
+    ("001111111101", "NaturalTrapsWalls", "natw001111111101", "TwelveTraps", "tw1_33"),
+    ("010110111111", "NaturalTrapsWalls", "natw010110111111", "TwelveTraps", "tw1_20"),
+    ("011101111111", "NaturalTrapsWalls", "natw011101111111", "TwelveTraps", "tw1_37"),
+    ("0000001001101", "NaturalTrapsWalls", "natw0000001001101", "ThirteenTraps", "th0_50"),
+    ("0000011000111", "NaturalTrapsWalls", "natw0000011000111", "ThirteenTraps", "th0_53"),
+    ("0000111011011", "NaturalTrapsWalls", "natw0000111011011", "ThirteenTraps", "th0_15"),
+    ("0001111101111", "NaturalTrapsWalls", "natw0001111101111", "ThirteenTraps", "th0_52"),
+    ("0010110111111", "NaturalTrapsWalls", "natw0010110111111", "ThirteenTraps", "th0_49"),
+    ("0101010101111", "NaturalTrapsWalls", "natw0101010101111", "ThirteenTraps", "th0_51"),
+    ("00000000010001", "NaturalTrapsWalls", "natw00000000010001", "FourteenTraps", "fo0_19"),
+    ("00000000110011", "NaturalTrapsWalls", "natw00000000110011", "FourteenTraps", "fo0_17"),
+    ("00000001010111", "NaturalTrapsWalls", "natw00000001010111", "FourteenTraps", "fo0_23"),
+    ("00000100001111", "NaturalTrapsWalls", "natw00000100001111", "FourteenTraps", "fo0_57"),
+    ("00000111001101", "NaturalTrapsWalls", "natw00000111001101", "FourteenTraps", "fo0_21"),
+    ("00001100011011", "NaturalTrapsWalls", "natw00001100011011", "FourteenTraps", "fo0_25"),
+    ("00010011111101", "NaturalTrapsWalls", "natw00010011111101", "FourteenTraps", "fo0_20"),
+    ("00010101111111", "NaturalTrapsWalls", "natw00010101111111", "FourteenTraps", "fo0_22"),
+    ("00100101100101", "NaturalTrapsWalls", "natw00100101100101", "FourteenTraps", "fo0_66"),
+    ("00100110111111", "NaturalTrapsWalls", "natw00100110111111", "FourteenTraps", "fo0_69"),
+    ("00101111101111", "NaturalTrapsWalls", "natw00101111101111", "FourteenTraps", "fo0_24"),
+    ("00110011111111", "NaturalTrapsWalls", "natw00110011111111", "FourteenTraps", "fo0_18"),
+    ("01110111111111", "NaturalTrapsWalls", "natw01110111111111", "FourteenTraps", "fo0_16"),
+    ("0000001101001", "NaturalTrapsLongLarge", "nat0000001101001", "CensusTraps13", "cen0000001101001"),
+    ("0000110111001", "NaturalTrapsLongLarge", "nat0000110111001", "CensusTraps13", "cen0000110111001"),
+    ("00000001111111", "NaturalTrapsLongLarge", "nat00000001111111", "CensusTraps14", "cen00000001111111"),
+    ("00000011110111", "NaturalTrapsLongLarge", "nat00000011110111", "CensusTraps14", "cen00000011110111"),
+    ("00011111110101", "NaturalTrapsLongLarge", "nat00011111110101", "CensusTraps14", "cen00011111110101"),
+    ("000000101011001", "FifteenWalls", "fw1_11", "CensusTraps15", "cen000000101011001"),
+    ("001001111101111", "FifteenWalls", "fw1_106", "CensusTraps15", "cen001001111101111"),
+    ("000010000101001", "FifteenWalls", "fw1_109", "CensusTraps15", "cen000010000101001"),
+]
 
 # Blocks whose every trap in the trap modules, and pair, is refuted by a half apart (`APART`), reduced instead to entry
 # into one of a set of traps: the block's traps in the modules by name (`named_tables`), and the natural traps its
@@ -2798,6 +2927,8 @@ def main() -> None:
     parser.add_argument("--lean-traps001", action="store_true",
                         help="the two more traps for 001 of Rule30Open.Columns.Traps001, and the refutations")
     parser.add_argument("--scan001", action="store_true", help="the long-run seeds whose chains reach 001")
+    parser.add_argument("--lean-apart-traps", action="store_true",
+                        help="the refutations and pair reductions of Rule30Open.Columns.ApartTraps")
     parser.add_argument("--apart-pairs", action="store_true",
                         help="every two traps of one block in Lean, one holding a closed set apart from the other")
     parser.add_argument("--lean-back", action="store_true",
@@ -3083,11 +3214,17 @@ def main() -> None:
             print(f"{seed} (lock values {values}, width {width}): 001 at distance {distance}, a trap of {t['cells']} "
                   f"cells, labels modulo {t['modulus']}, {len(t['states'])} states")
         return
+    if args.lean_apart_traps:
+        print(lean_apart_traps())
+        return
     if args.apart_pairs:
         found = apart_pairs()
         for block, (ma, na), (mb, nb), size in found:
             print(f"{block}: {mb}.{nb} holds a closed set of {size} states apart from {ma}.{na}")
         print(f"{len(found)} ordered pairs, {len({refuted for _, refuted, _, _ in found})} traps refuted")
+        print("APART_TRAPS:")
+        for entry in apart_traps(found):
+            print(f"    {entry},")
         return
     if args.lean_refuted:
         print(lean_refuted())

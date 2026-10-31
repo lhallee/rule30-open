@@ -2677,6 +2677,24 @@ def test_traps001() -> None:
     assert lock_chain.lean_traps001() in lean
 
 
+def test_apart_traps() -> None:
+    """Each entry of `lock_chain.APART_TRAPS`: the refuted trap and the other are of the named block and the other is
+    apart from it as a whole (`apart_closed`); the coverage holds each block through `ApartTraps` and counts the
+    refuted trap as refuted; and `lean_apart_traps` gives the declarations of `Rule30Open.Columns.ApartTraps`."""
+    from computations import coverage, lock_chain
+
+    entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
+    for block, module, name, other_module, other in lock_chain.APART_TRAPS:
+        c, s = entries[(module, name)](), entries[(other_module, other)]()
+        assert c["word"] == s["word"] == block and lock_chain.apart_closed(c, s).all()
+        assert block in lock_chain.apart_refuted()[module]
+    assert len(lock_chain.APART_TRAPS) == 48 == len({block for block, *_ in lock_chain.APART_TRAPS})
+    held = set(coverage.module_blocks())
+    assert all((block, "ApartTraps") in held for block, *_ in lock_chain.APART_TRAPS)
+    lean = (ROOT / "Rule30Open" / "Columns" / "ApartTraps.lean").read_text(encoding="utf-8")
+    assert lock_chain.lean_apart_traps() in lean
+
+
 def test_back_tables() -> None:
     """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
     order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the
@@ -2815,7 +2833,7 @@ def test_unreached() -> None:
     16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
     rule; the natural trap of 0010011110101 passes in the game of 20 cells and fails in that of 22 (`UNREACHED_WIDE`);
     and `coverage.refuted_blocks` holds the 171 blocks of periods 2 to 15 with no trap that passes, 01 among them
-    and 001, which keeps the kit's t001, not."""
+    and 001, which keeps the four traps of Traps001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())

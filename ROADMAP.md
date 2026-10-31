@@ -19,7 +19,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 |---|---|---|---|
 | 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 1,400 blocks of period at most 21, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
-| 1 | Single blocks through traps | open | 16 of the 56 blocks of period 9, 24 of the 99 of period 10, 55 of the 186 of period 11, 99 of the 335 of period 12, 181 of the 630 of period 13, 340 of the 1,161 of period 14 and 623 of the 2,182 of period 15 come down to entry into traps that every window of 20 cells can reach, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14 and six of period 15, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 15, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 3, 5, 6 and 7 has a trap that small halves almost never enter; entry into 277 other traps, most of them carried along a background's columns, is false, 109 of them in Lean, and 39 blocks need entry into one of several traps |
+| 1 | Single blocks through traps | open | 16 of the 56 blocks of period 9, 24 of the 99 of period 10, 55 of the 186 of period 11, 99 of the 335 of period 12, 181 of the 630 of period 13, 340 of the 1,161 of period 14 and 623 of the 2,182 of period 15 come down to entry into traps that every window of 20 cells can reach, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14 and six of period 15, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 15, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 3, 5, 6 and 7 has a trap that small halves almost never enter; entry into 325 other traps, most of them carried along a background's columns, is false, 168 of them in Lean, among them 48 natural traps that pass the test of reach but that a wider trap of their block is apart from, and 87 blocks need entry into one of several traps |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
@@ -27,7 +27,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
-| 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 277 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game or from where sampled halves settle |
+| 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 325 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game, from where sampled halves settle or from another trap of the block, and so does the kit's own reduction of $001$ to its trap `t001` |
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
 | 2 | Conservation laws | closed | none over four steps |
 | 2 | Bounds on runs | open | runs at most linear in their start time |
@@ -309,9 +309,12 @@ In order of the assessment above.
    windows of 16 to 64 cells, settles into a closed set apart from the trap; and for each of the 29 blocks the block's
    traps with the natural traps its halves are in pass the test of reach, so the block comes down to entry into one of
    several traps ([TrapSets](Rule30Open/Columns/TrapSets.md)). Entry into a single trap is the wrong hypothesis for many
-   blocks, as the kit found at period four; the hypotheses that can hold are families. Two of the natural traps there
-   are walls of the background of 2,145 cells at period 15, of 27 and 37 cells, wider than the census sees; carried
-   leftward they give traps that pass both tests to 86 blocks of period 15, 81 that nothing reached
+   blocks, as the kit found at period four; the hypotheses that can hold are families. A trap too wide for any game
+   tested can miss another: for 48 blocks the carried trap that fails the test of reach is apart from the natural trap
+   that passes, so only entry into one of the two can hold ([ApartTraps](Rule30Open/Columns/ApartTraps.md)), and the
+   same holds for the kit's `t001` ([Traps001](Rule30Open/Columns/Traps001.md)). Two of the natural traps there are
+   walls of the background of 2,145 cells at period 15, of 27 and 37 cells, wider than the census sees; carried leftward
+   they give traps that pass both tests to 86 blocks of period 15, 81 that nothing reached
    ([FifteenWalls](Rule30Open/Columns/FifteenWalls.md)), though no sampled half locks for 81 of them. In the game of 22
    cells, three of the 252 hypotheses that pass both tests at 20 cells and are not carried along a chain fail the first
    test, the pair of $00101101111$ and the natural traps of $0010011110101$ and $0101011111111$, while a fair coin
@@ -325,17 +328,17 @@ In order of the assessment above.
    which only refutes more; Lean refutations for the 138 of the 240 that
    [RefutedTraps](Rule30Open/Columns/RefutedTraps.md) does not check, with `not_absorption` and `not_absorption_wide`,
    or with the few windows that can reach a trap, or a closed set among the few that cannot, by `not_absorption_back`
-   and `not_absorption_fwd` ([ReachRefuted](Rule30Open/Columns/ReachRefuted.md));
-   traps for period 16; and at widths well past 18 for the backgrounds without walls, as the walls of period 9 are 43
-   cells wide; wider classes of halves for that edge, such as every half of twelve cells, as
-   [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569 values of column 17
-   that brings every window into it, as [LockWord](Rule30Open/Columns/LockWord.md) does for period four; the walls of
-   periods 11 and 12 are carried in Lean too ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md),
-   [TwelveTraps](Rule30Open/Columns/TwelveTraps.md)), and two of them, with the wall of period 10, take every half white
-   past its first eight cells ([WallGaps](Rule30Open/Columns/WallGaps.md)); other classes of halves for the walls of
-   period 9; at periods 5, 6 and 7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap
-   reaches, the left half, one statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half
-   meets ([every block](findings/columns/left-half-every-block.md)).
+   and `not_absorption_fwd` ([ReachRefuted](Rule30Open/Columns/ReachRefuted.md)); traps for period 16; and at widths
+   well past 18 for the backgrounds without walls, as the walls of period 9 are 43 cells wide; wider classes of halves
+   for that edge, such as every half of twelve cells, as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for
+   period four, and the word of 569 values of column 17 that brings every window into it, as
+   [LockWord](Rule30Open/Columns/LockWord.md) does for period four; the walls of periods 11 and 12 are carried in Lean
+   too ([ElevenTraps](Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](Rule30Open/Columns/TwelveTraps.md)), and two of
+   them, with the wall of period 10, take every half white past its first eight cells
+   ([WallGaps](Rule30Open/Columns/WallGaps.md)); other classes of halves for the walls of period 9; at periods 5, 6 and
+   7 traps that the coin of `coin_entry` enters readily; and for the blocks no trap reaches, the left half, one
+   statement per block ([LeftLatch](Rule30Open/Columns/LeftLatch.md)), which no small half meets ([every
+   block](findings/columns/left-half-every-block.md)).
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
    period-four certificate, the periodic backgrounds and the period-two computations ([open
    work](CATALOG.md#open-work)); the general facts of the seed's past are now in Lean

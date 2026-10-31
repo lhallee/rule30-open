@@ -97,7 +97,11 @@ those reduced to entry into a trap that passes the test, in [the coverage table]
 The test only grows stricter with the width: in the game of 22 cells the trap of $0010011110101$ and the pair of
 $00101101111$ fail it, with 99.992% and 99.994% of the nodes able to reach, so entry into either is false too ([what
 failed](../../negative-results/columns/missed-traps.md)); the other 53 traps and five pairs pass there. Passing the test
-is necessary for entry, not sufficient: entry for every finite right half stays open, as for the kit's traps.
+is necessary for entry, not sufficient. For 40 of the 54 traps it is not enough: the carried wall trap of the same
+block, 27 to 85 cells wide and wider than the games tested, is apart from the natural trap, so a half that starts in the
+wall trap never enters the natural one and entry into the natural trap alone is false; each of those blocks comes down
+to entry into one of its two traps ([ApartTraps](ApartTraps.md)). Entry into one of them for every finite right half
+stays open, as for the kit's traps.
 
 ## Relation to the kit
 
