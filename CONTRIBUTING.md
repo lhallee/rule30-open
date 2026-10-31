@@ -74,7 +74,8 @@ python scripts/catalog.py audit   # axioms of every headline theorem
 python -m pytest
 ```
 
-Continuous integration runs the same commands. Write without em dashes, in American English, and keep claims inside
+Continuous integration runs all of them but the tests, which run on your machine, on a CPU, with a limit of a minute
+for the whole suite: test each computation on small cases ([tests/README.md](tests/README.md)). Write without em dashes, in American English, and keep claims inside
 their evidence: a computation to $2^{20}$ cells is a statement about $2^{20}$ cells.
 
 ## Credit

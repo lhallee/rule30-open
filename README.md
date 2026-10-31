@@ -67,8 +67,9 @@ python scripts/catalog.py check
 
 `lake build` fetches the prize kit and checks every proof (under a minute after the first build). The audit prints the
 axioms of every headline theorem and fails on anything beyond `propext`, `Classical.choice` and `Quot.sound`. The
-source contains no `sorry`, `native_decide` or new axiom, which `catalog.py check` enforces. Continuous integration
-runs all of these on every push.
+source contains no `sorry`, `native_decide` or new axiom, which `catalog.py check` enforces. The tests run on your
+machine, on a CPU, not in continuous integration, which runs the build, the audit and the catalog check on every push;
+the limit for the whole suite is a minute, which it does not meet yet ([tests/README.md](tests/README.md)).
 
 ## Contributing
 

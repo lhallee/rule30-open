@@ -20,20 +20,14 @@ jobs:
       - run: pip install pyyaml
       - run: python scripts/catalog.py audit
 
+  # The tests run on the contributor's machine, in under a minute: `python -m pytest`.
   python:
-    name: Catalog and computations
+    name: Catalog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -e ".[test]"
+      - run: pip install pyyaml
       - run: python scripts/catalog.py check
-      # Some tests read the kit's Lean sources, which lake build fetches: check out the commit lake-manifest.json pins.
-      - run: |
-          read -r url rev < <(python -c "import json; p = next(p for p in json.load(open('lake-manifest.json'))['packages'] if p['name'] == 'rule30prize'); print(p['url'], p['rev'])")
-          git init --quiet .lake/packages/rule30prize
-          git -C .lake/packages/rule30prize fetch --quiet --depth 1 "$url" "$rev"
-          git -C .lake/packages/rule30prize checkout --quiet FETCH_HEAD
-      - run: python -m pytest

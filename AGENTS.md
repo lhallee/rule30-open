@@ -24,5 +24,9 @@ This repository works on the three Rule 30 Prize problems in the open. Read [REA
   what order; git history records that.
 - **Python follows the existing modules.** Type every function, give every array a shape comment, show progress on a
   loop that runs for more than a few seconds, and test each computation in `tests/` against an independent check.
+- **Tests are fast and comprehensive.** `python -m pytest` runs on the machine, on a CPU, not in continuous
+  integration, and the whole suite must take under a minute: test each computation on small cases, and leave the large
+  runs to the reproduce commands of its entry. The suite takes about 20 minutes now; [tests/README.md](tests/README.md)
+  lists the slow tests and how to cut them.
 - **Regenerate the catalog.** After editing any entry run `python scripts/catalog.py write`, then `check`.
 - **Write plainly.** No em dashes, American English, one term per concept.
