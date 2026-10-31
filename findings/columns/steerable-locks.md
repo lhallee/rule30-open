@@ -110,7 +110,13 @@ logarithm.
   88 of the 89 of period 13 and 195 of the 197 of period 15. The other three, $0000010111001$, $000001010110101$ and
   $001001111010111$, are those whose traps [MissedTraps](../../Rule30Open/Columns/MissedTraps.md) refutes: from their
   white window no locked node can be reached, at 16, 17 or 18 cells. So at 16 cells, unlike at 13 up to period 12, a
-  block can have locks that most windows never reach. The commands are under Reproduce.
+  block can have locks that most windows never reach. Of the 475, 125 are excluded already, by the game at 14 cells or
+  by the kit, and for 109 of those no play stays out of the locked nodes for long. For the other 350, 8 of period 10,
+  23 of period 11, 32 of 12, 67 of 13, 78 of 14 and 142 of 15, the locked nodes are 0.16% to 52.8% of the game, 6.2%
+  at the median, and the sequences of column $k + 17$ that keep a node out of them grow at rates from 1.548 to just
+  under 2 per step (`locks.growth`). So once column $k$ repeats one of them, column $k + 17$ has entropy at most 0.630
+  to 0.9999998 bits per step: below 0.95 for 39 of them, 0.991 at the median, the least for $000000001101001$ and the
+  most for $00000110001$, as at 13 cells. The commands are under Reproduce.
 
 ## What it means
 
@@ -125,7 +131,9 @@ constraint is mild: most of the freedom of column 14 survives. The growth rates 
 step of the fair coin on every phase, in floating point (`coin_lock.period_rate`): a power iteration of the step plus
 the identity, whose vector then bounds the radius from above by the largest ratio of its image to itself (Collatz and
 Wielandt), so each entropy in the table is an upper bound. A power iteration of the step alone can oscillate between
-eigenvalues of one modulus, as it does for $0000000001$. The Lean modules prove only the sequences.
+eigenvalues of one modulus, as it does for $0000000001$. The Lean modules prove only the sequences. At 16 cells the
+same bound holds, by computation only, for column $k + 17$ and 350 blocks of periods 10 to 15 that nothing excludes:
+0.991 bits per step at the median, and at the least 0.630, for $000000001101001$, below every bound at 13 cells.
 
 ## Reproduce
 
@@ -141,9 +149,10 @@ At 16 cells:
 
 ```bash
 python -m computations.locks --periods 10,11,12,13,14,15 --width 16 --workers 4
+python -m computations.locks --periods 10,11,12,13,14,15 --width 16 --growth --workers 4
 python -m computations.locks --periods 10,11,12,13,14,15 --census 16 --workers 4
 python -m computations.locks --reach 0000010111001,000001010110101,001001111010111 --width 18
 ```
 
-The first two take several hours each; the last shows that the white window of each of the three reaches no lock at 18
-cells.
+The first three take several hours each, the growth rates about two and a half hours more with three processes; the
+last shows that the white window of each of the three reaches no lock at 18 cells.

@@ -1581,7 +1581,8 @@ def test_period_rate() -> None:
     """`coin_lock.period_rate` where the power iteration of `decay_rate` oscillates: for the kit's block 0000000001 at
     width 13, two eigenvalues of one period of the coin step share the largest modulus, and the rate equals that of a
     power iteration shifted by the identity, which converges; for the certificates of 0011 and 0111 at width 16 the
-    rates are 0.99823 and 0.98251."""
+    rates are 0.99823 and 0.98251; and `locks.growth` gives the locked share and growth rate of 0111 at width 13 that
+    `locks.profile` gives."""
     from computations import coin_lock, locks
     from scipy.sparse.linalg import LinearOperator, eigs
     block = "0000000001"
@@ -1607,6 +1608,9 @@ def test_period_rate() -> None:
     assert abs(top[0] - top[1]) < 1e-9 and top[2] < 0.9 * top[0]
     assert round(coin_lock.period_rate("0011", coin_lock.certificate("0011", 16)), 5) == 0.99823
     assert round(coin_lock.period_rate("0111", coin_lock.certificate("0111", 16)), 5) == 0.98251
+    # `locks.growth`, the profile without the steering sequence: for 0111 at width 13 the share and rate of the table
+    share, rate = locks.growth("0111", 13)
+    assert round(share, 4) == 0.0584 and round(rate, 6) == 1.969279
 
 
 def test_locks() -> None:

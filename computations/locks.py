@@ -235,6 +235,16 @@ def profile(block: str, width: int) -> tuple[float, int, float]:
     return float(locked.mean()), len(values), avoid_growth(block, locked.reshape(len(block), 1 << width))
 
 
+def growth(block: str, width: int) -> tuple[float, float]:
+    """The fraction of nodes that are locked and the growth rate of `profile`, without the steering sequence, which is
+    long to build in the wider games, and with the rate's iteration cut at 5,000 steps (`coin_lock.period_rate`, whose
+    value bounds the rate from above wherever the iteration stops)."""
+    from computations import coin_lock
+    locked, _ = lock_info(block, width)  # (p n,)
+    member = locked.reshape(len(block), 1 << width)  # (p, 2^width)
+    return float(locked.mean()), 2 * coin_lock.period_rate(block, member, tolerance=1e-10, limit=5000)
+
+
 def longest_run(block: str) -> int:
     """The longest run of equal values in the block, read cyclically."""
     if len(set(block)) == 1:
@@ -250,6 +260,8 @@ def main() -> None:
     parser.add_argument("--width", type=int, default=13)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--profile", action="store_true", help="also profile the blocks the game does not exclude")
+    parser.add_argument("--growth", action="store_true",
+                        help="also give the locked share and growth rate of the blocks nothing excludes (for width 16)")
     parser.add_argument("--lean", action="store_true",
                         help="instead print the entries of LockBlocks11 and 12, leaving out the blocks the kit excludes")
     parser.add_argument("--census", help="instead count, at each of these widths, the blocks with any locked node")
@@ -313,9 +325,19 @@ def main() -> None:
                           f"  {b}: {best[1]} white values in column {best[0] + 1} steer every window of {best[0]} cells")
         if args.profile:
             for b in rest:
-                share, length, growth = profile(b, args.width)
+                share, length, rate = profile(b, args.width)
                 print(f"  {b}: longest run {longest_run(b)}, locked {share:.4f}, steering {length} values, "
-                      f"growth {growth:.6f}, entropy at most {np.log2(growth):.5f}")
+                      f"growth {rate:.6f}, entropy at most {np.log2(rate):.5f}")
+        if args.growth:
+            blocks = [b for b in rest if b not in kit]
+            task = functools.partial(growth, width=args.width)
+            if args.workers > 1:
+                with multiprocessing.get_context("spawn").Pool(args.workers) as pool:
+                    rates = list(tqdm(pool.imap(task, blocks), total=len(blocks), desc="growth", file=sys.stderr))
+            else:
+                rates = [task(b) for b in tqdm(blocks, desc="growth", file=sys.stderr)]
+            for b, (share, rate) in zip(blocks, rates):
+                print(f"  {b}: locked {share:.4f}, growth {rate:.9f}, entropy at most {np.log2(rate):.7f}")
 
 
 if __name__ == "__main__":
