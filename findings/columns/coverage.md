@@ -37,7 +37,7 @@ scan is inside a closed set apart from it.
 | 12 | 335 | 9 | 99 | 0 | 14 | 213 |
 | 13 | 630 | 21 | 183 | 0 | 38 | 388 |
 | 14 | 1161 | 31 | 340 | 0 | 40 | 750 |
-| 15 | 2182 | 53 | 537 | 0 | 56 | 1536 |
+| 15 | 2182 | 53 | 623 | 0 | 51 | 1455 |
 
 - **Excluded**: the finite game at width 6, 10 or 14, or the kit ([the game blocks](game-blocks.md)); every such
   block up to period 20 is excluded in Lean, by the kit or here.
@@ -56,6 +56,7 @@ scan is inside a closed set apart from it.
   [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md),
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
   [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md),
+  [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md),
   [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose four blocks need entry into one of two traps,
   [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six of whose blocks need the same,
   [TrapSets](../../Rule30Open/Columns/TrapSets.md), whose 29 blocks need entry into one of several traps, and
@@ -81,18 +82,20 @@ natural traps of [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.
 again. At periods 13 and 14 sampling gives traps to 87 and 136 blocks that nothing excludes ([natural
 traps](natural-traps.md)); the census of every locked window of 16 cells, carried by its chain, raises the count of
 blocks with some trap to 221 and 380, and at period 15, where nothing reached a block before, to 593 ([backgrounds
-periodic in time](space-time-backgrounds.md)), but 38, 40 and 56 of these have only traps that fail the test, which
-leaves 183, 340 and 537, 24.6% to 29.3% of each period. Most traps that fail are carried ones, but two walls themselves,
-a census component and two natural traps, all of 16 cells, pass in the game of their own width and fail in that of 20,
-where the cells after them follow the rule; the sampled halves of ten blocks split between two traps apart from each
-other, so that only entry into one of the two can hold ([TrapPairs](../../Rule30Open/Columns/TrapPairs.md),
+periodic in time](space-time-backgrounds.md)), and two walls of its largest background wider than 16 cells raise it to
+674 ([FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md)), but 38, 40 and 51 of these have only traps that fail the
+tests, which leaves 183, 340 and 623, 28.6% to 29.3% of each period. Most traps that fail are carried ones, but two
+walls themselves, a census component and two natural traps, all of 16 cells, pass in the game of their own width and
+fail in that of 20, where the cells after them follow the rule; the sampled halves of ten blocks split between two traps
+apart from each other, so that only entry into one of the two can hold
+([TrapPairs](../../Rule30Open/Columns/TrapPairs.md),
 [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md)); and for 29 blocks some halves settle into closed
 sets of 21 to 42 cells apart from every single trap, so that only entry into one of several can hold
-([TrapSets](../../Rule30Open/Columns/TrapSets.md)). Every reduction still needs its open step, entry
-for every finite half or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the 747
-blocks of period at most 12. Period 8 has no wall wider than 16 cells: its traps are the window locks of 13 cells of its
-eight blocks that have one, which every sampled half enters, three of them excluded by the game and five reduced by
-steering ([natural traps](natural-traps.md)).
+([TrapSets](../../Rule30Open/Columns/TrapSets.md)). Every reduction still needs its open step, entry for every finite
+half or the steering condition for the true orbit, and outright exclusions stay rare: 25 of the 747 blocks of period at
+most 12. Period 8 has no wall wider than 16 cells: its traps are the window locks of 13 cells of its eight blocks that
+have one, which every sampled half enters, three of them excluded by the game and five reduced by steering ([natural
+traps](natural-traps.md)).
 
 ## Reproduce
 

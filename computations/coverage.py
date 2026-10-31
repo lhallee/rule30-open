@@ -4,11 +4,11 @@ For each period: the primitive blocks; those excluded outright, by the finite ga
 (`game.first_width`, `game.kit_blocks`), each of which is excluded in Lean up to period 20; those that a trap in Lean
 reduces to entry (the blocks of `WordTraps`, `NineTraps`, `TenTraps`, `ElevenTraps`, `TwelveTraps`, `ThirteenTraps`,
 `FourteenTraps`, `NaturalTraps`, `NaturalTrapsLarge`, `NaturalTrapsLong`, `NaturalTrapsLongLarge`, `FarWalls`,
-`CensusTraps13`, `CensusTraps14`, `CensusTraps15`, `CensusTrapsLarge`, `CensusTrapsLarge15`, `TrapPairs`,
-`NaturalTrapsWalls`, `TrapSets` and `PeriodFourCertificate`, and the kit's `t001` for 001), counting only traps that
-pass the test of reach (`lock_chain.UNREACHED`) and that no half of the natural scan stays apart from
-(`lock_chain.APART`); those that a steering sequence of the `LockBlocks` modules
-reduces to a condition on column 14; and the rest, which no method here reaches.
+`CensusTraps13`, `CensusTraps14`, `CensusTraps15`, `CensusTrapsLarge`, `CensusTrapsLarge15`, `FifteenWalls`,
+`TrapPairs`, `NaturalTrapsWalls`, `TrapSets` and `PeriodFourCertificate`, and the kit's `t001` for 001), counting only
+traps that pass the test of reach (`lock_chain.UNREACHED`) and that no half of the natural scan stays apart from
+(`lock_chain.APART`); those that a steering sequence of the `LockBlocks` modules reduces to a condition on column 14;
+and the rest, which no method here reaches.
 
     python -m computations.coverage --max-period 15   # about ten minutes
 """
@@ -50,6 +50,8 @@ def module_blocks() -> list[tuple[str, str]]:
         found += [(block, f"CensusTraps{period}") for block, *_ in entries]
     found += [(block, "CensusTrapsLarge") for block, *_ in lock_chain.CENSUS_LARGE]
     found += [(block, "CensusTrapsLarge15") for block, *_ in lock_chain.CENSUS_LARGE15]
+    found += [(lock_chain.fifteen_tables(wall, distance)["word"], "FifteenWalls")
+              for wall, distance in lock_chain.FIFTEEN_DISTANCES]
     found += [(block, "TrapPairs") for block in lock_chain.PAIRS]
     found += [(word, "NaturalTrapsWalls") for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT]
     found += [(block, "TrapSets") for block, *_ in lock_chain.TRAP_SETS]

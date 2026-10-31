@@ -50,16 +50,17 @@ closed set of windows of 7 to 13 cells apart from the trap. In the game of 20 ce
 | [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md) | 70 | 2 | 16 | 2 |
 | [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md) | 124 | 25 | 19 to 105 | 22 |
 | [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md) | 232 | 30 | 18 to 104 | 27 |
-| [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md) | 569 | 56 | 16 to 115 | 56 |
+| [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md) | 569 | 56 | 16 to 115 | 51 |
 
-The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLongLarge and NaturalTrapsWalls pass, 101 natural traps, as
-do the 46 large census components, which are bottom components of 16 cells, and the ten pairs. Of the 240, 235 are
-carried traps, a lock carried leftward along the chain of columns of a background, 17 to 115 cells wide; the share of
-the nodes that can reach a failing trap ranges from 0.002% to 99.98%. Where the blocks of the five wall modules were
-left with no trap that passes, the natural scans give traps that pass for 60 of them, checked in NaturalTrapsWalls. The
-blocks left with no trap that passes number 173: one of period 2, $01$, and 7, 3, 14, 14, 38, 40 and 56 of periods 9
-to 15. For $001$ the kit's `t001` still passes, at every width up to 24 ([reach of the kit's
-conjectures](../../findings/columns/kit-absorption-reach.md)).
+The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLongLarge and NaturalTrapsWalls pass, 101 natural traps, as do
+the 46 large census components, which are bottom components of 16 cells, and the ten pairs. Of the 240, 235 are carried
+traps, a lock carried leftward along the chain of columns of a background, 17 to 115 cells wide; the share of the nodes
+that can reach a failing trap ranges from 0.002% to 99.98%. Where the blocks of the five wall modules were left with no
+trap that passes, the natural scans give traps that pass for 60 of them, checked in NaturalTrapsWalls; and two walls of
+period 15 wider than 16 cells give traps that pass to 5 blocks of CensusTraps15 left so, checked in
+[FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md). The blocks left with no trap that passes number 168: one of
+period 2, $01$, and 7, 3, 14, 14, 38, 40 and 51 of periods 9 to 15. For $001$ the kit's `t001` still passes, at every
+width up to 24 ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)).
 
 The second test refutes 28 more traps, and one pair, that pass the first (`APART`): 2 of ElevenTraps, 1 of
 TwelveTraps, 6 of ThirteenTraps, 2 of FourteenTraps, 1 of NaturalTrapsLong, 1 each of CensusTraps13 and CensusTraps14,
@@ -67,7 +68,7 @@ TwelveTraps, 6 of ThirteenTraps, 2 of FourteenTraps, 1 of NaturalTrapsLong, 1 ea
 in a trap is in the module's: the halves settle into closed sets of 21 to 42 cells that the module's trap, a carried
 wall or a census component, is apart from. For each of the 29 blocks the block's traps and the natural traps its halves
 are inside together pass the test of reach at 20 cells, and [TrapSets](../../Rule30Open/Columns/TrapSets.md) reduces
-the block to entry into one of them, so the count of blocks left with no trap that passes stays 173.
+the block to entry into one of them, so the count of blocks left with no trap that passes stays 168.
 
 **Where it stops, and why.** Four different failures.
 
@@ -100,7 +101,7 @@ the block to entry into one of them, so the count of blocks left with no trap th
   nodes that can reach one are 0.56% to 2.52% of the game (`python -m computations.locks --reach <block> --width 18`,
   or `--repeat 2`). The census components carried to these blocks one or two columns fail the same way.
 
-**What it means.** The reductions of 173 blocks were true theorems with false hypotheses, and [the coverage
+**What it means.** For 168 blocks every reduction is a true theorem with a false hypothesis, and [the coverage
 table](../../findings/columns/coverage.md) now counts a block as reduced only when one of its traps passes the test at
 20 cells. The test is a probabilistic one, that of [the coin beyond the window](../../findings/columns/coin-lock.md): a
 trap passes at $w$ cells exactly when, with a fair coin in column $w + 1$, every window of $w$ cells reaches it with

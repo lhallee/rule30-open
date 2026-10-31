@@ -2459,12 +2459,12 @@ def test_trap_reach_lifted() -> None:
 
 
 def test_module_entries() -> None:
-    """`lock_chain.module_entries`: 1,509 traps, each named by a declaration `def <name> : WTrap` of its module's Lean
+    """`lock_chain.module_entries`: 1,595 traps, each named by a declaration `def <name> : WTrap` of its module's Lean
     file, the wall of period 9 at distance 0 by that of WordTraps; the names are distinct within a module; and the
     builders of three carried traps give the walls carried to the distances their names say."""
     from computations import lock_chain
     entries = lock_chain.module_entries()
-    assert len(entries) == 1509
+    assert len(entries) == 1595
     columns = ROOT / "Rule30Open" / "Columns"
     names: dict[str, set[str]] = {}
     for module in {m for m, _, _ in entries}:
@@ -2538,11 +2538,42 @@ def test_trap_sets() -> None:
     assert lock_chain.lean_trap_sets() in (ROOT / "Rule30Open" / "Columns" / "TrapSets.lean").read_text(encoding="utf-8")
 
 
+def test_fifteen_walls() -> None:
+    """The traps of FifteenWalls: the two walls have 27 and 37 cells and 193 and 652 states; both chains end in the
+    background of spatial period 2,145, the second only from distance 152; each carried trap is for the block of its
+    wall's chain at its distance (`trap_chain`), and the 86 blocks are distinct, 81 of no other module and 5 whose
+    other traps are all refuted; the trap carried
+    2 columns is a lock by `is_lock` and every node of the game of 18 cells can reach it; and `lean_fifteen` is the text
+    of the module."""
+    from computations import coverage, lock_chain
+    walls = [lock_chain.fifteen_wall(k) for k in (0, 1)]
+    assert [(w["cells"], len(w["states"])) for w in walls] == [(27, 193), (37, 652)]
+    for wall, start in zip(walls, (0, 152)):
+        full = wall["word"] * (wall["modulus"] // 15)
+        values = "".join(str((wall["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(15))
+        assert (lambda found: (found[0], len(found[1])))(lock_chain.chain_cycle(full, values)) == (start, 2145)
+    chains = [lock_chain.trap_chain(w, 120) for w in walls]
+    blocks = []
+    for wall, distance in lock_chain.FIFTEEN_DISTANCES:
+        t = lock_chain.fifteen_tables(wall, distance)
+        assert t["word"] == chains[wall][distance] and t["cells"] == walls[wall]["cells"] + distance
+        blocks.append(t["word"])
+    assert len(blocks) == len(set(blocks)) == 86
+    held = [(b, m) for b, m in coverage.module_blocks() if m != "FifteenWalls" and b in set(blocks)]
+    assert all(b in lock_chain.UNREACHED.get(m, ()) or b in lock_chain.APART.get(m, ()) for b, m in held)
+    assert len({b for b, _ in held}) == 5
+    near = lock_chain.fifteen_tables(1, 2)
+    assert lock_chain.is_lock(near["word"], near["states"], near["cells"])
+    assert lock_chain.trap_reach(near, width=18) == 1
+    assert lock_chain.lean_fifteen() in (ROOT / "Rule30Open" / "Columns" / "FifteenWalls.lean").read_text(
+        encoding="utf-8")
+
+
 def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of
     16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
-    rule; and `coverage.refuted_blocks` holds the 173 blocks of periods 2 to 15 with no trap that passes, 01 among them
+    rule; and `coverage.refuted_blocks` holds the 168 blocks of periods 2 to 15 with no trap that passes, 01 among them
     and 001, which keeps the kit's t001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
@@ -2558,9 +2589,9 @@ def test_unreached() -> None:
     assert "0001111110011" in lock_chain.UNREACHED["NaturalTrapsLong"] and natural["cells"] == 16
     assert lock_chain.trap_reach(natural) == 1 > lock_chain.trap_reach(natural, width=17)
     refuted = coverage.refuted_blocks()
-    assert len(refuted) == 173 and "01" in refuted and "001" not in refuted
+    assert len(refuted) == 168 and "01" in refuted and "001" not in refuted
     assert sorted(Counter(len(b) for b in refuted).items()) == [(2, 1), (9, 7), (10, 3), (11, 14), (12, 14), (13, 38),
-                                                                (14, 40), (15, 56)]
+                                                                (14, 40), (15, 51)]
 
 
 def test_wall_natural() -> None:

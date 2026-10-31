@@ -93,7 +93,12 @@ every block of the period is a column of a background, and at 7 thirteen of the 
   and two of period 15, whose components some node of the finite game cannot reach
   ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)). The scan with windows of 16 cells, which samples 31 halves
   per block, finds traps for 12, 31, 41, 86 and 109 blocks at periods 10 to 14 ([natural traps](natural-traps.md)): it
-  misses few of the blocks with a lock, but most of what their chains hold.
+  misses few of the blocks with a lock, but most of what their chains hold. The background of 2,145 cells at period 15
+  also has walls wider than 16 cells, which the census does not see: the natural traps of 27 and 37 cells of
+  $000111111011101$ and $000001101011101$, which sampled halves settle into
+  ([TrapSets](../../Rule30Open/Columns/TrapSets.md)). The chain of the first is in the background from the start; that
+  of the second reaches it at distance 152, and within 120 columns holds 81 blocks that nothing reached, to which
+  [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md) carries it.
 - **Witnesses against the game.** In a background a column can repeat a block of period $p$, a proper divisor of $P$,
   while the column left of it does not repeat with period $p$. Its right side then makes a closed walk of [the finite
   game](../../Rule30Open/Columns/FiniteGame.md) on which the left column takes both values at one phase, so the game

@@ -53,9 +53,11 @@ sets instead. Nine of the natural traps of period 15 have 193 states, at widths 
 42. They are two walls of period 15 wider than the 16 cells the census sees, each carried along its background's
 columns: the nine blocks are those of the chain of the narrowest, the trap of 27 cells of $000111111011101$, at the
 distances 0 to 12 that their widths give, and the three those of the chain of the trap of 37 cells of $000001101011101$,
-at distances 0, 1 and 5 (`trap_chain`). The 29 blocks stay among those reduced to entry into traps that pass both tests,
-so the counts of [the coverage table](../../findings/columns/coverage.md) do not change. Passing the tests is necessary
-for entry, not sufficient: entry into one of the traps of a set, for every finite right half, stays open.
+at distances 0, 1 and 5 (`trap_chain`). Both walls belong to the background of 2,145 cells, and
+[FifteenWalls](FifteenWalls.md) carries them to blocks that nothing else reaches. The 29 blocks stay among those reduced
+to entry into traps that pass both tests, so the counts of [the coverage table](../../findings/columns/coverage.md) do
+not change. Passing the tests is necessary for entry, not sufficient: entry into one of the traps of a set, for every
+finite right half, stays open.
 
 ## Relation to the kit
 

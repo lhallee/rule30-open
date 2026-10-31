@@ -55,6 +55,7 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
+    python -m computations.lock_chain --lean-fifteen   # the traps of FifteenWalls, two walls of period 15 carried
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
     python -m computations.lock_chain --lean-wall-natural   # the traps of NaturalTrapsWalls
@@ -279,6 +280,8 @@ def module_entries() -> list[tuple[str, str, functools.partial]]:
         found += [(module, f"{prefix}{word}", functools.partial(extra_tables, word)) for word, *_ in entries]
     found += [("FarWalls", f"far{period}_{d}", functools.partial(carried, name, d))
               for period, entries in FAR_WALLS.items() for name, d in entries]
+    found += [("FifteenWalls", f"fw{wall}_{d}", functools.partial(fifteen_tables, wall, d))
+              for wall, d in FIFTEEN_DISTANCES]
     for period, entries in CENSUS_TRAPS.items():
         found += [(f"CensusTraps{period}", f"cen{entry[0]}", functools.partial(census_tables, entry))
                   for entry in entries]
@@ -1640,6 +1643,45 @@ WALL_SPLIT = [("0001010111", [(6648364488764846871, 19, 10), (0, 20, 10)]),
               ("00101101101101", [(0, 16, 14), (1252019101295043734, 32, 14)])]
 
 
+# Two walls of the background of 2,145 cells at period 15, wider than the 16 cells of the census of locked windows: the
+# natural traps of 000111111011101 (27 cells, 193 states) and 000001101011101 (37 cells, 652 states), in the form of
+# `EXTRA_TRAPS`. `Rule30Open.Columns.FifteenWalls` carries them, as (wall, distance), to the blocks of period 15 that no
+# other trap that passes reaches, where the carried trap passes the test of reach at 20 cells and no half of the
+# block's natural scan is apart from it.
+FIFTEEN_WALLS = [("000111111011101", 0, 27, 15), ("000001101011101", 6648364488764846871, 37, 15)]
+FIFTEEN_DISTANCES = [(0, 110), (1, 2), (1, 3), (1, 4), (1, 6), (1, 7), (1, 8), (1, 9), (1, 11), (1, 12), (1, 13),
+                     (1, 14), (1, 15), (1, 16), (1, 18), (1, 19), (1, 20), (1, 22), (1, 23), (1, 24), (1, 25), (1, 28),
+                     (1, 29), (1, 30), (1, 33), (1, 34), (1, 37), (1, 39), (1, 40), (1, 42), (1, 43), (1, 45), (1, 47),
+                     (1, 48), (1, 50), (1, 51), (1, 52), (1, 55), (1, 56), (1, 57), (1, 59), (1, 60), (1, 61), (1, 62),
+                     (1, 63), (1, 64), (1, 66), (1, 67), (1, 68), (1, 71), (1, 74), (1, 75), (1, 76), (1, 77), (1, 78),
+                     (1, 80), (1, 81), (1, 82), (1, 84), (1, 85), (1, 86), (1, 87), (1, 88), (1, 90), (1, 91), (1, 92),
+                     (1, 94), (1, 95), (1, 97), (1, 98), (1, 99), (1, 100), (1, 101), (1, 102), (1, 103), (1, 104),
+                     (1, 105), (1, 106), (1, 107), (1, 109), (1, 110), (1, 111), (1, 116), (1, 117), (1, 119), (1, 120)]
+
+
+@functools.lru_cache(maxsize=2)
+def fifteen_wall(wall: int) -> dict:
+    """The wall of `FIFTEEN_WALLS` as tables (`natural_tables`)."""
+    word, start, cells, modulus = FIFTEEN_WALLS[wall]
+    return natural_tables(word, start, 12000, cells, modulus)
+
+
+def fifteen_tables(wall: int, distance: int) -> dict:
+    """A wall of `FIFTEEN_WALLS` carried `distance` columns left by its chain (`carry`)."""
+    return carry(fifteen_wall(wall), distance)
+
+
+def lean_fifteen(piece: int = 1 << 16) -> str:
+    """The traps of `Rule30Open.Columns.FifteenWalls`, one per entry of `FIFTEEN_DISTANCES`, named by the wall and the
+    distance, each with its own kernel check."""
+    out = []
+    for wall, distance in FIFTEEN_DISTANCES:
+        label = f"fw{wall}_{distance}"
+        out.append(lean_entry(fifteen_tables(wall, distance), label, piece)
+                   + f"\ntheorem {label}_check : {label}.check = true := by decide +kernel\n")
+    return "\n".join(out)
+
+
 def extra_tables(word: str) -> dict:
     """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS`, `LONG_TRAPS`, `LONG_LARGE`, `MISSED_NATURAL` or `WALL_NATURAL` for
     the block, as tables (`natural_tables`)."""
@@ -2405,6 +2447,8 @@ def main() -> None:
                         help="the traps of TrapPairs, the two bottom components of each block of PAIRS")
     parser.add_argument("--lean-wall-natural", action="store_true",
                         help="the traps of NaturalTrapsWalls, natural traps for blocks whose wall traps fail")
+    parser.add_argument("--lean-fifteen", action="store_true",
+                        help="the traps of FifteenWalls, two walls of period 15 wider than 16 cells carried leftward")
     parser.add_argument("--lean-trap-sets", action="store_true",
                         help="the natural traps of TrapSets, for blocks whose every trap a sampled half stays apart from")
     parser.add_argument("--lean-refuted", action="store_true",
@@ -2659,6 +2703,8 @@ def main() -> None:
         print(lean_pairs())
     if args.lean_wall_natural:
         print(lean_wall_natural())
+    if args.lean_fifteen:
+        print(lean_fifteen())
     if args.lean_trap_sets:
         print(lean_trap_sets())
     if args.lean_refuted:

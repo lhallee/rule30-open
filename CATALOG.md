@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-84 Lean modules with 363 headline theorems, 30 findings (proved on paper,
+85 Lean modules with 366 headline theorems, 30 findings (proved on paper,
 computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 71 | 17 | 9 |
+| [Columns](#columns) | 72 | 17 | 9 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -125,6 +125,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Every truncation of the aligned ether, followed by a short word, enters the ether-and-wall family](Rule30Open/Columns/EtherPrefix.md) | [`Columns.EtherPrefix`](Rule30Open/Columns/EtherPrefix.lean) | `shift7_drv`, `shift7_family`, `prefix_absorption`, `etherPrefix_0001`, `etherPrefix_0011`, `etherPrefix_0111`, `prefixRight_0001`, `prefixRight_0011`, `prefixRight_0111` | 1 | extends a kit result |
 | [Every truncation of the aligned ether, followed by any word of up to six cells, enters the ether-and-wall family](Rule30Open/Columns/EtherPrefixSix.md) | [`Columns.EtherPrefixSix`](Rule30Open/Columns/EtherPrefixSix.lean) | `prefix_of_tails_len`, `etherPrefixSix_0001`, `etherPrefixSix_0011`, `etherPrefixSix_0111`, `prefixSixRight_0001`, `prefixSixRight_0011`, `prefixSixRight_0111` | 1 | extends a kit result |
 | [Traps for 12 more blocks of period 12, from the wall of the background of 60 cells carried past 40 columns](Rule30Open/Columns/FarWalls.md) | [`Columns.FarWalls`](Rule30Open/Columns/FarWalls.lean) | `farWalls_check`, `farWalls_blocks`, `far_absorption_excludes` | 1 | not in the kit |
+| [Traps for 86 blocks of period 15, from two walls wider than 16 cells carried leftward](Rule30Open/Columns/FifteenWalls.md) | [`Columns.FifteenWalls`](Rule30Open/Columns/FifteenWalls.lean) | `fifteenWalls_check`, `fifteenWalls_blocks`, `fifteen_absorption_excludes` | 1 | not in the kit |
 | [A finite game rules out repeating blocks](Rule30Open/Columns/FiniteGame.md) | [`Columns.FiniteGame`](Rule30Open/Columns/FiniteGame.lean) | `game_column`, `center_not_01111111`, `center_not_00000011` | 1 | independent proof of a kit result |
 | [A right half white past its first fourteen cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/FourteenCells.md) | [`Columns.FourteenCells`](Rule30Open/Columns/FourteenCells.lean) | `fourteen_absorption`, `fourteen_0001`, `fourteen_0011`, `fourteen_0111`, `fourteenRight_0001`, `fourteenRight_0011`, `fourteenRight_0111`, `smallFourteen_0001`, `smallFourteen_0011`, `smallFourteen_0111` | 1 | extends a kit result |
 | [Traps for 101 of the 1,161 blocks of period 14, from a wall of period fourteen carried leftward](Rule30Open/Columns/FourteenTraps.md) | [`Columns.FourteenTraps`](Rule30Open/Columns/FourteenTraps.lean) | `fourteenTraps_check`, `fourteenTraps_blocks`, `fourteen_absorption_excludes` | 1 | not in the kit |
