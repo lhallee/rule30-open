@@ -2817,7 +2817,8 @@ def test_fifteen_walls() -> None:
         assert t["word"] == chains[wall][distance] and t["cells"] == walls[wall]["cells"] + distance
         blocks.append(t["word"])
     assert len(blocks) == len(set(blocks)) == 86
-    held = [(b, m) for b, m in coverage.module_blocks() if m != "FifteenWalls" and b in set(blocks)]
+    held = [(b, m) for b, m in coverage.module_blocks()
+            if m not in ("FifteenWalls", "ApartTraps") and b in set(blocks)]
     assert all(b in lock_chain.UNREACHED.get(m, ()) or b in lock_chain.APART.get(m, ()) for b, m in held)
     assert len({b for b, _ in held}) == 5
     near = lock_chain.fifteen_tables(1, 2)
@@ -2885,7 +2886,7 @@ def test_wall_natural() -> None:
         sets = [{(lab % len(word), w & ((1 << cut) - 1)) for lab, w in t["states"]} for t in pair]
         assert not sets[0] & sets[1] and lock_chain.trap_reach(*pair, width=18) == 1
     for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT:
-        others = held[word] - {"NaturalTrapsWalls"}
+        others = held[word] - {"NaturalTrapsWalls", "ApartTraps"}
         assert others and others <= walls and all(word in lock_chain.UNREACHED[m] for m in others)
     for word in ("0000110011", "00001101011", "000000110011"):
         assert lock_chain.trap_reach(lock_chain.extra_tables(word)) == 1
