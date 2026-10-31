@@ -73,7 +73,7 @@ The module checks the method on the census trap of $000001010110101$ of MissedTr
 closed set of 1,472 states at 8 cells. At 8 cells 123 of the 3,840 nodes of the game can reach it, and
 `cen000001010110101_not_absorption_back` refutes entry from them and the white window at phase 0, which they miss.
 
-It then refutes entry into eight traps carried along a background's columns that pass the test of reach at 20 cells
+It then refutes entry into twelve traps carried along a background's columns that pass the test of reach at 20 cells
 and fail it at 22, those with the fewest nodes able to reach them:
 
 | trap | module | block | nodes of the game of 22 cells that can reach it |
@@ -86,6 +86,10 @@ and fail it at 22, those with the fewest nodes able to reach them:
 | `cen000011011110111` | [CensusTraps15](CensusTraps15.md) | $000011011110111$ | 3,746 of 62,914,560 |
 | `fo0_46` | [FourteenTraps](FourteenTraps.md) | $01010101111011$ | 4,051 of 58,720,256 |
 | `cen000100101010101` | [CensusTraps15](CensusTraps15.md) | $000100101010101$ | 4,449 of 62,914,560 |
+| `cen0000001011101` | [CensusTraps13](CensusTraps13.md) | $0000001011101$ | 5,728 of 54,525,952 |
+| `el1_23` | [ElevenTraps](ElevenTraps.md) | $00001011001$ | 7,707 of 46,137,344 |
+| `tw1_30` | [TwelveTraps](TwelveTraps.md) | $000101100111$ | 9,825 of 50,331,648 |
+| `th0_18` | [ThirteenTraps](ThirteenTraps.md) | $0010010011101$ | 10,154 of 54,525,952 |
 
 Each `<trap>_not_absorption_back` refutes entry from the white window at phase 0, which none of the sets holds: the
 white right half, driven by the block from phase 0, never enters the trap.

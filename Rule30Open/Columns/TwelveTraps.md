@@ -59,7 +59,7 @@ scan, closing windows of 16 to 64 cells, is inside a closed set apart from the t
 [TrapSets](TrapSets.md) reduces the block to entry into one of several traps. Of the 56 traps that pass both tests at 20
 cells, three fail in the game of 22 cells, `tw0_40`, `tw1_30` and `tw1_19`, with 0.0011% to 0.044% of the nodes able to
 reach them ([what failed](../../negative-results/columns/missed-traps.md)); [ReachRefuted](ReachRefuted.md) refutes
-entry into `tw0_40` in Lean from the few nodes that can, and the three blocks keep no trap that passes.
+entry into `tw0_40` and `tw1_30` in Lean from the few nodes that can, and the three blocks keep no trap that passes.
 
 ## Relation to the kit
 

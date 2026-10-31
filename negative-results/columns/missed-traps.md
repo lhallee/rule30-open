@@ -84,14 +84,14 @@ The run above left out the traps carried along a chain, which fail more often. O
 cells, 32 fail in the game of 22 cells (`wide_reach_carried`), of 29 to 140 cells: none of the 235 of at most 22 cells,
 and 3.1% to 5.3% of the wider ones, in ranges of width from 23 to 40 cells to 101 to 140. For 26 of them 0.0011% to 0.8%
 of the nodes can reach the trap, and [ReachRefuted](../../Rule30Open/Columns/ReachRefuted.md) refutes entry into the
-eight with the fewest, 544 to 4,449 nodes, from those nodes, in Lean (`not_absorption_back`). For two, 1.5% and 21% can,
-`cen001001011011011` of CensusTraps15 and `cen00000110111001` of CensusTraps14. For four, `el0_33`, `fo0_30`, `fo0_31`
-and `fw1_103`, all but 0.005% to 0.08% can, and the nodes that cannot hold a lock of 130 to 225 windows of 22 cells on
-which column 1 is fixed at the white phases. Every node can reach the locks beside `el0_33`, `fo0_30` and `fo0_31`, and
-each carried trap is apart from its lock as a whole, so [WideWalls](../../Rule30Open/Columns/WideWalls.md) refutes entry
-into each of the two from the other and reduces the three blocks to entry into one of the two, which passes; only 0.22%
-of the nodes can reach the lock beside `fw1_103`. The other 29 blocks are left with no hypothesis that passes, which
-makes 200, $001011$ among them, so no block of period 6 keeps a trap that passes.
+twelve with the fewest, 544 to 10,154 nodes, from those nodes, in Lean (`not_absorption_back`). For two, 1.5% and 21%
+can, `cen001001011011011` of CensusTraps15 and `cen00000110111001` of CensusTraps14. For four, `el0_33`, `fo0_30`,
+`fo0_31` and `fw1_103`, all but 0.005% to 0.08% can, and the nodes that cannot hold a lock of 130 to 225 windows of 22
+cells on which column 1 is fixed at the white phases. Every node can reach the locks beside `el0_33`, `fo0_30` and
+`fo0_31`, and each carried trap is apart from its lock as a whole, so [WideWalls](../../Rule30Open/Columns/WideWalls.md)
+refutes entry into each of the two from the other and reduces the three blocks to entry into one of the two, which
+passes; only 0.22% of the nodes can reach the lock beside `fw1_103`. The other 29 blocks are left with no hypothesis
+that passes, which makes 200, $001011$ among them, so no block of period 6 keeps a trap that passes.
 
 **Where it stops, and why.** Five different failures.
 
@@ -152,11 +152,11 @@ stricter at every larger width: traps that pass at their own width fail at 20 ce
 more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
 `S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
 ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 26 cells, and
-`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 179 are checked in Lean: the
+`t001` fails it by 52 cells, where the second trap for $001$ fits. Of the refutations here 183 are checked in Lean: the
 seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17 cells
 ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), the ten single traps of five pairs of NaturalTrapsWalls, the
-48 of ApartTraps, `trap001fifteen` in Traps001, and eight of the carried traps that fail at 22 cells in ReachRefuted and
-three in WideWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a
+48 of ApartTraps, `trap001fifteen` in Traps001, and twelve of the carried traps that fail at 22 cells in ReachRefuted
+and three in WideWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a
 closed set apart from the trap (`miss_tables`), and `not_absorption_back` of ReachRefuted any whose reaching nodes the
 kernel can hold.
 

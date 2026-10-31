@@ -61,7 +61,8 @@ not imply. For six of the traps that pass, a half of the block's natural scan, c
 inside a closed set apart from the trap, so entry into each is false too, and [TrapSets](TrapSets.md) reduces their
 blocks to entry into one of several traps. Of the 25 traps that pass both tests at 20 cells, one fails in the game of 22
 cells, `th0_18`, with 0.019% of the nodes able to reach it ([what
-failed](../../negative-results/columns/missed-traps.md)), and its block keeps no trap that passes.
+failed](../../negative-results/columns/missed-traps.md)); [ReachRefuted](ReachRefuted.md) refutes entry into it in Lean
+from the few nodes that can, and its block keeps no trap that passes.
 
 ## Relation to the kit
 

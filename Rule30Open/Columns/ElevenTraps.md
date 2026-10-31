@@ -60,9 +60,9 @@ scan, closing windows of 16 to 64 cells, is inside a closed set apart from the t
 and [TrapSets](TrapSets.md) reduces their blocks to entry into one of several traps. Of the 28 traps that pass both
 tests at 20 cells, three fail in the game of 22 cells, `el1_22`, `el1_23` and `el0_33`, with 0.0012% to 99.97% of the
 nodes able to reach them ([what failed](../../negative-results/columns/missed-traps.md)):
-[ReachRefuted](ReachRefuted.md) refutes entry into `el1_22` in Lean from the few nodes that can, the blocks of `el1_22`
-and `el1_23` keep no trap that passes, and the nodes that cannot reach `el0_33` hold a wall of 22 cells apart from it,
-so [WideWalls](WideWalls.md) reduces its block to entry into one of the two.
+[ReachRefuted](ReachRefuted.md) refutes entry into `el1_22` and `el1_23` in Lean from the few nodes that can, the blocks
+of `el1_22` and `el1_23` keep no trap that passes, and the nodes that cannot reach `el0_33` hold a wall of 22 cells
+apart from it, so [WideWalls](WideWalls.md) reduces its block to entry into one of the two.
 
 ## Relation to the kit
 

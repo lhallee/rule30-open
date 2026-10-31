@@ -2074,7 +2074,9 @@ REACH_REFUTED = [("MissedTraps", "cen000001010110101", 8, "back"), ("TwelveTraps
                  ("ElevenTraps", "el1_22", 22, "back"), ("CensusTraps14", "cen00000110101111", 22, "back"),
                  ("CensusTraps13", "cen0000010000111", 22, "back"), ("FourteenTraps", "fo0_46", 22, "back"),
                  ("CensusTraps15", "cen000011110101001", 22, "back"), ("CensusTraps15", "cen000011011110111", 22, "back"),
-                 ("CensusTraps15", "cen000100101010101", 22, "back")]
+                 ("CensusTraps15", "cen000100101010101", 22, "back"), ("CensusTraps13", "cen0000001011101", 22, "back"),
+                 ("ElevenTraps", "el1_23", 22, "back"), ("TwelveTraps", "tw1_30", 22, "back"),
+                 ("ThirteenTraps", "th0_18", 22, "back")]
 WIDE_WIDTH = 22
 # Walls of 22 cells: traps carried along a background's columns that fail the test of reach at `WIDE_WIDTH` cells
 # while most nodes can reach them, by module and name in Lean. For each, the least closed set among the nodes that

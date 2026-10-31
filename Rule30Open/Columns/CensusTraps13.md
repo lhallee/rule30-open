@@ -74,7 +74,7 @@ from the trap, so entry into it is false too, and [TrapSets](TrapSets.md) reduce
 traps. Of the 98 traps that pass both tests at 20 cells, four fail in the game of 22 cells, `cen0000010000111`,
 `cen0000001011101`, `cen0001101011001` and `cen0010100101101`, with 0.0067% to 0.14% of the nodes able to reach them
 ([what failed](../../negative-results/columns/missed-traps.md)); [ReachRefuted](ReachRefuted.md) refutes entry into the
-first in Lean from the few nodes that can, and the four blocks keep no trap that passes.
+first two in Lean from the few nodes that can, and the four blocks keep no trap that passes.
 
 ## Relation to the kit
 
