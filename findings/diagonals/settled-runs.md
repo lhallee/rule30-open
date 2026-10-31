@@ -4,7 +4,7 @@ category: diagonals
 problems: [2]
 status: conjecture
 formalization: partial
-evidence: [computations/diagonal_cones.py]
+evidence: [computations/diagonal_cones.py, computations/projections.py]
 ---
 
 # A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583
@@ -49,8 +49,20 @@ period 16 from time 12, which the code does not check. The settling constants of
 
 Every ratio is below $3/2$. Over depths $\ge 400$ the largest ratio sits at the edge of the table (depth 1,492 of
 1,499), so in this range it rises slowly with depth and does not fall. Every observed period is 1, 2, 4, 8 or 16.
-Depths beyond 7,999 are untested, including the white diagonals at 53,207, 58,286 and 87,866
-([the records](left-records.md)).
+A streamed check reaches further (`onsets` in [projections.py](../../computations/projections.py)): over $2^{17}$
+steps, every depth $8 \le j < 80{,}000$ repeats with period 16 from its onset to time $2^{17} - 16$, and no onset
+exceeds $\lceil 3j/2 \rceil$, so the hypothesis holds in that window. The settling constants there:
+
+| Depths | Largest onset / depth | At depth | Median onset / depth |
+|---|---:|---:|---:|
+| 4,096 to 8,191 | 1.3397 | 8,117 | 1.3302 |
+| 8,192 to 16,383 | 1.3432 | 15,424 | 1.3356 |
+| 16,384 to 32,767 | 1.3455 | 28,584 | 1.3407 |
+| 32,768 to 65,535 | 1.3421 | 32,780 | 1.3367 |
+| 65,536 to 79,999 | 1.3397 | 70,950 | 1.3373 |
+
+The ratios stay near $4/3$ and do not rise toward $3/2$ in this range. Depths from 80,000 on are untested, among them
+the white diagonal at 87,866 ([the records](left-records.md)).
 
 ## What the hypothesis gives
 
@@ -119,6 +131,7 @@ slope stays $3/5$.
 
 ```bash
 python -m computations.diagonal_cones --depth 1500 --steps 3600 --window 256
+python -m computations.projections front   # depths below 80,000 over 2^17 steps, about 1 min
 ```
 
 The command prints the settling table and the slopes by $\gamma$ in about 6 s. The longest-open-run counts are

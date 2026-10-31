@@ -251,7 +251,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
   about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
-  The hypothesis holds for $j < 8{,}000$ by computation and fails past depth 87,866, where the period becomes 32, so as
+  The hypothesis holds for $j < 80{,}000$ up to time $2^{17}$ by computation, with onsets near $4j/3$, and fails past depth 87,866, where the period becomes 32, so as
   stated the theorem reaches only starts below about 143,000, where computation already bounds the runs; a version
   with a period that grows with the depth is what would give a slope.
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
@@ -265,6 +265,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   positive density for the center: it moves a density bound left, never onto the center from nothing.
 - **Statistics.** *No signal.* The column passes every randomness and compression test tried
   ([randomness tests](negative-results/statistics/randomness-tests.md), [compression](negative-results/statistics/compression.md)).
+  Space-time patches of the single cell's chaotic region match the invariant measure under exact tests, and no
+  linear or learned projection (PCA, classifiers, an autoencoder, t-SNE) tells them from a random row
+  ([patch projections](negative-results/statistics/patch-projections.md)).
 
 ## Problem 3: does computing the $n$th cell take effort of order $n$?
 

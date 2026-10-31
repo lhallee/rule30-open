@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 100 Lean modules with 448 headline theorems, 42 findings (proved on paper,
-computed or conjectured) and 39 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 40 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -20,7 +20,7 @@ takes effort of order `n`.
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 2 | 5 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
-| [Statistics](#statistics) | 0 | 0 | 2 |
+| [Statistics](#statistics) | 0 | 0 | 3 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 2 | 3 | 6 |
 
@@ -404,6 +404,7 @@ Tests of the center column against randomness.
 | Result | Kind | Problems |
 |---|---|---|
 | [No compressor or Markov model beats one bit per cell](negative-results/statistics/compression.md) | no signal | 3 |
+| [No linear or learned projection tells the chaotic region of the single cell from the invariant measure](negative-results/statistics/patch-projections.md) | no signal | 2 |
 | [The center column passes every randomness test tried](negative-results/statistics/randomness-tests.md) | no signal | 2, 3 |
 
 ## Learned models
