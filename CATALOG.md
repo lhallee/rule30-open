@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-90 Lean modules with 386 headline theorems, 31 findings (proved on paper,
-computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
+98 Lean modules with 437 headline theorems, 40 findings (proved on paper,
+computed or conjectured) and 38 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,9 +12,9 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 77 | 18 | 9 |
-| [Period two](#period-two) | 3 | 4 | 3 |
-| [Diagonals](#diagonals) | 1 | 1 | 0 |
+| [Columns](#columns) | 80 | 22 | 10 |
+| [Period two](#period-two) | 5 | 6 | 6 |
+| [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 2 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 0 | 1 | 5 |
+| [Complexity](#complexity) | 2 | 3 | 6 |
 
 ## Open work
 
@@ -32,16 +32,22 @@ approach stopped.
 **Conjectures to prove or refute**
 
 - [The three words of period four lock the right half](findings/columns/period-four-locking.md): problem 1
+- [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md): problem 2
 
 **Findings that want a Lean proof**
 
+- [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md): problem 1
+- [Windows of 14 cells followed through the column's whole history exclude every tail of up to six cells but 10101 after 22 white cells, and 1,672 blocks of period at most 22](findings/columns/limit-windows.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
+- [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
+- [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
 
 **Findings proved in Lean in part**
 
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
+- [A second infinite right half that never enters the kit's family for 0001, a background of 80 cells](findings/columns/background-halves.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md): problem 1
 - [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
@@ -55,11 +61,14 @@ approach stopped.
 - [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md): problem 1
 - [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md): problem 1
 - [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md): problem 1
-- [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md): problems 3, 1
+- [An alternating left half fixes the center cell whatever the right half is, so the left half of the cone is not incompressible](findings/complexity/cone-screening.md): problem 3
+- [Problems 1 and 3 follow from space lower bounds for the center column, and space √(n log n) suffices](findings/complexity/space-ladder.md): problems 3, 1
+- [The center column is computed in space √(n log n), and each simulation sets a threshold that a space lower bound must pass](findings/complexity/space-thresholds.md): problems 3, 1
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md): problem 1
+- [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md): problem 1
 - [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
 - [No other right extension up to 40 cells keeps the center column](findings/seeds/no-other-extensions.md): problems 1, 2, 3
 
@@ -101,6 +110,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|---|---|
 | [No two adjacent columns are eventually periodic](Rule30Open/Columns/AdjacentColumns.md) | [`Columns.AdjacentColumns`](Rule30Open/Columns/AdjacentColumns.lean) | `adjacent_columns`, `no_constant_column`, `center_not_eventually_constant` | 1 | independent proof of a kit result |
 | [Entry into 48 traps that pass the tests of reach is false, refuted by a wider trap of the same block](Rule30Open/Columns/ApartTraps.md) | [`Columns.ApartTraps`](Rule30Open/Columns/ApartTraps.lean) | `natw00001111111_not_absorption_apart`, `pair_00001111111_excludes`, `fw1_106_not_absorption_apart`, `nat0000110111001_not_absorption_apart` | 1 | not in the kit |
+| [The right half beside a 0001 column of the 80-cell background is in the ether-and-wall family at no time](Rule30Open/Columns/BackgroundHalves.md) | [`Columns.BackgroundHalves`](Rule30Open/Columns/BackgroundHalves.lean) | `background_half_not_inFamily`, `background_half_not_absorbed`, `background_half_8`, `drv_eq`, `prefix_short` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 99 more blocks of period 17](Rule30Open/Columns/BitBlocks17.md) | [`Columns.BitBlocks17`](Rule30Open/Columns/BitBlocks17.lean) | `center_not_blocks17`, `not_eventually_blocks17`, `center_not_wallBlocks17` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 122 more blocks of period 18](Rule30Open/Columns/BitBlocks18.md) | [`Columns.BitBlocks18`](Rule30Open/Columns/BitBlocks18.lean) | `center_not_blocks18`, `not_eventually_blocks18`, `center_not_wallBlocks18` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 133 more blocks of period 19](Rule30Open/Columns/BitBlocks19.md) | [`Columns.BitBlocks19`](Rule30Open/Columns/BitBlocks19.lean) | `center_not_blocks19`, `not_eventually_blocks19`, `center_not_wallBlocks19` | 1 | not in the kit |
@@ -121,6 +131,8 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Traps for 569 blocks of period 15, from every locked window of 16 cells carried leftward](Rule30Open/Columns/CensusTraps15.md) | [`Columns.CensusTraps15`](Rule30Open/Columns/CensusTraps15.lean) | `censusTraps15_check`, `censusTraps15_blocks`, `census15_absorption_excludes` | 1 | not in the kit |
 | [Traps for 22 more blocks of periods 13 and 14, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge.md) | [`Columns.CensusTrapsLarge`](Rule30Open/Columns/CensusTrapsLarge.lean) | `censusTrapsLarge_check`, `censusTrapsLarge_blocks`, `censusLarge_absorption_excludes` | 1 | not in the kit |
 | [Traps for 24 more blocks of period 15, from locked windows of 16 cells, checked in parts](Rule30Open/Columns/CensusTrapsLarge15.md) | [`Columns.CensusTrapsLarge15`](Rule30Open/Columns/CensusTrapsLarge15.lean) | `censusTrapsLarge15_check`, `censusTrapsLarge15_blocks`, `censusLarge15_absorption_excludes` | 1 | not in the kit |
+| [A periodic column and any observable that closes the strip to its right](Rule30Open/Columns/ClosingObservable.md) | [`Columns.ClosingObservable`](Rule30Open/Columns/ClosingObservable.lean) | `closing_observable`, `affine_observable`, `center_xor`, `center_masked_two`, `center_parity` | 1 | extends a kit result |
+| [Counts of black cells move left by at most a factor of three](Rule30Open/Columns/ColumnTransfer.md) | [`Columns.ColumnTransfer`](Rule30Open/Columns/ColumnTransfer.lean) | `transfer`, `transfer_white`, `iterate`, `transfer_right`, `transfer_right_white`, `iterate_right`, `center_lower` | 2 | not in the kit |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
 | [Against a right half of at most six cells no center column repeats a word of period four](Rule30Open/Columns/EmptyRight.md) | [`Columns.EmptyRight`](Rule30Open/Columns/EmptyRight.lean) | `smallRight_0001`, `smallRight_0011`, `smallRight_0111`, `emptyRight_001`, `no_finite_of_family`, `no_finite_of_ptrap` | 1 | extends a kit result |
 | [The word 0001 comes down to the period-two map, and the ether is its domain](Rule30Open/Columns/EtherDomain.md) | [`Columns.EtherDomain`](Rule30Open/Columns/EtherDomain.lean) | `center_period_four_0001_integer`, `period_four_0001_held`, `held_etherLeft`, `ether_fits`, `ether_countdown`, `domainB_repeats` | 1 | extends a kit result |
@@ -164,8 +176,8 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Traps for 25 blocks of period 10, from one background of period ten whose edge driven right halves enter](Rule30Open/Columns/TenTraps.md) | [`Columns.TenTraps`](Rule30Open/Columns/TenTraps.lean) | `tenTraps_check`, `tenTraps_blocks`, `ten_absorption_excludes` | 1 | not in the kit |
 | [Traps for 53 of the 630 blocks of period 13, from a wall of period thirteen carried leftward](Rule30Open/Columns/ThirteenTraps.md) | [`Columns.ThirteenTraps`](Rule30Open/Columns/ThirteenTraps.lean) | `thirteenTraps_check`, `thirteenTraps_blocks`, `thirteen_absorption_excludes` | 1 | not in the kit |
 | [Four blocks of periods 13 and 14 reduced to entry into one of two traps](Rule30Open/Columns/TrapPairs.md) | [`Columns.TrapPairs`](Rule30Open/Columns/TrapPairs.lean) | `absorption_some_excludes`, `pair0001101101011_excludes`, `pair0010101111111_excludes` | 1 | not in the kit |
-| [Entry into one of several traps for 29 blocks whose sampled halves stay apart from their single traps](Rule30Open/Columns/TrapSets.md) | [`Columns.TrapSets`](Rule30Open/Columns/TrapSets.lean) | `set0001101101011_excludes`, `set0000010101101_excludes`, `set000111111011101_excludes` | 1 | not in the kit |
 | [Four traps for 001, pairwise apart, so the kit's AbsorptionT t001 is false and so is entry into one of any three](Rule30Open/Columns/Traps001.md) | [`Columns.Traps001`](Rule30Open/Columns/Traps001.lean) | `not_absorptionT_t001`, `traps001_pair_not_absorption`, `t001W_not_absorption_some`, `traps001_excludes`, `absorption_any_excludes` | 1 | not in the kit |
+| [Entry into one of several traps for 29 blocks whose sampled halves stay apart from their single traps](Rule30Open/Columns/TrapSets.md) | [`Columns.TrapSets`](Rule30Open/Columns/TrapSets.lean) | `set0001101101011_excludes`, `set0000010101101_excludes`, `set000111111011101_excludes` | 1 | not in the kit |
 | [A right half white past its first twelve cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TwelveCells.md) | [`Columns.TwelveCells`](Rule30Open/Columns/TwelveCells.lean) | `twelve_absorption`, `twelve_0001`, `twelve_0011`, `twelve_0111`, `twelveRight_0001`, `twelveRight_0011`, `twelveRight_0111`, `smallTwelve_0001`, `smallTwelve_0011`, `smallTwelve_0111` | 1 | extends a kit result |
 | [Traps for 83 of the 335 blocks of period 12, from walls of period twelve carried leftward](Rule30Open/Columns/TwelveTraps.md) | [`Columns.TwelveTraps`](Rule30Open/Columns/TwelveTraps.lean) | `twelveTraps_check`, `twelveTraps_blocks`, `twelve_absorption_excludes` | 1 | not in the kit |
 | [No finite configuration white on cells 9 to 1,610 has a center repeating 00000011011, nor one white on cells 9 to 2,357 a center repeating 001011100111](Rule30Open/Columns/WallGaps.md) | [`Columns.WallGaps`](Rule30Open/Columns/WallGaps.lean) | `eleven_gap`, `eleven_white`, `twelve_gap`, `twelve_white` | 1 | not in the kit |
@@ -182,7 +194,9 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
+| [A second infinite right half that never enters the kit's family for 0001, a background of 80 cells](findings/columns/background-halves.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
+| [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | wanted |
 | [Up to period 15, what the exclusions and reductions in Lean reach, period by period](findings/columns/coverage.md) | computed | 1 | not applicable |
 | [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md) | computed | 1 | partial |
 | [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
@@ -191,11 +205,13 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The kit's two absorption conjectures pass the test of reach that refutes seven traps found here](findings/columns/kit-absorption-reach.md) | computed | 1 | not applicable |
 | [No left half of up to 80 cells meets the kit's C3 for a period-four word](findings/columns/left-half-c3.md) | computed | 1 | partial |
 | [No small left half meets the left-half statement of any block of period 3, 5, 6, 7 or 9](findings/columns/left-half-every-block.md) | computed | 1 | partial |
+| [Windows of 14 cells followed through the column's whole history exclude every tail of up to six cells but 10101 after 22 white cells, and 1,672 blocks of period at most 22](findings/columns/limit-windows.md) | computed | 1 | wanted |
 | [Locks carried leftward from a few seeds give every locked window of 13 cells up to period 12, both of the kit's traps, and locked windows for a block of every period from 2 to 9](findings/columns/lock-chains.md) | computed | 1 | partial |
 | [Driven right halves settle into traps for 27 of the 99 blocks of period 10, 51 of the 186 of period 11 and 75 of the 335 of period 12](findings/columns/natural-traps.md) | computed | 1 | partial |
 | [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md) | computed | 1 | wanted |
 | [A width-16 window certifies the period-four lock from most starts](findings/columns/period-four-certificate.md) | computed | 1 | partial |
 | [The three words of period four lock the right half](findings/columns/period-four-locking.md) | conjecture | 1 | wanted |
+| [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md) | proved on paper | 1 | wanted |
 | [Every background of Rule 30 periodic in time, to period 14, and the traps at their edges](findings/columns/space-time-backgrounds.md) | computed | 1 | partial |
 | [For 72 blocks of period at most 12, every window of 13 cells can be steered into a lock](findings/columns/steerable-locks.md) | computed | 1 | partial |
 | [Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps](findings/columns/t001-census.md) | computed | 1 | partial |
@@ -213,6 +229,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [A search for slow right halves finds no counterexample and misses the slowest halves](negative-results/columns/slow-half-search.md) | no signal | 1 |
 | [Right halves driven by blocks of period 5, 6 and 7 almost never enter a trap](negative-results/columns/trap-entry.md) | no signal | 1 |
 | [No window of up to 20 cells locks for any block of period 2, 3, 5, 6, 7 or 9](negative-results/columns/window-locks.md) | no signal | 1 |
+| [Windows of up to 16 cells with the column's whole history leave the kit's white-run thresholds where they are](negative-results/columns/window-thresholds.md) | barrier | 1 |
 
 ## Period two
 
@@ -222,8 +239,10 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [The period-two condition is invisible at a bounded lag](Rule30Open/PeriodTwo/BoundedLag.md) | [`PeriodTwo.BoundedLag`](Rule30Open/PeriodTwo/BoundedLag.lean) | `held_preimage`, `pull_back`, `complete_window`, `invisible_at_bounded_lag`, `inK_window_invisible`, `invisible_at_bounded_lag_rational` | 1 | not in the kit |
 | [The alternating domains time the period-two condition](Rule30Open/PeriodTwo/Domains.md) | [`PeriodTwo.Domains`](Rule30Open/PeriodTwo/Domains.lean) | `held_domains_odd`, `held_countdown`, `held_disagree`, `held_agree_stepB` | 1 | independent proof of a kit result |
 | [Period two reduces to an integer map](Rule30Open/PeriodTwo/HeldColumn.md) | [`PeriodTwo.HeldColumn`](Rule30Open/PeriodTwo/HeldColumn.lean) | `period_two_held`, `period_two_integer`, `center_period_two_integer`, `heldNat_testBit` | 1 | independent proof of a kit result |
+| [The period-two condition is a full 2-shift on 2-adic halves](Rule30Open/PeriodTwo/ShiftModel.md) | [`PeriodTwo.ShiftModel`](Rule30Open/PeriodTwo/ShiftModel.lean) | `heldOrbit_triangular`, `column_bijective`, `inK_graph`, `itinerary_bijective`, `held_held_two_to_one`, `heldNat_triangular`, `inK_periodic_rational`, `inK_periodic_not_finite`, `positive_integer_not_preperiodic` | 1 | independent proof of a kit result |
 | [Against a white right half, no left half within depth 32,755 keeps the center alternating](Rule30Open/PeriodTwo/WhiteRightHalf.md) | [`PeriodTwo.WhiteRightHalf`](Rule30Open/PeriodTwo/WhiteRightHalf.lean) | `white_right_leaves`, `psi_empty_gaps`, `leaves_by_gap`, `psiBits_spec` | 1 | extends a kit result |
 
 **Findings**
@@ -231,8 +250,10 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
 | [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md) | computed | 1 | wanted |
+| [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md) | computed | 1 | wanted |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
+| [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md) | computed | 1 | partial |
 | [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | partial |
 
 **Negative results**
@@ -240,7 +261,10 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | Result | Kind | Problems |
 |---|---|---|
 | [The ether-and-wall family does not catch the right half beside an alternating center](negative-results/period-two/absorption-route.md) | dead end | 1 |
+| [Condrey's proof for a constant center does not extend to an alternating center](negative-results/period-two/condrey-mechanism.md) | dead end | 1 |
+| [Windows of 5 and 8 cells at the top of a defect on the ether do not bound it, with or without the condition of K](negative-results/period-two/ether-front-windows.md) | barrier | 1 |
 | [The left half is not a patchwork of ether domains](negative-results/period-two/ether-patchwork.md) | refuted | 1 |
+| [The first twelve forced bits of the period-two condition are dense polynomials of full degree](negative-results/period-two/forced-bits-dense.md) | dead end | 1 |
 | [No finite certificate settles period two](negative-results/period-two/no-finite-certificate.md) | dead end | 1 |
 
 ## Diagonals
@@ -252,12 +276,20 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
 | [Left diagonals remember only behind a white diagonal](Rule30Open/Diagonals/LeftMemory.md) | [`Diagonals.LeftMemory`](Rule30Open/Diagonals/LeftMemory.lean) | `D_reset`, `D_periodic_of_black`, `D_period_dichotomy`, `D_period_doubles`, `D_two_white`, `D_three_flips` | 1 | extends a kit result |
+| [If the left diagonals repeat with period 16 from time 3j/2 to depth J, black center runs have 13L at most 3a + 2400 and white blocks reach left at most (a + 100)/3](Rule30Open/Diagonals/SettledRuns.md) | [`Diagonals.SettledRuns`](Rule30Open/Diagonals/SettledRuns.lean) | `no_alt_pair`, `settled_alt_pair`, `no_white_pair`, `erode_alt`, `black_run_le_of_settled`, `white_block_le_of_settled` | 2 | not in the kit |
 
 **Findings**
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
 | [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md) | computed | 1 | partial |
+| [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md) | conjecture | 2 | partial |
+
+**Negative results**
+
+| Result | Kind | Problems |
+|---|---|---|
+| [Direct comparison with a true strip of the pattern near the left edge of any fixed depth leaves the slope of black center runs at 3/5](negative-results/diagonals/fixed-depth-strips.md) | barrier | 2 |
 
 ## Frames and the seed's past
 
@@ -382,11 +414,20 @@ Whether trained predictors find a shortcut for the center column.
 
 Prize Problem 3, and what an answer either way would imply.
 
+**Proved in Lean**
+
+| Result | Module | Headline theorems | Problems | Kit |
+|---|---|---|---|---|
+| [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
+| [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
+
 **Findings**
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
-| [Problems 1 and 3 follow from space lower bounds for the center column, and space √n log n suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | partial |
+| [An alternating left half fixes the center cell whatever the right half is, so the left half of the cone is not incompressible](findings/complexity/cone-screening.md) | proved on paper | 3 | partial |
+| [Problems 1 and 3 follow from space lower bounds for the center column, and space √(n log n) suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | partial |
+| [The center column is computed in space √(n log n), and each simulation sets a threshold that a space lower bound must pass](findings/complexity/space-thresholds.md) | proved on paper | 3, 1 | partial |
 
 **Negative results**
 
@@ -395,5 +436,6 @@ Prize Problem 3, and what an answer either way would imply.
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
 | [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
 | [The linear complexity is n/2, the most a sequence can have](negative-results/complexity/linear-complexity.md) | no signal | 1, 3 |
+| [Crossing sequences prove at most time (log n)² for the center column, and need a spectral hypothesis that implies Problem 1](negative-results/complexity/one-tape-crossing.md) | barrier | 3, 1 |
 | [Probabilistic checking verifies the center cell cheaply, as it does every computation, and does not compute it](negative-results/complexity/probabilistic-checking.md) | barrier | 3, 1, 2 |
 | [Problem 3 asks for a lower bound beyond current complexity theory](negative-results/complexity/problem-three-barrier.md) | barrier | 3, 1 |

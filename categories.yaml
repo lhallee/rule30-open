@@ -59,4 +59,5 @@
 
 - id: complexity
   title: Complexity
+  lean: Complexity
   summary: Prize Problem 3, and what an answer either way would imply.

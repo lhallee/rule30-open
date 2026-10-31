@@ -32,21 +32,42 @@ import multiprocessing
 import sys
 
 import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import breadth_first_order
 from tqdm.auto import tqdm
 
 from computations import game
 
 
-def back_closure(seed: np.ndarray, source: np.ndarray, target: np.ndarray) -> np.ndarray:
-    """The nodes from which some walk along the moves reaches the seed."""
+def reverse_graph(source: np.ndarray, target: np.ndarray, nodes: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """The moves reversed, as the row pointers and the sorted column indices of a compressed sparse row graph on
+    `nodes` nodes and one more row, left empty for `back_closure` to fill with a seed, and a vector of ones for its
+    weights."""
+    # source, target: (m,)
+    assert nodes < 1 << 31, "node numbers must fit 32 bits"
+    order = np.lexsort((source, target))  # (m,), by target, then source
+    pointers = np.zeros(nodes + 2, dtype=np.int32)  # (nodes + 2,)
+    np.cumsum(np.bincount(target, minlength=nodes), out=pointers[1:nodes + 1])
+    pointers[nodes + 1] = pointers[nodes]
+    return pointers, source[order].astype(np.int32), np.ones(order.size + nodes)  # (nodes + 2,), (m,), (m + nodes,)
+
+
+def back_closure(seed: np.ndarray, source: np.ndarray, target: np.ndarray,
+                 reverse: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None) -> np.ndarray:
+    """The nodes from which some walk along the moves reaches the seed: a breadth-first search of the reversed moves
+    from the seed, which `reverse` (from `reverse_graph`) lets calls on the same moves share."""
     # seed: (n,); source, target: (m,)
-    reached = seed.copy()  # (n,)
-    frontier = seed.copy()  # (n,)
-    while frontier.any():
-        before = np.zeros(seed.size, dtype=bool)  # (n,)
-        before[source[frontier[target]]] = True
-        frontier = before & ~reached
-        reached |= frontier
+    nodes = seed.size
+    pointers, predecessors, ones = reverse_graph(source, target, nodes) if reverse is None else reverse
+    starts = np.flatnonzero(seed).astype(np.int32)  # (s,), the extra node's successors
+    pointers = pointers.copy()  # (nodes + 2,)
+    pointers[nodes + 1] = pointers[nodes] + starts.size
+    indices = np.concatenate([predecessors, starts])  # (m + s,)
+    graph = csr_matrix((ones[:indices.size], indices, pointers), shape=(nodes + 1, nodes + 1))
+    graph.has_sorted_indices = True
+    found = breadth_first_order(graph, nodes, directed=True, return_predecessors=False)  # (r,)
+    reached = np.zeros(nodes, dtype=bool)  # (n,)
+    reached[found[found < nodes]] = True
     return reached  # (n,)
 
 
@@ -88,36 +109,37 @@ def predecessors(word: str, width: int, keys: np.ndarray) -> np.ndarray:
     repeats. The rule is permutive in its left cell, so the old cell `width` and the cell beyond it fix the old window
     from the right, cell by cell, and the old cell 0 must then be the column's value at the phase before."""
     # keys: (k,)
-    one, period = np.uint64(1), len(word)
-    window = keys & np.uint64((1 << width) - 1)  # (k,)
+    period = len(word)
+    cells = np.uint32 if width < 32 else np.uint64  # a window fits 32 bits up to 31 cells, which halves the traffic
+    one = cells(1)
+    window = (keys & np.uint64((1 << width) - 1)).astype(cells)  # (k,)
     before = ((keys >> np.uint64(width)).astype(np.int64) - 1) % period  # (k,)
-    column = np.array([int(bit) for bit in word], dtype=np.uint64)[before]  # (k,)
-    found = []
-    for last in (0, 1):
-        for beyond in (0, 1):
-            right = np.full(keys.shape, beyond, dtype=np.uint64)  # (k,), the old cell i + 1
-            cell = np.full(keys.shape, last, dtype=np.uint64)  # (k,), the old cell i
-            old = cell << np.uint64(width - 1)  # (k,)
-            for i in range(width, 0, -1):
-                left = ((window >> np.uint64(i - 1)) & one) ^ (cell | right)  # (k,), the old cell i - 1
-                if i > 1:
-                    old |= left << np.uint64(i - 2)
-                right, cell = cell, left
-            ok = cell == column  # (k,)
-            found.append(before[ok].astype(np.uint64) << np.uint64(width) | old[ok])
-    return np.concatenate(found)  # (m,)
+    column = np.array([int(bit) for bit in word], dtype=cells)[before]  # (k,)
+    last = np.array([0, 0, 1, 1], dtype=cells)[:, None]  # (4, 1), the old cell `width` of each case
+    cell = np.broadcast_to(last, (4, keys.size)).copy()  # (4, k), the old cell i
+    right = np.broadcast_to(np.array([0, 1, 0, 1], dtype=cells)[:, None], (4, keys.size)).copy()  # (4, k), cell i + 1
+    old = cell << cells(width - 1)  # (4, k)
+    for i in range(width, 0, -1):
+        left = ((window >> cells(i - 1)) & one) ^ (cell | right)  # (4, k), the old cell i - 1
+        if i > 1:
+            old |= left << cells(i - 2)
+        right, cell = cell, left
+    ok = cell == column  # (4, k), the old cell 0 is the column's value
+    return np.broadcast_to(before, ok.shape)[ok].astype(np.uint64) << np.uint64(width) | old[ok].astype(np.uint64)  # (m,)
 
 
 def lock_info(block: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     """The locked nodes, and the nodes from which some values of the free cell reach a locked node."""
     source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), _, _, (p n,)
     phase = np.arange(column.size) >> width  # (p n,)
+    reverse = reverse_graph(source, target, column.size)
     mixed = np.zeros(column.size, dtype=bool)  # (p n,), nodes that can reach both values at one phase
     for ph in range(len(block)):
         here = phase == ph  # (p n,)
-        mixed |= back_closure(here & column, source, target) & back_closure(here & ~column, source, target)
+        mixed |= back_closure(here & column, source, target, reverse) & back_closure(here & ~column, source, target,
+                                                                                      reverse)
     locked = ~mixed  # (p n,)
-    return locked, back_closure(locked, source, target)  # (p n,), (p n,)
+    return locked, back_closure(locked, source, target, reverse)  # (p n,), (p n,)
 
 
 def fewest_mixed(block: str, width: int) -> int:
@@ -125,10 +147,12 @@ def fewest_mixed(block: str, width: int) -> int:
     repeating one: 0 exactly when some node is locked."""
     source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), _, _, (p n,)
     phase = np.arange(column.size) >> width  # (p n,)
+    reverse = reverse_graph(source, target, column.size)
     count = np.zeros(column.size, dtype=np.int64)  # (p n,)
     for ph in range(len(block)):
         here = phase == ph  # (p n,)
-        count += back_closure(here & column, source, target) & back_closure(here & ~column, source, target)
+        count += back_closure(here & column, source, target, reverse) & back_closure(here & ~column, source, target,
+                                                                                      reverse)
     return int(count.min())
 
 

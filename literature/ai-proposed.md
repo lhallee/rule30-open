@@ -35,7 +35,17 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   - **136, a quasilinear PCP for PPAD.** End-of-Line instances of length $N$ reduce to numerical constraints of
     length $N (\log N)^{O(1)}$ that tolerate a fixed fraction of violations.
   - **137, one-tape machines in less space.** A one-tape machine's run of $T$ steps is decided in space
-    $O(T^{2/5} \log^{C} T)$, below Paterson's $T^{1/2}$ of 1972.
+    $O(T^{2/5} \log^{C} T)$, below the $T^{1/2}$ of Hopcroft and Ullman (1968) and Paterson (1972). The paper
+    ([Simulating one-tape time in two-fifths-power space](https://github.com/openai/math/blob/main/preprints/Simulating-One-Tape-Time-in-Two-Fifths-Power-Space-September-25-2026/article.pdf),
+    September 25, 2026; its abstract, model and Theorem 1 were read, its proofs were not) takes a fixed deterministic
+    machine with one writable tape, finitely many read-only input heads, and a supplied binary time cap $T$; the input
+    may be on the writable tape, as in the kit's model, and every initial symbol within distance $T$ of a head origin
+    must be computable in polylogarithmic space, which the digits of $n$ are. The simulator's running time is
+    unrestricted. The mechanism is block-respecting simulation with $b = T^{2/5}$, replayed through Cook and Mertz's
+    shared-register evaluation with a stack charged by the sizes of suspended guesses. It claims to answer the question
+    that Section 5 of Williams's full version asks, whether the one-tape exponent $1/2$ can drop by a constant. The Lean
+    formalization's scope is stated in [lean/docs/137.md](https://github.com/openai/math/blob/main/lean/docs/137.md);
+    the Lean formalization was not built. No refereed or independent check was found.
   - **145 and 146, ergodic theory.** Every invertible mixing transformation is mixing of all orders (Rokhlin's
     problem), and the standard map has positive metric entropy for all large parameters.
   - **154, multiple ergodic averages.** Almost-everywhere convergence of consecutive multiple ergodic averages for
@@ -56,9 +66,11 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
     degree.
 
   *Here:* 137 is the nearest to a route: Paterson's theorem turns the kit's Problem 3 into a space lower bound of order
-  $\sqrt{n}$ for the center column, and 137 would lower that to $n^{2/5}$ up to logarithms, a polynomial factor below
-  the space $O(\sqrt{n} \log n)$ that tree evaluation uses ([the space ladder](../findings/complexity/space-ladder.md));
-  no such space lower bound is known either. 007 is the nearest result to Problem 2: the one-point statement for
+  $\sqrt{n}$ for the center column, and 137 would lower that to $n^{2/5}$ up to a power of $\log n$, a polynomial factor
+  below the space $O(\sqrt{n \log n})$ that tree evaluation uses ([the space
+  thresholds](../findings/complexity/space-thresholds.md)); no such space lower bound is known either. If 137 holds, the
+  window between what a proof would have to show and what an algorithm achieves is polynomial, $n^{2/5}$ to $n^{1/2}$,
+  and without it the window is the factor $\sqrt{\log n}$ between $\sqrt{n}$ and $\sqrt{n \log n}$. 007 is the nearest result to Problem 2: the one-point statement for
   $\lambda$, that its values average to zero, is the prime number theorem, and 007 proves a two-point statement, while
   for $c$ the one-point statement is Problem 2 itself. Results of this kind rest on multiplicativity,
   $\lambda(pn) = -\lambda(n)$, which ties the sequence at one scale to another; no identity of that kind is known for
@@ -122,6 +134,23 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   search](../negative-results/complexity/automaton-lower-bounds.md)); rule 167's column follows its nested pattern,
   which Rule 30 does not have. The same repository states Prize Problems 1 and 2 in Lean as open
   ([rule-30.md](rule-30.md#the-prize-and-its-formal-statements)).
+
+- **Nye (2025).** *TIME[t] is contained in SPACE[O(sqrt t)] via tree height compression.*
+  [arXiv:2508.14831](https://arxiv.org/abs/2508.14831), four versions from August 20, 2025 to January 1, 2026; the
+  record was read, the text of the first versions was not. Claimed that multitape time $t$ runs in space $O(\sqrt{t})$,
+  removing the logarithmic factor of Williams's simulation. The author withdrew it on January 1, 2026, with the comment
+  that the proof of the main theorem is incorrect. It is listed under cs.CC, cs.AI and cs.DS; the record does not say
+  whether an AI system helped write it. *Here:* the claim would have moved the multitape time-$o(n)$ threshold for the
+  center column from $o(\sqrt{n \log n})$ to $o(\sqrt{n})$ ([the space
+  thresholds](../findings/complexity/space-thresholds.md)); it would have lowered the upper bound for the center column
+  only if its method also applied to the block tree. It gives no such result, and the space bound stays
+  $O(\sqrt{n \log n})$.
+
+- **Sibgatullin and Williams (2026).** The ECCC report on cellular-automaton and circuit simulation in low space
+  ([complexity.md](complexity.md#the-cost-of-computing-rule-30)) says that Claude and ChatGPT were used for its figures
+  and for proofreading, and that Claude pointed out that the transitive closure of the 2-CNF implication graph gives a
+  linear-time algorithm for lexicographically first 2-satisfiability. The results are the authors'. *Here:* the paper
+  bears on the center column through its cellular-automaton theorem, not through the AI contribution.
 
 ## Checked records, texts not read
 

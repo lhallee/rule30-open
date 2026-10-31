@@ -19,6 +19,7 @@ every cycle for a given period, by repeated squaring of the map, and the blocks 
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 from collections import Counter
 
@@ -26,20 +27,25 @@ import numpy as np
 from tqdm.auto import tqdm
 
 
+@functools.lru_cache(maxsize=4)
 def column_map(period: int) -> np.ndarray:
     """The leftward map on pairs of adjacent columns of words of length `period`, state a 2^period + b for the column a
-    and the column b right of it."""
+    and the column b right of it; kept for the periods asked again, so read-only."""
     # out: (4^period,)
     mask = (1 << period) - 1
     kind = np.int32 if 2 * period < 31 else np.int64  # halves the memory of periods up to 15
     states = np.arange(1 << (2 * period), dtype=kind)  # (4^P,)
     a, b = states >> period, states & mask  # (4^P,) each
     rot = (a >> 1) | ((a & 1) << (period - 1))  # (4^P,), bit ph is a at phase ph + 1
-    return ((rot ^ (a | b)) << period) | a  # (4^P,)
+    out = ((rot ^ (a | b)) << period) | a  # (4^P,)
+    out.flags.writeable = False
+    return out  # (4^P,)
 
 
+@functools.lru_cache(maxsize=4)
 def cycles(period: int) -> tuple[np.ndarray, np.ndarray]:
-    """The states on cycles of `column_map`, and for each the least state of its cycle, which labels the cycle."""
+    """The states on cycles of `column_map`, and for each the least state of its cycle, which labels the cycle; kept for
+    the periods asked again, so read-only."""
     # out: (c,), (c,)
     f = column_map(period)  # (4^P,)
     g = f.copy()  # (4^P,), f^(2^k) after k squarings
@@ -55,6 +61,7 @@ def cycles(period: int) -> tuple[np.ndarray, np.ndarray]:
         label = np.minimum(label, label[step])
         step = step[step]
         reach *= 2
+    nodes.flags.writeable = label.flags.writeable = False
     return nodes, label  # (c,), (c,)
 
 

@@ -20,8 +20,10 @@ entry (t, k) as t * 64 + k, the direct entries for K = 0 .. B - 1 and then the b
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 import time
+
 import numpy as np
 
 from tqdm.auto import tqdm
@@ -37,8 +39,9 @@ STEPS = 2000
 WALLS = [set(np.flatnonzero(row).tolist()) for row in absorption.kit_wall()]  # per phase, the 13-bit wall states
 
 
+@functools.lru_cache(maxsize=None)
 def ether_bits(j0: int, psi: int, n: int) -> int:
-    """The ether columns j0 + 1 .. j0 + n at phase psi, bit p - 1 for column p."""
+    """The ether columns j0 + 1 .. j0 + n at phase psi, bit p - 1 for column p; kept for the calls that ask again."""
     return sum(absorption.ether(j0 + p, psi) << (p - 1) for p in range(1, n + 1))
 
 

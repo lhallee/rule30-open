@@ -52,14 +52,14 @@ KIT_WORDS = (
 
 
 def necklaces(period: int) -> list[str]:
-    """The primitive binary necklaces of length `period`, each as its least rotation."""
-    found = []
-    for word in range(1 << period):
-        text = format(word, f"0{period}b")
-        rotations = {text[i:] + text[:i] for i in range(period)}
-        if len(rotations) == period and text == min(rotations):
-            found.append(text)
-    return found
+    """The primitive binary necklaces of length `period`, each as its least rotation, in increasing order."""
+    words = np.arange(1 << period, dtype=np.int64)  # (2^P,)
+    mask = (1 << period) - 1
+    keep = np.ones(words.size, dtype=bool)  # (2^P,)
+    for k in range(1, period):
+        rotated = ((words << k) | (words >> (period - k))) & mask  # (2^P,), the word turned k places
+        keep &= rotated > words  # primitive (no turn is the word) and least (no turn is smaller)
+    return [format(int(word), f"0{period}b") for word in np.flatnonzero(keep)]
 
 
 def moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray]:
@@ -77,21 +77,13 @@ def moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     return np.concatenate(sources), np.concatenate(targets)  # (2 p n,), (2 p n,)
 
 
+@functools.lru_cache(maxsize=6)
 def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """The game's moves (source, target), each node's strongly connected component, whether a play can stay in each
-    component, and the left column at each node."""
+    component, and the left column at each node. The last six games asked for are kept, so the arrays are read-only."""
     period, n_cells = len(pattern), 1 << width
     c = np.array([int(bit) for bit in pattern], dtype=np.int64)  # (p,)
-    cells = (np.arange(n_cells)[:, None] >> np.arange(width)[None, :]) & 1  # (n, width), cell x at index x - 1
-    weights = 1 << np.arange(width, dtype=np.int64)  # (width,)
-    sources, targets = [], []
-    for phase in range(period):
-        left = np.concatenate([np.full((n_cells, 1), c[phase]), cells[:, :-1]], axis=1)  # (n, width)
-        for free in (0, 1):
-            right = np.concatenate([cells[:, 1:], np.full((n_cells, 1), free)], axis=1)  # (n, width)
-            sources.append(phase * n_cells + np.arange(n_cells))  # (n,)
-            targets.append(((phase + 1) % period) * n_cells + ((left ^ (cells | right)) * weights).sum(axis=1))  # (n,)
-    source, target = np.concatenate(sources), np.concatenate(targets)  # (2 p n,), (2 p n,)
+    source, target = moves(pattern, width)  # (2 p n,), (2 p n,)
     nodes = period * n_cells
     graph = csr_matrix((np.ones(source.size, dtype=np.int8), (source, target)), shape=(nodes, nodes))
     _, label = connected_components(graph, directed=True, connection="strong")  # (p n,)
@@ -99,6 +91,8 @@ def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.nda
     recurrent[label[source][label[source] == label[target]]] = True  # components a play can stay in
     phase_of, first = np.arange(nodes) // n_cells, np.arange(nodes) % n_cells & 1  # (p n,), (p n,)
     column = (c[(phase_of + 1) % period] ^ (c[phase_of] | first)).astype(bool)  # (p n,), the left column
+    for array in (source, target, label, recurrent, column):
+        array.flags.writeable = False
     return source, target, label, recurrent, column  # (2 p n,), (2 p n,), (p n,), (components,), (p n,)
 
 
@@ -285,13 +279,15 @@ BLACK_RUN_BLOCKS = (("0", 18), ("00", 18), ("000", 18), ("0000", 18), ("0100", 1
                     ("0110", 27))
 
 
+@functools.lru_cache(maxsize=None)
 def kit_blocks(max_period: int) -> dict[str, str]:
     """The primitive blocks of period up to `max_period` that the pinned kit excludes as the eventual period of the
     center column, each with the reason: a strip certificate (`KIT_WORDS`), every run of 1s lasting at least 9 steps
     (`Rule30BlackRuns.not_eventuallyPeriodic_of_long_one_runs`, the constant blocks included), a padded word of
     `Rule30PaddedWords`: 0^q 1 with q >= 9, 0^r 11 with r >= 8, or 0^q 10111 with q >= 9, a white-padding certificate
     family (`PADDING_FAMILIES`), or Theorem B' (`BLACK_RUN_BLOCKS`). The kit's other families, its tails of at most
-    six cells after at least 69 white cells, its suffix families and its mixtures, need periods above 21."""
+    six cells after at least 69 white cells, its suffix families and its mixtures, need periods above 21. The result is
+    kept for the periods asked again; callers read it and do not change it."""
     found = {word: "strip certificate" for word in KIT_WORDS if len(word) <= max_period}
     for period in range(1, max_period + 1):
         padded = {least_rotation("0" * (period - len(tail)) + tail)

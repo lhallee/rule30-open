@@ -17,6 +17,7 @@ modules reduces to a condition on column 14; and the rest, which no method here 
 from __future__ import annotations
 
 import argparse
+import functools
 import re
 import sys
 from pathlib import Path
@@ -28,9 +29,10 @@ from computations import game, lock_chain
 ROOT = Path(__file__).resolve().parent.parent
 
 
+@functools.lru_cache(maxsize=None)
 def module_blocks() -> list[tuple[str, str]]:
     """Every block that a trap in Lean reduces to entry, each as its least rotation, with the module that holds the
-    trap, once per trap, in the order of the modules."""
+    trap, once per trap, in the order of the modules; kept, so callers do not change the list."""
     found: list[tuple[str, str]] = [("001", "Traps001")]
     found += [(lock_chain.tables(name)["word"], "WordTraps") for name, *_ in lock_chain.TRAPS]
     found.append((lock_chain.tables("trap001011111")["word"], "WordTraps"))
@@ -63,9 +65,10 @@ def module_blocks() -> list[tuple[str, str]]:
     return found
 
 
+@functools.lru_cache(maxsize=None)
 def trap_blocks() -> dict[str, str]:
     """The blocks that a trap in Lean reduces to entry, each as its least rotation, with the first module that holds
-    one."""
+    one; kept, so callers do not change the dict."""
     found: dict[str, str] = {}
     for block, module in module_blocks():
         found.setdefault(block, module)

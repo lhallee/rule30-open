@@ -108,8 +108,18 @@ def trap_keys() -> np.ndarray:
     return np.array(sorted(keys), dtype=np.uint64)  # (n,)
 
 
+def in_sorted(values: np.ndarray, keys: np.ndarray) -> np.ndarray:
+    """Whether each value is one of `keys`, which are sorted and distinct: a binary search, which beats `np.isin` on
+    the few values a step of a run asks about."""
+    # values: (m,); keys: (k,)
+    if keys.size == 0:
+        return np.zeros(values.shape, dtype=bool)  # (m,)
+    return keys[np.minimum(np.searchsorted(keys, values), keys.size - 1)] == values  # (m,)
+
+
 def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) -> np.ndarray:
     """The first step before `steps` at which each right half, driven by 001 from `phase`, is in t001, or -1."""
+    keys = np.unique(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
@@ -120,7 +130,7 @@ def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) ->
     mask = np.uint64((1 << TRAP_WIDTH) - 1)
     for t in tqdm(range(steps), desc=f"t001 phase {phase}", file=sys.stderr, leave=False, mininterval=5):
         drive = (t + phase) % 3
-        hit = np.isin((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys)  # (m,)
+        hit = in_sorted((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys)  # (m,)
         if hit.any():
             entry[alive[hit]] = t
             rows, alive = rows[~hit], alive[~hit]  # the trap is closed: an entered half stays in
@@ -136,6 +146,7 @@ def cut_entries(halves: list[int], phase: int, steps: int, widths: tuple[int, ..
     has its columns 1 .. w equal to those of a state of t001 whose label agrees with the drive's phase, or -1: entry
     into t001 cut to w cells, the event whose rate `lock_chain.t001_coin` gives for a coin in column w + 1. At 47 cells
     it is entry into t001 (`trap_entries`)."""
+    keys = np.unique(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
@@ -151,9 +162,9 @@ def cut_entries(halves: list[int], phase: int, steps: int, widths: tuple[int, ..
         for j, (mask, cut) in enumerate(zip(masks, cuts)):
             open_ = np.flatnonzero(first[alive, j] < 0)  # (o,), rows not yet in t001 cut to widths[j] cells
             if open_.size:
-                hit = np.isin((rows[open_, 0] & mask) * np.uint64(4) + drive, cut)  # (o,)
+                hit = in_sorted((rows[open_, 0] & mask) * np.uint64(4) + drive, cut)  # (o,)
                 first[alive[open_[hit]], j] = t
-        inside = np.isin((rows[:, 0] & full) * np.uint64(4) + drive, keys)  # (m,)
+        inside = in_sorted((rows[:, 0] & full) * np.uint64(4) + drive, keys)  # (m,)
         if inside.any():
             entered = first[alive[inside]]  # (e, k)
             first[alive[inside]] = np.where(entered < 0, t, entered)  # in t001, so in every cut of it
@@ -219,6 +230,7 @@ def beyond_stats(halves: list[int], phase: int, steps: int, width: int, context:
     white and black, by the phase of the drive and the last `context` cells of the window of `width` cells, as counts
     out[phase, cells, value], the cells read as bits, cell `width` highest."""
     assert context <= width <= 62
+    keys = np.unique(keys)  # (k,), sorted
     wide = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (wide + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
@@ -228,7 +240,7 @@ def beyond_stats(halves: list[int], phase: int, steps: int, width: int, context:
     mask, near = np.uint64((1 << TRAP_WIDTH) - 1), np.uint64((1 << context) - 1)
     for t in tqdm(range(steps), desc=f"cell beyond, phase {phase}", file=sys.stderr, leave=False, mininterval=5):
         drive = (t + phase) % 3
-        hit = np.isin((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys)  # (m,)
+        hit = in_sorted((rows[:, 0] & mask) * np.uint64(4) + np.uint64(drive), keys)  # (m,)
         rows = rows[~hit]  # entered halves stay in the trap and are counted no more
         if len(rows) == 0:
             break

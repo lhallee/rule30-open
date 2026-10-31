@@ -221,4 +221,6 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   $n < 16$ (`log2_succ_succ_le_time_lt_16`). A reviewer's comment proposes the unconditional form for $k \le 13$, not
   yet in the pull request. *Here:* bounds of the order of the input's length, for one model, against the linear bound
   Problem 3 asks; [the barrier](../negative-results/complexity/problem-three-barrier.md) says why the gap is the whole
-  problem, and the converse direction, Problem 3 implying Problem 1, is in the kit's equivalent forms.
+  problem, and the converse direction, Problem 3 implying Problem 1, is in the kit's equivalent forms. The matching
+  upper bound in the same model, a machine that computes the center column in $2n^2 + 2n\ell + O(n)$ steps, is
+  [the quadratic-time machine](../Rule30Open/Complexity/QuadraticTime.md).

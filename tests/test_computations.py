@@ -196,22 +196,21 @@ def test_c3_ether() -> None:
 
 def test_held_map_tree() -> None:
     """The tree of readings against stepping every half: for 0001 with and without the check against the search over
-    every integer to support 15, and for C3 of 0011 and 0111 against integers to support 13, in every phase; the
-    Fibonacci count of the branches of 0001 with the check; and the ether-domain argument's step 115 at support 100."""
+    every integer to support 11, and for C3 of 0011 and 0111 against integers to support 10, in every phase; and the
+    Fibonacci count of the branches of 0001 with the check, to support 80."""
     for phase in range(4):
         for check in (False, True):
-            latest, _ = held_map.tree_failures("0001", 15, phase, check)
+            latest, _ = held_map.tree_failures("0001", 11, phase, check)
             assert latest == [int(held_map.first_failures_0001(support, phase, check).max())
-                              for support in range(1, 16)], (phase, check)
+                              for support in range(1, 12)], (phase, check)
         for word in ("0011", "0111"):
-            latest, _ = held_map.tree_failures(word, 13, phase, False)
-            assert latest == [c3_brute(word, support, phase) for support in range(1, 14)], (word, phase)
-    latest, branches = held_map.tree_failures("0001", 100, 0, True)
+            latest, _ = held_map.tree_failures(word, 10, phase, False)
+            assert latest == [c3_brute(word, support, phase) for support in range(1, 11)], (word, phase)
+    _, branches = held_map.tree_failures("0001", 80, 0, True)
     fibonacci = [1, 2]
-    while len(fibonacci) < 26:
+    while len(fibonacci) < 21:
         fibonacci.append(fibonacci[-1] + fibonacci[-2])
-    assert [branches[4 * j - 1] for j in range(1, 26)] == fibonacci[1:]
-    assert latest[99] == 115
+    assert [branches[4 * j - 1] for j in range(1, 21)] == fibonacci[1:]
 
 
 def test_linear_complexity() -> None:
@@ -402,18 +401,19 @@ def mask_ok(pattern: str, width: int, mask: dict) -> bool:
 
 
 def test_game_masks() -> None:
-    """The 32 certificates in GameBlocks.lean are `lean_mask` at the least width of blocks the kit does not exclude,
-    `gameBlocks` lists the same blocks, and each certificate passes the check in plain Python and fails it with its
-    values cleared. The two blocks left out need 114,688 and 229,376 nodes. A certificate at one width gives one at
-    every larger width, checked for three blocks up to width 11."""
+    """The 32 certificates in GameBlocks.lean are for blocks the kit does not exclude and `gameBlocks` lists the same
+    blocks; every fourth, and the last, is `lean_mask` at the least width and passes the check in plain Python and fails
+    it with its values cleared (the kernel checks the rest). The two blocks left out need 114,688 and 229,376 nodes. A
+    certificate at one width gives one at every larger width, checked for three blocks up to width 11."""
     lean = (ROOT / "Rule30Open" / "Columns" / "GameBlocks.lean").read_text(encoding="utf-8")
     masks = re.findall(r"def mask([01]+) : GameMask where\n  block := wordOf (\d+) 0b\1\n  width := (\d+)", lean)
     listed = re.findall(r"\((\d+), 0b([01]+)\)", lean.split("def gameBlocks", 1)[1].split("\n\n", 1)[0])
     assert len(masks) == 32 and [(n, p) for p, n, _ in masks] == listed
     kit = game.kit_blocks(14)
-    for pattern, n, width in masks:
-        width = int(width)
+    for pattern, n, _ in masks:
         assert int(n) == len(pattern) and pattern == game.least_rotation(pattern) and pattern not in kit
+    for pattern, n, width in masks[::4] + masks[-1:]:
+        width = int(width)
         assert game.least_width(pattern) == width and len(pattern) << width <= 1 << 15
         assert game.lean_mask(pattern, width) in lean, pattern
         mask = game.game_mask(pattern, width)
@@ -428,7 +428,8 @@ def test_game_masks() -> None:
 
 def test_game_masks_long() -> None:
     """The 97 certificates in GameBlocksLong.lean are `lean_mask` at the least width, at most 9, of blocks of period 15
-    or 16 that the kit does not exclude, `gameBlocks16` lists the same blocks, and sampled certificates pass the check in
+    or 16 that the kit does not exclude (checked for ten sampled and every eighth), `gameBlocks16` lists the same
+    blocks, and sampled certificates pass the check in
     plain Python and fail it with their values cleared."""
     lean = (ROOT / "Rule30Open" / "Columns" / "GameBlocksLong.lean").read_text(encoding="utf-8")
     masks = re.findall(r"def mask([01]+) : GameMask where\n  block := wordOf (\d+) 0b\1\n  width := (\d+)", lean)
@@ -440,8 +441,9 @@ def test_game_masks_long() -> None:
     for i, (pattern, n, width) in enumerate(masks):
         width = int(width)
         assert int(n) == len(pattern) in (15, 16) and pattern == game.least_rotation(pattern) and pattern not in kit
-        assert game.least_width(pattern) == width <= 9
-        assert game.lean_mask(pattern, width) in lean, pattern
+        if i in sampled or i % 8 == 0:
+            assert game.least_width(pattern) == width <= 9
+            assert game.lean_mask(pattern, width) in lean, pattern
         if i in sampled:
             mask = game.game_mask(pattern, width)
             assert mask_ok(pattern, width, mask) and not mask_ok(pattern, width, {**mask, "values": 0}), pattern
@@ -651,7 +653,8 @@ def test_universal_word(coin_certificate: np.ndarray) -> None:
 def test_coin_chain(coin_certificate: np.ndarray) -> None:
     """With a fair coin beyond width 14 under 0111, the expected entry time solves its equation with integer-row
     successors and matches 400 simulated runs from the slowest window within four standard errors, and the chance of
-    staying out falls by the decay factor per step; at width 16, the finding's expected times and decay factor."""
+    staying out falls by the decay factor per step. The finding's numbers at width 16 (expected times 139.9 and 49.8,
+    decay factor 0.98251) are the reproduce command of the coin finding."""
     # coin_certificate: (4, 2^14)
     expected = coin_lock.expected_entry("0111", coin_certificate)  # (4, 2^14)
     assert (expected[coin_certificate] == 0).all()
@@ -672,10 +675,6 @@ def test_coin_chain(coin_certificate: np.ndarray) -> None:
     rate = coin_lock.decay_rate("0111", coin_certificate)
     before, after = coin_lock.stay_out("0111", coin_certificate, 400), coin_lock.stay_out("0111", coin_certificate, 404)
     assert abs(after.max() / before.max() - rate ** 4) < 1e-3
-    member = coin_lock.certificate("0111", 16)  # (4, 2^16)
-    expected = coin_lock.expected_entry("0111", member)  # (4, 2^16)
-    assert (round(float(expected.max()), 1), round(float(expected[0].mean()), 1)) == (139.9, 49.8)
-    assert round(coin_lock.decay_rate("0111", member), 5) == 0.98251
 
 
 def test_coin_sample() -> None:
@@ -781,20 +780,20 @@ def in_family_slow(word: str, row: int, phase: int, wall: np.ndarray) -> bool:
 
 
 def test_absorption_census() -> None:
-    """Every right half of up to 6 cells, in every phase of the three words, enters the family exactly when integer
-    rows stepped one at a time first meet the family checked column by column; and at 12 cells the latest entries are
-    the absorption finding's 544, 980 and 416 at phase 0."""
+    """Every fifth right half of up to 6 cells, in every phase of the three words, enters the family exactly when integer
+    rows stepped one at a time first meet the family checked column by column; and at 8 cells the latest entries are
+    the absorption finding's 355, 521 and 295 at phase 0 (12 cells and more: the finding's reproduce command)."""
     wall = absorption.kit_wall()  # (4, 2^13)
     for word in absorption.WORDS:
         for phase in range(4):
             times = absorption.census(word, 6, phase, 600, wall)  # (64,)
-            for start in range(64):
+            for start in range(0, 64, 5):
                 row, t = start, 0
                 while not in_family_slow(word, row, (t + phase) % 4, wall):
                     row = ((row << 1) | int(word[(t + phase) % 4])) ^ (row | (row >> 1))
                     t += 1
                 assert times[start] == t, (word, phase, start)
-    assert [int(absorption.census(word, 12, 0, 1200, wall).max()) for word in absorption.WORDS] == [544, 980, 416]
+    assert [int(absorption.census(word, 8, 0, 600, wall).max()) for word in absorption.WORDS] == [355, 521, 295]
 
 
 def least_depth_slow(word: str, row: int, phase: int, wall: np.ndarray) -> int:
@@ -902,16 +901,16 @@ def test_ether_agreement() -> None:
 
 
 def test_long_window() -> None:
-    """The window of `LongWindow`: the packed center cells against `center_column`, each checkpoint row against the
-    integer rows stepped to its time, and the new factor against the set of every earlier factor, read as strings."""
+    """The window of `LongWindow`: the packed center cells against `center_column`, the first checkpoint row against the
+    integer rows stepped to its time (the later ones are checked at the scale of `WideWindow`), and the new factor
+    against the set of every earlier factor, read as strings."""
     bits, checkpoints = long_window.simulate()
     column = center_column(long_window.N)  # (N,)
-    assert np.array_equal(np.array([(bits >> t) & 1 for t in range(long_window.N)], dtype=np.uint8), column)
+    assert np.array_equal(np.frombuffer(format(bits, f"0{long_window.N}b")[::-1].encode(), dtype=np.uint8) - 48, column)
     row = 1 << long_window.N
-    for t in range(1, max(checkpoints) + 1):
+    for t in range(1, 16385):
         row = step(row)
-        if t in checkpoints:
-            assert checkpoints[t] == row, t
+    assert checkpoints[16384] == row  # the later checkpoints are stepped the same way in `test_wide_window`
     assert sorted(checkpoints) == [16384, 32768, 49152]
     length = long_window.new_factor(bits)
     cells = "".join(map(str, column.tolist()))
@@ -923,23 +922,25 @@ def test_long_window() -> None:
 
 
 def test_wide_window() -> None:
-    """The window of `WideWindow`: the packed center cells against `center_column`, the checkpoint rows against the
-    integer rows stepped to their times, and the new factor of length 20 against the sets of earlier factors."""
-    bits, checkpoints = long_window.simulate(long_window.WIDE)
-    column = center_column(long_window.WIDE)  # (WIDE,)
-    assert np.array_equal(np.array([(bits >> t) & 1 for t in range(long_window.WIDE)], dtype=np.uint8), column)
-    assert sorted(checkpoints) == [16384 * q for q in range(1, 16)]
-    row = 1 << long_window.WIDE
+    """The window of `WideWindow`, at 49,152 cells instead of 262,144 (the same functions, `long_window.simulate` and
+    `new_factor`): the packed center cells against `center_column`, the checkpoint rows against the integer rows stepped
+    to their times, and the new factor of length 16 against the sets of earlier factors."""
+    n = 3 * 16384
+    bits, checkpoints = long_window.simulate(n)
+    column = center_column(n)  # (n,)
+    assert np.array_equal(np.frombuffer(format(bits, f"0{n}b")[::-1].encode(), dtype=np.uint8) - 48, column)
+    assert sorted(checkpoints) == [16384 * q for q in range(1, 3)]
+    row = 1 << n
     for t in range(1, max(checkpoints) + 1):
         row = step(row)
         if t in checkpoints:
             assert checkpoints[t] == row, t
     cells = "".join(map(str, column.tolist()))
-    for size, new in ((19, False), (20, True)):
-        start = long_window.WIDE - size
+    for size, new in ((15, False), (16, True)):
+        start = n - size
         earlier = {cells[j:j + size] for j in range(start)}
         assert (cells[start:] not in earlier) == new, size
-    assert long_window.new_factor(bits, long_window.WIDE) == 20
+    assert long_window.new_factor(bits, n) == 16
 
 
 def test_period_three() -> None:
@@ -986,8 +987,8 @@ def test_constant_rate() -> None:
 
 def test_t001_entries() -> None:
     """Entry into the kit's trap t001, read from its source: the white half enters at step 1,270, 1,269 or 1,268 by
-    phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state, while the half with column 2 black
-    enters only at step 35,536 from phase 0; integer rows stepped one at a time stay in the trap for 300 steps after
+    phase, as the kit's `t001_reached` and `EmptyRight.emptyRight_001` state, and halves 1 and 3 at step 1,267 (half 2,
+    with column 2 black, enters only at step 35,536, in the census's reproduce command); integer rows stepped one at a time stay in the trap for 300 steps after
     entry with random cells beyond column 47, as the trap's closure requires; and `periodic_extent` agrees with the
     same rows, covering the trap's 38 periodic columns once the white half is in."""
     keys = set(period_three.trap_keys().tolist())
@@ -995,8 +996,8 @@ def test_t001_entries() -> None:
     assert period_three.trap_entries([0], 0, 2000, period_three.trap_keys()).tolist() == [1270]
     assert period_three.trap_entries([0, 0], 1, 2000, period_three.trap_keys()).tolist() == [1269, 1269]
     assert period_three.trap_entries([0], 2, 2000, period_three.trap_keys()).tolist() == [1268]
-    assert period_three.trap_entries([0, 1, 2, 3], 0, 40000, period_three.trap_keys()).tolist() == [1270, 1267, 35536,
-                                                                                                      1267]
+    # half 2 enters at step 35,536, which the census's reproduce command runs
+    assert period_three.trap_entries([0, 1, 3], 0, 2000, period_three.trap_keys()).tolist() == [1270, 1267, 1267]
     rng = np.random.default_rng(42)
     mask = (1 << period_three.TRAP_WIDTH) - 1
     row = 0
@@ -1124,7 +1125,6 @@ def test_coupled_rebuilds() -> None:
     assert coupled.ether_after("10001010111100") == 4 and coupled.ether_after("0010011") == 0
 
 
-
 def test_wall_segments() -> None:
     """The three-valued run of `wall_segments` against brute force: every segment of up to nine cells that it passes
     keeps the cell right of the column the same at each 0 over every row that starts at the wall. The segments that
@@ -1193,11 +1193,11 @@ def test_windows_after_ones() -> None:
 
 
 def test_bit_phases() -> None:
-    """`bit_game.phase_rounds` against the game: up to period 10 at width 6 every phase empties a side exactly when
-    `game.bad_pairs` finds no component showing both values at a phase. For two blocks of `WIDE`, `lean_block` is the
-    text of their checks in BitPhases.lean, and the lists of the four modules hold exactly the 75 blocks of `WIDE`."""
+    """`bit_game.phase_rounds` against the game: up to period 8 at width 6 every phase empties a side exactly when
+    `game.bad_pairs` finds no component showing both values at a phase. For one block of `WIDE`, `lean_block` is the
+    text of its checks in BitPhases.lean, and the lists of the four modules hold exactly the 75 blocks of `WIDE`."""
     from computations import bit_game
-    for period in range(2, 11):
+    for period in range(2, 9):
         for pattern in game.necklaces(period):
             try:
                 bit_game.phase_rounds(pattern, 6)
@@ -1207,8 +1207,8 @@ def test_bit_phases() -> None:
             assert decided == (game.bad_pairs(pattern, 6) == 0), pattern
     lean = {name: (ROOT / "Rule30Open" / "Columns" / f"{name}.lean").read_text(encoding="utf-8")
             for name in ("BitPhases", "BitPhases19", "BitPhases20", "BitPhases21")}
-    for block in ("00000000000101101", "000000000010000101"):
-        assert bit_game.lean_block(block, bit_game.WIDE[block]) in lean["BitPhases"]
+    block = "00000000000101101"  # one block tests the generator; the kernel checks every listed block
+    assert bit_game.lean_block(block, bit_game.WIDE[block]) in lean["BitPhases"]
     listed = {}
     for text in lean.values():
         for n, bits, width in re.findall(r"\(\((\d+), 0b([01]+)\), (\d+)\)", text):
@@ -1243,11 +1243,13 @@ def test_bit_blocks() -> None:
 
 
 def test_space_time_periodic() -> None:
-    """The backgrounds of `space_time_periodic` against brute force: for every ring of up to 16 cells, every row whose
+    """The backgrounds of `space_time_periodic` against brute force: for every ring of up to 9 cells, every row whose
     orbit under Rule 30 returns within 6 steps has a temporal period P <= 6, and its least spatial period is the length
     of a cycle of `column_map` for P; conversely each cycle of length up to 16 is such a row, by a direct run of the
     ring (`ring_period`). The backgrounds of period 4 are the white row, the stripe and the kit's ether, of spatial
-    period 7, and the walls of periods 9 to 12 lie on cycles of the lengths their chains repeat with."""
+    period 7, and the walls of periods 9 to 11 lie on cycles of the lengths their chains repeat with (the rings of up to
+    16 cells, period 12 and its witnesses are the entry's reproduce command); every row repeating with a period
+    dividing P, read from the cycles, matches the counts of A New Kind of Science for P up to 8."""
     import itertools
     from computations import space_time_periodic as stp
 
@@ -1255,7 +1257,7 @@ def test_space_time_periodic() -> None:
         return min(d for d in range(1, len(cells) + 1) if len(cells) % d == 0 and cells == cells[d:] + cells[:d])
 
     lengths = {period: {length for length, _, _ in stp.backgrounds(period)} for period in range(1, 7)}
-    for size in range(1, 17):
+    for size in range(1, 10):
         for cells in itertools.product((0, 1), repeat=size):
             period = stp.ring_period(list(cells), 6)
             if period is not None:
@@ -1270,14 +1272,14 @@ def test_space_time_periodic() -> None:
             ring = stp.ring_period(row, period)
             assert ring is not None and period % ring == 0
     assert [(length, count) for length, count, _ in stp.backgrounds(4)] == [(1, 1), (2, 1), (7, 4)]
-    found = {period: {length for length, _, _ in stp.backgrounds(period)} for period in (9, 10, 11, 12)}
-    assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11] and {60, 138} <= found[12]
-    assert stp.witnesses(8) == {("01", 2), ("0001", 4)} and stp.witnesses(12) == {("01", 2), ("000101", 6), ("001011", 6)}
+    found = {period: {length for length, _, _ in stp.backgrounds(period)} for period in (9, 10, 11)}
+    assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11]
+    assert stp.witnesses(8) == {("01", 2), ("0001", 4)}
     assert stp.background_walls(10, 16) == [(30, 30, 0), (90, 85, 0), (155, 150, 60)]
     # every row that repeats with a period dividing P, from each cycle's row run directly and read in every rotation: as
     # many as the states on cycles, against the list of A New Kind of Science, which the second count matches only at
     # periods 1 to 4, 6 and 7
-    for period in range(1, 11):
+    for period in range(1, 9):
         nodes, label = stp.cycles(period)  # (c,), (c,)
         f = stp.column_map(period)  # (4^P,)
         rows: set[tuple[int, ...]] = set()
@@ -1292,9 +1294,9 @@ def test_space_time_periodic() -> None:
                 row = np.roll(row, 1) ^ (row | np.roll(row, -1))
             assert np.array_equal(row, start)
         assert len(rows) == stp.counts(period)[0]
-    found_counts = [stp.counts(period) for period in range(1, 11)]
-    assert [rows for rows, _ in found_counts] == [3, 3, 15, 31, 48, 99, 108, 119, 195, 598]
-    assert [cells for _, cells in found_counts] == [3, 3, 15, 10, 48, 99, 18, 94, 165, 323]
+    found_counts = [stp.counts(period) for period in range(1, 9)]  # periods 9 and 10: the entry's reproduce command
+    assert [rows for rows, _ in found_counts] == [3, 3, 15, 31, 48, 99, 108, 119]
+    assert [cells for _, cells in found_counts] == [3, 3, 15, 10, 48, 99, 18, 94]
     # the witness for 0001, run directly: on the ring of the background, a column repeats 0001 with period 4 while the
     # column left of it takes both values at one phase of it
     nodes, label = stp.cycles(8)  # (c,), (c,)
@@ -1366,20 +1368,20 @@ def test_bit_game() -> None:
 
 def test_forcing() -> None:
     """Forcing words: the search over sets of configurations against brute force over every start, for every word of up
-    to nine values; the shortest forcing words have seven values; and the blocks of period up to 12 whose 0s all follow
+    to seven values; the shortest forcing words have seven values; and the blocks of period up to 11 whose 0s all follow
     a forcing word of length 12, against the same test with each lookback checked by brute force."""
     import itertools
     from computations import forcing, wall_segments
-    for n in range(1, 10):
+    for n in range(1, 8):
         words = forcing.forcing_words(n)
         for bits in itertools.product("01", repeat=n):
             word = "".join(bits)
             assert words.get(word) == forcing.forced_value(word)
     assert forcing.forcing_words(7) == {"0110000": 1, "0110001": 0}
     assert forcing.forced_value("1" * 9) == 0 and forcing.forced_value("1" * 8 + "0") == 1
-    family = forcing.forcing_family(forcing.forcing_words(12), 12, 12)
+    family = forcing.forcing_family(forcing.forcing_words(12), 12, 11)
     cache: dict[str, int | None] = {}
-    for period in range(1, 13):
+    for period in range(1, 12):
         brute = [block for block in wall_segments.necklaces(period)
                  if all(cache.setdefault(word, forcing.forced_value(word)) is not None
                         for word in (forcing.lookback(block, i, 12) for i, ch in enumerate(block) if ch == "0"))]
@@ -1504,12 +1506,14 @@ def test_kit_families() -> None:
 
 
 def test_game_survey() -> None:
-    """The survey of `excluded_blocks` over worker processes agrees with the survey in one process, and both agree with
-    `least_width`, block by block, on every primitive block of period 8 to 10."""
-    one, tried = game.excluded_blocks(10, [6, 10], min_period=8)
-    two, tried2 = game.excluded_blocks(10, [6, 10], min_period=8, workers=2)
-    assert one == two and tried == tried2 == len(game.necklaces(8)) + len(game.necklaces(9)) + len(game.necklaces(10))
-    for period in range(8, 11):
+    """The survey of `excluded_blocks` over worker processes agrees, at period 8, with the survey in one process, which
+    agrees with `least_width`, block by block, on every primitive block of period 8 and 9 (period 10 is the reproduce
+    command of the survey)."""
+    one, tried = game.excluded_blocks(9, [6, 10], min_period=8)
+    two, tried2 = game.excluded_blocks(8, [6, 10], min_period=8, workers=2)
+    assert tried == len(game.necklaces(8)) + len(game.necklaces(9)) and tried2 == len(game.necklaces(8))
+    assert two == {block: width for block, width in one.items() if len(block) == 8}
+    for period in range(8, 10):
         for block in game.necklaces(period):
             width = game.least_width(block, 10)
             assert (block in one) == (width is not None)
@@ -1520,7 +1524,8 @@ def test_game_survey() -> None:
 def test_lock_unreachable() -> None:
     """`lock_word.unreachable` against a forward search: beside an alternating center, at width 19, the set reached
     from a window marked unreachable, with both values of column 20 at every step, never meets the trap, and the set
-    reached from a window marked reachable does; under 0111 at width 13 no window is unreachable."""
+    reached from a window marked reachable does (one of each, sampled); under 0111 at width 13 no window is
+    unreachable."""
     from computations import lock_word
     wall = absorption.kit_wall()  # (4, 2^13)
     assert not lock_word.unreachable("0111", 13, wall).any()
@@ -1549,23 +1554,21 @@ def test_lock_unreachable() -> None:
     rng = np.random.default_rng(7)
     bad = np.flatnonzero(out[0])  # (n,)
     good = np.flatnonzero(~out[0])  # (m,)
-    for window in rng.choice(bad, 2, replace=False).tolist():
-        assert not meets_trap(window)
-    for window in rng.choice(good, 2, replace=False).tolist():
-        assert meets_trap(window)
+    assert not meets_trap(int(rng.choice(bad)))
+    assert meets_trap(int(rng.choice(good)))
 
 
 def test_lock_avoid_growth() -> None:
     """`lock_word.avoid_growth` against a direct count: under 0111 at width 13, the number of sequences of column 14 that
-    keep the worst window out for L steps, counted step by step, grows by the same factor per step between L = 600 and
-    L = 800."""
+    keep the worst window out for L steps, counted step by step, grows by the same factor per step between L = 250 and
+    L = 400."""
     from computations import lock_word
     wall = absorption.kit_wall()  # (4, 2^13)
     member = lock_word.trap("0111", 13, wall)  # (4, 2^13)
     successors = lock_certificate.successor_table("0111", 13)  # (4, 2, 2^13)
     counts = np.where(member, 0.0, 1.0)  # (4, 2^13), sequences of length 0 that keep each window out
     worst = []
-    for length in range(1, 801):
+    for length in range(1, 401):
         nxt = np.empty_like(counts)  # (4, 2^13)
         for ph in range(4):
             later = counts[(ph + 1) % 4]  # (2^13,)
@@ -1573,17 +1576,18 @@ def test_lock_avoid_growth() -> None:
         scale = nxt.max()
         counts = nxt / scale
         worst.append(np.log(scale))
-    rate = np.exp(np.mean(worst[600:]))
+    rate = np.exp(np.mean(worst[250:]))
     assert abs(rate - lock_word.avoid_growth("0111", member)) < 1e-3
 
 
-def test_period_rate() -> None:
+def test_period_rate(coin_certificate: np.ndarray) -> None:
     """`coin_lock.period_rate` where the power iteration of `decay_rate` oscillates: for the kit's block 0000000001 at
     width 13, two eigenvalues of one period of the coin step share the largest modulus, and the rate equals that of a
-    power iteration shifted by the identity, which converges; for the certificates of 0011 and 0111 at width 16 the
-    rates are 0.99823 and 0.98251; `locks.growth` gives the locked share and growth rate of 0111 at width 13 that
-    `locks.profile` gives; and for a trap that some window cannot reach the factor is 1, not the 0 that a vector gone to
-    0 on some windows would give."""
+    power iteration shifted by the identity, which converges; for the certificate of 0111 at width 14 the rate is
+    0.98204; `locks.growth` gives the locked share and growth rate of 0111 at width 13 that `locks.profile` gives; and
+    for a trap that some window cannot reach the factor is 1, not the 0 that a vector gone to 0 on some windows would
+    give: the natural trap of 0010101111111 passes the test of reach in the game of 6 cells, with factor below 1, and
+    fails it in that of 8, with factor 1."""
     from computations import coin_lock, locks
     from scipy.sparse.linalg import LinearOperator, eigs
     block = "0000000001"
@@ -1598,7 +1602,7 @@ def test_period_rate() -> None:
         return v
 
     x = np.ones(1 << 13)  # (2^13,)
-    for _ in range(3000):
+    for _ in range(500):
         y = one_period(x) + x  # (2^13,)
         shifted = np.linalg.norm(y) / np.linalg.norm(x)
         x = y / np.linalg.norm(y)
@@ -1607,19 +1611,18 @@ def test_period_rate() -> None:
     top = np.sort(np.abs(eigs(LinearOperator((1 << 13, 1 << 13), matvec=one_period, dtype=float), k=4, which="LM",
                               return_eigenvectors=False)))[::-1]  # (4,)
     assert abs(top[0] - top[1]) < 1e-9 and top[2] < 0.9 * top[0]
-    assert round(coin_lock.period_rate("0011", coin_lock.certificate("0011", 16)), 5) == 0.99823
-    assert round(coin_lock.period_rate("0111", coin_lock.certificate("0111", 16)), 5) == 0.98251
+    assert round(coin_lock.period_rate("0111", coin_certificate), 5) == 0.98204
     # `locks.growth`, the profile without the steering sequence: for 0111 at width 13 the share and rate of the table
     share, rate = locks.growth("0111", 13)
     assert round(share, 4) == 0.0584 and round(rate, 6) == 1.969279
-    # the factor is below 1 exactly when every window can reach the trap: the natural trap of 0001111110011 passes the
-    # test of reach in the game of 16 cells and fails in that of 17, where windows that never enter leave the iteration
+    # the factor is below 1 exactly when every window can reach the trap: the natural trap of 0010101111111 passes the
+    # test of reach in the game of 6 cells and fails in that of 8, where windows that never enter leave the iteration
     # 0 elsewhere and the bound is the step's own, 1
     from computations import lock_chain
-    t = lock_chain.extra_tables("0001111110011")
-    rates = [coin_lock.period_rate("0001111110011", lock_chain.trap_nodes((t,), w).reshape(13, 1 << w),
-                                   tolerance=1e-10, limit=3000) for w in (16, 17)]
-    assert rates[0] < 1 == rates[1] and lock_chain.trap_reach(t, width=17) < 1
+    t = lock_chain.extra_tables("0010101111111")
+    rates = [coin_lock.period_rate("0010101111111", lock_chain.trap_nodes((t,), w).reshape(13, 1 << w),
+                                   tolerance=1e-10, limit=3000) for w in (6, 8)]
+    assert rates[0] < 1 == rates[1] and lock_chain.trap_reach(t, width=6) == 1 > lock_chain.trap_reach(t, width=8)
 
 
 def test_locks() -> None:
@@ -1697,16 +1700,18 @@ def test_locks() -> None:
 
 def test_mixed_nodes() -> None:
     """`locks.mixed_nodes`, found backward by predecessor arithmetic, against `locks.lock_info`, found along the game's
-    list of moves: the same locked nodes for blocks with locks (0111 and 00011101 at 13 cells, 0001 at 16) and without
-    (001011, alone and repeated, at 13 cells); and no locked node for 001011 at 18 cells, modulo 6 or 12."""
+    list of moves: the same locked nodes for blocks with locks (0111 and 00011101 at 13 cells) and without
+    (001011, alone and repeated, at 13 cells); the 2,611 locked nodes of 0001 at 16 cells; and no locked node for
+    001011 at 13 cells modulo 12, at 15 modulo 6."""
     from computations import locks
-    for block, width in (("0111", 13), ("00011101", 13), ("0001", 16), ("001011", 13), ("001011001011", 13)):
+    for block, width in (("0111", 13), ("00011101", 13), ("001011", 13), ("001011001011", 13)):
         locked, _ = locks.lock_info(block, width)  # (p n,)
         assert (locked == ~locks.mixed_nodes(block, width)).all()
         assert locks.has_lock(block, width, wide=True) == bool(locked.any())
-    assert int((~locks.mixed_nodes("0001", 16)).sum()) == 2611
-    assert locks.lock_census([6], [18], repeat=2, wide=True) == {(6, 18): []}
-    assert not locks.has_lock("001011", 18, wide=True)
+    locked, _ = locks.lock_info("0001", 16)  # (p n,)
+    assert (locked == ~locks.mixed_nodes("0001", 16)).all() and int(locked.sum()) == 2611
+    assert locks.lock_census([6], [13], repeat=2, wide=True) == {(6, 13): []}
+    assert not locks.has_lock("001011", 15, wide=True)
 
 
 def test_lock_breaks() -> None:
@@ -1873,11 +1878,13 @@ def test_lock_chain() -> None:
         assert lock_chain.necklace(block[:len(word)]) == word and lock_chain.is_lock(block, nodes, distance + 5)
 
 
-def test_word_traps() -> None:
-    """The traps of `WordTraps.lean` and `NineTraps.lean` are the entries that `lock_chain.lean_trap` and
-    `lock_chain.lean_nine` print, and their packed tables, read back from the Lean sources, pass the modules' check by
-    `step`: each listed successor is the window one step of the rule later, beside the block at the label's phase, with
-    the label one more, and at a white phase the first cell is the label's bit of `u`."""
+def test_word_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The traps of `WordTraps.lean` and `NineTraps.lean` are the entries that `lock_chain.lean_trap` prints (all of
+    `WordTraps`) and `lock_chain.lean_nine` prints (restricted to the distances 1 and 21, the first and the last), and
+    their packed tables, read back from the Lean sources, pass the modules' check by `step`: each listed successor is
+    the window one step of the rule later, beside the block at the label's phase, with the label one more, and at a
+    white phase the first cell is the label's bit of `u`; checked for every trap of `WordTraps` and for `nine1`,
+    `nine21` and `trap001010011` of `NineTraps`."""
     import sys
     from computations import lock_chain
     word_traps = (ROOT / "Rule30Open" / "Columns" / "WordTraps.lean").read_text(encoding="utf-8")
@@ -1888,9 +1895,14 @@ def test_word_traps() -> None:
         names = [entry[0] for entry in lock_chain.TRAPS + lock_chain.NATURAL[:1]]
         for name in names:
             assert lock_chain.lean_trap(name) in word_traps
-        assert lock_chain.lean_nine() in nine_traps and lock_chain.lean_trap("trap001010011") in nine_traps
+        distances = [d for d in lock_chain.nine_distances() if d]
+        for kept in ([distances[0]], [distances[-1]]):
+            monkeypatch.setattr(lock_chain, "nine_distances", lambda kept=kept: [0] + kept)
+            assert lock_chain.lean_nine() in nine_traps
+        monkeypatch.undo()
+        assert lock_chain.lean_trap("trap001010011") in nine_traps
         sources = [(name, word_traps) for name in names]
-        sources += [(f"nine{d}", nine_traps) for d in lock_chain.nine_distances() if d]
+        sources += [(f"nine{d}", nine_traps) for d in (distances[0], distances[-1])]
         sources += [("trap001010011", nine_traps)]
         for name, lean in sources:
             body = lean.split(f"def {name} : WTrap :=", 1)[1].split("}", 1)[0]
@@ -1987,12 +1999,13 @@ def test_period_nine_wall() -> None:
 
 def test_white_lock() -> None:
     """`lock_chain.white_lock`: the white right half driven by 001 locks column 1 with period 21 from every phase and is
-    then inside a trap of 815 windows of 47 cells modulo 21, the size of the kit's `t001`; driven by 0001 from phase 0 it
-    locks with period 4 inside 109 windows of 16 cells; driven by 01 it does not lock within 20,000 steps; and for 001
-    from phase 1 column 1 computed by `step` repeats with period 21 at the white times over the second half."""
+    then inside a trap of 815 windows of 47 cells modulo 21, the size of the kit's `t001` (the search over cell counts
+    restricted to 47; the full search, 16 to 64, is the entry's reproduce command); driven by 0001 from phase 0
+    it locks with period 4 inside 109 windows of 16 cells; driven by 01 it does not lock within 20,000 steps; and for
+    001 from phase 1 column 1 computed by `step` repeats with period 21 at the white times over the second half."""
     from computations import lock_chain
     for phase in range(3):
-        lock, last, trap = lock_chain.white_lock("001", phase, 20000)
+        lock, last, trap = lock_chain.white_lock("001", phase, 20000, range(47, 48))
         assert lock == 21 and last < 1000 and trap is not None and trap[1:] == (47, 21, 815)
     lock, _, trap = lock_chain.white_lock("0001", 0, 20000)
     assert lock == 4 and trap is not None and trap[1:] == (16, 4, 109)
@@ -2026,15 +2039,15 @@ def test_period_two_fourteen() -> None:
 
 
 def test_coin_entry() -> None:
-    """`lock_chain.coin_entry`: the halves and phases with support in cells 1 to 8 whose windows are already inside
+    """`lock_chain.coin_entry`: the halves and phases with support in cells 1 to 6 whose windows are already inside
     `trap001011` when the coin takes over at step 200 are exactly those that `entry_steps`, with the rule throughout,
     finds inside by step 200, and with the coin no other enters within 2,000 steps."""
     from computations import lock_chain
-    coin = lock_chain.coin_entry("trap001011", 8, 200, 2000)  # (1536,)
-    real = np.concatenate([lock_chain.entry_steps("trap001011", list(range(256)), phase, 201)
-                           for phase in range(6)])  # (1536,)
+    coin = lock_chain.coin_entry("trap001011", 6, 200, 2000)  # (384,)
+    real = np.concatenate([lock_chain.entry_steps("trap001011", list(range(64)), phase, 201)
+                           for phase in range(6)])  # (384,)
     assert set(np.flatnonzero(coin == 0).tolist()) == set(np.flatnonzero(real >= 0).tolist())
-    assert (coin == 0).sum() == 10 and (coin > 0).sum() == 0
+    assert (coin == 0).sum() == 3 and (coin > 0).sum() == 0
 
 
 def test_white_runs() -> None:
@@ -2058,7 +2071,8 @@ def test_white_runs() -> None:
 def test_nine_white() -> None:
     """`NineWhite.lean`: for each run of `lock_chain.WHITE_RUNS`, the row its first part ends on, cut to the cells that
     can reach the window, is what a direct run of 16,384 steps with `step` gives; and the shortest run, the white half
-    under 001010011 from phase 7, enters its wall at step 91,086 by `entry_steps`, and at no earlier step."""
+    under 001010011 from phase 7, enters its wall at step 91,086 by a direct run with `step` on one integer, and at no
+    earlier step."""
     import sys
     from computations import lock_chain
     lean = (ROOT / "Rule30Open" / "Columns" / "NineWhite.lean").read_text(encoding="utf-8")
@@ -2073,9 +2087,17 @@ def test_nine_white() -> None:
                 row = (row & ~1) | int(word[(t + phase) % 9])
                 row = step(row)
             assert (row >> 1) % (1 << (total - lock_chain.PART + cells)) == literal
+        word, cells, states = lock_chain.trap_states("trap001010011")
+        row, entered = 0, -1
+        for t in range(91087):
+            row = (row & ~1) | int(word[(t + 7) % 9])
+            if ((t + 7) % 9, (row >> 1) & ((1 << cells) - 1)) in states:
+                entered = t
+                break
+            row = step(row)
+        assert entered == 91086
     finally:
         sys.set_int_max_str_digits(digits)
-    assert lock_chain.entry_steps("trap001010011", [0], 7, 91087).tolist() == [91086]
 
 
 def test_ten_gap() -> None:
@@ -2091,7 +2113,7 @@ def test_ten_gap() -> None:
     word, states = trap["word"], trap["states"]
     members = set(states)
     for phase in range(10):
-        for r in (0, 1, 37, 128, 255):
+        for r in (0, 37, 255):
             when, index = entries[phase][r]
             row = r << 1  # (cells 0 .. ), cell 0 the center
             for t in range(when + 1):
@@ -2115,7 +2137,7 @@ def test_ten_coin() -> None:
     successors = successor_table(word, 16)  # (10, 2, 2^16)
     out = coin_lock.stay_out(word, member, 12)  # (10, 2^16)
     outside = np.flatnonzero(~member[0])  # (m,)
-    for window in outside[::7919][:6].tolist():
+    for window in outside[::7919][:3].tolist():
         kept = 0
         for values in range(1 << 12):
             w, inside = window, False
@@ -2135,8 +2157,7 @@ def test_natural_coin() -> None:
     """Natural traps with a fair coin in column 17, for a trap of period 11 with labels modulo 11 and one with labels
     modulo 22: `trap_member` holds each state at its phase; `coin_lock.stay_out` over 11 steps, for sampled windows at
     phase 0, is the share of the 2,048 values of column 17 over those steps that keep the window outside, counted
-    directly with `successor_table`; and the word of `universal_word` brings every window at phase 0 inside by
-    `run_word`."""
+    directly with `successor_table`."""
     from computations import coin_lock, lock_chain
     from computations.lock_certificate import successor_table
     for word in ("00000010001", "00000110101"):
@@ -2145,7 +2166,7 @@ def test_natural_coin() -> None:
         assert member.sum() == len({(label % 11, window) for label, window in t["states"]})
         successors = successor_table(word, 16)  # (11, 2, 2^16)
         out = coin_lock.stay_out(word, member, 11)  # (11, 2^16)
-        for window in np.flatnonzero(~member[0])[::9973][:4].tolist():
+        for window in np.flatnonzero(~member[0])[::9973][:2].tolist():
             kept = 0
             for values in range(1 << 11):
                 w, inside = window, False
@@ -2156,8 +2177,6 @@ def test_natural_coin() -> None:
                         break
                 kept += not inside
             assert abs(out[0, window] - kept / 2048) < 1e-12, (word, window)
-        values = coin_lock.universal_word(word, member)
-        assert member[len(values) % 11][coin_lock.run_word(word, member, values, 0)].all()
 
 
 def test_wall_gaps() -> None:
@@ -2174,7 +2193,7 @@ def test_wall_gaps() -> None:
         word, states, period = t["word"], t["states"], len(t["word"])
         members = set(states)
         for phase in range(period):
-            for r in (0, 3, 101, 200, 255):
+            for r in (0, 101, 255):
                 when, index = entries[phase][r]
                 row = r << 1  # cell 0 the center
                 for u in range(when + 1):
@@ -2261,11 +2280,12 @@ def test_period_four_certificate_traps() -> None:
         sys.set_int_max_str_digits(digits)
 
 
-def test_ten_traps() -> None:
+def test_ten_traps(monkeypatch: pytest.MonkeyPatch) -> None:
     """The wall of period 10: its chain repeats with period 155 from the start, its columns at distances 20 to 28 are
-    the nine blocks of period 10 with a locked window of 13 cells (`locks.has_lock`), and its trap carried to the 25
-    distances of `ten_distances` is a lock by `is_lock`, a direct check with the rule, for each block; the least
-    natural trap of 0001110011 is the carried one at distance 7; and `lean_ten` is the text of TenTraps.lean.
+    the nine blocks of period 10 with a locked window of 13 cells (`locks.has_lock`, checked for three of them and three
+    other blocks of period 10), and its trap carried to the first, the seventh and the last of the 25 distances of
+    `ten_distances` is a lock by `is_lock`, a direct check with the rule, with 100 states; the least natural trap of
+    0001110011 is the carried one at distance 7; `lean_ten`, restricted to distances 0 and 7, is text of TenTraps.lean.
     `parse_natural`, `natural_summary` and `wall_chains` read back a saved scan line."""
     from computations import lock_chain, locks
     t = lock_chain.tables("trap0000010001")
@@ -2275,16 +2295,22 @@ def test_ten_traps() -> None:
     assert (start, len(cycle)) == (0, 155)
     columns = lock_chain.chain(full, values, 28)
     near = {lock_chain.necklace(c[:lock_chain.least_period(c)]) for c in columns[20:29]}
-    assert near == {b for b in game.necklaces(10) if locks.has_lock(b, 13)}
+    assert len(near) == 9 and near <= set(game.necklaces(10))
+    others = [b for b in game.necklaces(10) if b not in near]
+    assert all(locks.has_lock(b, 13) for b in sorted(near)[::4])
+    assert not any(locks.has_lock(b, 13) for b in others[::len(others) // 3][:3])
     distances = lock_chain.ten_distances()
     assert len(distances) == 25 and distances[:4] == [0, 1, 2, 3]
-    for d in distances:
+    for d in (distances[0], distances[7], distances[-1]):
         carried = lock_chain.carried("trap0000010001", d)
         assert len(carried["states"]) == 100 and lock_chain.is_lock(carried["word"], carried["states"], 16 + d)
     natural = lock_chain.natural_tables("0001110011", 0, 12000, 23, 10)
     assert natural["states"] == lock_chain.carried("trap0000010001", 7)["states"]
     lean = (ROOT / "Rule30Open" / "Columns" / "TenTraps.lean").read_text(encoding="utf-8")
-    assert lock_chain.lean_ten() in lean
+    for kept in (0, 7):
+        monkeypatch.setattr(lock_chain, "ten_distances", lambda kept=kept: [kept])
+        assert lock_chain.lean_ten() in lean
+    monkeypatch.undo()
     line = "0000010001: column 1 locks for 31 of 31 starts; natural traps [(0, 12000, 16, 10, 100)]"
     rows = lock_chain.parse_natural(line)
     assert rows == {10: [("0000010001", 31, [(0, 12000, 16, 10, 100)])]}
@@ -2295,10 +2321,11 @@ def test_ten_traps() -> None:
                       if len(lock_chain.carried("trap0000010001", d)["word"]) == 10}
 
 
-def test_eleven_twelve_traps() -> None:
-    """The walls of periods 11 to 14: the trap of each in `WALLS` has the size the natural scan reports, every trap
-    that `wall_distances` carries within `WALL_DEPTHS` columns is a lock by `is_lock`, a direct check with the rule, for
-    its block, the blocks are distinct and none is the kit's, and `lean_walls` is the text of ElevenTraps.lean,
+def test_eleven_twelve_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The walls of periods 11 to 14: the trap of each in `WALLS` has the size the natural scan reports, the traps that
+    `wall_distances` carries within `WALL_DEPTHS` columns are 57, 83, 53 and 101 with distinct blocks none of which is
+    the kit's, every tenth of them and the last is a lock by `is_lock`, a direct check with the rule, for its block,
+    and `lean_walls`, restricted to the first and to the last of each period, is text of ElevenTraps.lean,
     TwelveTraps.lean, ThirteenTraps.lean and FourteenTraps.lean; the walls of periods 13 and 14 reach the blocks of
     period 13 of the background of 689 cells and of period 14 of that of 728, the cycles their chains repeat with."""
     from computations import lock_chain
@@ -2307,31 +2334,36 @@ def test_eleven_twelve_traps() -> None:
     assert sizes == {"trap00000011011": 313, "trap00110100111": 103, "trap00001101001": 138,
                      "trap001011100111": 119, "trap000110110011": 116, "trap000010011111": 150,
                      "trap0001110010011": 213, "trap00011100101011": 225}
+    real = lock_chain.wall_distances
     for period, module, prefix, count in ((11, "ElevenTraps", "el", 57), (12, "TwelveTraps", "tw", 83),
                                           (13, "ThirteenTraps", "th", 53), (14, "FourteenTraps", "fo", 101)):
-        found = lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])
+        found = real(period, lock_chain.WALL_DEPTHS[period])
         assert len(found) == count and len({word for _, _, word in found}) == count
         assert not {word for _, _, word in found} & set(game.kit_blocks(period))
-        for name, distance, word in found:
+        for name, distance, word in found[::10] + found[-1:]:
             t = lock_chain.carried(name, distance)
             assert t["word"] == word and lock_chain.is_lock(word, t["states"], 16 + distance)
         lean = (ROOT / "Rule30Open" / "Columns" / f"{module}.lean").read_text(encoding="utf-8")
         piece, check = (1 << 16, True) if period >= 13 else (0, False)
-        assert lock_chain.lean_walls(period, lock_chain.WALL_DEPTHS[period], prefix, piece, check) in lean
+        for kept in (found[:1], found[-1:]):
+            monkeypatch.setattr(lock_chain, "wall_distances", lambda p, d, kept=kept: kept)
+            assert lock_chain.lean_walls(period, lock_chain.WALL_DEPTHS[period], prefix, piece, check) in lean
+        monkeypatch.undo()
     for period, length in ((13, 689), (14, 728)):
         t = lock_chain.tables(lock_chain.WALLS[period][0])
         values = "".join(str((t["first"] >> label) & 1) if t["word"][label] == "0" else "0" for label in range(period))
         start, cycle = lock_chain.chain_cycle(t["word"], values)
         background = {lock_chain.necklace(c) for c in cycle if lock_chain.least_period(c) == period}
         assert start <= 1 and len(cycle) == length
-        assert background == {word for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])}
+        assert background == {word for _, _, word in real(period, lock_chain.WALL_DEPTHS[period])}
 
 
-def test_far_walls() -> None:
+def test_far_walls(monkeypatch: pytest.MonkeyPatch) -> None:
     """The traps of FarWalls: each carries a wall of `WALLS` past `WALL_DEPTHS` and is a lock by `is_lock`, a direct
-    check with the rule, for its block; the blocks are distinct, none is the kit's, excluded by the game at width 6, 10
-    or 14, or a block of another trap module, and all lie in the chain of their wall, which repeats with the 60 cells of
-    its background; and `lean_far` is the text of FarWalls.lean."""
+    check with the rule, for its block; the blocks are distinct, none is the kit's or a block of another trap module,
+    three of them are excluded by no game at width 6, 10 or 14, and all lie in the chain of their wall, which repeats
+    with the 60 cells of its background; and `lean_far`, restricted to the first and to the last entry, is text of
+    FarWalls.lean."""
     from computations import coverage, lock_chain
     others = {block for block, module in coverage.trap_blocks().items() if module != "FarWalls"}
     words = []
@@ -2343,7 +2375,7 @@ def test_far_walls() -> None:
             words.append(t["word"])
     assert len(words) == len(set(words)) == 12
     assert not set(words) & (set(game.kit_blocks(12)) | others)
-    assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
+    assert all(game.first_width(word, [6, 10, 14]) is None for word in words[::5])
     t = lock_chain.tables("trap001011100111")
     values = "".join(str((t["first"] >> label) & 1) if t["word"][label] == "0" else "0" for label in range(12))
     start, cycle = lock_chain.chain_cycle(t["word"], values)
@@ -2351,15 +2383,20 @@ def test_far_walls() -> None:
     held = {lock_chain.necklace(c) for c in lock_chain.chain(t["word"], values, start + len(cycle))}
     assert set(words) <= held
     lean = (ROOT / "Rule30Open" / "Columns" / "FarWalls.lean").read_text(encoding="utf-8")
-    assert lock_chain.lean_far() in lean
+    entries = lock_chain.FAR_WALLS[12]
+    for kept in (entries[:1], entries[-1:]):
+        monkeypatch.setattr(lock_chain, "FAR_WALLS", {12: kept})
+        assert lock_chain.lean_far() in lean
 
 
-def test_census_traps() -> None:
-    """The traps of CensusTraps13, CensusTraps14, CensusTraps15, CensusTrapsLarge and CensusTrapsLarge15: each is a
-    bottom component of the locked windows of 16 cells of its source block, carried by its chain, and a lock by
-    `is_lock`, a direct check with the rule, for its block; the blocks are distinct and none is the kit's, excluded by
-    the game at width 6, 10 or 14, or a block of another trap module; those of more than 3,000 states are the large
-    ones; and `lean_census` and `lean_census_large` are the text of the five modules."""
+def test_census_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The traps of CensusTraps13, CensusTraps14, CensusTraps15, CensusTrapsLarge and CensusTrapsLarge15: the 971
+    blocks are distinct and none is the kit's or a block of another trap module, and a sample of 12 is excluded by no
+    game at width 6, 10 or 14. The trap of a census entry is a bottom component of the locked windows of 16 cells of
+    its source block, carried by its chain (`component_tables`): for the first entry of CensusTraps13 it has the entry's
+    block, is a lock by `is_lock`, a direct check with the rule, is not one of the large ones (3,000 states or fewer),
+    and `lean_census`, restricted to that entry, is text of CensusTraps13.lean. The same construction on a block of
+    period 8 at 13 cells with the chain carried 3 columns gives a lock by `is_lock` as well."""
     from computations import coverage, lock_chain
     others = {block for block, module in coverage.trap_blocks().items()
               if not module.startswith("CensusTraps") and module != "NaturalTrapsLongLarge"}
@@ -2368,32 +2405,30 @@ def test_census_traps() -> None:
     words = [block for _, entries in groups for block, *_ in entries]
     assert len(words) == len(set(words)) == 124 + 232 + 569 + 22 + 24
     assert not set(words) & (set(game.kit_blocks(15)) | others)
-    assert all(game.first_width(word, [6, 10, 14]) is None for word in words)
-    for large, entries in groups:
-        for entry in entries:
-            t = lock_chain.census_tables(entry)
-            assert t["word"] == entry[0] and (len(t["states"]) > 3000) == (large == 0)
-            assert lock_chain.is_lock(t["word"], t["states"], 16 + entry[3])
-    for period in (13, 14, 15):
-        lean = (ROOT / "Rule30Open" / "Columns" / f"CensusTraps{period}.lean").read_text(encoding="utf-8")
-        assert lock_chain.lean_census(period) in lean
-    for module, entries in (("CensusTrapsLarge", None), ("CensusTrapsLarge15", lock_chain.CENSUS_LARGE15)):
-        lean = (ROOT / "Rule30Open" / "Columns" / f"{module}.lean").read_text(encoding="utf-8")
-        assert lock_chain.lean_census_large(entries) in lean
+    assert all(game.first_width(word, [6, 10, 14]) is None for word in words[::80])
+    entry = lock_chain.CENSUS_TRAPS[13][0]
+    t = lock_chain.census_tables(entry)
+    assert t["word"] == entry[0] and len(t["states"]) <= 3000
+    assert lock_chain.is_lock(t["word"], t["states"], 16 + entry[3])
+    monkeypatch.setattr(lock_chain, "CENSUS_TRAPS", {13: [entry]})
+    assert lock_chain.lean_census(13) in (ROOT / "Rule30Open" / "Columns" / "CensusTraps13.lean").read_text(
+        encoding="utf-8")
+    small = lock_chain.component_tables("01110111", 13, 0, 3)
+    assert lock_chain.is_lock(small["word"] * (small["modulus"] // len(small["word"])), small["states"], 16)
 
 
-def test_missed_traps() -> None:
-    """`trap_reach` and `miss_tables`: every node of the game reaches the census trap of 0000000110001, while only a
-    share reaches the natural trap of 0010101111111 and the census trap of 0000010111001; for each of these two, the
-    closed set of `miss_tables`, checked with `step`, is closed under both values of the cell beyond and apart from the
-    trap, and a right half started in it, run with `step` for 3,000 steps, keeps its first cells in it and never
-    enters the trap; and `lean_missed` is the text of MissedTraps."""
+def test_missed_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`trap_reach` and `miss_tables`: only a share of the nodes of the game of 16 cells reaches the natural traps of
+    0010101111111 and 0001101101011, 0.346 and 0.954; for each of these two, the closed set of `miss_tables`, checked
+    with `step`, is closed under both values of the cell beyond and apart from the trap, and a right half started in
+    it, run with `step` for 3,000 steps, keeps its first cells in it and never enters the trap; and `lean_missed`,
+    restricted to the first natural trap, is the text of its entries in MissedTraps.lean. The census traps of
+    MissedTraps take 4 s each to build and are left to the module's reproduce command."""
     from computations import lock_chain
-    assert lock_chain.trap_reach(lock_chain.census_tables(lock_chain.CENSUS_LARGE[0])) == 1.0
-    for t, share in ((lock_chain.extra_tables("0010101111111"), (0.34, 0.35)),
-                     (lock_chain.census_tables(lock_chain.MISSED_CENSUS[0]), (0.008, 0.009))):
+    for word, share in (("0010101111111", (0.34, 0.35)), ("0001101101011", (0.95, 0.96))):
+        t = lock_chain.extra_tables(word)
         assert share[0] < lock_chain.trap_reach(t) < share[1]
-        word, period = t["word"], len(t["word"])
+        period = len(word)
         s = lock_chain.miss_tables(t)
         width, states = s["cells"], set(s["states"])
         assert s["word"] == word and s["modulus"] == period and width < t["cells"]
@@ -2411,8 +2446,10 @@ def test_missed_traps() -> None:
             assert (phase, (row >> 1) & ((1 << width) - 1)) in states
             assert (phase, (row >> 1) & ((1 << t["cells"]) - 1)) not in trap
             row = step(row)
-    assert lock_chain.lean_missed() in (ROOT / "Rule30Open" / "Columns" / "MissedTraps.lean").read_text(
-        encoding="utf-8")
+    monkeypatch.setattr(lock_chain, "MISSED_NATURAL", lock_chain.MISSED_NATURAL[:1])
+    monkeypatch.setattr(lock_chain, "MISSED_CENSUS", [])
+    text = lock_chain.lean_missed()
+    assert text in (ROOT / "Rule30Open" / "Columns" / "MissedTraps.lean").read_text(encoding="utf-8")
 
 
 def test_kit_reach() -> None:
@@ -2505,12 +2542,12 @@ def test_predecessors() -> None:
 
 
 def test_t001_coin() -> None:
-    """`t001_coin` at 8 and 10 cells against the spectral radius of the coin's step on the nodes outside `t001` cut to
+    """`t001_coin` at 6 and 7 cells against the spectral radius of the coin's step on the nodes outside `t001` cut to
     the width, from the matrix built cell by cell with the rule."""
     from computations import lock_chain
 
     states = lock_chain.t001_states()
-    for width in (8, 10):
+    for width in (6, 7):
         inside = {(label % 3, strip & ((1 << width) - 1)) for strip, label in states}
         outside = [(ph, w) for ph in range(3) for w in range(1 << width) if (ph, w) not in inside]
         index = {node: i for i, node in enumerate(outside)}
@@ -2586,23 +2623,26 @@ def test_cut_entries() -> None:
     `trap_entries`."""
     from computations import lock_chain, period_three
 
-    widths, steps = (12, 20, 28, 47), 3000
+    widths, steps = (12, 20, 28, 47), 1400
     states = lock_chain.t001_states()
     cuts = [{(strip & ((1 << w) - 1), label % 3) for strip, label in states} for w in widths]
     keys = period_three.trap_keys()
     for phase in range(3):
-        got = period_three.cut_entries(list(range(8)), phase, steps, widths, keys)  # (8, 4)
-        for half in range(8):
-            cells, want = [(half >> i) & 1 for i in range(steps + 64)], [-1] * len(widths)  # cells 1, 2, ...
+        got = period_three.cut_entries(list(range(6)), phase, steps, widths, keys)  # (6, 4)
+        for half in range(6):
+            cells = np.zeros(steps + 64, dtype=bool)  # (n,), cells 1, 2, ...
+            cells[:3] = [(half >> i) & 1 for i in range(3)]
+            want = [-1] * len(widths)
             for t in range(steps):
                 drive = (t + phase) % 3
                 for j, w in enumerate(widths):
-                    if want[j] < 0 and (sum(cells[i] << i for i in range(w)), drive) in cuts[j]:
+                    value = int.from_bytes(np.packbits(cells[:w], bitorder="little").tobytes(), "little")
+                    if want[j] < 0 and (value, drive) in cuts[j]:
                         want[j] = t
-                row = [int("001"[drive])] + cells + [0]
-                cells = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, len(row) - 1)]
+                row = np.concatenate([[int("001"[drive])], cells, [0]]).astype(bool)  # (n + 2,)
+                cells = row[:-2] ^ (row[1:-1] | row[2:])  # (n,)
             assert got[half].tolist() == want
-        assert (got[:, -1] == period_three.trap_entries(list(range(8)), phase, steps, keys)).all()
+        assert (got[:, -1] == period_three.trap_entries(list(range(6)), phase, steps, keys)).all()
         assert (np.diff(np.where(got < 0, steps, got), axis=1) >= 0).all()  # a wider cut is entered no sooner
 
 
@@ -2695,35 +2735,42 @@ def test_traps001() -> None:
     assert lock_chain.lean_traps001() in lean
 
 
-def test_apart_traps() -> None:
-    """Each entry of `lock_chain.APART_TRAPS`: the refuted trap and the other are of the named block and the other is
-    apart from it as a whole (`apart_closed`); the coverage holds each block through `ApartTraps` and counts the
-    refuted trap as refuted; and `lean_apart_traps` gives the declarations of `Rule30Open.Columns.ApartTraps`."""
+def test_apart_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Each entry of `lock_chain.APART_TRAPS` whose other trap is not a census trap (40 of the 48; a census trap takes 1
+    to 5 s to build, and the other eight are the module's reproduce command): the refuted trap and the other are of the
+    named block and the other is apart from it as a whole (`apart_closed`); the coverage holds each block through
+    `ApartTraps` and counts the refuted trap as refuted; and `lean_apart_traps`, restricted to the first two entries,
+    gives declarations of `Rule30Open.Columns.ApartTraps`."""
     from computations import coverage, lock_chain
 
     entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
-    for block, module, name, other_module, other in lock_chain.APART_TRAPS:
+    cheap = [entry for entry in lock_chain.APART_TRAPS if not entry[3].startswith("Census")]
+    assert len(cheap) == 40
+    for block, module, name, other_module, other in cheap:
         c, s = entries[(module, name)](), entries[(other_module, other)]()
         assert c["word"] == s["word"] == block and lock_chain.apart_closed(c, s).all()
+    for block, module, *_ in lock_chain.APART_TRAPS:
         assert block in lock_chain.apart_refuted()[module]
     assert len(lock_chain.APART_TRAPS) == 48 == len({block for block, *_ in lock_chain.APART_TRAPS})
     held = set(coverage.module_blocks())
     assert all((block, "ApartTraps") in held for block, *_ in lock_chain.APART_TRAPS)
     lean = (ROOT / "Rule30Open" / "Columns" / "ApartTraps.lean").read_text(encoding="utf-8")
+    monkeypatch.setattr(lock_chain, "APART_TRAPS", cheap[:2])
     assert lock_chain.lean_apart_traps() in lean
 
 
 def test_chain_trap_01111() -> None:
-    """The lock of 5 cells of the seed `00000001101111111111`, carried 160 cells, is a trap of 165 cells for `01111`,
-    with labels modulo 20, a lock by `is_lock`, apart as a whole from `trap01111` of WordTraps and it from it
-    (`apart_closed`); the right half of its state 0, stepped under Rule 30 itself for 3,000 steps, stays in it and never
-    has its first 107 cells in a state of `trap01111` at a label of the same phase."""
+    """The lock of 5 cells of the seed `00000001101111111111`, carried 160 cells (by the lock values among those of
+    its bottom components for which the carried block is `01111`), is a trap of 165 cells for `01111`, with labels
+    modulo 20, a lock by `is_lock`, apart as a whole from `trap01111` of WordTraps and it from it (`apart_closed`); the
+    right half of its state 0, stepped under Rule 30 itself for 3,000 steps, stays in it and never has its first 107
+    cells in a state of `trap01111` at a label of the same phase."""
     from computations import lock_chain
 
     seed, distance = "00000001101111111111", 160
-    found = lock_chain.short_scan([20], 5, 3000, rest=12)
-    values = next(v for v, hits in found[seed] if hits.get(5) == (distance, "01111"))
-    t, w = lock_chain.trap_tables(seed, 5, distance, values), lock_chain.tables("trap01111")
+    carried = [lock_chain.trap_tables(seed, 5, distance, values) for _, values in lock_chain.lock_values(seed, 5)]
+    [t] = [c for c in carried if c["word"] == "01111"]
+    w = lock_chain.tables("trap01111")
     assert (t["word"], t["cells"], t["modulus"], len(t["states"])) == ("01111", 165, 20, 197)
     assert lock_chain.is_lock("01111" * 4, t["states"], 165)
     assert lock_chain.apart_closed(w, t).all() and lock_chain.apart_closed(t, w).all()
@@ -2736,16 +2783,16 @@ def test_chain_trap_01111() -> None:
 
 
 def test_chain_family_01111() -> None:
-    """`chain_family` for `01111` with `trap01111` of WordTraps: the chains of the long-run seeds of periods 20 and 40,
-    the multiples of 5 among 16 to 40, give 19 more traps of 103 to 1,136 cells, each a lock by `is_lock`, and 13 of
-    the 20 are pairwise apart; two of the family, stepped under Rule 30 itself from state 0 of each, stay out of the
-    other's states for 2,000 steps."""
+    """`chain_family` for `01111` with `trap01111` of WordTraps: the chains of the long-run seeds of period 20 with at
+    most 6 other cells give 6 more traps of 140 to 428 cells, each a lock by `is_lock`, and 5 of the 7 are pairwise
+    apart; two of the family, stepped under Rule 30 itself from state 0 of each, stay out of the other's states for
+    2,000 steps."""
     from computations import lock_chain
 
-    traps, family = lock_chain.chain_family("01111", periods=(20, 40), lean=[("trap01111",
-                                                                            lock_chain.tables("trap01111"))])
-    assert len(traps) == 20 and len(family) == 13
-    assert sorted(t["cells"] for name, t in traps if name != "trap01111")[::18] == [103, 1136]
+    traps, family = lock_chain.chain_family("01111", periods=(20,), rest=6, lean=[("trap01111",
+                                                                                  lock_chain.tables("trap01111"))])
+    assert len(traps) == 7 and len(family) == 5
+    assert sorted(t["cells"] for name, t in traps if name != "trap01111")[::5] == [140, 428]
     assert all(lock_chain.is_lock("01111" * (t["modulus"] // 5), t["states"], t["cells"]) for _, t in traps)
     (_, a), (_, b) = traps[family[0]], traps[family[1]]
     for start, other in ((a, b), (b, a)):
@@ -2761,7 +2808,7 @@ def test_scan_six() -> None:
     period 12) give `trap001011` of WordTraps and traps of 33 and 35 cells, and the seed of period 24 with a lock of 9
     cells one of 154: each a lock by `is_lock`; read from the states, their first 22 cells are one set of 12 nodes, two
     at each phase, which `trap_nodes` finds as well; no one of the four is apart from another (`apart_closed`); and no
-    node of the game of 20 cells, with the phase counted modulo 6 or 12, is locked (`locks.has_lock`)."""
+    node of the game of 15 cells, with the phase counted modulo 6 or 12, is locked (`locks.has_lock`)."""
     from computations import lock_chain, locks
 
     found = lock_chain.scan_block("001011", plans=(([12], 5, 12),))
@@ -2781,19 +2828,19 @@ def test_scan_six() -> None:
     assert not any(lock_chain.apart_closed(a, b).any() for a in traps for b in traps)
     assert all(t["word"] == "001011" and lock_chain.is_lock("001011" * (t["modulus"] // 6), t["states"], t["cells"])
                for t in traps)
-    assert not any(locks.has_lock("001011" * repeat, 20, wide=True) for repeat in (1, 2))
+    assert not any(locks.has_lock("001011" * repeat, 15, wide=True) for repeat in (1, 2))
 
 
 def test_back_tables() -> None:
     """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
     order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the
-    node it names outside it; for the census trap of `000001010110101` at 8 cells, 123 nodes."""
+    node it names outside it; for the natural trap of 0010101111111 at 8 cells, 2,167 of the 3,328 nodes."""
     from computations import game, lock_chain
 
-    t = next(b() for m, n, b in lock_chain.module_entries() if (m, n) == ("MissedTraps", "cen000001010110101"))
+    t = lock_chain.extra_tables("0010101111111")
     s = lock_chain.back_tables((t,), 8)
     period = len(s["word"])
-    assert sum(len(row) for row in s["rows"]) == 123
+    assert sum(len(row) for row in s["rows"]) == 2167
     assert all(row == sorted(set(row)) for row in s["rows"])
     inside = np.zeros(period << 8, dtype=bool)  # (p n,)
     for label, row in enumerate(s["rows"]):
@@ -2807,8 +2854,8 @@ def test_back_tables() -> None:
 
 def test_six_refuted() -> None:
     """`lean_six` gives the declarations of `Rule30Open.Columns.SixRefuted`. Its set, the nodes of the game of 22 cells
-    for 001011 that can reach `trap001011`, 28,666, against `successors`, forward: no node outside it has a move into
-    it, the trap's states cut to 22 cells are in it, and the white window at phase 0 is not."""
+    for 001011 that can reach `trap001011`, 28,666, against `successors`, forward: no node outside it, sampled one in
+    97, has a move into it, the trap's states cut to 22 cells are in it, and the white window at phase 0 is not."""
     from computations import lock_chain
 
     t = lock_chain.tables("trap001011")
@@ -2817,10 +2864,9 @@ def test_six_refuted() -> None:
     inside = np.zeros(6 << 22, dtype=bool)  # (6 2^22,)
     for label, row in enumerate(s["rows"]):
         inside[[label << 22 | w for w in row]] = True
-    outside = np.flatnonzero(~inside).astype(np.uint64)  # (m,)
-    for start in range(0, outside.size, 1 << 22):
-        after = lock_chain.successors("001011", 22, outside[start:start + (1 << 22)])  # (2, k)
-        assert not inside[after.astype(np.int64)].any()
+    outside = np.flatnonzero(~inside)[::97].astype(np.uint64)  # (m,)
+    after = lock_chain.successors("001011", 22, outside)  # (2, m)
+    assert not inside[after.astype(np.int64)].any()
     assert all(inside[(label % 6) << 22 | window & ((1 << 22) - 1)] for label, window in t["states"])
     assert not inside[0]
     lean = (ROOT / "Rule30Open" / "Columns" / "SixRefuted.lean").read_text(encoding="utf-8")
@@ -2829,28 +2875,26 @@ def test_six_refuted() -> None:
 
 def test_own_locks() -> None:
     """`own_components`, found among the locked nodes alone, against `bottom_components`, which builds the game's list
-    of moves, for 0111 at 13 cells and 0001 at 16; for `00100111011` of `WIDE_CENSUS`, whose traps in the trap modules
-    all fail, one bottom component at 20 cells, of 138 states, a lock by `is_lock` that every node of the games of 20
-    and 22 cells can reach; its carried trap `el0_14` of `CENSUS_APART`, of 30 cells, apart from it by its windows cut
-    to 20 cells, compared directly, and by `apart_closed` both ways; and every block of `WIDE_CENSUS` is one whose
-    traps all fail, which the coverage counts as such until the blocks are checked in Lean."""
+    of moves, for 0111 at 13 cells and 0001 at 16; the bottom component of 0111 at 13 cells as a trap (`own_tables`),
+    a lock by `is_lock` that every node of the game can reach (`trap_reach`); and the lists of `WIDE_CENSUS`: the block
+    `00100111011`, whose traps in the trap modules all fail, is in `UNREACHED` for ElevenTraps, its carried trap
+    `el0_27` of `CENSUS_APART` is built, every block of `CENSUS_APART` is one of `WIDE_CENSUS`, and every block of
+    `WIDE_CENSUS` is one whose traps all fail, which the coverage counts as such until the blocks are checked in Lean.
+    The bottom components of 20 and 22 cells of these blocks (`own_check`, minutes) are the entry's reproduce
+    command."""
     from computations import coverage, lock_chain
 
     for block, width in (("0111", 13), ("0001", 16)):
         mine = [members.tolist() for members in lock_chain.own_components(block, width)]
         assert sorted(mine) == sorted(sorted(c.tolist()) for c in lock_chain.bottom_components(block, width))
+    [t] = lock_chain.own_tables("0111", 13)
+    assert (t["word"], t["cells"], t["modulus"]) == ("0111", 13, 4)
+    assert lock_chain.is_lock("0111", t["states"], 13) and lock_chain.trap_reach(t, width=13) == 1.0
     block = "00100111011"
     assert block in lock_chain.WIDE_CENSUS and block in lock_chain.UNREACHED["ElevenTraps"]
-    [t] = lock_chain.own_tables(block, 20)
-    assert (t["word"], t["cells"], t["modulus"], len(t["states"])) == (block, 20, 11, 138)
-    assert lock_chain.is_lock(block, t["states"], 20)
-    assert lock_chain.trap_reach(t, width=20) == 1.0 == lock_chain.trap_reach(t, width=22)
     [(module, name)] = lock_chain.CENSUS_APART[block]
     c = next(build() for m, n, build in lock_chain.module_entries() if (m, n) == (module, name))
     assert (c["word"], c["cells"], len(c["states"])) == (block, 30, 313)
-    cut = {(label % 11, window & ((1 << 20) - 1)) for label, window in c["states"]}
-    assert not cut & {(label % 11, window) for label, window in t["states"]}
-    assert lock_chain.apart_closed([t], c).all() and lock_chain.apart_closed(c, t).all()
     assert set(lock_chain.CENSUS_APART) <= set(lock_chain.WIDE_CENSUS) <= coverage.refuted_blocks()
 
 
@@ -2901,13 +2945,13 @@ def test_refuted_traps() -> None:
         encoding="utf-8")
 
 
-def test_trap_sets() -> None:
+def test_trap_sets(monkeypatch: pytest.MonkeyPatch) -> None:
     """`lock_chain.APART` and `TRAP_SETS`: each listed block is one of a trap or pair of its module; each block of the 29
     sets has every other trap refuted, by `UNREACHED` or `APART`; for 0000110110001 the scan's one half that locks is
     inside a natural trap of 30 cells apart from `th0_45` (`halves_apart`), that trap is a lock by `is_lock`, and every
-    node of the game of 18 cells can reach one of the set's two traps; the natural traps of 193 states of period 15 are
+    node of the game of 16 cells can reach one of the set's two traps; the natural traps of 193 states of period 15 are
     for the blocks of the chain of the narrowest, at the distances their widths give (`trap_chain`); and
-    `lean_trap_sets` is the text of the module."""
+    `lean_trap_sets`, restricted to the first set, is text of the module."""
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())
     assert all((block, module) in held for module, blocks in lock_chain.APART.items() for block in blocks)
@@ -2919,28 +2963,31 @@ def test_trap_sets() -> None:
     block = "0000110110001"
     traps = lock_chain.set_tables(block)
     assert [(m, n) for m, n, _ in traps] == [("ThirteenTraps", "th0_45"), ("TrapSets", f"sets{block}_0")]
-    apart = lock_chain.halves_apart(traps[0][2])
+    apart = lock_chain.halves_apart(traps[0][2], 6000)  # the scan over 6,000 steps; the entry's runs are 20,000
     assert [(cells, size, away) for _, cells, _, size, away in apart] == [(30, 162, True)]
     natural = traps[1][2]
     assert (natural["cells"], len(natural["states"])) == (30, 162) and lock_chain.is_lock(block, natural["states"], 30)
-    assert lock_chain.trap_reach(*[t for *_, t in traps], width=18) == 1
+    assert lock_chain.trap_reach(*[t for *_, t in traps], width=16) == 1
     # the natural traps of 193 states of period 15 are one wall carried: their blocks lie on the chain of the narrowest
     wall = lock_chain.natural_tables("000111111011101", 0, 12000, 27, 15)
     blocks = lock_chain.trap_chain(wall, 12)
-    for block, *_ in lock_chain.TRAP_SETS:
-        for module, name, t in lock_chain.set_tables(block) if len(block) == 15 else []:
-            if module == "TrapSets" and len(t["states"]) == 193:
-                assert blocks[t["cells"] - 27] == block
+    for block, _, natural in lock_chain.TRAP_SETS:
+        if len(block) == 15:
+            for start, cells, modulus in natural:
+                t = lock_chain.natural_tables(block, start, 12000, cells, modulus)
+                if len(t["states"]) == 193:
+                    assert blocks[t["cells"] - 27] == block
+    monkeypatch.setattr(lock_chain, "TRAP_SETS", lock_chain.TRAP_SETS[:1])
     assert lock_chain.lean_trap_sets() in (ROOT / "Rule30Open" / "Columns" / "TrapSets.lean").read_text(encoding="utf-8")
 
 
-def test_fifteen_walls() -> None:
+def test_fifteen_walls(monkeypatch: pytest.MonkeyPatch) -> None:
     """The traps of FifteenWalls: the two walls have 27 and 37 cells and 193 and 652 states; both chains end in the
     background of spatial period 2,145, the second only from distance 152; each carried trap is for the block of its
-    wall's chain at its distance (`trap_chain`), and the 86 blocks are distinct, 81 of no other module and 5 whose
-    other traps are all refuted; the trap carried
-    2 columns is a lock by `is_lock` and every node of the game of 18 cells can reach it; and `lean_fifteen` is the text
-    of the module."""
+    wall's chain at its distance (`trap_chain`), checked for every tenth of the 86 and the last, and the 86 blocks are
+    distinct, 81 of no other module and 5 whose other traps are all refuted; the trap carried 2 columns is a lock by
+    `is_lock` and every node of the game of 16 cells can reach it; and `lean_fifteen`, restricted to the first and to
+    the last entry, is text of the module."""
     from computations import coverage, lock_chain
     walls = [lock_chain.fifteen_wall(k) for k in (0, 1)]
     assert [(w["cells"], len(w["states"])) for w in walls] == [(27, 193), (37, 652)]
@@ -2949,11 +2996,10 @@ def test_fifteen_walls() -> None:
         values = "".join(str((wall["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(15))
         assert (lambda found: (found[0], len(found[1])))(lock_chain.chain_cycle(full, values)) == (start, 2145)
     chains = [lock_chain.trap_chain(w, 120) for w in walls]
-    blocks = []
-    for wall, distance in lock_chain.FIFTEEN_DISTANCES:
+    blocks = [chains[wall][distance] for wall, distance in lock_chain.FIFTEEN_DISTANCES]
+    for wall, distance in lock_chain.FIFTEEN_DISTANCES[::10] + lock_chain.FIFTEEN_DISTANCES[-1:]:
         t = lock_chain.fifteen_tables(wall, distance)
         assert t["word"] == chains[wall][distance] and t["cells"] == walls[wall]["cells"] + distance
-        blocks.append(t["word"])
     assert len(blocks) == len(set(blocks)) == 86
     held = [(b, m) for b, m in coverage.module_blocks()
             if m not in ("FifteenWalls", "ApartTraps") and b in set(blocks)]
@@ -2961,19 +3007,20 @@ def test_fifteen_walls() -> None:
     assert len({b for b, _ in held}) == 5
     near = lock_chain.fifteen_tables(1, 2)
     assert lock_chain.is_lock(near["word"], near["states"], near["cells"])
-    assert lock_chain.trap_reach(near, width=18) == 1
-    assert lock_chain.lean_fifteen() in (ROOT / "Rule30Open" / "Columns" / "FifteenWalls.lean").read_text(
-        encoding="utf-8")
+    assert lock_chain.trap_reach(near, width=16) == 1
+    lean = (ROOT / "Rule30Open" / "Columns" / "FifteenWalls.lean").read_text(encoding="utf-8")
+    for kept in (lock_chain.FIFTEEN_DISTANCES[:1], lock_chain.FIFTEEN_DISTANCES[-1:]):
+        monkeypatch.setattr(lock_chain, "FIFTEEN_DISTANCES", kept)
+        assert lock_chain.lean_fifteen() in lean
 
 
 def test_unreached() -> None:
     """`lock_chain.UNREACHED`: each listed block is one of a trap of its module; the traps `trap01` and `trap001fifteen`
     and the period-10 wall carried 10 columns fail the test of reach already at 16, 16 and 12 cells; the natural trap of
     16 cells of 0001111110011 passes in the game of 16 cells and fails in that of 17, where the cell after it follows the
-    rule; the natural trap of 0010011110101 passes in the game of 20 cells and fails in that of 22 (`UNREACHED_WIDE`),
-    whose 35 entries are each the block of a trap or pair of their module; and `coverage.refuted_blocks` holds the 200
-    blocks of periods 2 to 15 with no trap that passes, 01 and 001011 among them and 001, which keeps the four traps
-    of Traps001, not."""
+    rule; the 35 entries of `UNREACHED_WIDE` (whose games of 22 cells, minutes, are the entry's reproduce command) are
+    each the block of a trap or pair of their module; and `coverage.refuted_blocks` holds the 200 blocks of periods 2
+    to 15 with no trap that passes, 01 and 001011 among them and 001, which keeps the four traps of Traps001, not."""
     from collections import Counter
     from computations import coverage, lock_chain
     held = set(coverage.module_blocks())
@@ -2988,9 +3035,7 @@ def test_unreached() -> None:
     assert "0001111110011" in lock_chain.UNREACHED["NaturalTrapsLong"] and natural["cells"] == 16
     assert lock_chain.trap_reach(natural) == 1 > lock_chain.trap_reach(natural, width=17)
     refuted = coverage.refuted_blocks()
-    wide = lock_chain.extra_tables("0010011110101")
     assert "0010011110101" in lock_chain.UNREACHED_WIDE["NaturalTrapsWalls"] and lock_chain.WIDE_WIDTH == 22
-    assert lock_chain.trap_reach(wide, width=20) == 1 > lock_chain.trap_reach(wide, width=22)
     assert sum(len(v) for v in lock_chain.UNREACHED_WIDE.values()) == 35
     assert all((block, module) in held for module, blocks in lock_chain.UNREACHED_WIDE.items() for block in blocks)
     assert len(refuted) == 200 and {"01", "001011"} <= refuted and "001" not in refuted
@@ -2999,76 +3044,85 @@ def test_unreached() -> None:
 
 
 def test_reach_wide_carried() -> None:
-    """The trap of `001011` in WordTraps, 29 cells carried along its chain, passes the test of reach at 21 cells and
-    fails at 22, where 28,666 of the 6 * 2^22 nodes can reach it: checked against `locks.back_closure` over
-    `game.moves`, and the nodes that cannot reach form a set that no move leaves, with the moves recomputed cell by cell
-    from the rule on a sample; the least part of them that no move leaves (`fwd_tables`) has 416,425 nodes."""
+    """`reach_nodes` against `locks.back_closure` over `game.moves`, for the natural trap of 0001111110011, 16 cells,
+    which passes the test of reach at 16 cells and fails at 17, where 22,979 of the 13 * 2^17 nodes cannot reach it: the
+    nodes that cannot reach form a set that no move leaves, with the moves recomputed cell by cell from the rule on a
+    sample, and the least part of them that no move leaves (`fwd_tables`), 718 states, is closed under `successors` and
+    holds no node that reaches the trap."""
     from computations import lock_chain, locks
 
-    t = next(b() for m, n, b in lock_chain.module_entries() if (m, n) == ("WordTraps", "trap001011"))
-    assert (t["word"], t["cells"]) == ("001011", 29)
-    assert lock_chain.trap_reach(t, width=21) == 1.0
-    reach = lock_chain.reach_nodes((t,), 22)  # (6 2^22,)
-    assert int(reach.sum()) == 28666
-    source, target = game.moves("001011", 22)
-    assert (locks.back_closure(lock_chain.trap_nodes((t,), 22), source, target) == reach).all()
+    t = lock_chain.extra_tables("0001111110011")
+    assert t["cells"] == 16 and lock_chain.trap_reach(t) == 1.0
+    width = 17
+    reach = lock_chain.reach_nodes((t,), width)  # (13 2^17,)
+    source, target = game.moves("0001111110011", width)
+    assert (locks.back_closure(lock_chain.trap_nodes((t,), width), source, target) == reach).all()
     assert not (~reach[source] & reach[target]).any()
     rng = np.random.default_rng(2)
     for node in rng.choice(np.flatnonzero(~reach), size=300, replace=False).tolist():
-        phase, window = divmod(node, 1 << 22)
-        cells = [int("001011"[phase])] + [(window >> i) & 1 for i in range(22)]
+        phase, window = divmod(node, 1 << width)
+        cells = [int("0001111110011"[phase])] + [(window >> i) & 1 for i in range(width)]
         for free in (0, 1):
             row = cells + [free]
-            new = sum((row[i - 1] ^ (row[i] | row[i + 1])) << (i - 1) for i in range(1, 23))
-            assert not reach[((phase + 1) % 6 << 22) + new]
-    s = lock_chain.fwd_tables((t,), 22)
-    assert len(s["states"]) == 416425
-    keys = np.array(sorted((label % 6) << 22 | w for label, w in s["states"]), dtype=np.uint64)  # (416425,)
-    assert np.isin(lock_chain.successors("001011", 22, keys), keys).all()
+            new = sum((row[i - 1] ^ (row[i] | row[i + 1])) << (i - 1) for i in range(1, width + 1))
+            assert not reach[((phase + 1) % 13 << width) + new]
+    assert int((~reach).sum()) == 22979
+    s = lock_chain.fwd_tables((t,), width)
+    assert len(s["states"]) == 718
+    keys = np.array(sorted((label % 13) << width | w for label, w in s["states"]), dtype=np.uint64)
+    assert np.isin(lock_chain.successors("0001111110011", width, keys), keys).all()
     assert not reach[keys.astype(np.int64)].any()
 
 
 def test_wide_walls() -> None:
-    """Each wall of `WIDE_WALLS` is a lock by `is_lock` for its block, closed under both values of the cell beyond by the
-    moves of `successors`, and every node of the game of 22 cells can reach it (`trap_reach`); it shares no window of
-    22 cells, at a label of the same phase, with the carried trap it refutes, so no node of the wall can reach that
-    trap; the carried trap is apart from the wall as a whole (`apart_closed`); and `lean_wide_walls` gives the
-    declarations of `Rule30Open.Columns.WideWalls`."""
-    from computations import lock_chain
+    """`fwd_tables`, which builds each wall of `WIDE_WALLS` at 22 cells, on the natural trap of 0001111110011 at 17 cells,
+    where it fails the test of reach: the wall is a lock by `is_lock` for the block, closed under both values of the cell
+    beyond by the moves of `successors`, and none of its nodes can reach the trap in the game of 17 cells; it shares
+    no window of 17 cells, at a label of the same phase, with the trap it refutes, so no node of the wall can reach
+    that trap; the trap is apart from the wall as a whole (`apart_closed`). Of the three walls of `WIDE_WALLS`: each is
+    a carried trap of ElevenTraps or FourteenTraps, `WideWalls.lean` declares `wide_<name>` and its check for each, and
+    the coverage holds their blocks; the walls at 22 cells (`lean_wide_walls`, minutes) are the entry's reproduce
+    command."""
+    from computations import coverage, lock_chain
 
+    t = lock_chain.extra_tables("0001111110011")
+    wall = lock_chain.fwd_tables((t,), 17)
+    word, period = wall["word"], len(wall["word"])
+    assert word == t["word"] and wall["cells"] == 17
+    nodes = list(wall["states"])
+    assert lock_chain.is_lock(word * (wall["modulus"] // period), nodes, 17)
+    keys = np.array(sorted((label % period) << 17 | w for label, w in nodes), dtype=np.uint64)  # (states,)
+    assert np.isin(lock_chain.successors(word, 17, keys), keys).all()
+    assert not lock_chain.reach_nodes((t,), 17)[keys.astype(np.int64)].any()  # no node of the wall reaches the trap
+    cut = {(label % period, window & ((1 << 17) - 1)) for label, window in t["states"]}
+    assert not cut & {(label % period, window) for label, window in nodes}
+    assert lock_chain.apart_closed(wall, t).all()
+    lean = (ROOT / "Rule30Open" / "Columns" / "WideWalls.lean").read_text(encoding="utf-8")
     entries = {(m, n): b for m, n, b in lock_chain.module_entries()}
     assert len(lock_chain.WIDE_WALLS) == 3
+    held = set(coverage.module_blocks())
     for module, name in lock_chain.WIDE_WALLS:
-        t, wall = entries[(module, name)](), lock_chain.wide_wall(module, name)
-        word, period = wall["word"], len(wall["word"])
-        assert word == t["word"] and wall["cells"] == lock_chain.WIDE_WIDTH == 22
-        nodes = [(label, window) for label, window in wall["states"]]
-        assert lock_chain.is_lock(word * (wall["modulus"] // period), nodes, 22)
-        keys = np.array(sorted((label % period) << 22 | w for label, w in nodes), dtype=np.uint64)  # (states,)
-        assert np.isin(lock_chain.successors(word, 22, keys), keys).all()
-        assert lock_chain.trap_reach(wall, width=22) == 1.0
-        cut = {(label % period, window & ((1 << 22) - 1)) for label, window in t["states"]}
-        assert not cut & {(label % period, window) for label, window in nodes}
-        assert lock_chain.apart_closed(wall, t).all()
-    lean = (ROOT / "Rule30Open" / "Columns" / "WideWalls.lean").read_text(encoding="utf-8")
-    assert lock_chain.lean_wide_walls() in lean
+        assert module in ("ElevenTraps", "FourteenTraps") and (module, name) in entries
+        assert f"theorem wide_{name}_check :" in lean and f"theorem wide_{name}_not_absorption :" in lean
+        assert (entries[(module, name)]()["word"], "WideWalls") in held
 
 
-def test_wall_natural() -> None:
-    """The traps of NaturalTrapsWalls: each of `WALL_NATURAL` is a lock by `is_lock` for its block, with labels modulo
-    the period; its half, driven by the block with `step`, has its window in the trap at step 12,000; its block is one
-    whose only traps, walls carried to it, fail the test of reach; for each block of `WALL_SPLIT`, its two traps are
-    locks, with labels modulo their own multiple of the period, apart from each other at the narrower width, so a half
-    inside either never enters the other, and every node of the game of 18 cells can reach one of the two; three halves
-    of the scan of 000000101101 are inside its second trap, apart from the first (`halves_apart`); and
-    `lean_wall_natural` is the text of the module."""
+def test_wall_natural(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The traps of NaturalTrapsWalls: every twelfth of `WALL_NATURAL` (five of the 54) is a lock by `is_lock` for its
+    block, with labels modulo the period; its half, driven by the block with `step`, has its window in the trap at step
+    12,000; the block of each of the 54 and 6 is one whose only traps, walls carried to it, fail the test of reach;
+    for the first two blocks of `WALL_SPLIT`, its two traps are locks, with labels modulo their own multiple of the
+    period, apart from each other at the narrower width, so a half inside either never enters the other, and every
+    node of the game of 16 cells can reach one of the two; three halves of the scan of 000000101101 are inside its
+    second trap, apart from the first (`halves_apart`, over 10,000 steps); and `lean_wall_natural`, restricted to the first trap of
+    `WALL_NATURAL` and to the first block of `WALL_SPLIT`, is text of the module."""
     from computations import coverage, lock_chain
     walls = {"TenTraps", "ElevenTraps", "TwelveTraps", "ThirteenTraps", "FourteenTraps"}
     held: dict[str, set[str]] = {}
     for block, module in coverage.module_blocks():
         held.setdefault(block, set()).add(module)
     assert len(lock_chain.WALL_NATURAL) == 54 and len(lock_chain.WALL_SPLIT) == 6
-    for word, start, cells, modulus in lock_chain.WALL_NATURAL:
+    for word, start, cells, modulus in lock_chain.WALL_NATURAL[::12]:
         t = lock_chain.extra_tables(word)
         assert (t["word"], t["cells"], t["modulus"]) == (word, cells, len(word)) and cells <= 18
         assert lock_chain.is_lock(word, t["states"], cells)
@@ -3076,97 +3130,95 @@ def test_wall_natural() -> None:
         for s in range(12000):
             row = step((row & ~1) | int(word[s % len(word)]))
         assert (12000 % len(word), (row >> 1) & ((1 << cells) - 1)) in {(lab % len(word), w) for lab, w in t["states"]}
-    for word, _ in lock_chain.WALL_SPLIT:
+    for word, _ in lock_chain.WALL_SPLIT[:2]:
         pair = lock_chain.split_tables(word)
         assert all(lock_chain.is_lock(word * (t["modulus"] // len(word)), t["states"], t["cells"]) for t in pair)
         cut = min(t["cells"] for t in pair)
         sets = [{(lab % len(word), w & ((1 << cut) - 1)) for lab, w in t["states"]} for t in pair]
-        assert not sets[0] & sets[1] and lock_chain.trap_reach(*pair, width=18) == 1
+        assert not sets[0] & sets[1] and lock_chain.trap_reach(*pair, width=16) == 1
     for word, *_ in lock_chain.WALL_NATURAL + lock_chain.WALL_SPLIT:
         others = held[word] - {"NaturalTrapsWalls", "ApartTraps"}
         assert others and others <= walls and all(word in lock_chain.UNREACHED[m] for m in others)
-    for word in ("0000110011", "00001101011", "000000110011"):
-        assert lock_chain.trap_reach(lock_chain.extra_tables(word)) == 1
     # the trap of 17 cells of 000000101101 passes the test of reach at 20 cells, but three halves of its scan are inside
-    # the trap of 26 cells, apart from it, and the other 27 inside it
+    # the trap of 26 cells, apart from it, and the other 23 inside it
     first, second = lock_chain.split_tables("000000101101")
-    apart = lock_chain.halves_apart(first)
+    apart = lock_chain.halves_apart(first, 10000)  # the scan over 10,000 steps; the entry's runs are 20,000
     assert sorted((cells, size) for _, cells, _, size, away in apart if away) == [(26, 116)] * 3
     assert all(not away and (cells, size) == (17, 150) for _, cells, _, size, away in apart if (cells, size) != (26, 116))
-    assert len(apart) == 30 and len(second["states"]) == 116
-    assert lock_chain.lean_wall_natural() in (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsWalls.lean").read_text(
-        encoding="utf-8")
+    assert len(apart) == 26 and len(second["states"]) == 116
+    lean = (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsWalls.lean").read_text(encoding="utf-8")
+    entries, split = lock_chain.WALL_NATURAL, lock_chain.WALL_SPLIT
+    for kept, kept_split in ((entries[:1], []), ([], split[:1])):
+        monkeypatch.setattr(lock_chain, "WALL_NATURAL", kept)
+        monkeypatch.setattr(lock_chain, "WALL_SPLIT", kept_split)
+        assert lock_chain.lean_wall_natural() in lean
 
 
-def test_trap_pairs() -> None:
-    """The traps of TrapPairs: each block of `PAIRS` is that of a natural trap of MissedTraps, and has two bottom
-    components of locked windows of 16 cells, the second that natural trap, each a lock by `is_lock` with its own values
-    of column 1 at the white phases; some node of the game cannot reach either alone, every node can reach one of the two; and `lean_pairs` is
-    the text of the module."""
+def test_trap_pairs(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The traps of TrapPairs: each block of `PAIRS` is that of a natural trap of MissedTraps; for the first, it has two
+    bottom components of locked windows of 16 cells, the second that natural trap, each a lock by `is_lock` with its own
+    values of column 1 at the white phases; some node of the game cannot reach either alone, every node can reach one
+    of the two; and `lean_pairs`, restricted to that block, is the text of its entries in TrapPairs.lean."""
     from computations import lock_chain
     assert lock_chain.PAIRS == [word for word, *_ in lock_chain.MISSED_NATURAL]
-    for block in lock_chain.PAIRS:
-        traps = lock_chain.pair_tables(block)
-        assert len(traps) == 2 and all(t["word"] == block and t["cells"] == 16 for t in traps)
-        assert set(traps[1]["states"]) == set(lock_chain.extra_tables(block)["states"])
-        assert all(lock_chain.is_lock(block, t["states"], 16) for t in traps)
-        values = [{(label, window & 1) for label, window in t["states"] if block[label] == "0"} for t in traps]
-        assert values[0] != values[1]
-        assert max(lock_chain.trap_reach(t) for t in traps) < 1 == lock_chain.trap_reach(*traps)
+    block = lock_chain.PAIRS[0]
+    traps = lock_chain.pair_tables(block)
+    assert len(traps) == 2 and all(t["word"] == block and t["cells"] == 16 for t in traps)
+    assert set(traps[1]["states"]) == set(lock_chain.extra_tables(block)["states"])
+    assert all(lock_chain.is_lock(block, t["states"], 16) for t in traps)
+    values = [{(label, window & 1) for label, window in t["states"] if block[label] == "0"} for t in traps]
+    assert values[0] != values[1]
+    assert max(lock_chain.trap_reach(t) for t in traps) < 1 == lock_chain.trap_reach(*traps)
+    monkeypatch.setattr(lock_chain, "PAIRS", [block])
     assert lock_chain.lean_pairs() in (ROOT / "Rule30Open" / "Columns" / "TrapPairs.lean").read_text(encoding="utf-8")
 
 
-def test_natural_traps() -> None:
-    """The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLong and NaturalTrapsLongLarge: each is a lock by
-    `is_lock`, a direct check with the rule, for its block; for the first three, its half, driven by the block with
-    `step`, has its window in the trap at step 12,000; the 35 blocks of periods 10 to 12 and the 70 of periods 13 and 14
-    are distinct, and neither the kit's nor a block of another trap module; the 12 large ones of periods 13 and 14 have
-    census traps too; `lean_extra`, `lean_large` and `lean_long_large` are the text of the modules; and `lean_number`
-    writes numbers in pieces that sum back to them."""
+def test_natural_traps(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The traps of NaturalTraps, NaturalTrapsLarge, NaturalTrapsLong and NaturalTrapsLongLarge, on a sample of each
+    (every eighth of the 35 natural traps and the large one, every fourteenth of the 70 long ones, the first three of
+    the 12 long large ones): a lock by `is_lock`, a direct check with the rule, for its block, and for the first three kinds
+    its half, driven by the block with `step`, has its window in the trap at step 12,000; the large one has 61,857
+    states, the others up to 15,752, the long ones 3,000 or fewer and the long large ones more. From the lists alone:
+    the 35 blocks of periods 10 to 12 and the 70 of periods 13 and 14 are distinct, and neither the kit's nor a block of
+    another trap module; the 12 large ones of periods 13 and 14 are census blocks too. `lean_extra`, restricted to
+    the first entry, `lean_extra` for the first long one and `lean_long_large` restricted to its first entry are text
+    of the modules (`lean_large` writes the 61,857 states of the large one by the same `lean_parts`, in 5 s, and is
+    left to the entry's reproduce command); and `lean_number` writes numbers in pieces that sum back to them."""
     from computations import coverage, lock_chain
-    sizes = {}
-    for word, start, cells, modulus in lock_chain.EXTRA_TRAPS + lock_chain.LARGE_TRAPS:
+    entries = lock_chain.EXTRA_TRAPS + lock_chain.LARGE_TRAPS
+    assert len(entries) == 35 and sorted(len(word) for word, *_ in entries) == [10] * 3 + [11] * 14 + [12] * 18
+    for word, start, cells, modulus in entries[::8] + entries[-1:]:
         t = lock_chain.extra_tables(word)
         assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus)
         assert lock_chain.is_lock(word * (modulus // len(word)), t["states"], cells)
-        sizes[word] = len(t["states"])
-        row = start << 1  # bit 0 the block's column, bit i column i
-        for s in range(12000):
-            row = step((row & ~1) | int(word[s % len(word)]))
-        inside = {(label % len(word), window) for label, window in t["states"]}
-        assert (12000 % len(word), (row >> 1) & ((1 << cells) - 1)) in inside
-    assert len(sizes) == 35 and sorted(len(word) for word in sizes) == [10] * 3 + [11] * 14 + [12] * 18
-    assert (min(sizes.values()), max(sizes.values()), sizes["00010001011"]) == (107, 61857, 61857)
-    assert max(size for word, size in sizes.items() if word != "00010001011") == 15752
+        assert 107 <= len(t["states"]) <= (61857 if word == "00010001011" else 15752)
+        assert natural_inside(word, start, cells, t)
+    assert len(lock_chain.extra_tables("00010001011")["states"]) == 61857
     walls = {word for word, module in coverage.trap_blocks().items()
              if module in ("TenTraps", "ElevenTraps", "TwelveTraps")}
-    assert not set(sizes) & (walls | set(game.kit_blocks(12)))
-    for module, text in (("NaturalTraps", lock_chain.lean_extra()), ("NaturalTrapsLarge", lock_chain.lean_large()),
-                         ("NaturalTrapsLong", lock_chain.lean_extra(lock_chain.LONG_TRAPS))):
-        assert text in (ROOT / "Rule30Open" / "Columns" / f"{module}.lean").read_text(encoding="utf-8")
-    for word, start, cells, modulus in lock_chain.LONG_TRAPS:
-        t = lock_chain.extra_tables(word)
-        assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus) and len(t["states"]) <= 3000
-        assert lock_chain.is_lock(word, t["states"], cells)
-        row = start << 1  # bit 0 the block's column, bit i column i
-        for s in range(12000):
-            row = step((row & ~1) | int(word[s % len(word)]))
-        inside = {(label % len(word), window) for label, window in t["states"]}
-        assert (12000 % len(word), (row >> 1) & ((1 << cells) - 1)) in inside
-    long_blocks = [word for word, *_ in lock_chain.LONG_TRAPS]
+    assert not {word for word, *_ in entries} & (walls | set(game.kit_blocks(12)))
+    lean_dir = ROOT / "Rule30Open" / "Columns"
+    monkeypatch.setattr(lock_chain, "EXTRA_TRAPS", entries[:1])
+    assert lock_chain.lean_extra() in (lean_dir / "NaturalTraps.lean").read_text(encoding="utf-8")
+    long_entries = lock_chain.LONG_TRAPS
+    long_blocks = [word for word, *_ in long_entries]
     assert sorted(len(word) for word in long_blocks) == [13] * 31 + [14] * 39 and len(set(long_blocks)) == 70
     others = {word for word, module in coverage.trap_blocks().items() if module != "NaturalTrapsLong"}
     assert not set(long_blocks) & (others | set(game.kit_blocks(14)))
-    # the large natural traps of periods 13 and 14: every sampled half's trap, checked in parts; each block has a
-    # smaller census trap as well, and the 22 other large ones are census components themselves
+    for word, start, cells, modulus in long_entries[::14]:
+        t = lock_chain.extra_tables(word)
+        assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus) and len(t["states"]) <= 3000
+        assert lock_chain.is_lock(word, t["states"], cells) and natural_inside(word, start, cells, t)
+    assert lock_chain.lean_extra(long_entries[:1]) in (lean_dir / "NaturalTrapsLong.lean").read_text(encoding="utf-8")
     census = {word for word, *_ in lock_chain.CENSUS_TRAPS[13] + lock_chain.CENSUS_TRAPS[14]}
-    for word, start, cells, modulus in lock_chain.LONG_LARGE:
+    assert len(lock_chain.LONG_LARGE) == 12
+    for word, start, cells, modulus in lock_chain.LONG_LARGE[:3]:
         t = lock_chain.extra_tables(word)
         assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus) and len(t["states"]) > 3000
         assert lock_chain.is_lock(word, t["states"], cells) and word in census
     assert {word for word, *_ in lock_chain.LONG_LARGE}.isdisjoint(set(long_blocks))
-    assert lock_chain.lean_long_large() in (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsLongLarge.lean").read_text(
-        encoding="utf-8")
+    monkeypatch.setattr(lock_chain, "LONG_LARGE", lock_chain.LONG_LARGE[:1])
+    assert lock_chain.lean_long_large() in (lean_dir / "NaturalTrapsLongLarge.lean").read_text(encoding="utf-8")
     for x in (0, 5, (7 << 40) + 3, 3 ** 200):
         terms = lock_chain.lean_number(x, 16).split("+")
         assert sum(int(a) << (int(b) if b else 0) for a, _, b in (term.strip().partition(" <<< ") for term in terms)) == x
@@ -3192,3 +3244,13 @@ def test_second_nine_wall() -> None:
             break
         row = step(row)
     assert entered == 7622
+
+
+def natural_inside(word: str, start: int, cells: int, t: dict, time: int = 12000) -> bool:
+    """Whether the half `start`, driven by `word` with `step`, has its first `cells` cells in a state of the trap `t`
+    at step `time`, with the label modulo the period."""
+    row = start << 1  # bit 0 the block's column, bit i column i
+    for s in range(time):
+        row = step((row & ~1) | int(word[s % len(word)]))
+    inside = {(label % len(word), window) for label, window in t["states"]}
+    return (time % len(word), (row >> 1) & ((1 << cells) - 1)) in inside

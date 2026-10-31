@@ -157,9 +157,10 @@ def chain_cycle(seed: str, values: str, limit: int = 100000) -> tuple[int, list[
     return start, columns[start:len(columns) - 2]
 
 
+@functools.lru_cache(maxsize=64)
 def bottom_components(block: str, width: int) -> list[np.ndarray]:
     """The bottom components of the locked nodes of the game at this width: each a strongly connected set of locked
-    nodes that no move leaves."""
+    nodes that no move leaves. Kept for the arguments asked again; the list and its arrays are not to be changed."""
     period, size = len(block), 1 << width
     source, target, _, _, _ = game.game_graph(block, width)  # (2 p n,), (2 p n,)
     locked, _ = locks.lock_info(block, width)  # (p n,)
@@ -196,6 +197,7 @@ def frozen_columns(block: str, width: int) -> list[tuple[int, list[str]]]:
             for members in bottom_components(block, width)]
 
 
+@functools.lru_cache(maxsize=256)
 def lock_values(block: str, width: int) -> list[tuple[list[str], str]]:
     """For each bottom component of the locked nodes, `phase_columns` there and column 1 right of the last of them at
     each phase (of the block itself when there is none): its one value at the white phases of that column, which the
@@ -739,8 +741,10 @@ def relabeled_tables(full: str, cells: int, nodes: set[tuple[int, int]]) -> dict
             "first": first}
 
 
+@functools.lru_cache(maxsize=None)
 def carried(name: str, distance: int) -> dict:
-    """The trap of `NATURAL` named `name` carried `distance` columns left by its chain (`carry`)."""
+    """The trap of `NATURAL` named `name` carried `distance` columns left by its chain (`carry`), kept for the traps
+    asked again."""
     return carry(tables(name), distance)
 
 
@@ -752,10 +756,8 @@ def carry(t: dict, distance: int) -> dict:
     full = word * (modulus // period)  # the trap's block at its labels
     values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(modulus))
     columns = chain(full, values, distance)  # columns m, m - 1, .., m - distance at the labels
-    nodes = set()
-    for label, window in t["states"]:
-        near = sum(int(columns[distance - 1 - j][label]) << j for j in range(distance))
-        nodes.add((label, near | window << distance))
+    near = [sum(int(columns[distance - 1 - j][label]) << j for j in range(distance)) for label in range(modulus)]
+    nodes = {(label, near[label] | window << distance) for label, window in t["states"]}
     return relabeled_tables(columns[distance], distance + cells, nodes)
 
 
@@ -1292,8 +1294,9 @@ CENSUS_LARGE15 = [("000000001010101", "000000001010101", 0, 0), ("00000000110100
                   ("010111110111111", "010111110111111", 0, 0), ("011011011111111", "011011011111111", 0, 0)]
 
 
+@functools.lru_cache(maxsize=None)
 def tables(name: str) -> dict:
-    """The tables of a trap of `TRAPS` or `NATURAL`."""
+    """The tables of a trap of `TRAPS` or `NATURAL`, kept for the names asked again."""
     for entry in TRAPS:
         if entry[0] == name:
             return trap_tables(*entry[1:])
@@ -2054,10 +2057,12 @@ def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> lis
     return found
 
 
+@functools.lru_cache(maxsize=None)
 def gap_entries(name: str, cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
     """For each phase of the natural trap `name` and each right half r with support in cells 1 .. `cells` (bit i is
     column i + 1), the first step T at which the run of r driven from that phase has its first cells in a state of the
-    trap with the label of its phase, and that state's index in the sorted states of the trap's Lean definition."""
+    trap with the label of its phase, and that state's index in the sorted states of the trap's Lean definition; kept
+    for the traps asked again."""
     t = carried(name, 0)
     word, period, width = t["word"], len(t["word"]), t["cells"]
     index = {state: k for k, state in enumerate(t["states"])}
@@ -2468,9 +2473,10 @@ def lean_fifteen(piece: int = 1 << 16) -> str:
     return "\n".join(out)
 
 
+@functools.lru_cache(maxsize=None)
 def extra_tables(word: str) -> dict:
     """The trap of `EXTRA_TRAPS`, `LARGE_TRAPS`, `LONG_TRAPS`, `LONG_LARGE`, `MISSED_NATURAL` or `WALL_NATURAL` for
-    the block, as tables (`natural_tables`)."""
+    the block, as tables (`natural_tables`), kept for the blocks asked again."""
     _, start, cells, modulus = next(entry for entry in EXTRA_TRAPS + LARGE_TRAPS + LONG_TRAPS + LONG_LARGE
                                     + MISSED_NATURAL + WALL_NATURAL if entry[0] == word)
     return natural_tables(word, start, 12000, cells, modulus)
@@ -2672,8 +2678,9 @@ def lean_walls(period: int, depth: int, prefix: str, piece: int = 0, check: bool
     return "\n".join(out)
 
 
+@functools.lru_cache(maxsize=None)
 def census_tables(entry: tuple[str, str, int, int]) -> dict:
-    """The trap of an entry of `CENSUS_TRAPS`."""
+    """The trap of an entry of `CENSUS_TRAPS`, kept for the entries asked again."""
     _, source, index, distance = entry
     return component_tables(source, 16, index, distance)
 
@@ -2806,6 +2813,7 @@ def entry_steps(name: str | dict, halves: list[int], phase: int, steps: int) -> 
         name = f"trap{word}"
     else:
         word, cells, states = trap_states(name)
+    from computations.period_three import in_sorted
     period, blocks = len(word), (cells + 63) // 64
     full, low = (1 << cells) - 1, np.uint64((1 << min(cells, 64)) - 1)
     firsts = [np.array(sorted({w & ((1 << 64) - 1) for ph, w in states if ph == q}), dtype=np.uint64)
@@ -2820,7 +2828,7 @@ def entry_steps(name: str | dict, halves: list[int], phase: int, steps: int) -> 
     for t in tqdm(range(steps), desc=f"{name} phase {phase}", file=sys.stderr, leave=False, mininterval=10):
         q = (t + phase) % period
         hit = np.zeros(len(alive), dtype=bool)  # (m,)
-        for r in np.flatnonzero(np.isin(rows[:, 0] & low, firsts[q])).tolist():
+        for r in np.flatnonzero(in_sorted(rows[:, 0] & low, firsts[q])).tolist():
             window = sum(int(rows[r, j]) << (64 * j) for j in range(blocks)) & full
             hit[r] = (q, window) in states
         if hit.any():
@@ -2839,6 +2847,7 @@ def coin_entry(name: str, support: int, start: int, steps: int, seed: int = 30) 
     only its first cells, as many as the trap is wide, are kept, and the cell beyond them is a fair coin flipped at
     every step. Returns, in the order of `entry_steps` (phase by phase, then half), the first step after `start` at
     which the window is a state of the trap at its phase, or -1. The trap must be at most 63 cells wide."""
+    from computations.period_three import in_sorted
     word, cells, states = trap_states(name)
     period = len(word)
     assert cells < 64
@@ -2858,7 +2867,7 @@ def coin_entry(name: str, support: int, start: int, steps: int, seed: int = 30) 
         alive = np.arange(len(w))  # (m,), the halves not yet inside
         for t in range(steps):
             q = (start + phase + t) % period
-            hit = np.isin(w[alive], members[q])  # (m,)
+            hit = in_sorted(w[alive], members[q])  # (m,)
             entry[alive[hit]] = t
             alive = alive[~hit]
             if alive.size == 0:
@@ -3024,11 +3033,12 @@ def natural_scan(word: str, steps: int, starts: int = 30, max_width: int = 64) -
     return locks, found
 
 
-def white_lock(word: str, phase: int, steps: int) -> tuple[int, int | None, tuple[int, int, int, int] | None]:
+def white_lock(word: str, phase: int, steps: int, widths: range = range(16, 65)) -> tuple[
+        int, int | None, tuple[int, int, int, int] | None]:
     """The white right half driven by `word` from `phase` (the center reads `word[phase]` at step 0): the period with
     which column 1, read at the word's white times, repeats over the second half of `steps` steps (0 if it does not),
     and if it does, the step of its last change before that half and the natural trap it is in at three late steps,
-    as `natural_trap` returns it."""
+    as `natural_trap` returns it, searched over the cell counts `widths`."""
     from computations import right_half
     turned = word[phase:] + word[:phase]
     period = right_half.locked_period(turned, 0, steps)
@@ -3037,7 +3047,7 @@ def white_lock(word: str, phase: int, steps: int) -> tuple[int, int | None, tupl
     last, _, _ = right_half.lock_breaks(turned, 0, steps // 2, period, 0)
     later, _, _ = right_half.lock_breaks(turned, 0, 3 * steps // 2, 2 * period, 0)  # a trap keeps the lock forever
     late = [t for t in (steps * 3 // 5, steps * 4 // 5, steps - 1) if t > later]
-    return period, last, natural_trap(turned, 0, late, list(range(16, 65)), [period, 2 * period]) if late else None
+    return period, last, natural_trap(turned, 0, late, list(widths), [period, 2 * period]) if late else None
 
 
 def white_runs(word: str, steps: int, cells: int) -> list[list[int]]:

@@ -31,6 +31,7 @@ that `Rule30Open.Columns.EmptyRight` checks in the kernel.
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 import textwrap
 import time
@@ -107,6 +108,13 @@ def kit_wall() -> np.ndarray:
     return (label == sinks[0]).reshape(4, size)  # (4, 2^13)
 
 
+@functools.lru_cache(maxsize=None)
+def ether_pattern(j0: int, psi: int) -> np.uint64:
+    """Columns 1 .. 64 of the ether right of column j0 at phase `psi`, column p at bit p - 1; kept for the calls that
+    ask again."""
+    return np.uint64(sum(ether(j0 + p, psi) << (p - 1) for p in range(1, 65)))
+
+
 def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np.ndarray:
     """For each right half whose columns 1 .. 64 are the bits of `low`, at drive phase `phase` (the center reads
     word[phase] now), the least depth k at which it is in the family with that wall, or -1."""
@@ -114,15 +122,13 @@ def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np
     depth = np.full(low.size, -1, dtype=np.int64)  # (n,)
     for j0, shift in ALIGNMENTS[word]:
         psi = (phase + shift) % 4  # the ether phase of now
-        pattern = np.uint64(sum(ether(j0 + p, psi) << (p - 1) for p in range(1, 65)))
-        differ = low ^ pattern  # (n,)
-        for k in range(64 - WALL_CELLS + 1):
-            if (j0 + k) % 7 != 2:
-                continue
-            ether_ok = (differ & np.uint64((1 << k) - 1)) == 0  # (n,), columns 1 .. k carry the ether
-            strip = ((low >> np.uint64(k)) & np.uint64((1 << WALL_CELLS) - 1)).astype(np.int64)  # (n,)
-            found = ether_ok & wall[psi][strip] & ((depth < 0) | (depth > k))  # (n,)
-            depth[found] = k
+        differ = low ^ ether_pattern(j0, psi)  # (n,)
+        depths = np.array([k for k in range(64 - WALL_CELLS + 1) if (j0 + k) % 7 == 2], dtype=np.int64)  # (K,)
+        masks = (np.uint64(1) << depths.astype(np.uint64)) - np.uint64(1)  # (K,), columns 1 .. k
+        strip = ((low[:, None] >> depths.astype(np.uint64)) & np.uint64((1 << WALL_CELLS) - 1)).astype(np.int64)  # (n, K)
+        ok = ((differ[:, None] & masks) == 0) & wall[psi][strip]  # (n, K), columns 1 .. k carry the ether, then the wall
+        first = np.where(ok.any(axis=1), depths[ok.argmax(axis=1)], -1)  # (n,), the least such k, or -1
+        depth = np.where(first >= 0, np.where(depth < 0, first, np.minimum(depth, first)), depth)
     return depth  # (n,)
 
 

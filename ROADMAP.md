@@ -23,7 +23,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
-| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{52}$ fails |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
@@ -32,8 +32,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 2 | Conservation laws | closed | none over four steps |
 | 2 | Bounds on runs | open | runs at most linear in their start time |
 | 2 | Statistics | no signal | the column passes every test tried |
+| 3 | An upper bound | proved in Lean | a one-tape machine of the kit's model computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps, so Problem 3 is the question whether the exponent 2 can fall to 1 |
 | 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
-| 3 | A space lower bound | open, as hard | space $O(\sqrt{n} \log n)$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
+| 3 | A space lower bound | open, as hard | space $O(\sqrt{n \log n})$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
 | 3 | A shortcut | no signal | automata, recurrences and learned predictors find none |
 | 3 | Restricted models | open | no automaton below 131,070 states on the range searched |
 
@@ -41,7 +42,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 
 - **Rigidity from the left edge.** *Closed as a route on its own; every other route ends with it.* Two adjacent
   columns are never both eventually periodic, and no column is eventually constant
-  ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). The kit proves that Rules 90, 150 and 210 share every
+  ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)). More generally, an eventually periodic column and any
+  sequence that, with the cells between, closes the strip to its right are never both eventually periodic: the center
+  column and column 1 xor column 2, or the parity of columns 1 to $k$ for any $k$, in Lean
+  ([ClosingObservable](Rule30Open/Columns/ClosingObservable.md)). The kit proves that Rules 90, 150 and 210 share every
   fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period. [The coverage](findings/columns/coverage.md) counts, period by
@@ -66,7 +70,13 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     [LongWindow](Rule30Open/Columns/LongWindow.md), where the kit has 16,359). The kit's main branch, since October 30
     and after the commit this repository is pinned at, excludes every eventual period whose white runs are all at least
     17, and four more families with long white runs ([the kit's pull
-    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)).
+    requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Windows of 14 cells
+    followed through the column's whole history, the limit of the windows that any history leaves, exclude 1,672 blocks
+    of period at most 22 and infinite families with white runs: every tail of at most six cells but $10101$ after a white
+    run of at least 22, against 74 in the kit, by computation, Lean pending ([limit
+    windows](findings/columns/limit-windows.md)); up to period 21 they add no block to the game's list, and no white run
+    is a wall, so the kit's threshold of 17 for mixed black runs drops only to 16 ([window
+    thresholds](negative-results/columns/window-thresholds.md)).
   - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
     every exclusion rests on a run of five or more equal values; most blocks do not lock the right half
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
@@ -113,7 +123,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   to 750, 1,446 and 560 ([FourteenCells](Rule30Open/Columns/FourteenCells.md)), and so does every half with at most two
   black cells among columns 1 to $G$, whatever lies beyond, with $G$ = 778, 1,359 and 623, which includes one black cell
   anywhere ([SparseRight](Rule30Open/Columns/SparseRight.md); the kit has one cell for $0001$), and so does every
-  truncation of the aligned ether, the only infinite half seen to stay out, followed by at most six cells
+  truncation of the aligned ether, one of the two infinite halves known to stay out with the half beside a $0001$ column
+  of the background of 80 cells, whose truncations enter after 2.5 steps per cell
+  ([background halves](findings/columns/background-halves.md)), followed by at most six cells
   ([EtherPrefix](Rule30Open/Columns/EtherPrefix.md) for four, [EtherPrefixSix](Rule30Open/Columns/EtherPrefixSix.md) for
   six); a window of 16 columns has a certificate ([the certificate](findings/columns/period-four-certificate.md)), in
   Lean a trap ([PeriodFourCertificate](Rule30Open/Columns/PeriodFourCertificate.md)), every window can reach it, and one
@@ -124,7 +136,13 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   ([reach of the kit's conjectures](findings/columns/kit-absorption-reach.md)): the test that refutes entry into seven
   traps of periods 13 to 15 ([MissedTraps](Rule30Open/Columns/MissedTraps.md)) finds nothing against either at those
   widths. A set of 52 cells misses `t001`: the second trap for $001$, so the kit's `AbsorptionT t001` is false
-  ([Traps001](Rule30Open/Columns/Traps001.md)). Open: attraction for halves with at least three black cells among the
+  ([Traps001](Rule30Open/Columns/Traps001.md)). Under $0001$ every right half reads column 1 as $0^a 1^{4-a}$ on
+  each block of four steps, along a graph of 13 transitions, and a repeated value 2 or 3 forces the aligned ether up to
+  its first $B_3$ column ([column-one blocks](findings/columns/column-one-blocks.md)). For a uniformly random infinite
+  half the law at each time is exact, uniform on a set of measure $2^{-t}$; almost every infinite half enters exactly
+  when entry has a uniform positive chance after every prefix, which is open, and for $0001$ a half stays out for $T$
+  steps with chance at least $2^{-(T + 20)}$ ([random halves](findings/columns/random-halves.md)). Open: attraction for
+  halves with at least three black cells among the
   first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$, one among columns 11 to $G'$ and one
   among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells. *Assessment:* the most direct route to a full
   case of Problem 1, though attraction asks the chaotic part of the right half to deliver an entry pattern, a statement
@@ -156,7 +174,27 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   absorption route](negative-results/period-two/absorption-route.md)) and by a Lean proof claimed in the kit's pull
   request #39, and about half the windows of 19 or 20 columns cannot enter it whatever the next column does. Other pull
   requests work on the gate, from which the kit reconstructs the one candidate left row ([the kit's pull
-  requests](literature/kit-pull-requests.md#period-two)).
+  requests](literature/kit-pull-requests.md#period-two)). The 2-adic integers that keep the center alternating form the
+  one-sided full 2-shift under two steps of the map; its periodic points are domains periodic in space, so a positive
+  integer in it would have an itinerary that is never periodic, so the conjecture (R) that every rational point is
+  preperiodic would settle period two ([the shift model](findings/period-two/shift-model.md)). (R) holds for every
+  rational whose tail falls onto a stripe, since a defect can climb past a stripe by at most one cell, which the kit
+  proves in its own encoding (`Rule30ZeroBoundaryStripe.stripe_absorb`); every rational
+  point with a head and period of at most 64 cells together, 2,592 of them, is preperiodic and falls onto a stripe or
+  the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
+  ether, which the window automaton at the top of the defect does not do at 5 or 8 cells, where it has a cycle of
+  positive gain (10 cells is open); no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
+  a fixed lag removes none of its moves, since it does not restrict the cells above the lag (in Lean,
+  [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)), so
+  bounding it is the mirror of the kit's `Absorption` for the ether
+  ([ether fronts](negative-results/period-two/ether-front-windows.md)); the forced bits are dense polynomials of
+  full degree, which rules out a sparse certificate ([forced bits](negative-results/period-two/forced-bits-dense.md)).
+  The structure of this shift and the aperiodic itinerary of a positive integer in it are in Lean
+  ([ShiftModel](Rule30Open/PeriodTwo/ShiftModel.md)). Condrey's proof for a constant center does not extend: only the
+  uniqueness of the left half carries over, the forced left half is not a finite-state function of the right half, and
+  a bound on how long a row of radius $A$ alternates would itself be the period-two theorem; the longest such run is 36
+  steps for $A \le 26$, with no law like Condrey's $A + 2$ ([the carry-over](findings/period-two/condrey-carryover.md),
+  [where it stops](negative-results/period-two/condrey-mechanism.md)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains, beside a second: every right half white on its
   first 1,317 cells enters `t001`, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half
@@ -196,32 +234,61 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
   at least about $\log n$ times before $n$ (the kit); a black-run slope of $3/5$ and $\log\log$ margins are in the
   kit's main branch since October 30, after the commit this repository is pinned at ([the kit's pull
-  requests](literature/kit-pull-requests.md#runs-of-the-center-column)). Numerically the longest runs are logarithmic. *Assessment:* going below linear needs
-  a statement about the chaotic left half near the center, and even a logarithmic bound gives no positive density.
+  requests](literature/kit-pull-requests.md#runs-of-the-center-column)). Numerically the longest runs are logarithmic.
+  In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
+  starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
+  about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
+  The hypothesis holds for $j < 8{,}000$ by computation and fails past depth 87,866, where the period becomes 32, so as
+  stated the theorem reaches only starts below about 143,000, where computation already bounds the runs; a version
+  with a period that grows with the depth is what would give a slope.
+  A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
+  strips](negative-results/diagonals/fixed-depth-strips.md)). *Assessment:* going below linear needs a statement about
+  the chaotic left half near the center, here a linear bound on when the left diagonals settle, with a period that may
+  grow; and even a logarithmic bound gives no positive density.
+- **Transfer between columns.** *Proved in Lean, weak.* Left permutivity bounds the black cells of column $i - 1$
+  by those of columns $i$ (twice) and $i + 1$, and likewise by their white cells, so upper densities satisfy
+  $\bar d_{i-1} \le 2 \bar d_i + \bar d_{i+1}$, and rightward $\bar d_{i+1} \le \bar d_{i-1} + \bar d_i$
+  ([ColumnTransfer](Rule30Open/Columns/ColumnTransfer.md)). This gives no
+  positive density for the center: it moves a density bound left, never onto the center from nothing.
 - **Statistics.** *No signal.* The column passes every randomness and compression test tried
   ([randomness tests](negative-results/statistics/randomness-tests.md), [compression](negative-results/statistics/compression.md)).
 
 ## Problem 3: does computing the $n$th cell take effort of order $n$?
 
+- **An upper bound.** *Proved in Lean.* A one-tape machine in the kit's exact model computes $c(n)$ from the binary
+  digits of $n$ in exactly $2n^2 + 2n\ell + 7n + 3\ell + 6$ steps, $\ell$ the number of digits, hence within
+  $6(n + 1)^2$ ([the quadratic-time machine](Rule30Open/Complexity/QuadraticTime.md)). So the formal Problem 3
+  quantifies over a nonempty class of machines and asks whether the exponent 2 of one-tape time can fall to 1.
 - **A lower bound.** *Closed with present methods.* It is an exponential lower bound for one explicit function in
   exponential time ([the barrier](negative-results/complexity/problem-three-barrier.md)). Hypotheses about
   satisfiability, settled or not, do not reach it ([the hardness hypotheses](negative-results/complexity/hardness-hypotheses.md)),
   nor does probabilistic checking, and a circuit form of it would give $\mathrm{P} = \mathrm{BPP}$
   ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). Problem 3 implies Problem 1,
   proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
+- **The cone as a Boolean function.** *Computed, with a proof.* An alternating left half fixes the center cell for
+  every right half once $t \ge 8$ or 9, so the $2^t$ left halves give at most $2^t - 2$ functions of the right half;
+  reading the row from the right gives far fewer subfunctions at $t \le 10$. No lower bound follows
+  ([cone screening](findings/complexity/cone-screening.md)).
 - **A space lower bound.** *Open, as hard.* By Paterson's theorem the kit's Problem 3 follows if the center column needs
   space larger than order $\sqrt{n}$, and by the kit Problem 1 follows if it needs any space that grows; tree evaluation
-  on the kit's block tree computes it in space $O(\sqrt{n} \log n)$ ([the space
-  ladder](findings/complexity/space-ladder.md)). *Assessment:* a reformulation, and likely a closed one: if tree
-  evaluation runs in logarithmic space, which Cook and Mertz's algorithm misses by a factor $\log b$, the center column
-  takes space $O(\sqrt{n})$ and the threshold is out of reach. The claimed one-tape simulation in space $T^{2/5}$ would
-  lower the threshold to $n^{2/5}$.
+  on the kit's block tree computes it in space $O(\sqrt{n \log n})$, with the final bound of Cook and Mertz, as
+  Sibgatullin and Williams (2026, unrefereed) do for any automaton of one dimension ([the space
+  ladder](findings/complexity/space-ladder.md), [the thresholds](findings/complexity/space-thresholds.md)). So a lower
+  bound through Paterson's theorem has room of a factor $\sqrt{\log n}$ only, and for multitape time $o(n)$ none.
+  *Assessment:* a reformulation, and likely a closed one: if tree evaluation runs in space $O(h + b)$ on these trees,
+  which Cook and Mertz miss by a factor $\log b$ on the height term, the center column takes space $O(\sqrt{n})$ and the
+  threshold is out of reach. The claimed one-tape simulation in space $T^{2/5}$ (OpenAI's family 137, unrefereed) would
+  lower the threshold to $n^{2/5}$ up to logarithms.
 - **A shortcut.** *No signal.* Automata, linear recurrences, learned predictors and exact structure searches find none
   ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$
   on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)). *Assessment:* a
   lower bound in a restricted model is within reach only for finite ranges; an asymptotic one, even "the column is not
-  automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides.
+  automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides. Crossing
+  sequences, the kit's method for one tape, give at most time of order $(\log n)^2$ for any function, and for $c$ only
+  under a spectral hypothesis on its digit matrices that already implies Problem 1; every lower bound for finite
+  automata with a bounded number of passes is a proof that $c$ is not 2-automatic ([crossing
+  sequences](negative-results/complexity/one-tape-crossing.md)).
 
 ## Next steps
 
@@ -303,3 +370,17 @@ In order of the assessment above.
    pass, and move an entry's `kit:` relation when the kit gains its result; keep [the literature](literature/README.md)
    current, AI-proposed claims included ([ai-proposed.md](literature/ai-proposed.md)), and the kit's open pull
    requests ([kit-pull-requests.md](literature/kit-pull-requests.md)) until each is merged or closed.
+5. **Period two, Problems 2 and 3: the open statements at their sharpest.**
+   - *Period two.* (R) on ether tails is what the computations leave; it needs every defect on the ether to have a
+     bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5 and 8 cells at the top
+     cannot certify that (10 is open), with or without $K$ ([ether fronts](negative-results/period-two/ether-front-windows.md),
+     [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)); entry into the 13-cell closed strips suffices and is the mirror
+     of the kit's `Absorption` for the ether. Next: a statement about the region between the wall and the top that
+     uses $K$ at a lag growing with the top, or a proof of entry for the ether that also serves the kit.
+   - *Problem 2.* The transfer inequalities ([ColumnTransfer](Rule30Open/Columns/ColumnTransfer.md)) move density
+     bounds left and give nothing on the center; a positive lower density needs an input that creates black cells,
+     such as a linear bound on runs with slope below 1 ([bounds on runs](#problem-2-does-each-color-occur-with-density-12)).
+   - *Problem 3.* The cone of the center is screened by alternating left halves
+     ([ConeScreening](Rule30Open/Complexity/ConeScreening.md)), so its $2^t$ left halves are not pairwise distinguishable
+     for $t \ge 9$; the counts for other variable orders are in [cone screening](findings/complexity/cone-screening.md)
+     to $t = 10$, and a proof of a lower bound for some order is open.

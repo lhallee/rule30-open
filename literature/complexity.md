@@ -10,6 +10,8 @@ explains why an affirmative answer is beyond current complexity theory; the sour
 - **Wolfram (2019).** [Announcing the Rule 30 Prizes](https://writings.stephenwolfram.com/2019/10/announcing-the-rule-30-prizes/).
   Reaching step $n$ by direct simulation takes about $n^2$ cell updates; Problem 3 asks whether anything essentially
   faster exists for the center cell.
+  *Here:* [the quadratic-time machine](../Rule30Open/Complexity/QuadraticTime.md) does the simulation in the kit's
+  one-tape model in exactly $2n^2 + 2n\ell + 7n + 3\ell + 6$ steps, $\ell$ the number of digits of $n$, in Lean.
 - **Natal and Al-saadi (2024).** [Fast simulation of cellular automata by self-composition](https://arxiv.org/abs/2409.07065).
   arXiv:2409.07065.
   Composing a rule with itself reaches generation $n$ of the whole configuration in time $O(n^2 / \log n)$ and space
@@ -24,6 +26,18 @@ explains why an affirmative answer is beyond current complexity theory; the sour
   by algebraic and dynamical criteria, and reports that simple initial rows of Rule 30 generate every Boolean function
   of up to five variables, which suggests, without proof, universality in this sense.
   *Here:* the barrier entry names a proof that Rule 30 can simulate arbitrary computation as one route to Problem 3.
+- **Sibgatullin and Williams (2026).**
+  [Space-efficient simulations beyond multitape Turing machines](https://eccc.weizmann.ac.il/report/2026/223/).
+  ECCC TR26-223, October 2, 2026; unrefereed. The record and the text of the introduction and of Section 6 were read.
+  Simulates $t$ steps of a $d$-dimensional cellular automaton, from the initial states of the cells within the light
+  cone of the cell asked for, in space $O((t \log t)^{1 - 1/(d+1)})$ (Theorem 1.5); for $d = 1$ this is
+  $O(\sqrt{t \log t})$ (Theorem 1.4). The proof runs $k$ steps per round of an external-memory model, one processor per
+  cell, and applies their generalization of Cook and Mertz's algorithm. The same paper evaluates unbounded fan-in
+  circuits of $n$ gates in space $O(\sqrt{n \log n})$ and lexicographically first 2-satisfiability in space
+  $\tilde O(\sqrt{n})$.
+  *Here:* it is the center column. For the single black cell the initial states are computed on demand; [the space
+  thresholds](../findings/complexity/space-thresholds.md) derive $O(\sqrt{n \log n})$ from the kit's block tree
+  directly, and compare it with the thresholds a space lower bound must pass.
 
 ## Computational irreducibility and coarse prediction
 
@@ -81,17 +95,65 @@ any natural function in exponential time (see the barrier entry).
 - **Hopcroft, Paul and Valiant (1977).** [On time versus space](https://doi.org/10.1145/322003.322015).
   *Journal of the ACM* 24(2), 332 to 337.
   Multitape time $t$ can be simulated in space about $t / \log t$.
+- **Hopcroft and Ullman (1968).** [Relations between time and tape complexities](https://doi.org/10.1145/321466.321474).
+  *Journal of the ACM* 15(3), 414 to 427; the record was checked through Crossref, the text was not read.
+  Williams credits it with the simulation of one-tape time $t$ in space $O(\sqrt{t})$ that predates Paterson's.
+- **Hennie (1965) and Hartmanis (1968).**
+  [One-tape, off-line Turing machine computations](https://doi.org/10.1016/s0019-9958(65)90399-2),
+  *Information and Control* 8(6), 553 to 578;
+  [Computational complexity of one-tape Turing machine computations](https://doi.org/10.1145/321450.321464),
+  *Journal of the ACM* 15(2), 325 to 339. The records were checked through Crossref, the texts were not read.
+  A deterministic one-tape machine that decides a nonregular language needs time of order $n \log n$ (Hennie with
+  Trakhtenbrot, 1964, and Hartmanis, as the kit's `OneTapeGap` attributes it), proved by counting crossing sequences.
+  *Here:* the kit proves it in Lean for digit input, and [the crossing-sequence barrier](../negative-results/complexity/one-tape-crossing.md)
+  asks what the same method can give for the center column beyond it.
 - **Cook and Mertz (2024).** [Tree evaluation is in space O(log n · log log n)](https://doi.org/10.1145/3618260.3649664).
-  STOC 2024, 1268 to 1278; ECCC TR23-174.
-  Evaluates a tree of fixed fan-in, height $h$ and $b$-bit nodes in space about $(h + b) \log b$, below the
-  $h \cdot b$ of storing a path of values.
+  STOC 2024, 1268 to 1278; ECCC TR23-174; *SIAM Journal on Computing*, 2025,
+  [DOI 10.1137/24m1690126](https://doi.org/10.1137/24m1690126) (the record was checked through Crossref).
+  Evaluates a tree of fan-in $d$, height $h$ and $b$-bit nodes in space $O(d b + h \log (d b))$, as Williams states
+  their Theorem 7 and as Goldreich states it for binary trees, $O(b + h \log b)$. The ECCC text proves the weaker
+  $O((h + b) \log b)$ (its Theorem 10); both are below the $h \cdot b$ of storing a path of values.
   *Here:* the kit's `Rule30LightCone` cuts the spacetime diagram into a tree of this shape, which puts the center
-  cell at time $n$ in space $O(\sqrt{n} \log n)$ ([the space ladder](../findings/complexity/space-ladder.md)).
+  cell at time $n$ in space $O(\sqrt{n \log n})$ with the first form and $O(\sqrt{n} \log n)$ with the second ([the space
+  thresholds](../findings/complexity/space-thresholds.md)).
+- **Goldreich (2024) and Stoeckl.** [On the Cook-Mertz tree evaluation procedure](https://eccc.weizmann.ac.il/report/2024/109),
+  ECCC TR24-109, June 29, 2024, revised December 2024; and
+  [Solving tree evaluation in o(log n · log log n) space](https://eccc.weizmann.ac.il/report/2024/124/), ECCC TR24-124,
+  July 26, 2024, also in *Computational Complexity and Local Algorithms*, Lecture Notes in Computer Science, 2025,
+  [DOI 10.1007/978-3-031-88946-2_7](https://doi.org/10.1007/978-3-031-88946-2_7) (Crossref); the text of TR24-124 was
+  read. The first explains Cook and Mertz's algorithm as univariate interpolation. The second, a result Goldreich
+  credits to Manuel Stoeckl, groups $h'$ levels into one $2^{h'}$-ary node and obtains space
+  $O(h + 2^{h'} b + (h / h') \log b)$, which shaves a factor $\log\log$ from $h \log b$ when the height $h$ is much
+  larger than $b / \log b$ ($h \log b \gg b$).
+  *Here:* the block tree of the center column has $h \approx 3 b / \log_2 b$ at its best $b$, the balanced case where
+  the grouping gains nothing ([the space thresholds](../findings/complexity/space-thresholds.md)).
 - **Williams (2025).** [Simulating time with square-root space](https://arxiv.org/abs/2502.17779). arXiv:2502.17779,
-  STOC 2025.
-  Improves the simulation to space about $\sqrt{t \log t}$, through Cook and Mertz's algorithm. For the center
-  column the direct tree is better: simulation takes multitape time of order $n^2$, which this turns into space of
-  order $n \sqrt{\log n}$.
+  STOC 2025; *Journal of the ACM* 73(3), 1 to 25, June 2026,
+  [DOI 10.1145/3798104](https://doi.org/10.1145/3798104) (the record was checked through Crossref; the text read is the
+  arXiv version).
+  Multitape time $t$ is simulated in space $O(\sqrt{t \log t})$ (Theorem 1.1), by cutting a block-respecting run into
+  $b$-step blocks, evaluating the resulting tree of height $t / b$ with Cook and Mertz's algorithm, and choosing
+  $b = \Theta(\sqrt{t \log t})$; $d$-dimensional multitape machines go in $O((t \log t)^{1 - 1/(d+1)})$ (Theorem 1.5);
+  random-access machines only when their memory accesses are oblivious (Remark 1.6). Section 5 asks whether the
+  Hopcroft and Ullman bound $O(\sqrt{t})$ for one tape can be lowered to $t^{1/2 - \varepsilon}$.
+  *Here:* simulating Rule 30 row by row is multitape time of order $n^2$, which gives space of order
+  $n \sqrt{\log n}$, worse than the tree on the block structure and than Sibgatullin and Williams below.
+- **Shalunov (2025).** [Improved bounds on the space complexity of circuit evaluation](https://arxiv.org/abs/2504.20950).
+  arXiv:2504.20950, April 29, 2025, revised June 19, 2025; the abstract was read.
+  A direct reduction from circuit evaluation to tree evaluation: a circuit of $s$ gates in space $O(\sqrt{s \log s})$.
+  *Here:* the same balance of $b$ and $h$ as for the center column.
+- **Henzinger, Pyne and Ragavan (2026).** [Catalytic tree evaluation from matching vectors](https://arxiv.org/abs/2602.14320).
+  arXiv:2602.14320, February 15, 2026; the abstract was read.
+  A catalytic algorithm for tree evaluation with logarithmic free space, polynomial time and catalytic space
+  $2^{\log^{\varepsilon} n}$ for every $\varepsilon > 0$, an improvement of the catalytic space of an earlier route
+  through circuit evaluation; they present it as a step toward placing tree evaluation in logarithmic space, which
+  stays open.
+  *Here:* catalytic space is borrowed space that must be restored, so the result lowers the free space of a simulation
+  only when the borrowed memory is available; it does not change the space ladder's $O(\sqrt{n \log n})$.
+- **Asadi and Cleve (2026), withdrawn.** [Polynomial-time almost log-space tree evaluation by catalytic pebbling](https://eccc.weizmann.ac.il/report/2026/044/).
+  ECCC TR26-044, April 2, 2026, and [arXiv:2604.02606](https://arxiv.org/abs/2604.02606). Claimed space
+  $O(\log^{1 + \varepsilon} n)$ in polynomial time. Both records are withdrawn, on April 7, 2026, for an error in the
+  degree of the polynomial for each subtree. Do not cite it as a result.
 - **Razborov and Rudich (1997).** [Natural proofs](https://doi.org/10.1006/jcss.1997.1494).
   *Journal of Computer and System Sciences* 55(1), 24 to 35.
   Most known circuit lower-bound proofs are natural, and natural proofs cannot give superpolynomial circuit lower bounds

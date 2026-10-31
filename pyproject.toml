@@ -19,3 +19,5 @@ packages = ["computations"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# Plugins of the global environment that no test uses and whose import (torch, zarr, dash) costs about 20 s per run.
+addopts = "-p no:anyio -p no:dash -p no:hydra_pytest -p no:hypothesispytest -p no:jaxtyping -p no:pytest_cov -p no:torchtyping -p no:typeguard -p no:zarr"

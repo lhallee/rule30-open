@@ -79,17 +79,25 @@ public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
 public import Rule30Open.Columns.Traps001
 public import Rule30Open.Columns.ApartTraps
+public import Rule30Open.Columns.BackgroundHalves
+public import Rule30Open.Columns.ClosingObservable
+public import Rule30Open.Columns.ColumnTransfer
 public import Rule30Open.Columns.WideWalls
 public import Rule30Open.Columns.SixRefuted
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
+public import Rule30Open.PeriodTwo.ShiftModel
+public import Rule30Open.PeriodTwo.BoundedLag
 public import Rule30Open.Diagonals.LeftMemory
+public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.RandomRows.LeftWindow
+public import Rule30Open.Complexity.QuadraticTime
+public import Rule30Open.Complexity.ConeScreening
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

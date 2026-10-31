@@ -617,7 +617,8 @@ def test_wall_segments_lean() -> None:
     `wall_segments`; the block of `wallGood_two_runs` is in the family."""
     from computations import wall_segments
     source = module("Columns/WallSegments")
-    kit = (ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30BlackRunBlocks.lean").read_text()
+    kit = (ROOT / ".lake/packages/rule30prize/lean/Ruliology/CellularAutomata/Rule30BlackRunBlocks.lean").read_text(
+        encoding="utf-8")
     tails = sorted(set(re.findall(r"theorem det_([01]+)\b", kit)))
     assert len(tails) == 8
     body = re.search(r"theorem segOK_kit_tails :\n    \(\[(.*?)\] : List \(List Bool\)\)", source, re.S).group(1)

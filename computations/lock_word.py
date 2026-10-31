@@ -31,6 +31,7 @@ import argparse
 
 import numpy as np
 
+from computations import locks
 from computations.absorption import ALIGNMENTS, WALL_CELLS, ether, kit_wall
 from computations.coin_lock import UNREACHED, entry_paths, period_rate
 from computations.lock_certificate import successor_table
@@ -61,8 +62,8 @@ def unreachable(word: str, width: int, wall: np.ndarray) -> np.ndarray:
     """out[ph, s]: whether no values of column W + 1 bring window s at drive phase ph into the trap, with the most
     steps any window needs to enter."""
     # wall: (4, 2^13)
-    dist, _ = entry_paths(word, trap(word, width, wall))  # (4, 2^W)
-    return dist >= UNREACHED  # (4, 2^W)
+    entered = locks.back_search(word, width, trap(word, width, wall).reshape(-1))  # (4 2^W,), found backward
+    return ~entered.reshape(4, 1 << width)  # (4, 2^W)
 
 
 def avoid_growth(word: str, member: np.ndarray) -> float:
