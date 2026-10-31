@@ -2467,6 +2467,74 @@ def test_trap_reach_lifted() -> None:
             assert lock_chain.trap_reach(t, width=width) == pytest.approx(direct(word, states, cells, width), abs=1e-12)
 
 
+def test_predecessors() -> None:
+    """`locks.predecessors` lists exactly the nodes with a move to each node, against the moves of `game.moves` at
+    small widths, and `lock_chain.successors` gives those moves; `reach_nodes` agrees with `locks.back_closure` over
+    `game.moves`."""
+    from computations import game, lock_chain, locks
+
+    for word, width in (("001", 5), ("0001011", 6), ("0010111", 4)):
+        source, target = game.moves(word, width)  # (2 p n,), (2 p n,)
+        nodes = np.arange(len(word) << width, dtype=np.uint64)  # (p n,)
+        after = lock_chain.successors(word, width, nodes)  # (2, p n)
+        assert sorted(zip(source.tolist(), target.tolist())) == sorted(
+            zip(np.tile(nodes, 2).tolist(), after.reshape(-1).tolist()))
+        for node in range(0, len(word) << width, 7):
+            want = sorted(set(source[target == node].tolist()))
+            got = sorted(set(locks.predecessors(word, width, np.array([node], dtype=np.uint64)).tolist()))
+            assert got == want
+    t = {"word": "0001011", "cells": 6, "states": [(0, 5), (3, 17), (9, 40)]}
+    for width in (4, 6, 8):
+        source, target = game.moves("0001011", width)
+        dense = locks.back_closure(lock_chain.trap_nodes((t,), width), source, target)  # (p n,)
+        assert (lock_chain.reach_nodes((t,), width) == dense).all()
+
+
+def test_t001_coin() -> None:
+    """`t001_coin` at 8 and 10 cells against the spectral radius of the coin's step on the nodes outside `t001` cut to
+    the width, from the matrix built cell by cell with the rule."""
+    from computations import lock_chain
+
+    states = lock_chain.t001_states()
+    for width in (8, 10):
+        inside = {(label % 3, strip & ((1 << width) - 1)) for strip, label in states}
+        outside = [(ph, w) for ph in range(3) for w in range(1 << width) if (ph, w) not in inside]
+        index = {node: i for i, node in enumerate(outside)}
+        step = np.zeros((len(outside), len(outside)))  # (m, m), the coin's step among the nodes outside
+        for (ph, w), i in index.items():
+            cells = [int("001"[ph])] + [(w >> k) & 1 for k in range(width)]
+            for coin in (0, 1):
+                row = cells + [coin]
+                new = sum((row[k - 1] ^ (row[k] | row[k + 1])) << (k - 1) for k in range(1, width + 1))
+                j = index.get(((ph + 1) % 3, new))
+                if j is not None:
+                    step[i, j] += 0.5
+        radius = float(np.abs(np.linalg.eigvals(step)).max())
+        (got_width, factor), = lock_chain.t001_coin((width,))
+        assert got_width == width and factor == pytest.approx(radius, abs=1e-6)
+
+
+def test_back_tables() -> None:
+    """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
+    order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the
+    node it names outside it; for the census trap of `000001010110101` at 8 cells, 123 nodes."""
+    from computations import game, lock_chain
+
+    t = next(b() for m, n, b in lock_chain.module_entries() if (m, n) == ("MissedTraps", "cen000001010110101"))
+    s = lock_chain.back_tables((t,), 8)
+    period = len(s["word"])
+    assert sum(len(row) for row in s["rows"]) == 123
+    assert all(row == sorted(set(row)) for row in s["rows"])
+    inside = np.zeros(period << 8, dtype=bool)  # (p n,)
+    for label, row in enumerate(s["rows"]):
+        inside[[label << 8 | w for w in row]] = True
+    source, target = game.moves(s["word"], 8)
+    assert not (inside[target] & ~inside[source]).any()
+    assert all(inside[(label % period) << 8 | window & 255] for label, window in t["states"])
+    l0, w0 = s["miss"]
+    assert not inside[l0 << 8 | w0]
+
+
 def test_module_entries() -> None:
     """`lock_chain.module_entries`: 1,595 traps, each named by a declaration `def <name> : WTrap` of its module's Lean
     file, the wall of period 9 at distance 0 by that of WordTraps; the names are distinct within a module; and the

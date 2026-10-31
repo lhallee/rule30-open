@@ -54,12 +54,14 @@ components of each block of `PAIRS`, which every node can reach together.
     python -m computations.lock_chain --halves-apart   # halves of the natural scans apart from NaturalTrapsWalls' traps
     python -m computations.lock_chain --apart-census 3   # the same for every trap that passes the test of reach, APART
     python -m computations.lock_chain --lean-refuted   # closed sets refuting entry into traps of UNREACHED, in Lean
+    python -m computations.lock_chain --lean-back   # the windows that can reach a trap, refuting entry, in Lean
     python -m computations.lock_chain --lean-trap-sets   # the natural traps of TrapSets
     python -m computations.lock_chain --lean-fifteen   # the traps of FifteenWalls, two walls of period 15 carried
     python -m computations.lock_chain --lean-missed   # the traps of MissedTraps, with closed sets apart from them
     python -m computations.lock_chain --lean-pairs   # the traps of TrapPairs, two for each block
     python -m computations.lock_chain --lean-wall-natural   # the traps of NaturalTrapsWalls
-    python -m computations.lock_chain --t001-reach 24   # every node of the game of 001 can reach t001, about 2 min
+    python -m computations.lock_chain --t001-reach 26   # every node of the game of 001 can reach t001, about 11 min
+    python -m computations.lock_chain --t001-coin   # a fair coin beyond the window against t001, widths 12 to 20
     python -m computations.lock_chain --lean-extra   # the traps of NaturalTraps
     python -m computations.lock_chain --lean-large   # the trap of NaturalTrapsLarge, checked in parts
     python -m computations.lock_chain --lean-long   # the traps of NaturalTrapsLong, periods 13 and 14
@@ -236,11 +238,32 @@ def trap_reach(*traps: dict, width: int | None = None) -> float:
     supported right half enters one of the traps only if this is 1 at every width: the nodes that cannot reach the
     states form a set that no move leaves, so a half whose first cells start there never has them in a state, and such
     a set at one width gives one at every larger width, the windows that begin with its nodes."""
+    width = max(t["cells"] for t in traps) if width is None else width
+    return float(reach_nodes(traps, width).mean())
+
+
+def reach_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
+    """The nodes of the game of `width` cells that can reach the traps' nodes (`trap_nodes`), found backward from them
+    (`locks.back_search`)."""
     word = traps[0]["word"]
     assert all(t["word"] == word for t in traps), "one block"
-    width = max(t["cells"] for t in traps) if width is None else width
-    source, target = game.moves(word, width)  # (2 p n,), (2 p n,)
-    return float(locks.back_closure(trap_nodes(traps, width), source, target).mean())
+    return locks.back_search(word, width, trap_nodes(traps, width))  # (p n,)
+
+
+def successors(word: str, width: int, keys: np.ndarray) -> np.ndarray:
+    """The nodes of the game of `width` cells that the nodes `keys` (phase * 2^width + window) move to, under each value
+    of the cell beyond: an array of shape (2, k)."""
+    # keys: (k,)
+    period, low = len(word), np.uint64((1 << width) - 1)
+    window = keys & low  # (k,)
+    phase = (keys >> np.uint64(width)).astype(np.int64)  # (k,)
+    column = np.array([int(bit) for bit in word], dtype=np.uint64)[phase]  # (k,)
+    after = (((phase + 1) % period).astype(np.uint64) << np.uint64(width))  # (k,)
+    out = []
+    for beyond in (0, 1):
+        wide = column | window << np.uint64(1) | np.uint64(beyond << (width + 1))  # (k,), the column at bit 0
+        out.append(after | (((wide << np.uint64(1)) ^ (wide | (wide >> np.uint64(1)))) >> np.uint64(1) & low))
+    return np.stack(out)  # (2, k)
 
 
 def trap_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
@@ -1273,6 +1296,125 @@ def lean_entry(t: dict, name: str, piece: int = 0) -> str:
             f"    u := {t['first']},\n    R := {windows},\n    L := {labels},\n    S := {nexts} }}\n")
 
 
+def back_tables(traps: tuple[dict, ...], width: int) -> dict:
+    """The nodes of the game of `width` cells that can reach the traps (`reach_nodes`), by label modulo the block's
+    period, each label's windows in increasing order, and the least node outside them: the set that
+    `Rule30Open.Columns.ReachRefuted` checks closed under predecessors."""
+    word = traps[0]["word"]
+    reach = reach_nodes(traps, width).reshape(len(word), 1 << width)  # (p, n)
+    rows = [np.flatnonzero(reach[label]).tolist() for label in range(len(word))]
+    l0, w0 = divmod(int(np.flatnonzero(~reach.reshape(-1))[0]), 1 << width)
+    return {"word": word, "cells": width, "rows": rows, "miss": (l0, w0)}
+
+
+def lean_back(name: str, trap: str, s: dict, piece: int = 0, part: int = 512) -> str:
+    """The declarations of `Rule30Open.Columns.ReachRefuted` for one trap of another module: the set `name` of
+    `back_tables`, the check of each label's windows in parts of `part`, one kernel check each, that the set holds the
+    trap's states, and the refutation of entry into the trap `trap`."""
+    block = ", ".join("true" if c == "1" else "false" for c in s["word"])
+    cells, period = s["cells"], len(s["word"])
+    sizes = ", ".join(str(len(row)) for row in s["rows"])
+    rows = ",\n      ".join(lean_number(sum(w << (cells * i) for i, w in enumerate(row)), piece) for row in s["rows"])
+    total = sum(len(row) for row in s["rows"])
+    l0, w0 = s["miss"]
+    out = [f"/-- The windows of {cells} cells from which the trap `{trap}` can be reached, by label: {total} of the "
+           f"{period << cells:,} nodes of the game. -/\n"
+           f"def {name} : WinSet :=\n  {{ b := [{block}], K := {cells},\n    sizes := [{sizes}],\n"
+           f"    rows := [{rows}] }}\n"]
+    for label, row in enumerate(s["rows"]):
+        full, rest = divmod(len(row), part)
+        for k in range(full):
+            out.append(f"theorem {name}_{label}_{k} : WinSet.allRangeT ({name}.backOK {label}) ({part} * {k}) {part} = "
+                       f"true := by\n  decide +kernel\n")
+        out.append(f"theorem {name}_{label}_{full} : WinSet.allRangeT ({name}.backOK {label}) ({part} * {full}) {rest} "
+                   f"= true := by\n  decide +kernel\n")
+        cases = "".join(f"      | {k}, _ => {name}_{label}_{k}\n" for k in range(full))
+        out.append(f"theorem {name}_{label} : Rule30EtherThree.allBelowT ({name}.backOK {label}) "
+                   f"({name}.cnt {label}) = true :=\n  WinSet.allBelowT_of_forall fun i hi => WinSet.allRange_cover "
+                   f"(c := {part}) "
+                   f"(q := {full}) (r := {rest}) (by decide)\n"
+                   f"    (fun k hk =>\n      match k, hk with\n{cases}"
+                   f"      | _ + {full}, h => absurd h (by omega))\n"
+                   f"    {name}_{label}_{full} i (by have h : i < {len(row)} := hi; omega)\n")
+    out.append(f"theorem {name}_check : {name}.check = true :=\n"
+               f"  WinSet.check_of_labels _ (by decide) (by decide) fun l hl =>\n"
+               f"    match l, hl with\n" + "".join(f"    | {label}, _ => {name}_{label}\n" for label in range(period)) +
+               f"    | _ + {period}, h => absurd h (by show ¬ _ < {period}; omega)\n")
+    out.append(f"theorem {name}_holds : {name}.holds {trap} = true := by decide +kernel\n")
+    out.append(f"/-- **Some finitely supported right half driven by `{s['word']}` never enters `{trap}`.** -/\n"
+               f"theorem {trap}_not_absorption_back : ¬ {trap}.Absorption :=\n"
+               f"  not_absorption_back _ {name} rfl (by decide) {name}_check {name}_holds {l0} {w0} "
+               f"(by decide +kernel)\n")
+    return "\n".join(out)
+
+
+def cut_rows(traps: tuple[dict, ...], width: int) -> list[list[int]]:
+    """The traps' states cut to their first `width` cells, by label modulo the block's period, each label's windows in
+    increasing order: the set `WinSet.holds` checks in `Rule30Open.Columns.ReachRefuted`."""
+    period = len(traps[0]["word"])
+    rows = [set() for _ in range(period)]
+    for t in traps:
+        for label, window in t["states"]:
+            rows[label % period].add(window & ((1 << width) - 1))
+    return [sorted(row) for row in rows]
+
+
+def fwd_tables(traps: tuple[dict, ...], width: int) -> dict:
+    """A closed set apart from the traps when they fail the test of reach at `width` cells: the least strongly connected
+    component that no move leaves among the nodes that cannot reach them (`reach_nodes`), as tables
+    (`relabeled_tables`), with labels modulo the block's period."""
+    word = traps[0]["word"]
+    away = np.flatnonzero(~reach_nodes(traps, width)).astype(np.uint64)  # (a,)
+    target = np.searchsorted(away, successors(word, width, away).reshape(-1))  # (2 a,), into `away`: no move leaves
+    source = np.tile(np.arange(away.size), 2)  # (2 a,)
+    graph = csr_matrix((np.ones(source.size, dtype=np.int8), (source, target)), shape=(away.size, away.size))
+    _, label = connected_components(graph, directed=True, connection="strong")  # (a,)
+    leaves = np.zeros(label.max() + 1, dtype=bool)  # (components,)
+    leaves[label[source][label[source] != label[target]]] = True
+    sizes = np.bincount(label)  # (components,)
+    best = min((c for c in range(label.max() + 1) if not leaves[c]), key=lambda c: (sizes[c], c))
+    low = (1 << width) - 1
+    return relabeled_tables(word, width, {(int(k) >> width, int(k) & low) for k in away[label == best].tolist()})
+
+
+def lean_fwd(name: str, trap: str, s: dict, rows: list[list[int]], piece: int = 0) -> str:
+    """The declarations of `Rule30Open.Columns.ReachRefuted` for a closed set `s` apart from the trap `trap` of another
+    module (`fwd_tables`): the set with its check that it is closed, the trap's states cut to its width (`cut_rows`),
+    that they hold the trap's states and that the closed set avoids them, and the refutation of entry."""
+    block = ", ".join("true" if c == "1" else "false" for c in s["word"])
+    cells = s["cells"]
+    sizes = ", ".join(str(len(row)) for row in rows)
+    packed = ", ".join(lean_number(sum(w << (cells * i) for i, w in enumerate(row)), piece) for row in rows)
+    body = lean_entry(s, f"{name}", piece).split("\n", 1)[1]
+    return (f"/-- A closed set apart from `{trap}`: windows of {cells} cells, labels modulo {s['modulus']}, "
+            f"{len(s['states'])} states. -/\n{body}\n"
+            f"theorem {name}_closed : {name}.closedCheck = true := by decide +kernel\n\n"
+            f"/-- The states of `{trap}` cut to {cells} cells, by label. -/\n"
+            f"def {name}_cut : WinSet :=\n  {{ b := [{block}], K := {cells},\n    sizes := [{sizes}],\n"
+            f"    rows := [{packed}] }}\n\n"
+            f"theorem {name}_holds : {name}_cut.holds {trap} = true := by decide +kernel\n\n"
+            f"theorem {name}_avoids : {name}_cut.avoids {name} = true := by decide +kernel\n\n"
+            f"/-- **Some finitely supported right half driven by `{s['word']}` never enters `{trap}`.** -/\n"
+            f"theorem {trap}_not_absorption_fwd : ¬ {trap}.Absorption :=\n"
+            f"  not_absorption_fwd _ {name} {name}_cut {name}_closed rfl rfl (by decide) (by decide) {name}_holds "
+            f"{name}_avoids (by decide)\n")
+
+
+def lean_back_module(piece: int = 1 << 16, part: int = 1024) -> str:
+    """The declarations of `Rule30Open.Columns.ReachRefuted` after its general part: for each entry of
+    `REACH_REFUTED`, the windows that can reach the trap (`back_tables`, `lean_back`) or a closed set apart from it
+    (`fwd_tables`, `lean_fwd`), at its width, and the refutation of entry into it."""
+    entries = {(module, name): build for module, name, build in module_entries()}
+    out = []
+    for module, name, width, kind in REACH_REFUTED:
+        t = entries[(module, name)]()
+        if kind == "back":
+            out.append(lean_back(f"back_{name}", name, back_tables((t,), width), piece, part))
+        else:
+            out.append(lean_fwd(f"fwd_{name}", name, fwd_tables((t,), width), cut_rows((t,), width), piece))
+    return "\n".join(out)
+
+
 def lean_trap(name: str) -> str:
     """The Lean entry `WTrap` for a trap of `TRAPS` or `NATURAL`, with its kernel check."""
     return lean_entry(tables(name), name) + f"\ntheorem {name}_check : {name}.check = true := by decide +kernel\n"
@@ -1597,6 +1739,10 @@ PAIRS = ["0001101101011", "0010010010111", "0010101111111", "00001101111001"]
 # The hypotheses that pass both tests at `REACH_WIDTH` cells but fail the test of reach in the game of `WIDE_WIDTH`
 # cells (`wide_reach`, which tries the natural traps, the large census components, the pairs and the sets): by module,
 # the blocks of those traps, or of the pair of `WALL_SPLIT` for 00101101111.
+# Traps that fail the test of reach and whose refutation `Rule30Open.Columns.ReachRefuted` checks: module, the trap's
+# name in Lean, the width, and the kind, "back" from the windows that can reach the trap (`back_tables`) or "fwd" from
+# a closed set apart from it (`fwd_tables`).
+REACH_REFUTED = [("MissedTraps", "cen000001010110101", 8, "back")]
 WIDE_WIDTH = 22
 UNREACHED_WIDE = {"NaturalTrapsLongLarge": ["0101011111111"], "NaturalTrapsWalls": ["00101101111", "0010011110101"]}
 
@@ -2391,11 +2537,25 @@ def t001_reach(width: int) -> float:
     counts it, from which some values of the cell beyond reach the states of `t001` cut to their first `width` cells.
     Entry into `t001` for every finitely supported right half needs 1 at every width (`trap_reach`)."""
     low = (1 << width) - 1
-    source, target = game.moves("001", width)  # (6 n,), (6 n,)
     inside = np.zeros(3 << width, dtype=bool)  # (3 n,)
     for strip, label in t001_states():
         inside[(label % 3) << width | strip & low] = True
-    return float(locks.back_closure(inside, source, target).mean())
+    return float(locks.back_search("001", width, inside).mean())
+
+
+def t001_coin(widths: tuple[int, ...] = (12, 14, 16, 18, 20)) -> list[tuple[int, float]]:
+    """For the kit's `t001`, the factor per step by which the chance of staying out of its states cut to `width` cells
+    falls when column `width` + 1 is a fair coin, the phase modulo 3 as `AbsorptionT` counts it
+    (`coin_lock.period_rate`, an upper bound wherever its iteration stops): (width, factor) for each width."""
+    from computations import coin_lock
+    states = t001_states()
+    out = []
+    for width in widths:
+        member = np.zeros((3, 1 << width), dtype=bool)  # (3, 2^width)
+        for strip, label in states:
+            member[label % 3, strip & ((1 << width) - 1)] = True
+        out.append((width, coin_lock.period_rate("001", member, limit=60000)))
+    return out
 
 
 def t001_as_chain() -> tuple[str, str, bool, bool, int]:
@@ -2469,6 +2629,8 @@ def main() -> None:
     parser.add_argument("--rest", type=int, default=None, help="with --short, only seeds of a long run and this many "
                         "other cells")
     parser.add_argument("--t001", action="store_true", help="the kit's trap for 001 as a chain")
+    parser.add_argument("--t001-coin", action="store_true",
+                        help="the fair coin's factor per step for t001 at widths 12 to 20")
     parser.add_argument("--t001-reach", type=int, default=0,
                         help="with a width, the share of nodes that can reach t001 cut to each width up to it")
     parser.add_argument("--verify", action="store_true", help="check the chain locks of short-period blocks directly")
@@ -2505,6 +2667,8 @@ def main() -> None:
                         help="the traps of FifteenWalls, two walls of period 15 wider than 16 cells carried leftward")
     parser.add_argument("--lean-trap-sets", action="store_true",
                         help="the natural traps of TrapSets, for blocks whose every trap a sampled half stays apart from")
+    parser.add_argument("--lean-back", action="store_true",
+                        help="the sets of Rule30Open.Columns.ReachRefuted, from the windows that can reach each trap")
     parser.add_argument("--lean-refuted", action="store_true",
                         help="the closed sets of RefutedTraps, which refute entry into traps of UNREACHED in Lean")
     parser.add_argument("--apart-census", type=int, metavar="WORKERS",
@@ -2749,6 +2913,10 @@ def main() -> None:
         print(lean_census_large(CENSUS_LARGE15 if args.lean_census_large == 15 else None))
     if args.lean_missed:
         print(lean_missed())
+    if args.t001_coin:
+        for width, factor in t001_coin():
+            print(f"t001, a fair coin in column {width + 1}: the chance of staying out falls by {factor:.6f} per step, "
+                  f"a mean of {1 / (1 - factor):.0f} steps")
     if args.t001_reach:
         shares = [t001_reach(width) for width in tqdm(range(1, args.t001_reach + 1), file=sys.stderr)]
         print(f"t001: at widths 1 to {args.t001_reach}, the share of the nodes of the game of 001 that can reach its "
@@ -2770,6 +2938,9 @@ def main() -> None:
         print(lean_fifteen())
     if args.lean_trap_sets:
         print(lean_trap_sets())
+    if args.lean_back:
+        print(lean_back_module())
+        return
     if args.lean_refuted:
         print(lean_refuted())
     if args.apart_census:

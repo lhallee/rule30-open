@@ -4,7 +4,7 @@ category: columns
 problems: [1]
 status: computed
 formalization: partial
-evidence: [computations/period_three.py]
+evidence: [computations/period_three.py, computations/lock_chain.py, computations/coin_lock.py]
 ---
 
 # Every right half of up to ten cells enters the kit's trap for 001, some only after 10^5 steps
@@ -43,6 +43,14 @@ so, entry times past that point would be exponential, and the mean excess over s
 to the mean leaves 1.0%, 1.0% and 1.1% of the halves out at step 100,000, where 1.6%, 1.6% and 1.2% are: the bulk fits
 constant-rate entry, and the tail is somewhat heavier.
 
+Heuristic: a fair coin in place of the cells beyond the window enters far faster. With column $w + 1$ a fair coin and
+the trap cut to $w$ cells, the chance of staying out falls by a factor of 0.98714, 0.99506, 0.99628, 0.99747 and
+0.99734 per step at $w$ = 12, 14, 16, 18 and 20 (`t001_coin`), a rate of entry of $2.7 \cdot 10^{-3}$ per step at 20
+cells, a mean of 376 steps. The census's mean entry steps, 22,570 to 23,028 by phase, put Rule 30's own rate past step
+1,260 near $4.6 \cdot 10^{-5}$ per step, about 55 times slower. The coin's rate levels off from 18 cells on, so moving
+the coin further out does not close the gap at these widths: for this trap the true cells beyond the window are far
+from fair coins, and the coin model is the optimistic one.
+
 ## How entry happens
 
 Within a few hundred steps the columns next to the center repeat with the trap's period 21, but only on at most the
@@ -66,7 +74,12 @@ which for the slow halves asks for a white stretch of more than $10^5$ cells.
 python -m computations.period_three --trap --cells 10 --steps 400000
 ```
 
+```bash
+python -m computations.lock_chain --t001-coin
+```
+
 About eight minutes; `--cells 8 --steps 300000` takes about four. `trap_entries` reads the trap from the kit's source,
 and `periodic_extent` measures the repeating region; tests/test_computations.py checks the white half's entry steps
 against the kit, the trap's closure against rows stepped one at a time, one slow entry, and `constant_rate` against
-values computed by hand and against the exponential law.
+values computed by hand and against the exponential law. The coin's factors take about a minute and a half;
+`test_t001_coin` checks them at 8 and 10 cells against the spectral radius of the coin's step built cell by cell.

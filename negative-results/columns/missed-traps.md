@@ -60,7 +60,7 @@ trap that passes, the natural scans give traps that pass for 60 of them, checked
 period 15 wider than 16 cells give traps that pass to 5 blocks of CensusTraps15 left so, checked in
 [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md). The blocks left with no trap that passes number 168: one of
 period 2, $01$, and 7, 3, 14, 14, 38, 40 and 51 of periods 9 to 15. For $001$ the kit's `t001` still passes, at every
-width up to 24 ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)).
+width up to 26 ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)).
 
 The second test refutes 28 more traps, and one pair, that pass the first (`APART`): 2 of ElevenTraps, 1 of
 TwelveTraps, 6 of ThirteenTraps, 2 of FourteenTraps, 1 of NaturalTrapsLong, 1 each of CensusTraps13 and CensusTraps14,
@@ -118,7 +118,7 @@ never brings in, and each half apart is one that the true rule supplies. The tes
 stricter at every larger width: traps that pass at their own width fail at 20 cells, so wider games would likely refute
 more traps, natural ones among them. The kit met the same failure for its period-four certificates `S0001`, `S0011` and
 `S0111` (`Rule30Ether.never_enters_S0001` and the two after it) and states its absorption conjecture for the whole
-ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 23 and 24 cells.
+ether-and-wall family instead of one certificate; that family, and the kit's `t001`, pass the test at 25 and 26 cells.
 Of the refutations here 119 are checked in Lean: the seven of MissedTraps, 102 of the 240, with closed sets of 2 to 17
 cells ([RefutedTraps](../../Rule30Open/Columns/RefutedTraps.md)), and the ten single traps of five pairs of
 NaturalTrapsWalls; `not_absorption` and `not_absorption_wide` of MissedTraps would check any of the others, given a

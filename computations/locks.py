@@ -48,6 +48,64 @@ def back_closure(seed: np.ndarray, source: np.ndarray, target: np.ndarray) -> np
     return reached  # (n,)
 
 
+def back_search(word: str, width: int, seen: np.ndarray) -> np.ndarray:
+    """The nodes of the game of `word` at `width` cells from which some values of the cell beyond reach the nodes
+    `seen`, found backward from them (`predecessors`), in time proportional to their number and one byte per node of
+    the game; `seen` is filled in place."""
+    # seen: (p n,)
+    frontier = np.flatnonzero(seen)  # (f,)
+    fresh = np.zeros(seen.size, dtype=bool)  # (p n,), the nodes found in one round, cleared after it
+    while frontier.size:
+        before = predecessors(word, width, frontier.astype(np.uint64)).astype(np.int64)  # (m,)
+        fresh[before[~seen[before]]] = True
+        frontier = np.flatnonzero(fresh)  # (f,), each once, in order
+        fresh[frontier] = False
+        seen[frontier] = True
+    return seen  # (p n,)
+
+
+def sparse_search(word: str, width: int, start: np.ndarray, cap: int) -> np.ndarray | None:
+    """The nodes of the game of `word` at `width` cells, up to 58, from which some values of the cell beyond reach the
+    nodes `start` (phase * 2^width + window), found backward as `back_search` finds them but holding only the nodes
+    found, in increasing order: for games too wide for a byte per node, when few nodes can reach. None once more than
+    `cap` are found."""
+    # start: (s,)
+    seen = np.unique(start.astype(np.uint64))  # (v,)
+    frontier = seen
+    while frontier.size:
+        before = np.unique(predecessors(word, width, frontier))  # (m,)
+        frontier = before[~np.isin(before, seen, assume_unique=True)]  # (f,)
+        seen = np.union1d(seen, frontier)  # (v,)
+        if seen.size > cap:
+            return None
+    return seen  # (v,)
+
+
+def predecessors(word: str, width: int, keys: np.ndarray) -> np.ndarray:
+    """The nodes of the game of `width` cells with a move to one of the nodes `keys` (phase * 2^width + window), with
+    repeats. The rule is permutive in its left cell, so the old cell `width` and the cell beyond it fix the old window
+    from the right, cell by cell, and the old cell 0 must then be the column's value at the phase before."""
+    # keys: (k,)
+    one, period = np.uint64(1), len(word)
+    window = keys & np.uint64((1 << width) - 1)  # (k,)
+    before = ((keys >> np.uint64(width)).astype(np.int64) - 1) % period  # (k,)
+    column = np.array([int(bit) for bit in word], dtype=np.uint64)[before]  # (k,)
+    found = []
+    for last in (0, 1):
+        for beyond in (0, 1):
+            right = np.full(keys.shape, beyond, dtype=np.uint64)  # (k,), the old cell i + 1
+            cell = np.full(keys.shape, last, dtype=np.uint64)  # (k,), the old cell i
+            old = cell << np.uint64(width - 1)  # (k,)
+            for i in range(width, 0, -1):
+                left = ((window >> np.uint64(i - 1)) & one) ^ (cell | right)  # (k,), the old cell i - 1
+                if i > 1:
+                    old |= left << np.uint64(i - 2)
+                right, cell = cell, left
+            ok = cell == column  # (k,)
+            found.append(before[ok].astype(np.uint64) << np.uint64(width) | old[ok])
+    return np.concatenate(found)  # (m,)
+
+
 def lock_info(block: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     """The locked nodes, and the nodes from which some values of the free cell reach a locked node."""
     source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), _, _, (p n,)

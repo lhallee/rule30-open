@@ -24,7 +24,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{52}$ fails |
-| 1 | Least period three | open | $001$ through the kit's trap, which every window of 24 cells can reach (a second trap fails that test), $011$ through the left half |
+| 1 | Least period three | open | $001$ through the kit's trap, which every window of 26 cells can reach (a second trap fails that test), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 277 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game or from where sampled halves settle |
@@ -120,7 +120,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   word of a few hundred values in column 17 forces entry ([the coin lock](findings/columns/coin-lock.md)); in Lean, one
   sequence of 1,193, 955 or 381 values in column 17, 15 or 14 brings every window into the family, so a center that
   repeats the word keeps that column off the sequence forever ([LockWord](Rule30Open/Columns/LockWord.md)). No set of
-  windows of up to 23 cells that no move leaves misses the family, nor one of up to 24 cells the kit's `t001` for $001$
+  windows of up to 25 cells that no move leaves misses the family, nor one of up to 26 cells the kit's `t001` for $001$
   ([reach of the kit's conjectures](findings/columns/kit-absorption-reach.md)): the test that refutes entry into seven
   traps of periods 13 to 15 ([MissedTraps](Rule30Open/Columns/MissedTraps.md)) finds nothing against either. Open:
   attraction for halves with at least three black cells among the first $G$ columns, one of them among columns 1 to 30,
@@ -318,7 +318,9 @@ In order of the assessment above.
    whose chains hold 1,365 of the 4,080 blocks. Next: traps for the 171 blocks whose traps all fail, built so that every
    window of 20 cells can reach them; the test of reach at 22 cells for the carried traps, and in wider games for all,
    which only refutes more; Lean refutations for the 138 of the 240 that
-   [RefutedTraps](Rule30Open/Columns/RefutedTraps.md) does not check, with `not_absorption` and `not_absorption_wide`;
+   [RefutedTraps](Rule30Open/Columns/RefutedTraps.md) does not check, with `not_absorption` and `not_absorption_wide`,
+   or with the few windows that can reach a trap, or a closed set among the few that cannot, by `not_absorption_back`
+   and `not_absorption_fwd` ([ReachRefuted](Rule30Open/Columns/ReachRefuted.md));
    traps for period 16; and at widths well past 18 for the backgrounds without walls, as the walls of period 9 are 43
    cells wide; wider classes of halves for that edge, such as every half of twelve cells, as
    [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and the word of 569 values of column 17

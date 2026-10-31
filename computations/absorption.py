@@ -25,7 +25,7 @@ that `Rule30Open.Columns.EmptyRight` checks in the kernel.
     python -m computations.absorption starts --steps 12000   # the 31 starts of the locking finding
     python -m computations.absorption census --cells 14 --words 0101   # the alternating center: few halves enter
     python -m computations.absorption shield --count 300 --steps 3000   # the ether on columns 1 to 120, random beyond
-    python -m computations.absorption reach --width 23   # every node of the game can reach the family, about 4 min
+    python -m computations.absorption reach --width 25   # every node of the game can reach the family, about 20 min
 """
 
 from __future__ import annotations
@@ -155,9 +155,8 @@ def family_reach(word: str, width: int, wall: np.ndarray) -> float:
     """The share of the nodes of the game of `word` at `width` from which some values of the cell beyond reach
     `family_cut`. Entry into the family for every finitely supported right half needs 1 at every width: the nodes that
     cannot reach it form a set that no move leaves, and a half that starts there never has a member's first cells."""
-    from computations import game, locks
-    source, target = game.moves(word, width)  # (8 n,), (8 n,)
-    return float(locks.back_closure(family_cut(word, width, wall), source, target).mean())
+    from computations import locks
+    return float(locks.back_search(word, width, family_cut(word, width, wall)).mean())
 
 
 def step_rows(rows: np.ndarray, center: int) -> np.ndarray:
