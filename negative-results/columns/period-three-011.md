@@ -9,14 +9,16 @@ evidence: [computations/period_three.py]
 
 # Driven by 011, the right half does not settle next to the center
 
-**Question.** Least period three has two words, $001$ and $011$. For $001$ the kit has a trap that the driven right
-half enters
+**Question.** Least period three has two words, $001$ and $011$. For $001$ the kit has a trap that the driven right half
+enters
 ([`Rule30EtherThreeTrap`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30EtherThreeTrap.lean)):
 a strip of 47 columns that repeats with period 21, on which column 1 at the center's white times is a function of the
 label. Masked Jen forbids that column to be periodic in a finite configuration, so $001$ is excluded once every finite
-half enters (`AbsorptionT t001`, open), and [HighThree](../../Rule30Open/Columns/HighThree.md) proves entry for every
-half white on its first 1,317 cells. For $011$ the kit has only a statement about the left half, `C3w`, and no trap.
-Does the right half driven by $011$ settle into anything that would give $011$ the same route?
+half enters (`AbsorptionT t001`; as stated it is false, since a half that starts in a second trap stays out
+([Traps001](../../Rule30Open/Columns/Traps001.md)), and entry into one of the two is open), and
+[HighThree](../../Rule30Open/Columns/HighThree.md) proves entry for every half white on its first 1,317 cells. For $011$
+the kit has only a statement about the left half, `C3w`, and no trap. Does the right half driven by $011$ settle into
+anything that would give $011$ the same route?
 
 **Method.** Drive right halves with the center repeating the word from each of its three phases, record column 1, and
 ask two things: at each phase of the drive, whether column 1 is constant over the second half of the run; and whether

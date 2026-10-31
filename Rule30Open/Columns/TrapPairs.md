@@ -74,10 +74,10 @@ is false for that block, and [TrapSets](TrapSets.md) reduces it to entry into on
 
 ## Relation to the kit
 
-The kit's `AbsorptionT` asks entry into one trap, `t001`; its period-four `Absorption` asks entry into one member of
-the ether-and-wall family, an infinite list of traps, after its single certificates fail
-(`Rule30Ether.never_enters_S0001` and the two after it). `AbsorptionSome` is the same move for a finite list of
-`WTrap`s of any period.
+The kit's `AbsorptionT` asks entry into one trap, `t001`, which is false ([Traps001](Traps001.md)); its period-four
+`Absorption` asks entry into one member of the ether-and-wall family, an infinite list of traps, after its single
+certificates fail (`Rule30Ether.never_enters_S0001` and the two after it). `AbsorptionSome` is the same move for a
+finite list of `WTrap`s of any period.
 
 ## Lean
 

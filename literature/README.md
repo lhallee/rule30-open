@@ -25,15 +25,16 @@ repository, every block of period at most 21 that the finite game excludes is ex
 primitive blocks of period at most 16, 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and 20 and
 434 of the 99,858 of period 21, and 1,338 blocks of periods 9 to 15 come down to the entry of the right half into a
 trap, a closed set of windows beside the column, most of them at the edge of a background periodic in time, that passes
-a test entry needs; the reductions of 171 more had false hypotheses. For 49
-blocks of period at most 12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14
-off one fixed sequence forever. The kit also excludes families of padded words and shows that an eventual period $P$
-after a transient $T$ needs $T + P \ge 16{,}359$, which windows of 65,536 and 262,144 cells raise to 65,518 and 262,125
-here. The general theory of single columns reaches pairs of columns and special classes of automata, not one column of
-one orbit: Kopra (2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic and states the
-one-cell center column as open, and Rule 90, in the same class, has an eventually periodic center column, so a proof has
-to use more than the properties that define the class. One preprint claims a solution; none is refereed, and the prize
-is unclaimed.
+a test entry needs; the reductions of 171 more had false hypotheses. So does the kit's own reduction of $001$ to entry
+into its trap `t001`: a right half that starts in a second trap for $001$ stays out of it, in Lean here
+([Traps001](../Rule30Open/Columns/Traps001.md)), and entry into one of the two is open. For 49 blocks of period at most
+12 that nothing excludes, Lean shows only that a center repeating one of them keeps column 14 off one fixed sequence
+forever. The kit also excludes families of padded words and shows that an eventual period $P$ after a transient $T$
+needs $T + P \ge 16{,}359$, which windows of 65,536 and 262,144 cells raise to 65,518 and 262,125 here. The general
+theory of single columns reaches pairs of columns and special classes of automata, not one column of one orbit: Kopra
+(2023) puts Rule 30 in a class whose traces two cells wide are never eventually periodic and states the one-cell center
+column as open, and Rule 90, in the same class, has an eventually periodic center column, so a proof has to use more
+than the properties that define the class. One preprint claims a solution; none is refereed, and the prize is unclaimed.
 
 
 **Problem 2.** For a uniformly random initial row each center cell is black with probability exactly 1/2, because Rule

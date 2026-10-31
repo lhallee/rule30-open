@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-86 Lean modules with 369 headline theorems, 30 findings (proved on paper,
+87 Lean modules with 372 headline theorems, 30 findings (proved on paper,
 computed or conjectured) and 32 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 73 | 17 | 9 |
+| [Columns](#columns) | 74 | 17 | 9 |
 | [Period two](#period-two) | 3 | 4 | 3 |
 | [Diagonals](#diagonals) | 1 | 1 | 0 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -162,6 +162,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Traps for 53 of the 630 blocks of period 13, from a wall of period thirteen carried leftward](Rule30Open/Columns/ThirteenTraps.md) | [`Columns.ThirteenTraps`](Rule30Open/Columns/ThirteenTraps.lean) | `thirteenTraps_check`, `thirteenTraps_blocks`, `thirteen_absorption_excludes` | 1 | not in the kit |
 | [Four blocks of periods 13 and 14 reduced to entry into one of two traps](Rule30Open/Columns/TrapPairs.md) | [`Columns.TrapPairs`](Rule30Open/Columns/TrapPairs.lean) | `absorption_some_excludes`, `pair0001101101011_excludes`, `pair0010101111111_excludes` | 1 | not in the kit |
 | [Entry into one of several traps for 29 blocks whose sampled halves stay apart from their single traps](Rule30Open/Columns/TrapSets.md) | [`Columns.TrapSets`](Rule30Open/Columns/TrapSets.lean) | `set0001101101011_excludes`, `set0000010101101_excludes`, `set000111111011101_excludes` | 1 | not in the kit |
+| [The kit's trap for 001 does not take every right half, so its AbsorptionT t001 is false](Rule30Open/Columns/Traps001.md) | [`Columns.Traps001`](Rule30Open/Columns/Traps001.lean) | `not_absorptionT_t001`, `trap001fifteen_not_absorption`, `traps001_excludes` | 1 | not in the kit |
 | [A right half white past its first twelve cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TwelveCells.md) | [`Columns.TwelveCells`](Rule30Open/Columns/TwelveCells.lean) | `twelve_absorption`, `twelve_0001`, `twelve_0011`, `twelve_0111`, `twelveRight_0001`, `twelveRight_0011`, `twelveRight_0111`, `smallTwelve_0001`, `smallTwelve_0011`, `smallTwelve_0111` | 1 | extends a kit result |
 | [Traps for 83 of the 335 blocks of period 12, from walls of period twelve carried leftward](Rule30Open/Columns/TwelveTraps.md) | [`Columns.TwelveTraps`](Rule30Open/Columns/TwelveTraps.lean) | `twelveTraps_check`, `twelveTraps_blocks`, `twelve_absorption_excludes` | 1 | not in the kit |
 | [No finite configuration white on cells 9 to 1,610 has a center repeating 00000011011, nor one white on cells 9 to 2,357 a center repeating 001011100111](Rule30Open/Columns/WallGaps.md) | [`Columns.WallGaps`](Rule30Open/Columns/WallGaps.lean) | `eleven_gap`, `eleven_white`, `twelve_gap`, `twelve_white` | 1 | not in the kit |

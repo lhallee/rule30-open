@@ -199,6 +199,38 @@ def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle:
     return bound if bound >= 0.5 else 0.0
 
 
+def biased_rate(word: str, member: np.ndarray, prob: np.ndarray, tolerance: float = 1e-12, settle: int = 200,
+                limit: int = 20000) -> float:
+    """`period_rate` when the cell beyond the window is black with chance prob[ph, s] at window s and phase ph
+    instead of 1/2: the spectral radius of one step of the biased coin on the windows outside the certificate, bounded
+    from above as `period_rate` bounds it."""
+    # member: (period, 2^W); prob: (period, 2^W)
+    period, size = member.shape
+    successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
+
+    def step(values: np.ndarray) -> np.ndarray:
+        out = np.empty_like(values)  # (period, 2^W)
+        for ph in range(period):
+            later = values[(ph + 1) % period]  # (2^W,)
+            out[ph] = (1 - prob[ph]) * later[successors[ph, 0]] + prob[ph] * later[successors[ph, 1]]
+        out[member] = 0.0
+        return out  # (period, 2^W)
+
+    values = np.where(member, 0.0, 1.0)  # (period, 2^W)
+    estimates: list[float] = []
+    while len(estimates) < limit and (len(estimates) <= settle
+                                      or abs(estimates[-1] - estimates[-1 - settle]) >= tolerance):
+        shifted = step(values) + values  # (period, 2^W)
+        estimates.append(float(shifted.sum() / values.sum()) - 1)
+        values = shifted / shifted.max()
+    image, outside = step(values), ~member  # (period, 2^W), (period, 2^W)
+    if not outside.any():
+        return 0.0
+    if (values[outside] <= 0).any():
+        return 1.0
+    return float((image[outside] / values[outside]).max())
+
+
 def sample(word: str, member: np.ndarray, count: int, steps: int) -> tuple[np.ndarray, np.ndarray]:
     """For the empty right half and count - 1 random halves of 64 cells (`right_half.random_starts`), driven from phase
     0 in Rule 30 itself: when each first lies in the certificate within `steps` steps (-1 if never), and, for those

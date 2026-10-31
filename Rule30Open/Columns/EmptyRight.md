@@ -62,7 +62,8 @@ and its siblings); `EmptyRight3` holds for $001$ and every $\varphi$.
    center is black at some time. These are `no_finite_of_family` and `no_finite_of_ptrap`: the kit's
    `absorption_excludes` and `PTrap.trap`, which concern the single seed, carried to every finite configuration.
 
-The kit's `Absorption` and `AbsorptionT` conjectures ask for step 2 for every finite right half. Each right half that
+The kit's `Absorption` and `AbsorptionT` conjectures ask for step 2 for every finite right half; the second is
+false for `t001` as stated ([Traps001](Traps001.md)). Each right half that
 enters gives the statement for every left half, so [the absorption census](../../findings/columns/absorption-census.md),
 in which all right halves of up to 20 cells enter, is the same argument by computation for those halves; here the
 kernel checks it to six cells. Eight cells check too, in about 54 s, which is why they are left out of the build.

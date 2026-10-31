@@ -98,7 +98,8 @@ The kit refutes entry into each of its own period-four certificates `S0001`, `S0
 deeper members of the ether-and-wall family forever. This is why its `Absorption` asks for entry into the whole family.
 Here the same failure is found for traps of periods 13 to 15 by a general test, and refuted with a closed set that the
 kernel checks, in the form of the kit's `AbsorptionT`. The kit's family and its `t001` pass the same test at every width
-searched, 26 cells ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)).
+searched, 26 cells ([reach of the kit's conjectures](../../findings/columns/kit-absorption-reach.md)); `t001` fails it
+in the game of 52 cells, where the second trap for $001$ is apart from it ([Traps001](Traps001.md)).
 
 ## Lean
 

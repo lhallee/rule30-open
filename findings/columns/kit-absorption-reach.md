@@ -10,19 +10,22 @@ evidence: [computations/absorption.py, computations/lock_chain.py, computations/
 # The kit's two absorption conjectures pass the test of reach that refutes seven traps found here
 
 The kit reduces the word $001$ to entry into its trap `t001` (`Rule30EtherThreeTrap.AbsorptionT`), and the three words
-of period four to entry into the ether-and-wall family (`Rule30Ether.Absorption`). Both are open. Entry into a set of
-windows needs every node of the finite game to reach it. The nodes that cannot form a set that no move leaves, whatever
-the cell beyond does, and a right half that starts there never enters. That test refutes entry into seven traps of
-periods 13 to 15 ([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)). Neither of the kit's conjectures fails it at
-any width that can be searched:
+of period four to entry into the ether-and-wall family (`Rule30Ether.Absorption`). The first is false: a half that
+starts in a second trap for $001$, 52 cells wide, stays out of `t001`
+([Traps001](../../Rule30Open/Columns/Traps001.md)). The second is open. Entry into a set of windows needs every node of
+the finite game to reach it. The nodes that cannot form a set that no move leaves, whatever the cell beyond does, and a
+right half that starts there never enters. That test refutes entry into seven traps of periods 13 to 15
+([MissedTraps](../../Rule30Open/Columns/MissedTraps.md)). Neither of the kit's conjectures fails it at any width that
+can be searched:
 
 - **The family**, for $0001$, $0011$ and $0111$ with the kit's alignments: at every width $w$ from 1 to 26, every node
   of the game of $w$ cells, with the phase modulo 4, can reach a window that is the first $w$ cells of a member. At 26
   cells those windows are 168,769, 703,143 and 899,978 nodes of the 268,435,456.
 - **`t001`**, for $001$, with the phase modulo 3 as `AbsorptionT` compares it: at every width from 1 to 26, every node
-  of the game can reach the states of `t001` cut to $w$ cells, at 26 cells all 201,326,592. Columns 1 to 38 of `t001`
-  are functions of the label modulo 21, so up to 38 cells the cut trap is 21 windows, one for each label, the columns
-  of the chain that carries the trap's lock to the center.
+  of the game can reach the states of `t001` cut to $w$ cells, at 26 cells all 201,326,592. In the game of 52 cells the
+  states of the second trap form a set that no move leaves, apart from `t001`, so the test fails there. Columns 1 to 38
+  of `t001` are functions of the label modulo 21, so up to 38 cells the cut trap is 21 windows, one for each label, the
+  columns of the chain that carries the trap's lock to the center.
 
 ## Method
 

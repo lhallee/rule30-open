@@ -77,6 +77,7 @@ public import Rule30Open.Columns.FifteenWalls
 public import Rule30Open.Columns.ReachRefuted
 public import Rule30Open.Columns.NineWhite
 public import Rule30Open.Columns.PeriodFourCertificate
+public import Rule30Open.Columns.Traps001
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf

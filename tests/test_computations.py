@@ -2514,6 +2514,105 @@ def test_t001_coin() -> None:
         assert got_width == width and factor == pytest.approx(radius, abs=1e-6)
 
 
+def test_biased_rate() -> None:
+    """`coin_lock.biased_rate` with an even coin is `period_rate`, and with a random bias per window it is the spectral
+    radius of the biased coin's step outside `t001` cut to 8 cells, built cell by cell with the rule."""
+    from computations import coin_lock, lock_chain
+
+    width, states = 8, lock_chain.t001_states()
+    member = np.zeros((3, 1 << width), dtype=bool)  # (3, 2^8)
+    for strip, label in states:
+        member[label % 3, strip & ((1 << width) - 1)] = True
+    even = np.full(member.shape, 0.5)  # (3, 2^8)
+    assert coin_lock.biased_rate("001", member, even) == pytest.approx(coin_lock.period_rate("001", member), abs=1e-9)
+    prob = np.random.default_rng(3).uniform(0.1, 0.9, size=member.shape)  # (3, 2^8)
+    outside = [(ph, w) for ph in range(3) for w in range(1 << width) if not member[ph, w]]
+    index = {node: i for i, node in enumerate(outside)}
+    step = np.zeros((len(outside), len(outside)))  # (m, m)
+    for (ph, w), i in index.items():
+        cells = [int("001"[ph])] + [(w >> k) & 1 for k in range(width)]
+        for coin, weight in ((0, 1 - prob[ph, w]), (1, prob[ph, w])):
+            row = cells + [coin]
+            new = sum((row[k - 1] ^ (row[k] | row[k + 1])) << (k - 1) for k in range(1, width + 1))
+            j = index.get(((ph + 1) % 3, new))
+            if j is not None:
+                step[i, j] += weight
+    radius = float(np.abs(np.linalg.eigvals(step)).max())
+    assert coin_lock.biased_rate("001", member, prob) == pytest.approx(radius, abs=1e-6)
+
+
+def test_beyond_stats() -> None:
+    """`period_three.beyond_stats` against a direct count: right halves stepped cell by cell under 001, stopped at their
+    first step in `t001` (its states with their labels modulo 3), the cell beyond a window of 10 cells counted by the
+    phase and the last 3 cells of the window."""
+    from collections import Counter
+    from computations import lock_chain, period_three
+
+    inside = {(strip, label % 3) for strip, label in lock_chain.t001_states()}
+    width, context, steps, phase = 10, 3, 400, 1
+    want = Counter()
+    for half in range(16):
+        cells = [(half >> i) & 1 for i in range(steps + 64)]  # cells 1, 2, ...
+        for t in range(steps):
+            drive = (t + phase) % 3
+            if (sum(cells[i] << i for i in range(47)), drive) in inside:
+                break
+            near = sum(cells[width - context + i] << i for i in range(context))
+            want[(drive, near, cells[width])] += 1
+            row = [int("001"[drive])] + cells + [0]
+            cells = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, len(row) - 1)]
+    got = period_three.beyond_stats(list(range(16)), phase, steps, width, context, period_three.trap_keys())
+    assert all(got[d, n, v] == want[(d, n, v)] for d in range(3) for n in range(1 << context) for v in (0, 1))
+    assert got.sum() == sum(want.values()) > 0
+
+
+def test_cut_entries() -> None:
+    """`period_three.cut_entries` against right halves stepped cell by cell under 001, each width's first step found by
+    looking up the window and the phase modulo 3 among `t001`'s states cut to that width; at 47 cells it is
+    `trap_entries`."""
+    from computations import lock_chain, period_three
+
+    widths, steps = (12, 20, 28, 47), 3000
+    states = lock_chain.t001_states()
+    cuts = [{(strip & ((1 << w) - 1), label % 3) for strip, label in states} for w in widths]
+    keys = period_three.trap_keys()
+    for phase in range(3):
+        got = period_three.cut_entries(list(range(8)), phase, steps, widths, keys)  # (8, 4)
+        for half in range(8):
+            cells, want = [(half >> i) & 1 for i in range(steps + 64)], [-1] * len(widths)  # cells 1, 2, ...
+            for t in range(steps):
+                drive = (t + phase) % 3
+                for j, w in enumerate(widths):
+                    if want[j] < 0 and (sum(cells[i] << i for i in range(w)), drive) in cuts[j]:
+                        want[j] = t
+                row = [int("001"[drive])] + cells + [0]
+                cells = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, len(row) - 1)]
+            assert got[half].tolist() == want
+        assert (got[:, -1] == period_three.trap_entries(list(range(8)), phase, steps, keys)).all()
+        assert (np.diff(np.where(got < 0, steps, got), axis=1) >= 0).all()  # a wider cut is entered no sooner
+
+
+def test_coin_entries() -> None:
+    """`period_three.coin_entries` at 10 cells against the coin's exact mean first step in `t001` cut to 10 cells, the
+    sum over k of the chance of staying out for k steps (`coin_lock.coin_step`), from the same windows and phases."""
+    from computations import coin_lock, lock_certificate, period_three
+
+    width, keys = 10, period_three.trap_keys()
+    member = np.zeros((3, 1 << width), dtype=bool)  # (3, 2^10)
+    member[(keys & np.uint64(3)).astype(np.int64), ((keys >> np.uint64(2)) & np.uint64((1 << width) - 1)).astype(
+        np.int64)] = True
+    successors = lock_certificate.successor_table("001", width)  # (3, 2, 2^10)
+    out, mean = np.where(member, 0.0, 1.0), np.zeros((3, 1 << width))  # (3, 2^10) each
+    while out.max() > 1e-12:
+        mean += out
+        out = coin_lock.coin_step("001", member, out, successors)
+    rng = np.random.default_rng(5)
+    for phase in range(3):
+        first = period_three.coin_entries([h for h in range(16) for _ in range(500)], phase, 10 ** 5, width, keys, rng)
+        exact = mean[phase, :16].mean()
+        assert (first >= 0).all() and abs(first.mean() - exact) < 0.05 * exact
+
+
 def test_back_tables() -> None:
     """`back_tables` gives the set that `Rule30Open.Columns.ReachRefuted` checks: each label's windows in increasing
     order, every node with a move into the set in it, by `game.moves`, the trap's states cut to the width in it, and the

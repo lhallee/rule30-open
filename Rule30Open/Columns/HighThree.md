@@ -11,8 +11,9 @@ kit_modules: [Rule30EtherThreeTrap, Rule30EtherThreeReach]
 
 # A right half white on its first 1,317 cells enters the kit's trap for 001
 
-The kit reduces least period three for the word $001$ to three open statements, one of them `AbsorptionT t001`: every
-finite right half, driven by a center that repeats $001$, enters the kit's trap `t001`, a set of 815 states of the 47
+The kit reduces least period three for the word $001$ to three statements, one of them `AbsorptionT t001`, false as
+stated ([Traps001](Traps001.md)): every finite right half, driven by a center that repeats $001$, enters the kit's
+trap `t001`, a set of 815 states of the 47
 columns next to the center on which column 1 repeats with period 21 at the white times. The kit and
 [EmptyRight](EmptyRight.md) show that the white right half enters, at step 1270, 1269 or 1268 by phase. Here that
 entry is carried to every right half white on its first 1,317 cells, whatever lies beyond.

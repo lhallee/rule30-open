@@ -46,24 +46,22 @@ either.
   [NineTraps](../../Rule30Open/Columns/NineTraps.md), [TenTraps](../../Rule30Open/Columns/TenTraps.md),
   [ElevenTraps](../../Rule30Open/Columns/ElevenTraps.md), [TwelveTraps](../../Rule30Open/Columns/TwelveTraps.md),
   [ThirteenTraps](../../Rule30Open/Columns/ThirteenTraps.md),
-  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md),
-  [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
+  [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md), [NaturalTraps](../../Rule30Open/Columns/NaturalTraps.md),
   [NaturalTrapsLarge](../../Rule30Open/Columns/NaturalTrapsLarge.md),
   [NaturalTrapsLong](../../Rule30Open/Columns/NaturalTrapsLong.md),
   [NaturalTrapsLongLarge](../../Rule30Open/Columns/NaturalTrapsLongLarge.md),
-  [FarWalls](../../Rule30Open/Columns/FarWalls.md),
-  [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
+  [FarWalls](../../Rule30Open/Columns/FarWalls.md), [CensusTraps13](../../Rule30Open/Columns/CensusTraps13.md),
   [CensusTraps14](../../Rule30Open/Columns/CensusTraps14.md),
   [CensusTraps15](../../Rule30Open/Columns/CensusTraps15.md),
   [CensusTrapsLarge](../../Rule30Open/Columns/CensusTrapsLarge.md),
   [CensusTrapsLarge15](../../Rule30Open/Columns/CensusTrapsLarge15.md),
-  [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md),
-  [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose four blocks need entry into one of two traps,
-  [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six of whose blocks need the same,
-  [TrapSets](../../Rule30Open/Columns/TrapSets.md), whose 29 blocks need entry into one of several traps, and
-  [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001` for $001$.
-  Of these traps only those that pass both tests count (`lock_chain.UNREACHED`, `lock_chain.APART`), as do the kit's
-  `t001` and its ether-and-wall family, behind PeriodFourCertificate, which pass the test of reach ([reach of the kit's
+  [FifteenWalls](../../Rule30Open/Columns/FifteenWalls.md), [TrapPairs](../../Rule30Open/Columns/TrapPairs.md), whose
+  four blocks need entry into one of two traps, [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md), six
+  of whose blocks need the same, [TrapSets](../../Rule30Open/Columns/TrapSets.md), whose 29 blocks need entry into one
+  of several traps, and [PeriodFourCertificate](../../Rule30Open/Columns/PeriodFourCertificate.md), and the kit's `t001`
+  for $001$ with the second trap of WordTraps ([Traps001](../../Rule30Open/Columns/Traps001.md)). Of these traps only
+  those that pass both tests count (`lock_chain.UNREACHED`, `lock_chain.APART`), as do the kit's `t001` and its
+  ether-and-wall family, behind PeriodFourCertificate, which pass the test of reach ([reach of the kit's
   conjectures](kit-absorption-reach.md)).
 - **Reduced by steering only**: the blocks of [LockBlocks](../../Rule30Open/Columns/LockBlocks.md) and its two
   companions that no trap that passes reaches.

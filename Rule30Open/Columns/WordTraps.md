@@ -81,12 +81,12 @@ modulo $m$, and that at a white phase the first cell be bit $\mathrm{lab}(i)$ of
 ## What it covers
 
 Each trap is a contradiction device of the kit's kind: it says nothing about whether a right half driven by the block
-enters it, which stays open, as the kit's `AbsorptionT t001` and `Absorption` do for $001$ and the words of period
-four. What it adds is the reduction itself for four periods where none was known: a block of period 5, 6, 7 or 9 is
-now excluded by a statement of the same kind as the kit's for period three. Entry looks hard in the same way: the traps
-are wider than the kit's wall for period four, and under $001$ entry into the kit's trap takes up to $2 \cdot 10^5$
-steps ([the census for 001](../../findings/columns/t001-census.md)). Each trap reduces one block of its period, not the
-period: the other blocks of period 5, 6, 7 and 9 have no trap found.
+enters it, which stays open, as the kit's `Absorption` does for the words of period four; the kit's `AbsorptionT t001`
+for $001$ is false ([Traps001](Traps001.md)). What it adds is the reduction itself for four periods where none was
+known: a block of period 5, 6, 7 or 9 is now excluded by a statement of the same kind as the kit's for period three.
+Entry looks hard in the same way: the traps are wider than the kit's wall for period four, and under $001$ entry into
+the kit's trap takes up to $2 \cdot 10^5$ steps ([the census for 001](../../findings/columns/t001-census.md)). Each trap
+reduces one block of its period, not the period: the other blocks of period 5, 6, 7 and 9 have no trap found.
 
 **The test of reach.** In the game of 20 cells, two of the seven traps here fail the test of
 [MissedTraps](MissedTraps.md), `trap01` for $01$ and `trap001fifteen` for $001$: some node cannot reach a window whose
@@ -94,7 +94,9 @@ first cells form a state of the trap, cut to 20 cells when the trap is wider, so
 there never enters, and entry into the trap is false ([what failed](../../negative-results/columns/missed-traps.md)).
 [RefutedTraps](RefutedTraps.md) checks the refutation for `trap01` in Lean. The block $001$ keeps the kit's `t001`,
 which passes the test at every width up to 26 ([reach of the kit's
-conjectures](../../findings/columns/kit-absorption-reach.md)); for $01$ no trap here passes, so its reduction is empty.
+conjectures](../../findings/columns/kit-absorption-reach.md)), but `t001` and `trap001fifteen` are closed sets apart
+from each other, so entry into either alone is false, and $001$ comes down to entry into one of the two
+([Traps001](Traps001.md)); for $01$ no trap here passes, so its reduction is empty.
 The other five traps pass the test, which entry needs but does not imply.
 
 ## Relation to the kit
