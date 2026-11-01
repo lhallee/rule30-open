@@ -231,7 +231,8 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   chains](findings/columns/lock-chains.md), [WordTraps](Rule30Open/Columns/WordTraps.md)). For $011$ the right half
   never settles next to the center, so no trap of that kind appears ([the word
   011](negative-results/columns/period-three-011.md)), no chain found holds it, and the route is the kit's left-only
-  statement `C3w`. Column 1 does settle into a set of words: under $001$ every right half, finite or not, has readings
+  statement `C3w`; against the white right half no left half within depth 32,751 keeps the center on $011$, in Lean
+  ([WhiteRightHalf011](Rule30Open/Columns/WhiteRightHalf011.md)). Column 1 does settle into a set of words: under $001$ every right half, finite or not, has readings
   at the second white phase with no run of 1s of length 1 and no run of 0s of length 1 or 2 from step 46 on, a finite
   computation, and under $011$ every half of up to 16 cells reads no two whites 1, 2, 4 or 5 apart from step 104 on,
   so `C3s001` and `C3w` need only exclude free bits in those sets ([reading

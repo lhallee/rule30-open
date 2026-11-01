@@ -37,6 +37,7 @@ public import Rule30Open.Columns.KickedForm
 public import Rule30Open.Columns.LeftLatch
 public import Rule30Open.Columns.EtherDomain
 public import Rule30Open.Columns.EmptyRight
+public import Rule30Open.Columns.WhiteRightHalf011
 public import Rule30Open.Columns.WhiteGap
 public import Rule30Open.Columns.SparseRight
 public import Rule30Open.Columns.EtherPrefix

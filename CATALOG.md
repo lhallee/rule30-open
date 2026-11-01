@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-113 Lean modules with 554 headline theorems, 49 findings (proved on paper,
+114 Lean modules with 561 headline theorems, 49 findings (proved on paper,
 computed or conjectured) and 49 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 90 | 26 | 14 |
+| [Columns](#columns) | 91 | 26 | 14 |
 | [Period two](#period-two) | 9 | 10 | 7 |
 | [Diagonals](#diagonals) | 3 | 3 | 3 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -38,7 +38,6 @@ approach stopped.
 **Findings that want a Lean proof**
 
 - [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md): problem 1
-- [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md): problem 1
 - [Windows of 14 cells followed through the column's whole history exclude every tail of up to six cells but 10101 after 22 white cells, and 1,672 blocks of period at most 22](findings/columns/limit-windows.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
@@ -53,6 +52,7 @@ approach stopped.
 - [The game with cyclic classes at 16 cells closes ten blocks of period 13 to 16 that nothing else excludes](findings/columns/class-blocks.md): problem 1
 - [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
+- [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md): problem 1
 - [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md): problem 1
 - [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
 - [The finite game excludes 434 of the 99,858 blocks of period 21](findings/columns/game-blocks-21.md): problem 1
@@ -202,6 +202,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [After nine 1s the next cell stays known through five kinds of segment, excluding infinite families of periods](Rule30Open/Columns/WallSegments.md) | [`Columns.WallSegments`](Rule30Open/Columns/WallSegments.lean) | `center_run_family`, `center_wall_block`, `center_run_segment`, `wall_segments_column`, `run_family_column` | 1 | extends a kit result |
 | [After nine 1s, the set of possible three-cell windows excludes every block with nine 1s that the game excludes](Rule30Open/Columns/WallSets.md) | [`Columns.WallSets`](Rule30Open/Columns/WallSets.lean) | `center_wall_set_block`, `center_runs_odd_100`, `center_runs_odd_110`, `center_runs_even_1010`, `wall_sets_column` | 1 | extends a kit result |
 | [A right half white past its first six cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/WhiteGap.md) | [`Columns.WhiteGap`](Rule30Open/Columns/WhiteGap.lean) | `drv_cone`, `inFamily_of_check_cone`, `gap_absorption`, `gap_0001`, `gap_0011`, `gap_0111`, `gapRight_0001`, `gapRight_0011`, `gapRight_0111`, `high_0011`, `high_0111` | 1 | extends a kit result |
+| [Against a white right half, no left half within depth 32,751 keeps the center on 011 through 16 steps past its width](Rule30Open/Columns/WhiteRightHalf011.md) | [`Columns.WhiteRightHalf011`](Rule30Open/Columns/WhiteRightHalf011.lean) | `white_right_leaves_011`, `psi011_gaps`, `leaves_by_lc`, `left_eq_lc`, `psiBitsC_spec`, `colC_testBit`, `rh_white` | 1 | extends a kit result |
 | [A black run of r ≥ 9 steps rules out every eventual period with a tail of at most 4⌊r/9⌋ steps; nine 1s and then b 0s rule out every tail of at most 4⌊(b - 1)/9⌋ + 2](Rule30Open/Columns/WideWall.md) | [`Columns.WideWall`](Rule30Open/Columns/WideWall.lean) | `center_long_run_tail`, `center_black_white_tail`, `long_run_tail_column`, `black_white_tail_column`, `wide_wall_column`, `stripe_agree`, `black_shield` | 1 | extends a kit result |
 | [Walls of 22 cells beside traps carried far along a background's columns, and entry into one of the two](Rule30Open/Columns/WideWalls.md) | [`Columns.WideWalls`](Rule30Open/Columns/WideWalls.lean) | `wideWalls_check`, `widePair_00100100101_excludes`, `el0_33_not_absorption_fwd`, `wide_el0_33_not_absorption` | 1 | not in the kit |
 | [An eventual period of the center column needs T + P of at least 262,125](Rule30Open/Columns/WideWindow.md) | [`Columns.WideWindow`](Rule30Open/Columns/WideWindow.lean) | `runRel_fst`, `runRel_snd`, `center_eq_wide`, `wideFactor_new`, `transient_add_period_ge_262125` | 1 | extends a kit result |
@@ -218,7 +219,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
 | [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | wanted |
 | [Up to period 15, what the exclusions and reductions in Lean reach, period by period](findings/columns/coverage.md) | computed | 1 | not applicable |
-| [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md) | computed | 1 | wanted |
+| [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md) | computed | 1 | partial |
 | [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md) | computed | 1 | partial |
 | [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md) | computed | 1 | partial |
 | [The finite game excludes 434 of the 99,858 blocks of period 21](findings/columns/game-blocks-21.md) | computed | 1 | partial |

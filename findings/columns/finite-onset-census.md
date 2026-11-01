@@ -3,7 +3,7 @@ title: Against a right half of at most 11 to 14 cells, no left half of fewer tha
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/finite_onset.py, computations/coupled.py]
 ---
 
@@ -135,10 +135,10 @@ from the other side, with the right half free, is [the left-half statement of ev
 block](left-half-every-block.md); with both halves free and the onset later than time 0 it is [late
 onsets](../../negative-results/columns/late-onset.md).
 
-A formal step within reach is [WhiteRightHalf](../../Rule30Open/PeriodTwo/WhiteRightHalf.md) for $011$: computing
-$\Psi_{011}(\emptyset)$ in the kernel to depth 32,768 and checking that every 16 consecutive depths hold a black cell
-would show that every finite configuration with a white right half and a left half within depth $W < 32{,}752$ leaves
-$011$ within 16 steps past its width.
+[WhiteRightHalf011](../../Rule30Open/Columns/WhiteRightHalf011.md) does for $011$ what
+[WhiteRightHalf](../../Rule30Open/PeriodTwo/WhiteRightHalf.md) does for $01$: it computes $\Psi_{011}(\emptyset)$ in the
+kernel to depth 32,768 and proves that every configuration with a white right half and a left half within depth
+$W < 32{,}752$ leaves $011$, in every phase, by time $W + 16$.
 
 ## Reproduce
 
