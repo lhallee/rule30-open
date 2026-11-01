@@ -44,7 +44,8 @@ reaches column 1 there, and with a free cell on the right every column can be ke
 classes modulo the gcd $d$ of the lengths of its cycles, a multiple of the period $P$, since every move advances the
 phase by one. So the left column is eventually periodic, with period $d$, along every such play as soon as it is a
 function of the class, which the adjacent-column theorem forbids as well; for $d > P$ this asks less than a function of
-the phase (`component_periods`). It adds no block either. Over the same 747 blocks at widths 6 and 10 it excludes the
+the phase (`component_periods`). It adds no block either at these widths; at 16 cells it adds
+$000000001011$, of period 12 ([class game](../../findings/columns/class-game.md)). Over the same 747 blocks at widths 6 and 10 it excludes the
 same 23, and at width 10 the components where the left column takes both values in one class have period $P$, 744 of
 them, but one, of period $2P$, which sits beside a component of period $P$ that also mixes. Each of the 724 blocks the
 game leaves open has a component of period $P$ where both values meet in one class, and there the classes are the

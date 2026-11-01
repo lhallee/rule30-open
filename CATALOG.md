@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-103 Lean modules with 485 headline theorems, 45 findings (proved on paper,
-computed or conjectured) and 44 negative results. Prize problem 1 asks whether the center column
+103 Lean modules with 485 headline theorems, 46 findings (proved on paper,
+computed or conjectured) and 45 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 84 | 23 | 12 |
+| [Columns](#columns) | 84 | 24 | 13 |
 | [Period two](#period-two) | 6 | 9 | 6 |
 | [Diagonals](#diagonals) | 2 | 3 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -37,6 +37,7 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
+- [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md): problem 1
 - [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md): problem 1
 - [Windows of 14 cells followed through the column's whole history exclude every tail of up to six cells but 10101 after 22 white cells, and 1,672 blocks of period at most 22](findings/columns/limit-windows.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
@@ -203,6 +204,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|---|
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
 | [A second infinite right half that never enters the kit's family for 0001, a background of 80 cells](findings/columns/background-halves.md) | computed | 1 | partial |
+| [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md) | computed | 1 | wanted |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
 | [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | wanted |
 | [Up to period 15, what the exclusions and reductions in Lean reach, period by period](findings/columns/coverage.md) | computed | 1 | not applicable |
@@ -241,6 +243,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Right halves driven by blocks of period 5, 6 and 7 almost never enter a trap](negative-results/columns/trap-entry.md) | no signal | 1 |
 | [No window of up to 20 cells locks for any block of period 2, 3, 5, 6, 7 or 9](negative-results/columns/window-locks.md) | no signal | 1 |
 | [Windows of up to 16 cells with the column's whole history leave the kit's white-run thresholds where they are](negative-results/columns/window-thresholds.md) | barrier | 1 |
+| [Reading lists of entropy 0 fail at up to 16 cells for every block of period 3 to 9 that the game does not exclude, and for 720 of 744 up to period 12](negative-results/columns/zero-entropy-readings.md) | barrier | 1 |
 
 ## Period two
 

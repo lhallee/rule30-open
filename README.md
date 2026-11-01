@@ -6,7 +6,7 @@ computational finding comes with the code that reproduces it. And every approach
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
 None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 103 Lean modules with 485
-headline theorems, 45 findings and 44 negative results.
+headline theorems, 46 findings and 45 negative results.
 
 ## The problems
 
