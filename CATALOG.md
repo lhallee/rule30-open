@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-114 Lean modules with 561 headline theorems, 49 findings (proved on paper,
+119 Lean modules with 588 headline theorems, 49 findings (proved on paper,
 computed or conjectured) and 49 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 91 | 26 | 14 |
+| [Columns](#columns) | 96 | 26 | 14 |
 | [Period two](#period-two) | 9 | 10 | 7 |
 | [Diagonals](#diagonals) | 3 | 3 | 3 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -49,7 +49,7 @@ approach stopped.
 
 - [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md): problem 1
 - [A second infinite right half that never enters the kit's family for 0001, a background of 80 cells](findings/columns/background-halves.md): problem 1
-- [The game with cyclic classes at 16 cells closes ten blocks of period 13 to 16 that nothing else excludes](findings/columns/class-blocks.md): problem 1
+- [The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes](findings/columns/class-blocks.md): problem 1
 - [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
 - [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md): problem 1
@@ -144,6 +144,10 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game with cyclic classes excludes 00100101111111, which nothing else excludes](Rule30Open/Columns/ClassBlocks14.md) | [`Columns.ClassBlocks14`](Rule30Open/Columns/ClassBlocks14.lean) | `column_not_00100101111111`, `center_not_00100101111111`, `not_eventually_00100101111111` | 1 | not in the kit |
 | [The game with cyclic classes excludes two blocks of period 16 that nothing else excludes](Rule30Open/Columns/ClassBlocks16.md) | [`Columns.ClassBlocks16`](Rule30Open/Columns/ClassBlocks16.lean) | `column_not_0000001101111011`, `center_not_0000001101111011`, `not_eventually_0000001101111011`, `column_not_0110110111111111`, `center_not_0110110111111111`, `not_eventually_0110110111111111` | 1 | not in the kit |
 | [The game with cyclic classes excludes 0001101111111001, which nothing else excludes](Rule30Open/Columns/ClassBlocks16Wide.md) | [`Columns.ClassBlocks16Wide`](Rule30Open/Columns/ClassBlocks16Wide.lean) | `column_not_0001101111111001`, `center_not_0001101111111001`, `not_eventually_0001101111111001` | 1 | not in the kit |
+| [The game with cyclic classes excludes 00000000011111001, 00011011111111001 and 00000000010010001, of period 17, which nothing else excludes](Rule30Open/Columns/ClassBlocks17.md) | [`Columns.ClassBlocks17`](Rule30Open/Columns/ClassBlocks17.lean) | `column_not_00000000011111001`, `center_not_00000000011111001`, `not_eventually_00000000011111001`, `column_not_00011011111111001`, `center_not_00011011111111001`, `not_eventually_00011011111111001`, `column_not_00000000010010001`, `center_not_00000000010010001`, `not_eventually_00000000010010001` | 1 | not in the kit |
+| [The game with cyclic classes at 17 cells excludes 01010111111111111, which nothing else excludes](Rule30Open/Columns/ClassBlocks17Cells.md) | [`Columns.ClassBlocks17Cells`](Rule30Open/Columns/ClassBlocks17Cells.lean) | `column_not_01010111111111111`, `center_not_01010111111111111`, `not_eventually_01010111111111111` | 1 | not in the kit |
+| [The game with cyclic classes excludes 00000011011111011, of period 17, which nothing else excludes](Rule30Open/Columns/ClassBlocks17Mid.md) | [`Columns.ClassBlocks17Mid`](Rule30Open/Columns/ClassBlocks17Mid.lean) | `column_not_00000011011111011`, `center_not_00000011011111011`, `not_eventually_00000011011111011` | 1 | not in the kit |
+| [The game with cyclic classes excludes 00000000001000001, of period 17, which nothing else excludes](Rule30Open/Columns/ClassBlocks17Wide.md) | [`Columns.ClassBlocks17Wide`](Rule30Open/Columns/ClassBlocks17Wide.lean) | `column_not_00000000001000001`, `center_not_00000000001000001`, `not_eventually_00000000001000001` | 1 | not in the kit |
 | [The game with cyclic classes, checked width by width, excludes 000000001011 in Lean](Rule30Open/Columns/ClassGame.md) | [`Columns.ClassGame`](Rule30Open/Columns/ClassGame.lean) | `class_column`, `center_not_class`, `class_not_eventuallyWord`, `column_not_000000001011`, `center_not_000000001011`, `not_eventually_000000001011` | 1 | not in the kit |
 | [A periodic column and any observable that closes the strip to its right](Rule30Open/Columns/ClosingObservable.md) | [`Columns.ClosingObservable`](Rule30Open/Columns/ClosingObservable.lean) | `closing_observable`, `affine_observable`, `center_xor`, `center_masked_two`, `center_parity` | 1 | extends a kit result |
 | [Counts of black cells move left by at most a factor of three](Rule30Open/Columns/ColumnTransfer.md) | [`Columns.ColumnTransfer`](Rule30Open/Columns/ColumnTransfer.lean) | `transfer`, `transfer_white`, `iterate`, `transfer_right`, `transfer_right_white`, `iterate_right`, `center_lower` | 2 | not in the kit |
@@ -160,6 +164,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Traps for 101 of the 1,161 blocks of period 14, from a wall of period fourteen carried leftward](Rule30Open/Columns/FourteenTraps.md) | [`Columns.FourteenTraps`](Rule30Open/Columns/FourteenTraps.lean) | `fourteenTraps_check`, `fourteenTraps_blocks`, `fourteen_absorption_excludes` | 1 | not in the kit |
 | [The finite game, checked in bit masks, excludes 32 more blocks of period at most 14](Rule30Open/Columns/GameBlocks.md) | [`Columns.GameBlocks`](Rule30Open/Columns/GameBlocks.lean) | `mask_column`, `center_not_gameBlocks`, `not_eventually_gameBlocks` | 1 | not in the kit |
 | [The finite game, checked in bit masks, excludes 97 more blocks of period 15 and 16](Rule30Open/Columns/GameBlocksLong.md) | [`Columns.GameBlocksLong`](Rule30Open/Columns/GameBlocksLong.lean) | `center_not_gameBlocks16`, `not_eventually_gameBlocks16` | 1 | not in the kit |
+| [The game at 15 or 16 cells excludes 00110011111111, 0000000000111011 and 0000101111111001, which nothing else excludes](Rule30Open/Columns/GameBlocksWide.md) | [`Columns.GameBlocksWide`](Rule30Open/Columns/GameBlocksWide.lean) | `column_not_00110011111111`, `center_not_00110011111111`, `not_eventually_00110011111111`, `column_not_0000000000111011`, `center_not_0000000000111011`, `not_eventually_0000000000111011`, `column_not_0000101111111001`, `center_not_0000101111111001`, `not_eventually_0000101111111001` | 1 | not in the kit |
 | [A right half white on its first 1,317 cells enters the kit's trap for 001](Rule30Open/Columns/HighThree.md) | [`Columns.HighThree`](Rule30Open/Columns/HighThree.lean) | `highRight3_of_entry`, `highRight_001` | 1 | extends a kit result |
 | [The kicked form of the left half](Rule30Open/Columns/KickedForm.md) | [`Columns.KickedForm`](Rule30Open/Columns/KickedForm.lean) | `left_kicked_zero`, `left_kicked_succ`, `left_kicked_check`, `period_two_golden` | 1 | extends a kit result |
 | [No left half within depth 88 keeps the kit's left-half pattern for 0001](Rule30Open/Columns/LeftHalf0001.md) | [`Columns.LeftHalf0001`](Rule30Open/Columns/LeftHalf0001.lean) | `c3_0001_bounded`, `c3_0001_small`, `c3_0001_depth`, `c3_0001_of_checks` | 1 | extends a kit result |
@@ -214,7 +219,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 |---|---|---|---|
 | [Every right half of up to 20 cells enters the kit's ether-and-wall family](findings/columns/absorption-census.md) | computed | 1 | partial |
 | [A second infinite right half that never enters the kit's family for 0001, a background of 80 cells](findings/columns/background-halves.md) | computed | 1 | partial |
-| [The game with cyclic classes at 16 cells closes ten blocks of period 13 to 16 that nothing else excludes](findings/columns/class-blocks.md) | computed | 1 | partial |
+| [The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes](findings/columns/class-blocks.md) | computed | 1 | partial |
 | [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
 | [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | wanted |

@@ -60,8 +60,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     21](findings/columns/game-blocks-21.md), [BitPhases](Rule30Open/Columns/BitPhases.md)); the game with cyclic
     classes at 16 cells excludes $000000001011$, of period 12, in Lean through a certificate of local checks that
     holds for any block ([class game](findings/columns/class-game.md), [ClassGame](Rule30Open/Columns/ClassGame.md)), and ten blocks of
-    period 13 to 16 that nothing else excludes ([class blocks](findings/columns/class-blocks.md),
-    [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules it links); the kit excludes every
+    period 13 to 16 and six of period 17 that nothing else excludes, with two more of period 17 by computation only
+    ([class blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules
+    it links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean
+    ([GameBlocksWide](Rule30Open/Columns/GameBlocksWide.md)); the kit excludes every
     $1\,0^q$ with $q \ge 9$ and every block followed by exponentially many white cells. After nine 1s, following the
     cells beside the column extends the kit's long black runs to every period whose runs of nine or more 1s are
     separated by segments that the possible windows of three cells follow: exactly the 77 blocks with nine 1s in a row

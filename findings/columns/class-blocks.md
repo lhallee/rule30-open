@@ -1,13 +1,13 @@
 ---
-title: The game with cyclic classes at 16 cells closes ten blocks of period 13 to 16 that nothing else excludes
+title: The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes
 category: columns
 problems: [1]
 status: computed
 formalization: partial
-evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_certificate.py]
+evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_blocks_wide.py, computations/class_certificate.py]
 ---
 
-# The game with cyclic classes at 16 cells closes ten blocks of period 13 to 16 that nothing else excludes
+# The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes
 
 [The game with cyclic classes](class-game.md) was run at 16 cells on every primitive block of period 13 to 16 with both
 colors, 8,053 blocks. It closes 186 of them; the plain game at 16 cells closes 176, and the class test closes ten more,
@@ -16,7 +16,8 @@ leftmost 1, the center column of the single cell among them, eventually repeats 
 ([ClassBlocks](../../Rule30Open/Columns/ClassBlocks.md), [ClassBlocks13](../../Rule30Open/Columns/ClassBlocks13.md),
 [ClassBlocks14](../../Rule30Open/Columns/ClassBlocks14.md), [ClassBlocks16](../../Rule30Open/Columns/ClassBlocks16.md),
 [ClassBlocks16Wide](../../Rule30Open/Columns/ClassBlocks16Wide.md)). The plain game at 15 or 16 cells also closes three
-blocks that its surveys at widths up to 14 miss and that nothing else excludes; those are not in Lean yet.
+blocks that its surveys at widths up to 14 miss and that nothing else excludes;
+[GameBlocksWide](../../Rule30Open/Columns/GameBlocksWide.md) proves them with the same certificates.
 
 ## Result
 
@@ -61,7 +62,7 @@ $0000000000111011$ and $0000101111111001$ (15 cells each). They are not in [the 
 16](game-blocks.md), which ran the game at widths 6, 10 and 14, and the kit, WallSets and limit windows do not exclude
 them. [NaturalTrapsWalls](../../Rule30Open/Columns/NaturalTrapsWalls.md) and
 [FourteenTraps](../../Rule30Open/Columns/FourteenTraps.md) hold traps for $00110011111111$, which hold once the column
-enters them.
+enters them. [GameBlocksWide](../../Rule30Open/Columns/GameBlocksWide.md) excludes all three unconditionally.
 
 At 17 cells the same survey of the 8,053 blocks finds three more blocks that the class test closes and nothing else
 excludes, $00001011111011$ (period 14), $000000000111011$ (15) and $0011001111111111$ (16), each first at 17 cells.
@@ -98,8 +99,9 @@ enters them.
 The five ClassBlocks modules check each block's certificate in the kernel, one `decide +kernel` per width and phase and
 one per phase of the classes, and apply ClassGame's general soundness `class_column`, so each gives
 `column_not_<b>`, `center_not_<b>` and `not_eventually_<b>`. That the ten are all the class test adds at 16 cells, and
-the counts above, rest on the computation. The three blocks the plain game closes at 15 or 16 cells are not in
-Lean yet; the same certificates would prove them, since the game's test is the class test's case $d = P$.
+the counts above, rest on the computation. The three blocks the plain game closes at 15 or 16 cells are in
+[GameBlocksWide](../../Rule30Open/Columns/GameBlocksWide.md), with the same certificates: the game's test is the class
+test's case $d = P$.
 
 ## Reproduce
 
@@ -110,3 +112,47 @@ python -m computations.class_survey --block 0000001011011 --width 16          # 
 python -m computations.class_blocks                                          # the ten certificates, checked, 20 s
 ```
 
+## Period 17
+
+The same survey at 16 cells on every primitive block of period 17 with both colors, 7,710 blocks, finds five more
+blocks that nothing else excludes, and Lean proves all five ([ClassBlocks17](../../Rule30Open/Columns/ClassBlocks17.md),
+[ClassBlocks17Mid](../../Rule30Open/Columns/ClassBlocks17Mid.md),
+[ClassBlocks17Wide](../../Rule30Open/Columns/ClassBlocks17Wide.md)). The plain game at 16 cells closes 120 blocks, the
+119 that [the game blocks of period 17 and 18](game-blocks-18.md) find at widths up to 14 and one more; the class test
+closes those 120 and four more. The 12 blocks of period 17 that the kit excludes are among the 120.
+
+| Block | Closed by | Least width of the class test | Components at that width that can hold a play: nodes (cyclic period) |
+|---|---|---:|---|
+| $00000000011111001$ | classes only | 12 | 1,894 (17); 100 (34, mixed by phase); 45 (34, mixed by phase); 32 (17) |
+| $00011011111111001$ | the game at 15 cells, not at 14 | 13 | 1,077 (17); 432 (17); 122 (17); 61 (51, mixed by phase); 28 (17); 25 (17) |
+| $00000000010010001$ | classes only | 14 | 1,212 (17); 603 (17); 394 (17); 105 (51, mixed by phase); 39 (17); 27 (17); 18 (17) |
+| $00000011011111011$ | classes only | 14 | 2,768 (17); 231 (17); 89 (34, mixed by phase); 56 (17); 53 (17); 52 (17); 49 (17); 22 (17); 22 (17) |
+| $00000000001000001$ | classes only | 16 | 12,686 (17); 175 (68, mixed by phase); 149 (17); 77 (17); 31 (17) |
+
+"Classes only" means the plain game does not close the block at 16 cells (`game.bad_pairs` is 2, 5, 1 and 1 at 16
+cells, in the table's order). For none of the five does `class_survey.elsewhere` find the kit, the wall sets or the
+limit windows of 14 cells, and no other Lean module names any of them. The certificates, at the least
+widths above, check 16,040 to 150,894 nodes over the widths and 4,820 to 43,758 nodes for the classes
+(`class_blocks_wide`, each checked node by node by `class_certificate.check`).
+
+At 17 cells the survey of period 17 closes three blocks more, which nothing else excludes either: the class test
+closes $00011111111110101$ and $01010111111111111$ (the plain game fails at one phase in a component of 142 nodes and
+cyclic period 51, and of 151 nodes and cyclic period 34), and both tests close $01111011111111111$; neither test closes
+any of the three at 16 cells. At 17 cells the plain game also closes $00000000010010001$, which the class test closes
+at 14. So at 17 cells the plain game closes 122 blocks of period 17 and the class test 127, and the blocks that nothing
+else excludes number eight. The certificates of the three at 17 cells check 175,714 to 227,810 nodes over the widths
+and 51,430 to 65,607 for the classes. [ClassBlocks17Cells](../../Rule30Open/Columns/ClassBlocks17Cells.md) proves
+$01010111111111111$, the smallest; $00011111111110101$ (205,288 nodes) and $01111011111111111$ (227,810) are not in
+Lean.
+
+The three blocks of period 14 and 16 that the plain game closes at 15 or 16 cells are proved in
+[GameBlocksWide](../../Rule30Open/Columns/GameBlocksWide.md) with the same certificates; the class test closes
+$00110011111111$ at 13 cells, three fewer than the plain game needs, and the other two at 15.
+
+```bash
+python -m computations.class_survey --periods 17 17 --width 16 --workers 2 --out rows17.jsonl   # about 45 minutes
+python -m computations.class_blocks_wide --report rows17.jsonl   # the five blocks, their widths and other exclusions
+python -m computations.class_survey --periods 17 17 --width 17 --workers 2 --out rows17w.jsonl  # about 75 minutes
+python -m computations.class_blocks_wide --report rows17w.jsonl  # the eight blocks at 17 cells
+python -m computations.class_blocks_wide                         # all eleven certificates, checked node by node, 40 s
+```

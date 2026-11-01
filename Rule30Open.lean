@@ -89,6 +89,11 @@ public import Rule30Open.Columns.ClassBlocks13
 public import Rule30Open.Columns.ClassBlocks14
 public import Rule30Open.Columns.ClassBlocks16
 public import Rule30Open.Columns.ClassBlocks16Wide
+public import Rule30Open.Columns.GameBlocksWide
+public import Rule30Open.Columns.ClassBlocks17
+public import Rule30Open.Columns.ClassBlocks17Mid
+public import Rule30Open.Columns.ClassBlocks17Wide
+public import Rule30Open.Columns.ClassBlocks17Cells
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable
