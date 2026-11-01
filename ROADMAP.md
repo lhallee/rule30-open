@@ -188,8 +188,8 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
   ether. Beyond the stripes and the ether, every background that a periodic tail of up to 12 cells reaches
   carries fronts on which the tops of most defects run away, provably on 10 of the 12, so there (R) can hold only because
-  $K$ misses those tails; no head of up to 16 cells on them is in $K$, each breaking it by step 47 ([the tail
-  census](findings/period-two/tail-census.md), [front backgrounds](negative-results/period-two/front-backgrounds.md)). Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
+  $K$ misses those tails; no head of up to 16 cells on them is in $K$, each breaking it by step 47, and for heads of up to 12 cells on four of them
+  in Lean ([NoKTails](Rule30Open/PeriodTwo/NoKTails.md), [the tail census](findings/period-two/tail-census.md), [front backgrounds](negative-results/period-two/front-backgrounds.md)). Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
   cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
   census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 16 cells
   ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle

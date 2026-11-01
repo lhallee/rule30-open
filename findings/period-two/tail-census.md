@@ -3,7 +3,7 @@ title: Beyond the stripes and the ether, every periodic tail of up to 12 cells f
 category: period-two
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/tail_census.py, computations/defect_potential.py, computations/held_shift.py]
 ---
 
@@ -129,7 +129,8 @@ a statement about $K$ alone, of the same kind as the period-two question.
 The census of item 4 is a finite check, each head followed for at most 45 steps on numbers below $2^{64}$, and needs
 no closed strip. For the backgrounds with $L = 4, 5, 10$ and $(L, P) = (12, 3)$ it covers 225,280 heads of 12 cells,
 a smaller kernel computation than the census of [EtherCensus](../../Rule30Open/PeriodTwo/EtherCensus.md), and would
-prove in Lean that no point of $K$ has one of these tails from cell 12 on; it is not formalized here.
+prove in Lean that no point of $K$ has one of these tails from cell 12 on; [NoKTails](../../Rule30Open/PeriodTwo/NoKTails.md)
+does.
 
 ## Reproduce
 
