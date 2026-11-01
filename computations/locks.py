@@ -37,6 +37,7 @@ from scipy.sparse.csgraph import breadth_first_order
 from tqdm.auto import tqdm
 
 from computations import game
+from computations.rule30 import distinct
 
 
 def reverse_graph(source: np.ndarray, target: np.ndarray, nodes: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -82,7 +83,7 @@ def back_search(word: str, width: int, seen: np.ndarray) -> np.ndarray:
         before = predecessors(word, width, frontier.astype(np.uint64)).astype(np.int64)  # (m,)
         new = before[~seen[before]]  # (m',), with repeats
         if new.size * 32 < seen.size:
-            frontier = np.unique(new)  # (f,), each once, in order
+            frontier = distinct(new)  # (f,), each once, in order
         else:
             fresh[new] = True
             frontier = np.flatnonzero(fresh)  # (f,), each once, in order
@@ -97,10 +98,10 @@ def sparse_search(word: str, width: int, start: np.ndarray, cap: int) -> np.ndar
     found, in increasing order: for games too wide for a byte per node, when few nodes can reach. None once more than
     `cap` are found."""
     # start: (s,)
-    seen = np.unique(start.astype(np.uint64))  # (v,)
+    seen = distinct(start.astype(np.uint64))  # (v,)
     frontier = seen
     while frontier.size:
-        before = np.unique(predecessors(word, width, frontier))  # (m,)
+        before = distinct(predecessors(word, width, frontier))  # (m,)
         frontier = before[~np.isin(before, seen, assume_unique=True)]  # (f,)
         seen = np.union1d(seen, frontier)  # (v,)
         if seen.size > cap:
@@ -157,6 +158,19 @@ def predecessors(word: str, width: int, keys: np.ndarray) -> np.ndarray:
 
 def lock_info(block: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     """The locked nodes, and the nodes from which some values of the free cell reach a locked node."""
+    locked, source, target, reverse = locked_search(block, width)  # (p n,), (2 p n,), (2 p n,)
+    return locked, back_closure(locked, source, target, reverse)  # (p n,), (p n,)
+
+
+def locked_nodes(block: str, width: int) -> np.ndarray:
+    """The locked nodes of `lock_info` alone, without the search for the nodes that reach them."""
+    return locked_search(block, width)[0]  # (p n,)
+
+
+def locked_search(block: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray,
+                                                   tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    """The locked nodes, as the complement of the nodes that can reach both values at one phase, with the game's moves
+    and their reverse graph for a further search."""
     source, target, column = game.game_moves(block, width)  # (2 p n,), (2 p n,), (p n,)
     phase = np.arange(column.size) >> width  # (p n,)
     reverse = reverse_graph(source, target, column.size)
@@ -165,10 +179,12 @@ def lock_info(block: str, width: int) -> tuple[np.ndarray, np.ndarray]:
         here = phase == ph  # (p n,)
         if not ((here & column).any() and (here & ~column).any()):
             continue  # one value at this phase (a black one), so no node reaches both there
-        mixed |= back_closure(here & column, source, target, reverse) & back_closure(here & ~column, source, target,
-                                                                                      reverse)
-    locked = ~mixed  # (p n,)
-    return locked, back_closure(locked, source, target, reverse)  # (p n,), (p n,)
+        ones = back_closure(here & column, source, target, reverse) & ~mixed  # (p n,), not yet known to be mixed
+        if ones.any():
+            mixed |= ones & back_closure(here & ~column, source, target, reverse)
+        if mixed.all():
+            break  # no node is locked, whatever the later phases give
+    return ~mixed, source, target, reverse  # (p n,), (2 p n,), (2 p n,)
 
 
 def fewest_mixed(block: str, width: int) -> int:
@@ -219,7 +235,7 @@ def has_lock(block: str, width: int, wide: bool = False) -> bool:
     """Whether some node of the game at this width is locked, by `lock_info`, or by `mixed_nodes` when `wide`."""
     if wide:
         return not bool(mixed_nodes(block, width).all())
-    locked, _ = lock_info(block, width)  # (p n,)
+    locked = locked_nodes(block, width)  # (p n,)
     return bool(locked.any())
 
 
@@ -277,7 +293,7 @@ def finals_of(block: str, width: int, values: list[int]) -> dict[int, list[int]]
         windows = np.arange(1 << width, dtype=np.int64)  # (2^W,)
         for step, value in enumerate(values):
             windows = successors[(start + step) % period, value][windows]  # (2^W,)
-        finals.setdefault((start + len(values)) % period, set()).update(np.unique(windows).tolist())
+        finals.setdefault((start + len(values)) % period, set()).update(distinct(windows).tolist())
     return {phase: sorted(states) for phase, states in sorted(finals.items())}
 
 
@@ -285,7 +301,7 @@ def steering(block: str, width: int) -> tuple[list[int], dict[int, list[int]]]:
     """A sequence of values of the free cell that brings every node, started at any phase, to a locked node
     (`lock_word.universal_word` with the locked nodes as target), and the windows where it leaves them, by final phase."""
     from computations.lock_word import universal_word
-    locked, _ = lock_info(block, width)  # (p n,)
+    locked = locked_nodes(block, width)  # (p n,)
     values = universal_word(block, locked.reshape(len(block), 1 << width))
     return values, finals_of(block, width, values)
 
@@ -299,7 +315,7 @@ def constant_steering(block: str, width: int, value: int) -> int | None:
     successors = successor_table(block, width)  # (p, 2, 2^W)
     nodes = np.arange(period * size)  # (p n,)
     after = ((nodes >> width) + 1) % period * size + successors[nodes >> width, value, nodes & (size - 1)]  # (p n,)
-    reached, _ = lock_info(block, width)  # (p n,), nodes at distance at most `steps`
+    reached = locked_nodes(block, width)  # (p n,), nodes at distance at most `steps`
     steps = 0
     while not reached.all():
         grown = reached | reached[after]  # (p n,)
@@ -369,7 +385,7 @@ def profile(block: str, width: int) -> tuple[float, int, float]:
     (`lock_word.avoid_growth`). Once column k repeats b, column k + width + 1 keeps every node out of them, so its
     topological entropy is at most the base-2 logarithm of the growth rate."""
     from computations.lock_word import avoid_growth
-    locked, _ = lock_info(block, width)  # (p n,)
+    locked = locked_nodes(block, width)  # (p n,)
     values, _ = steering(block, width)
     return float(locked.mean()), len(values), avoid_growth(block, locked.reshape(len(block), 1 << width))
 
@@ -379,7 +395,7 @@ def growth(block: str, width: int) -> tuple[float, float]:
     long to build in the wider games, and with the rate's iteration cut at 5,000 steps (`coin_lock.period_rate`, whose
     value bounds the rate from above wherever the iteration stops)."""
     from computations import coin_lock
-    locked, _ = lock_info(block, width)  # (p n,)
+    locked = locked_nodes(block, width)  # (p n,)
     member = locked.reshape(len(block), 1 << width)  # (p, 2^width)
     return float(locked.mean()), 2 * coin_lock.period_rate(block, member, tolerance=1e-10, limit=5000)
 

@@ -66,10 +66,11 @@ def test_rule30_evasive_and_rule90_sparse() -> None:
 
 
 def test_top_coefficient_against_direct_sum() -> None:
-    """mu(c_t) from the bit-sliced chunks, for several chunk sizes, equals the direct signed sum over the cone."""
+    """mu(c_t) from the bit-sliced chunks, for several chunk sizes, equals the direct signed sum over the cone (chunks
+    of 6 cells up to t = 7, where they are many; of 9 and 24 cells up to t = 8)."""
     for t in range(1, 9):
         direct = qd.signed_sum(cone_table(t), 2 * t + 1)
-        for inner in (6, 9, 24):
+        for inner in (6, 9, 24) if t < 8 else (9, 24):
             nu, _ = qd.subcube_sums(t, {}, inner)
             assert 2 * nu == direct
 

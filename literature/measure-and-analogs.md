@@ -106,6 +106,15 @@ rules in [the analogs category](../CATALOG.md#sibling-rules) are compared with R
   *Physical Review E* 60, 197 to 202; [arXiv:comp-gas/9902001](https://arxiv.org/abs/comp-gas/9902001).
   The exact flow at every time for a traffic automaton that reduces to Rule 184, from a random initial row, by counting
   preimages as lattice paths. Preimage counting is one route to exact densities.
+- **Zhu and Richard (2026).** *Elementary cellular automata: spectral properties of Koopman operator for finite periodic
+  realizations.* [arXiv:2610.10967](https://arxiv.org/abs/2610.10967), October 2026, math.SP, 16 pages; seen only in
+  search results, the text was not read. By the abstract as quoted there, the spectra of the Koopman operators of every
+  elementary rule on rings of $n$ cells, which hold properties of the dynamics independent of the initial row, are
+  characterized and give a spectral classification of the 88 classes of elementary rules; the authors present it as a
+  preliminary step toward the infinite line. Unrefereed. *Here:* a ring's Koopman operator is composition with the rule
+  on functions of the $2^n$ rows, so its nonzero spectrum, roots of unity, records the cycles of the ring, the objects
+  of [the ring orbits](../negative-results/columns/ring-orbits.md), and averages over all rows of the ring, not the
+  single cell's orbit on the line ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
 - **Chan-López and Martín-Ruiz (2026)**, in [rule-30.md](rule-30.md): a closed form for Rule 22's single-seed rows over
   $\mathbb{F}_2$, the only exact single-seed formula for a nonlinear sibling rule the search found.
 

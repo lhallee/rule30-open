@@ -33,6 +33,7 @@ from tqdm.auto import tqdm
 from computations import absorption
 from computations.lock_certificate import entry_time, greatest_invariant_set, jen_seeds, successor_table
 from computations.right_half import random_starts
+from computations.rule30 import distinct
 
 
 UNREACHED = np.iinfo(np.int64).max // 4
@@ -50,22 +51,52 @@ def certificate(word: str, width: int) -> np.ndarray:
 
 def entry_paths(word: str, member: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """dist[ph, s], the fewest steps after which some values of column W + 1 bring window s at phase ph into the
-    certificate (UNREACHED if none do), and first[ph, s], the value of column W + 1 at the first of those steps."""
+    certificate (UNREACHED if none do), and first[ph, s], the value of column W + 1 at the first of those steps.
+
+    The relaxation sweeps the phases in order until nothing changes, each window taking the better of its two
+    successors at the next phase. After its first sweep a phase looks only at the windows with a successor that changed
+    since then (`back`, the moves reversed): the others would find what they found before. The updates, and so the
+    choice of `first` between two successors at the same distance, are those of relaxing every window each sweep."""
     # member: (period, 2^W)
     period, size = member.shape
     successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
     dist = np.where(member, 0, UNREACHED).astype(np.int64)  # (period, 2^W)
     first = np.zeros((period, size), dtype=np.int8)  # (period, 2^W)
+    back = []  # by phase: for each window of the next phase, the windows with a move to it, as pointers and sources
+    for ph in range(period):
+        targets = successors[ph].reshape(-1)  # (2 2^W,)
+        pointers = np.zeros(size + 1, dtype=np.int64)  # (2^W + 1,)
+        np.cumsum(np.bincount(targets, minlength=size), out=pointers[1:])
+        back.append((pointers, np.argsort(targets, kind="stable") % size))  # (2^W + 1,), (2 2^W,)
+    pending = [np.zeros(0, dtype=np.int64) for _ in range(period)]  # by phase, windows changed since the phase before
+    swept = [False] * period  # whether the phase has had its first, full sweep
     changed = True
     while changed:
         changed = False
         for ph in range(period):
-            after = dist[(ph + 1) % period][successors[ph]] + 1  # (2, 2^W)
-            best = np.minimum(after[0], after[1])  # (2^W,)
-            better = (best < dist[ph]) & ~member[ph]  # (2^W,)
+            nxt = (ph + 1) % period
+            if not swept[ph]:
+                windows = np.arange(size)  # (2^W,)
+                swept[ph] = True
+            else:
+                moved = distinct(pending[nxt])  # (c,)
+                pointers, sources = back[ph]
+                counts = pointers[moved + 1] - pointers[moved]  # (c,)
+                ends = np.cumsum(counts)  # (c,)
+                offsets = np.arange(int(ends[-1]) if ends.size else 0) + np.repeat(pointers[moved] - (ends - counts),
+                                                                                    counts)  # (e,)
+                windows = distinct(sources[offsets])  # (m,)
+            pending[nxt] = pending[nxt][:0]
+            if windows.size == 0:
+                continue
+            after = dist[nxt][successors[ph][:, windows]] + 1  # (2, m)
+            best = np.minimum(after[0], after[1])  # (m,)
+            better = (best < dist[ph][windows]) & ~member[ph][windows]  # (m,)
             if better.any():
-                dist[ph][better] = best[better]
-                first[ph][better] = (after[1] < after[0])[better]
+                chosen = windows[better]  # (b,)
+                dist[ph][chosen] = best[better]
+                first[ph][chosen] = (after[1] < after[0])[better]
+                pending[ph] = np.concatenate([pending[ph], chosen])
                 changed = True
     return dist, first  # (period, 2^W) each
 
@@ -90,7 +121,7 @@ def universal_word(word: str, member: np.ndarray) -> list[int]:
         while not member[ph][window]:
             value = int(first[ph][window])
             values.append(value)
-            windows = np.unique(successors[ph, value][windows])  # (n,)
+            windows = distinct(successors[ph, value][windows])  # (n,)
             window = int(successors[ph, value][window])
             ph = (ph + 1) % period
 

@@ -15,6 +15,20 @@ def step(row: int) -> int:
     return (row << 1) ^ (row | (row >> 1))
 
 
+def distinct(values: np.ndarray) -> np.ndarray:
+    """The distinct values of a one-dimensional array in increasing order, which `np.unique` gives, by a sort and a
+    comparison of neighbors: numpy 2's `np.unique` hashes the values before it sorts them and takes about ten times as
+    long on the arrays of integers of the backward searches."""
+    # values: (n,)
+    ordered = np.sort(values)  # (n,)
+    if ordered.size < 2:
+        return ordered  # (n,)
+    keep = np.empty(ordered.size, dtype=bool)  # (n,)
+    keep[0] = True
+    np.not_equal(ordered[1:], ordered[:-1], out=keep[1:])
+    return ordered[keep]  # (d,)
+
+
 def center_column(n: int) -> np.ndarray:
     """The first `n` cells of the single black cell's center column (OEIS A051023)."""
     row = 1 << n  # the black cell at bit n leaves room for n steps of the left edge

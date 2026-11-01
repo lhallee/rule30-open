@@ -148,6 +148,7 @@ public import Rule30Open.PeriodTwo.EtherCensus16
 public import Rule30Open.PeriodTwo.NoKTails
 public import Rule30Open.PeriodTwo.NoKTails16
 public import Rule30Open.PeriodTwo.EtherKTree
+public import Rule30Open.PeriodTwo.EtherKTree32
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Diagonals.SettledSlope
@@ -163,6 +164,7 @@ public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth
 public import Rule30Open.Complexity.RightCorner
+public import Rule30Open.Complexity.CornerOr
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

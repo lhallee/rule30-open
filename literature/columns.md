@@ -37,6 +37,18 @@ center column of Rule 30 is open.
   the arithmetic of multiplication.
   *Here:* [fractional multiplication](../negative-results/analogs/fractional-multiplication.md) records why the argument
   does not transfer to Rule 30.
+- **Palamarchuk (2026).**
+  [lean-elementary-cellular-automata](https://github.com/lividgreen/lean-elementary-cellular-automata), a Lean 4 library
+  on all 256 elementary rules, written, by its README, with substantial assistance from Claude Code; two commits,
+  October 10 and 16, 2026; the README was read, the Lean was not built here. Claims, among others: at every quiescent
+  rule whose diameter never grows, every column and every ray of rational speed of an orbit is eventually periodic
+  (`eventuallyPeriodic_observedColumn_of_diam_le`); at every quiescent rule, the columns between two eventually periodic
+  columns are eventually periodic (`eventuallyPeriodic_observedColumn_between`); from the single cell, Rule 90's column
+  at cell 1 is not eventually periodic while its center column is; and no map on the even cells carries Rule 30's second
+  iterate (`not_exists_decim_law_f30`). It says that its column theorem says nothing about a rule whose diameter grows,
+  Rule 30 included. *Here:* the between-columns statement is the kit's `Rule30Jen.between_periodic` for every quiescent
+  elementary rule; the Rule 90 pair is another instance of the point made above for Kopra (2023), that a property shared
+  with Rule 90 cannot decide one column.
 - **Kari and Kopra (2017).** [Cellular automata and powers of p/q](https://doi.org/10.1051/ita/2017014).
   *RAIRO Theoretical Informatics and Applications* 51(4), 191 to 204.
   Uses the multiplication automata to bound where the fractional parts of $\xi (p/q)^n$ can lie, the setting of

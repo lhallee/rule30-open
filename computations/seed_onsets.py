@@ -34,7 +34,9 @@ from __future__ import annotations
 
 import argparse
 import functools
+import hashlib
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -208,12 +210,25 @@ def same_skeleton(onsets: np.ndarray, J: int, H: int, P: int = 8) -> bool:
 
 @functools.cache
 def _binary(name: str) -> Path:
-    """Compile computations/<name>.c once per process into a temporary directory."""
+    """Compile computations/<name>.c, or reuse the binary an earlier process compiled from the same source with the
+    same compiler and flags on the same machine: it is kept in a directory of the temporary folder that only this
+    user can write, under a hash of all four."""
     cc = shutil.which("cc") or shutil.which("gcc")
     assert cc, "a C compiler is needed for the searches"
-    out = Path(tempfile.mkdtemp(prefix="seed_onsets_")) / name
+    source = HERE / f"{name}.c"
     flags = ["-O3", "-march=native"] if os.environ.get("SEED_ONSETS_FAST", "1") == "1" else ["-O1"]
-    subprocess.run([cc, *flags, "-fopenmp", "-w", str(HERE / f"{name}.c"), "-o", str(out)], check=True)
+    command = [cc, *flags, "-fopenmp", "-w", str(source)]
+    key = hashlib.sha256(source.read_bytes() + repr((command, platform.node(), platform.machine())).encode())
+    folder = Path(tempfile.gettempdir()) / f"rule30-open-{os.getuid()}"
+    folder.mkdir(mode=0o700, exist_ok=True)
+    if folder.stat().st_uid != os.getuid() or folder.stat().st_mode & 0o022:
+        folder = Path(tempfile.mkdtemp(prefix="seed_onsets_"))  # not ours alone, so compile afresh
+    out = folder / f"{name}-{key.hexdigest()[:20]}"
+    if not out.exists():
+        fresh = Path(tempfile.mkdtemp(prefix="seed_onsets_", dir=folder)) / name
+        subprocess.run([*command, "-o", str(fresh)], check=True)
+        os.replace(fresh, out)  # whole, so a process running at the same time never sees half a binary
+        fresh.parent.rmdir()
     return out
 
 

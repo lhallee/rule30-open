@@ -28,6 +28,7 @@ the tries of `Rule30Open.Columns.ClassGame` (a node's cells as a key, read from 
 from __future__ import annotations
 
 import argparse
+import functools
 import math
 import sys
 from dataclasses import dataclass
@@ -170,8 +171,10 @@ def certificate(block: str, width: int) -> Certificate:
     return Certificate(block, heights, codes, base, transient, mods, values)
 
 
+@functools.lru_cache(maxsize=1 << 18)
 def step(block: str, width: int, phase: int, cells: int, free: int) -> tuple[int, int]:
-    """One move written cell by cell, for `check`: the next phase and cells."""
+    """One move written cell by cell, for `check`: the next phase and cells. `check` asks each move of the widest level
+    twice, and a check of a second certificate of the same block asks them all again, so the moves are kept."""
     row = [int(block[phase])] + [(cells >> i) & 1 for i in range(width)] + [free]
     new = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, width + 1)]
     return (phase + 1) % len(block), sum(bit << i for i, bit in enumerate(new))

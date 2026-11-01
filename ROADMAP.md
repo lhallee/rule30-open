@@ -10,8 +10,9 @@ The kit's own status table, in its
 [lean/README.md](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/README.md#status-by-period),
 summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
-kit's commit 932cf8d; the kit's main branch has since gained 43 modules (a09f245, October 31), which exclude 133 blocks of
-period at most 21 that this repository's Lean already excludes and no block that it does not
+kit's commit 932cf8d; the kit's main branch has since gained 52 modules (27060a7, November 1), which exclude 133 blocks of
+period at most 21 that this repository's Lean already excludes and no block that it does not; its new period-two theorems
+each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW)
 ([kit pull requests](literature/kit-pull-requests.md)), and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
@@ -199,9 +200,13 @@ period at most 21 that this repository's Lean already excludes and no block that
   cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
   census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 16 cells
   ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); with the condition of $K$, (R) holds in Lean for every point of $K$ whose
-  tail from cell 28 on is the ether, whose defect then never leaves the head, and by computation to 36 cells, though the
-  leaves of the tree of $K$ that survive step 63 grow with the head (54, 66, 104 and 701 at 24 to 36 cells)
-  ([EtherKTree](Rule30Open/PeriodTwo/EtherKTree.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
+  tail from cell 28 on is the ether, whose defect then never leaves the head, and from cell 32 on with the bound 39
+  ([EtherKTree](Rule30Open/PeriodTwo/EtherKTree.md), [EtherKTree32](Rule30Open/PeriodTwo/EtherKTree32.md)); by
+  computation the points of $K$ with an ether tail from cell 56 on are exactly 203, on four periodic orbits (14 periodic
+  points), and they are the points with $p \le 56$ of a finite backward tree of 303 points; conjecture (E), that these are
+  all of them, gives (R) on the ether, and a counterexample keeps a defect of more than 57 cells ([the points of $K$ with an
+  ether tail](findings/period-two/k-ether-points.md)), but neither the top of the defect nor its length decreases along $K$
+  ([no monotone defect on K](negative-results/period-two/k-ether-monotone.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain, and real defects follow such cycles: one orbit returns to its own window of 24 cells 14 cells higher, so
   no potential on top windows of up to 28 cells holds even along single orbits ([the ether
   census](findings/period-two/ether-defect-census.md), item 3); no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
@@ -306,7 +311,10 @@ period at most 21 that this repository's Lean already excludes and no block that
   ([FrontWalker](Rule30Open/Diagonals/FrontWalker.md)); the walk advances about $2.01$ per depth to depth 200,000, with
   $\delta = 1$ at slope $41/20$, but it reads only the settled parts, and leads through the onset phase, the front
   at the white diagonals and a finite set of pair types stop at the transient or at a law of large numbers for the
-  settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)). Over every row white left
+  settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)); a density budget on reset
+  gaps, the decay of damage from one flipped cell and a doubling law for the onsets each reduce to the onsets again, and
+  the onsets spread like a walk (variance about 2.2 per depth, a heuristic reading)
+  ([onset heuristics](negative-results/diagonals/onset-heuristics.md)). Over every row white left
   of a black cell, a later row of which is again such a row, diagonal $j$ settles by $\lceil 3j/2 \rceil + 5$ for
   $j \le 76$, exactly, with 5 attained at $j = 48$; this seed-uniform bound is conjectured for every $j$ ([seed-uniform
   onsets](findings/diagonals/seed-uniform-onsets.md)), and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
@@ -376,11 +384,15 @@ period at most 21 that this repository's Lean already excludes and no block that
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
   they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
-  on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 17$ by computation, where Rule 90 needs only
+  on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 21$ by computation, where Rule 90 needs only
   $2^{\mathrm{popcount}(t)}$; this bound is linear and says nothing about the single seed
   ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)); certificates, sensitivity and fixed answers cannot pass $2t$,
   since no row is sensitive to all three rightmost cells of the cone, in Lean ([RightCorner](Rule30Open/Complexity/RightCorner.md),
-  [query-depth routes](negative-results/complexity/query-depth-routes.md)).
+  [query-depth routes](negative-results/complexity/query-depth-routes.md)); the center sees the two rightmost cone cells
+  only through their OR, in Lean, so an adversary must answer the first of them white, and $2t + 1$ for every $t$ is
+  equivalent to one function $G_t$ of $2t - 1$ cells needing all its cells; self-similar restrictions, restricted top
+  coefficients and congruences stop ([CornerOr](Rule30Open/Complexity/CornerOr.md), [adversary
+  routes](negative-results/complexity/query-adversary-routes.md)).
 
 ## Next steps
 

@@ -32,8 +32,9 @@ def naive_trap(block: str, width: int, words: tuple[str, ...]) -> set[tuple[int,
                 out.append((True, ((p + 1) % len(block), v, s)))
         return out
 
+    moves = {st: successors(*st) for st in states}  # each state's moves, stepped cell by cell once
     while True:
-        bad = {st for st in states if any(not ok or nxt not in states for ok, nxt in successors(*st))}
+        bad = {st for st in states if any(not ok or nxt not in states for ok, nxt in moves[st])}
         if not bad:
             return states
         states -= bad

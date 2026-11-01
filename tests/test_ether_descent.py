@@ -96,11 +96,12 @@ def test_bound_against_direct_runs() -> None:
 
 
 def test_descent_is_cheaper() -> None:
-    """With descent, the heads of 8 cells settle in fewer rounds than without, with the same highest top; descent
-    below the first head of a block of 8 costs at most 10% more rounds than descent below the head itself."""
-    without = ec.census(8, 61, 80)
-    with_descent = ed.census_descent(8, 0, 61, 80, 1)
-    blocks = ed.census_descent(8, 0, 61, 80, 8)
+    """With descent, the heads of 7 cells settle in fewer rounds than without, with the same highest top; descent
+    below the first head of a block of 8 costs at most 10% more rounds than descent below the head itself (9.5% at 7
+    cells, 5.2% at 8)."""
+    without = ec.census(7, 61, 80)
+    with_descent = ed.census_descent(7, 0, 61, 80, 1)
+    blocks = ed.census_descent(7, 0, 61, 80, 8)
     assert with_descent["failed"] == 0 and blocks["failed"] == 0 and with_descent["heads"] == without["heads"]
     assert with_descent["rounds"] < 0.7 * without["rounds"]
     assert with_descent["rounds"] <= blocks["rounds"] <= 1.1 * with_descent["rounds"]

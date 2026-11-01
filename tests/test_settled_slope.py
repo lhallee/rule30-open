@@ -6,7 +6,7 @@ import numpy as np
 
 from computations.diagonal_cones import diagonal_table
 from computations.run_slope_routes import skeleton_from_table
-from computations.settled_slope import (alternations, black_slope, by_period, cost_offset, least_periods,
+from computations.settled_slope import (Diagonals, alternations, black_slope, by_period, cost_offset, least_periods,
                                         pair_onset_bound, settling_offset, stream, white_runs)
 
 DEPTH, STEPS, PERIOD, WINDOW = 120, 400, 16, 128
@@ -71,9 +71,10 @@ def test_offsets_on_small_cases() -> None:
     assert black_slope(3, 2) == (3, 13) and black_slope(27, 20) == (21, 115) and black_slope(6, 1) == (15, 29)
 
 
-def test_numbers_to_depth_10000() -> None:
-    """The numbers the entry quotes for depths up to 10,000 (the full range is the reproduce command)."""
-    d = stream(10000, 15600, progress=False)
+def test_numbers_to_depth_10000(deep_diagonals: Diagonals) -> None:
+    """The numbers the entry quotes for depths up to 10,000 (the full range is the reproduce command), from the run of
+    `stream` to depth 10,000 over 15,600 steps that the tests of both entries share (`deep_diagonals`)."""
+    d = deep_diagonals
     white = white_runs(d.tail)  # (10001,)
     alt = alternations(d.tail)  # (10000,)
     assert np.flatnonzero(white < 0).tolist() == [2, 7, 28, 399]

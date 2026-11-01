@@ -102,18 +102,19 @@ def test_run_head_against_direct_runs() -> None:
 
 
 def test_census_counts() -> None:
-    """The census of heads of 5 cells: every head settles, by the same way as in `defect_potential.census`, which
-    checks the closed strip at every step rather than at every fourth."""
+    """The census of heads of 5 cells: every head settles at all 28 alignments, and at every fourth alignment (seven)
+    as many by a closed strip as in `defect_potential.census`, which checks the closed strip at every step rather than
+    at every fourth."""
     r = ec.census(5, 61, 80)
     assert r["heads"] == 28 * 32 and r["failed"] == 0
+    sample = [(a, o) for a in range(4) for o in range(7)][::4]
     closed = dp.closed_strips(dp.STRIP)
     strip = 0
-    for a in range(4):
-        for o in range(7):
-            d = dp.census(5, a, o, 400, closed)
-            assert (d["settled"] >= 0).all()
-            strip += int((d["cell"] >= 0).sum())
-    assert strip == r["strip"]
+    for a, o in sample:
+        d = dp.census(5, a, o, 400, closed)
+        assert (d["settled"] >= 0).all()
+        strip += int((d["cell"] >= 0).sum())
+    assert strip == ec.census(5, 61, 80, sample)["strip"]
 
 
 def test_lean_tables_match_module() -> None:

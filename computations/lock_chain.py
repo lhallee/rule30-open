@@ -106,6 +106,7 @@ from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
 
 from computations import absorption, game, locks
+from computations.rule30 import distinct
 
 # Seeds, the width of their lock, a distance at which their chain holds a block of a shorter period, the shortest found
 # for each such block (`short_scan`), and the seed's lock values when it has more than one bottom component without a
@@ -125,7 +126,7 @@ def necklace(word: str) -> str:
 
 def least_period(word: str) -> int:
     """The least period of a word read cyclically."""
-    return min(p for p in range(1, len(word) + 1) if len(word) % p == 0 and word == word[p:] + word[:p])
+    return (word + word).find(word, 1)  # the least rotation that gives the word back, which divides its length
 
 
 def left_column(column: str, right: str) -> str:
@@ -166,7 +167,7 @@ def bottom_components(block: str, width: int) -> list[np.ndarray]:
     nodes that no move leaves. Kept for the arguments asked again; the list and its arrays are not to be changed."""
     period, size = len(block), 1 << width
     source, target, _ = game.game_moves(block, width)  # (2 p n,), (2 p n,)
-    locked, _ = locks.lock_info(block, width)  # (p n,)
+    locked = locks.locked_nodes(block, width)  # (p n,)
     keep = locked[source]  # (2 p n,), moves from locked nodes, which stay locked
     start, end = source[keep], target[keep]  # (k,), (k,)
     nodes = period * size
@@ -174,7 +175,7 @@ def bottom_components(block: str, width: int) -> list[np.ndarray]:
     _, label = connected_components(graph, directed=True, connection="strong")  # (p n,)
     leaves = np.zeros(label.max() + 1, dtype=bool)  # (components,)
     leaves[label[start][label[start] != label[end]]] = True
-    return [np.flatnonzero(label == c) for c in np.unique(label[locked]) if not leaves[c]]  # each (members,)
+    return [np.flatnonzero(label == c) for c in distinct(label[locked]) if not leaves[c]]  # each (members,)
 
 
 def phase_columns(members: np.ndarray, width: int, period: int) -> list[str]:
@@ -624,11 +625,12 @@ def chain_lock(seed: str, width: int, distance: int, want: str | None = None) ->
         if want is not None and values != want:
             continue
         columns = chain(seed, values, distance)  # columns m, m - 1, .., m - distance
+        near = [sum(int(columns[distance - 1 - j][ph]) << j for j in range(distance))  # cells 1 .. distance
+                for ph in range(period)]
         nodes = []
         for x in members.tolist():
             ph, window = x >> width, x & ((1 << width) - 1)
-            near = sum(int(columns[distance - 1 - j][ph]) << j for j in range(distance))  # cells 1 .. distance
-            nodes.append((ph, near | window << distance))
+            nodes.append((ph, near[ph] | window << distance))
         return columns[distance], nodes
     raise ValueError(f"{seed} has no such bottom component at width {width}")
 
@@ -760,6 +762,22 @@ def carried(name: str, distance: int) -> dict:
     """The trap of `NATURAL` named `name` carried `distance` columns left by its chain (`carry`), kept for the traps
     asked again."""
     return carry(tables(name), distance)
+
+
+@functools.lru_cache(maxsize=None)
+def carried_word(name: str, distance: int) -> str:
+    """The block of `carried(name, distance)`, without its tables (`carried_block`)."""
+    return carried_block(tables(name), distance)
+
+
+def carried_block(t: dict, distance: int) -> str:
+    """The block of `carry(t, distance)`, as its least rotation, from the chain alone: the lists of the trap modules
+    need the blocks of hundreds of carried traps, and building their tables takes most of the time."""
+    word, period, modulus = t["word"], len(t["word"]), t["modulus"]
+    full = word * (modulus // period)  # the trap's block at its labels
+    values = "".join(str((t["first"] >> label) & 1) if full[label] == "0" else "0" for label in range(modulus))
+    column = chain(full, values, distance)[distance]  # the block at the distance, at the trap's labels
+    return necklace(column[:least_period(column)])
 
 
 def carry(t: dict, distance: int) -> dict:
@@ -1557,11 +1575,16 @@ def chain_family(block: str, periods: tuple[int, ...] = (16, 20, 24, 28, 32, 36,
 
 
 def lean_check_names() -> set[str]:
-    """The names `x` of the traps with a theorem `x_check` in the Lean modules of `Rule30Open/Columns`."""
+    """The names `x` of the traps with a theorem `x_check` in the Lean modules of `Rule30Open/Columns`. A theorem starts
+    a line: the search looks for it after a newline, and at the start of the file, which runs four times as fast on the
+    90 MB of the modules as an anchored search line by line (`re.M`)."""
     root = Path(__file__).resolve().parents[1] / "Rule30Open" / "Columns"
     found = set()
     for path in root.glob("*.lean"):
-        found |= set(re.findall(r"^theorem (\w+)_check :", path.read_text(encoding="utf-8"), re.M))
+        text = path.read_text(encoding="utf-8")
+        found |= set(re.findall(r"\ntheorem (\w+)_check :", text))
+        if (first := re.match(r"theorem (\w+)_check :", text)) is not None:
+            found.add(first.group(1))
     return found
 
 
@@ -1954,7 +1977,7 @@ def chain_distances(name: str, period: int, depth: int) -> list[int]:
     """The least distance below `depth` at which the chain of the natural trap `name` holds each block of `period`."""
     seen, found = set(), []
     for distance in range(depth):
-        word = carried(name, distance)["word"]
+        word = carried_word(name, distance)
         if len(word) == period and word not in seen:
             seen.add(word)
             found.append(distance)
@@ -1971,7 +1994,7 @@ def ten_distances() -> list[int]:
     the kit does not exclude; the chain repeats with period 155 in the distance, and every block in it appears by
     distance 30."""
     return [d for d in chain_distances("trap0000010001", 10, 31)
-            if carried("trap0000010001", d)["word"] not in game.KIT_WORDS]
+            if carried_word("trap0000010001", d) not in game.KIT_WORDS]
 
 
 def ten_entry(cells: int, steps: int) -> list[tuple[int, str, int, np.ndarray]]:
@@ -2073,17 +2096,19 @@ def ten_lengths(lengths: list[int], count: int = 60, steps: int = 100000) -> lis
     return found
 
 
-def gap_entries(name: str, cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
-    """For each phase of the natural trap `name` and each right half r with support in cells 1 .. `cells` (bit i is
-    column i + 1), the first step T at which the run of r driven from that phase has its first cells in a state of the
-    trap with the label of its phase, and that state's index in the sorted states of the trap's Lean definition; kept
-    for the traps asked again, however the arguments are passed."""
-    return cached_gap_entries(name, cells, steps)
+def gap_entries(name: str, cells: int = 8, steps: int = 50000,
+                phases: tuple[int, ...] | None = None) -> list[list[tuple[int, int]]]:
+    """For each phase of the natural trap `name` (or each of `phases`, in order) and each right half r with support in
+    cells 1 .. `cells` (bit i is column i + 1), the first step T at which the run of r driven from that phase has its
+    first cells in a state of the trap with the label of its phase, and that state's index in the sorted states of the
+    trap's Lean definition; kept for the traps asked again, however the arguments are passed."""
+    return cached_gap_entries(name, cells, steps, phases)
 
 
 @functools.lru_cache(maxsize=None)
-def cached_gap_entries(name: str, cells: int, steps: int) -> list[list[tuple[int, int]]]:
-    """`gap_entries`, computed once for each trap, support and number of steps."""
+def cached_gap_entries(name: str, cells: int, steps: int,
+                       phases: tuple[int, ...] | None = None) -> list[list[tuple[int, int]]]:
+    """`gap_entries`, computed once for each trap, support, number of steps and choice of phases."""
     t = carried(name, 0)
     word, period, low = t["word"], len(t["word"]), (1 << t["cells"]) - 1
     index: list[dict[int, int]] = [{} for _ in range(period)]  # by label, each window's index in the states
@@ -2092,7 +2117,7 @@ def cached_gap_entries(name: str, cells: int, steps: int) -> list[list[tuple[int
             index[label][window] = k
     centers = [int(bit) for bit in word]
     out = []
-    for phase in range(period):
+    for phase in range(period) if phases is None else phases:
         row_entries = []
         for r in range(1 << cells):
             row, label = r, phase  # label = (step + phase) % period
@@ -2109,16 +2134,19 @@ def cached_gap_entries(name: str, cells: int, steps: int) -> list[list[tuple[int
     return out
 
 
-def ten_gap_entries(cells: int = 8, steps: int = 50000) -> list[list[tuple[int, int]]]:
+def ten_gap_entries(cells: int = 8, steps: int = 50000,
+                    phases: tuple[int, ...] | None = None) -> list[list[tuple[int, int]]]:
     """`gap_entries` for the period-10 wall `ten0`."""
-    return gap_entries("trap0000010001", cells, steps)
+    return gap_entries("trap0000010001", cells, steps, phases)
 
 
-def lean_gap(name: str, trap: str, bound: int, prefix: str) -> str:
-    """The entry data of a gap module for the natural trap `name`, whose Lean definition is `trap`: for each phase, the
-    step and the state of each half of `gap_entries`, with the kernel check of the phase against the bound."""
+def lean_gap(name: str, trap: str, bound: int, prefix: str, phases: tuple[int, ...] | None = None) -> str:
+    """The entry data of a gap module for the natural trap `name`, whose Lean definition is `trap`: for each phase (or
+    each of `phases`), the step and the state of each half of `gap_entries`, with the kernel check of the phase against
+    the bound."""
+    chosen = range(len(carried(name, 0)["word"])) if phases is None else phases
     blocks = []
-    for phase, entries in enumerate(gap_entries(name)):
+    for phase, entries in zip(chosen, gap_entries(name, phases=phases)):
         items = [f"({step}, {k})" for step, k in entries]
         lines, line = [], "    "
         for j, item in enumerate(items):
@@ -2136,9 +2164,9 @@ def lean_gap(name: str, trap: str, bound: int, prefix: str) -> str:
     return "\n".join(blocks)
 
 
-def lean_ten_gap() -> str:
-    """The entry data of `Rule30Open.Columns.TenGap`."""
-    return lean_gap("trap0000010001", "ten0", 3058, "tenGap")
+def lean_ten_gap(phases: tuple[int, ...] | None = None) -> str:
+    """The entry data of `Rule30Open.Columns.TenGap`, or of its phases `phases`."""
+    return lean_gap("trap0000010001", "ten0", 3058, "tenGap", phases)
 
 
 # The walls of `Rule30Open.Columns.WallGaps`: the trap, its Lean definition, the bound (the latest entry plus 16) and
@@ -2648,7 +2676,7 @@ def wall_distances(period: int, depth: int) -> list[tuple[str, int, str]]:
     seen, found = set(game.KIT_WORDS), []
     for name in WALLS[period]:
         for distance in range(depth + 1):
-            word = carried(name, distance)["word"]
+            word = carried_word(name, distance)
             if len(word) == period and word not in seen:
                 seen.add(word)
                 found.append((name, distance, word))

@@ -121,7 +121,8 @@ proved for heads of 28 cells, against 16 for every half in [EtherCensus16](Ether
 bound uses $K$ only through the breaks: at a leaf that survives step 63, the defect is bounded by the ether's own
 closed strips and repeats, as without $K$. Each pair of cells doubles the leaves, so this is still a census of finitely
 many heads, and the leaves that survive past step 63 grow with the head (54, 66, 104 and 701 at 24, 28, 32 and 36
-cells, the highest defect cell before settling rising to 73). A proof for every head would need what the ether census asks
+cells, the highest defect cell before settling rising to 73); 18 of the 104 and 562 of the 701 break $K$ after step 63,
+and the true points are counted in [the points of $K$ with an ether tail](../../findings/period-two/k-ether-points.md). A proof for every head would need what the ether census asks
 for, a bound on the top of every defect, or a proof that the survivors of $K$ settle, and the items 3 and 4 of the
 [ether census](../../findings/period-two/ether-defect-census.md) say why the local routes to the first fail.
 

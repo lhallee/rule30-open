@@ -1,7 +1,10 @@
 """The blocks that the kit's main branch excludes beyond its pinned commit, and the entries here they reach.
 
 This repository pins the kit at commit 932cf8d; its main branch, at a09f245, adds families that exclude whole classes of
-blocks as the eventual period of the single cell's center column, for every transient and so in every rotation:
+blocks as the eventual period of the single cell's center column, for every transient and so in every rotation (the
+main branch at 27060a7 adds no family to these: `Rule30Problem3Bounds`, `Rule30LeftAntiPeriod`,
+`Rule30ZeroBoundaryStripeCascade`, `Rule30WedgeParity` and the seven period-two and Problem 2 bridge modules exclude no
+block unconditionally, and the six modules below are unchanged):
 
 - `Rule30White17Runs.not_eventually_long_white_runs`: every word 1^r1 0^q1 ... 1^rk 0^qk with every q >= 17;
 - `Rule30GrammarRuns.not_eventually_grammar`: the same with every pair (r, q) in one of the categories

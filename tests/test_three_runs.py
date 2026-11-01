@@ -37,16 +37,17 @@ def test_ranks_match_naive() -> None:
     width = 7
     good, rank = ranks(width)
     states = {(p, s, w) for p in range(3) for s in range(8) for w in range(1 << width)}
+    moves = {st: naive_successors(*st, width) for st in states}  # each state's moves, stepped cell by cell once
     keep = set(states)
     while True:
-        drop = {st for st in keep if any(not ok or nx not in keep for ok, nx in naive_successors(*st, width))}
+        drop = {st for st in keep if any(not ok or nx not in keep for ok, nx in moves[st])}
         if not drop:
             break
         keep -= drop
     assert keep == {(p, s, w) for p, w, s in zip(*np.nonzero(good))}
     layer, k = {st: 0 for st in keep}, 0
     while True:
-        add = {st for st in states - layer.keys() if all(nx in layer for _, nx in naive_successors(*st, width))}
+        add = {st for st in states - layer.keys() if all(nx in layer for _, nx in moves[st])}
         if not add:
             break
         k += 1

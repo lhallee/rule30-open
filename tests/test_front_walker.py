@@ -7,7 +7,7 @@ import numpy as np
 from computations.diagonal_cones import diagonal_table
 from computations.front_walker import (front_law, pair_types, phase_chi2, phase_gaps, step_pairs, step_table,
                                        walk_direct, walk_from_tail, walk_offset, window_max)
-from computations.settled_slope import least_periods, stream, white_runs
+from computations.settled_slope import Diagonals, least_periods, stream, white_runs
 
 DEPTH, STEPS, PERIOD, WINDOW = 120, 400, 16, 128
 
@@ -53,9 +53,10 @@ def test_helpers_on_small_cases() -> None:
     assert pair_types(tail, 0, 2, 4) == 1 and pair_types(tail, 0, 3, 4) == 2
 
 
-def test_numbers_to_depth_10000() -> None:
-    """The numbers the entry quotes for depths up to 10,000 (the full range is the reproduce command)."""
-    d = stream(10000, 15600, progress=False)
+def test_numbers_to_depth_10000(deep_diagonals: Diagonals) -> None:
+    """The numbers the entry quotes for depths up to 10,000 (the full range is the reproduce command), from the run of
+    `stream` to depth 10,000 over 15,600 steps that the tests of both entries share (`deep_diagonals`)."""
+    d = deep_diagonals
     w = walk_from_tail(d.onset, d.tail, 15600, d.period)  # (10001,)
     assert (d.onset <= w).all()
     assert np.flatnonzero(np.diff(w) == 0).tolist() == [2, 7, 28, 399]

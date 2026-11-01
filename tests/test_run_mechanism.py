@@ -69,25 +69,27 @@ def test_single_cell_is_reachable() -> None:
 
 def class_runs(a: int, extra: int) -> tuple[int, int]:
     """Longest black and white run of column 0 from time a over every row with the cells left of 0 white, cell 0 black
-    and cells 1 .. a + extra free (direct simulation)."""
+    and cells 1 .. a + extra free (direct simulation, of every row at once as the rows of one array)."""
     T = a + extra
-    best_b = best_w = 0
-    for bits in itertools.product([0, 1], repeat=a + extra):
-        width = 2 * T + a + extra + 4
-        row = np.zeros(width, dtype=np.uint8)  # (width,)
-        c0 = T + 1
-        row[c0] = 1
-        row[c0 + 1: c0 + 1 + a + extra] = bits
-        col = spacetime(row, T)[:, c0]  # (T + 1,)
-        for color in (0, 1):
-            L = 0
-            while a + L <= T and col[a + L] == color:
-                L += 1
-            if color:
-                best_b = max(best_b, L)
-            else:
-                best_w = max(best_w, L)
-    return best_b, best_w
+    width = 2 * T + a + extra + 4
+    c0 = T + 1
+    free = np.array(list(itertools.product([0, 1], repeat=a + extra)), dtype=bool)  # (m, a + extra)
+    rows = np.zeros((free.shape[0], width), dtype=bool)  # (m, width)
+    rows[:, c0] = True
+    rows[:, c0 + 1: c0 + 1 + a + extra] = free
+    col = [rows[:, c0]]  # each (m,)
+    for _ in range(T):
+        left = np.concatenate([np.zeros((rows.shape[0], 1), dtype=bool), rows[:, :-1]], axis=1)  # (m, width)
+        right = np.concatenate([rows[:, 1:], np.zeros((rows.shape[0], 1), dtype=bool)], axis=1)  # (m, width)
+        rows = left ^ (rows | right)
+        col.append(rows[:, c0])
+    after = np.stack(col, axis=1)[:, a:]  # (m, T + 1 - a), column 0 from time a
+    best = []
+    for color in (False, True):
+        differs = after != color  # (m, T + 1 - a)
+        runs = np.where(differs.any(axis=1), differs.argmax(axis=1), differs.shape[1])  # (m,), the leading run
+        best.append(int(runs.max()))
+    return best[1], best[0]
 
 
 def test_driven_bounds_cover_the_class() -> None:
@@ -100,16 +102,14 @@ def test_driven_bounds_cover_the_class() -> None:
 
 
 def brute_forced(word: list[int], s: int) -> set[int]:
-    """Positions (relative to the word) on which all s-step preimages agree, by forward evaluation of every word."""
+    """Positions (relative to the word) on which all s-step preimages agree, by forward evaluation of every word, all
+    at once as the rows of one array."""
     n = len(word)
-    pre = []
-    for bits in itertools.product([0, 1], repeat=n + 2 * s):
-        row = np.array(bits, dtype=np.uint8)
-        for _ in range(s):
-            row = row[:-2] ^ (row[1:-1] | row[2:])
-        if row.tolist() == word:
-            pre.append(bits)
-    arr = np.array(pre)  # (m, n + 2s)
+    rows = np.array(list(itertools.product([0, 1], repeat=n + 2 * s)), dtype=np.uint8)  # (2^(n + 2s), n + 2s)
+    image = rows
+    for _ in range(s):
+        image = image[:, :-2] ^ (image[:, 1:-1] | image[:, 2:])
+    arr = rows[(image == np.array(word, dtype=np.uint8)).all(axis=1)]  # (m, n + 2s)
     return {i - s for i in np.nonzero(np.all(arr == arr[0], axis=0))[0].tolist()}
 
 

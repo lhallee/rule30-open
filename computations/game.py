@@ -39,6 +39,8 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
 
+from computations.rule30 import distinct
+
 # The words of the kit's strip-certificate table (`Rule30StripCertificateTable.certTable`) and of its three single strip
 # certificates (`Rule30StripCertificates.not_eventually_01111111`, `not_eventually_00000011` and
 # `not_eventually_000000000101`), each as its least rotation. tests/test_computations.py reads them from the kit.
@@ -179,7 +181,7 @@ def component_periods(pattern: str, width: int) -> list[tuple[int, int, bool, bo
             level[node] = level[parent[node]] + 1
         moves = label[src] == component  # (k,)
         cycle = 0
-        for gap in np.unique(np.abs(level[src[moves]] + 1 - level[tgt[moves]])).tolist():
+        for gap in distinct(np.abs(level[src[moves]] + 1 - level[tgt[moves]])).tolist():
             cycle = math.gcd(cycle, int(gap))
 
         def mixed(key: np.ndarray, size: int) -> bool:

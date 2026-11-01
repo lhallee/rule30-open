@@ -158,10 +158,12 @@ def greatest_strips(width: int) -> np.ndarray:
 
 
 def strip_at(lo: np.ndarray, hi: np.ndarray, low: np.ndarray, width: int) -> np.ndarray:
-    """The `width` cells low .. low + width - 1 of each defect held as two words, for low in 0 .. 127 - width."""
-    s_lo = np.clip(low, 0, 63).astype(np.uint64)  # (n,) every shift below 64, where numpy is defined
-    s_spill = (64 - np.clip(low, 1, 63)).astype(np.uint64)  # (n,)
-    s_hi = np.clip(low - 64, 0, 63).astype(np.uint64)  # (n,)
+    """The `width` cells low .. low + width - 1 of each defect held as two words, for low in 0 .. 127 - width. The
+    shifts are clamped with `np.minimum` and `np.maximum`, which on these short arrays take a fraction of the time of
+    `np.clip`."""
+    s_lo = np.minimum(np.maximum(low, 0), 63).astype(np.uint64)  # (n,) every shift below 64, where numpy is defined
+    s_spill = (64 - np.minimum(np.maximum(low, 1), 63)).astype(np.uint64)  # (n,)
+    s_hi = np.minimum(np.maximum(low - 64, 0), 63).astype(np.uint64)  # (n,)
     in_lo = (lo >> s_lo) | np.where(low > 0, hi << s_spill, U64(0))  # (n,) for low < 64
     word = np.where(low < 64, in_lo, hi >> s_hi)  # (n,)
     return (word & U64((1 << width) - 1)).astype(np.int64)  # (n,)

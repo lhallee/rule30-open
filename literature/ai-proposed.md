@@ -6,8 +6,9 @@ and says whether it opens a route here. Every item is a claim: the collections b
 are at different stages of verification, and none is refereed unless stated. The work of agents on the prize itself is
 in [rule-30.md](rule-30.md#work-on-the-prize-problems-since-2019).
 
-The search found three AI-proposed results about cellular automata: one on nonsofic groups (family 197 below) and two
-OEIS conjectures proved by formal proof search, one of them on the center column of rule 167 (Other claims). It found
+The search found four AI-proposed results about cellular automata: one on nonsofic groups (family 197 below), two
+OEIS conjectures proved by formal proof search, one of them on the center column of rule 167 (Other claims), and a Lean
+library on the 256 elementary rules written with an AI assistant (Other claims). It found
 one about the pseudorandomness of an explicit sequence, the Liouville function (family 007), and none about normal
 numbers or 2-adic maps. The items below are the nearest ones, and the bearing of each is assessed against the routes in
 [the roadmap](../ROADMAP.md).
@@ -135,6 +136,12 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   which Rule 30 does not have. The same repository states Prize Problems 1 and 2 in Lean as open
   ([rule-30.md](rule-30.md#the-prize-and-its-formal-statements)).
 
+- **Palamarchuk (2026).**
+  [lean-elementary-cellular-automata](https://github.com/lividgreen/lean-elementary-cellular-automata), written, by its
+  README, with substantial assistance from Claude Code; summarized in [columns.md](columns.md#traces). Columns and rays
+  of rational speed are eventually periodic at every quiescent rule whose diameter never grows, which excludes Rule 30,
+  and columns between two eventually periodic columns are eventually periodic. *Here:* the general theory of columns
+  reaches Rule 30 only through pairs of columns, as for Kopra (2023).
 - **Nye (2025).** *TIME[t] is contained in SPACE[O(sqrt t)] via tree height compression.*
   [arXiv:2508.14831](https://arxiv.org/abs/2508.14831), four versions from August 20, 2025 to January 1, 2026; the
   record was read, the text of the first versions was not. Claimed that multitape time $t$ runs in space $O(\sqrt{t})$,

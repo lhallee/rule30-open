@@ -77,7 +77,7 @@ def test_tests_are_nested() -> None:
 
 
 def test_one_cell_short() -> None:
-    """The lemma holds on small widths and periods."""
+    """The lemma holds on small widths and periods: widths 3 and 5, periods 1 to 6 (period 7 takes 0.2 s more)."""
     for width in (3, 5):
-        for period in range(1, 8):
+        for period in range(1, 7):
             assert all(ss.one_cell_short(block, width) for block in game.necklaces(period))

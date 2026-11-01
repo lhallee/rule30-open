@@ -97,7 +97,7 @@ def test_certificates_are_valid_and_minimum_matches_exhaustive_search() -> None:
             if any(is_certificate(n, set(c)) for c in itertools.combinations(cells, size))
         )
         assert brute == min_certificate(n)
-    for n in range(4, 10):
+    for n in range(4, 10):  # n <= 9, as the restricted-models entry states
         assert _min_by_choices(n) == min_certificate(n)
     for n in (8, 15, 22):
         assert is_certificate(n, lazy_certificate(n))

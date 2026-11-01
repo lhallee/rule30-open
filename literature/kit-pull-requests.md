@@ -10,22 +10,28 @@ brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, 
 *merged* below. Thirteen more followed, #17, #59 and #61 to #71, each in a commit of its own (#17 at
 [da21aa7](https://github.com/WolframInstitute/Rule30PrizeKit/commit/da21aa7), #71 at
 [d41defd](https://github.com/WolframInstitute/Rule30PrizeKit/commit/d41defd)), and the main branch at
-[a09f245](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a09f245) has 184 modules, 43 more than the pin. On
-November 1, 2026 the main branch was still at a09f245, its equivalent forms (`equivalents/`) had not changed since the
-pin, and thirteen pull requests were open: #23, #33, #38, #39, #40, #41, #47, #48, #52, #55, #57, #60 and #72, the last
-opened that day. Four earlier pull requests were closed without their modules reaching the main branch: #3
-(`Rule30WordExclusions`), #5 (`Rule30Sparse16`), #29 (`Rule30PeriodThirtyTwoShielding`) and #32 (`Rule30XorCollision`,
-`Rule30XorSharpness`). Two more reached the kit before the pin in other modules: the tail-13 completion of #15 is the
-pinned `Rule30ZeroBoundaryStripeFourComplete` with `Rule30Certificates/StripeTail13Completion`, and the single-cell and
-high-support absorption of #20 is the pinned `Rule30EtherSingleCell`, while its two-cell absorption
-(`Rule30EtherTwoCell`) is in neither. These six are not summarized below. This repository is not yet
-pinned there, so here the merged ones are results of the kit's main branch that the pin does not include; the summaries
-below that say "claims" were written from the pull request pages before the merge, and the merged modules state what
-they claim. The pull requests still open are claims. Each pull request adds Lean
-modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
-request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
-[What the main branch covers here](#what-the-main-branch-covers-here) lists the entries here whose results the main
-branch now proves in part.
+[a09f245](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a09f245) had 184 modules. On November 1, 2026 (UTC)
+seven more were merged, #72, #73, #74, #77, #78, #75 and #76 (#72 at
+[f218d11](https://github.com/WolframInstitute/Rule30PrizeKit/commit/f218d11), #76 at
+[cd5466b](https://github.com/WolframInstitute/Rule30PrizeKit/commit/cd5466b)), and the main branch at
+[27060a7](https://github.com/WolframInstitute/Rule30PrizeKit/commit/27060a7) has 193 modules, 52 more than the pin; its
+equivalent forms (`equivalents/`) have not changed since the pin. Thirteen pull requests were open after these merges:
+#23, #33, #38, #39, #40, #41, #47, #48, #52, #55, #57, #60 and #79, the last opened that day. None of the seven merged
+on November 1 excludes a block unconditionally (#75 and #76 exclude period two only under open hypotheses), so the
+block counts of [what the main branch covers here](#what-the-main-branch-covers-here) are those of a09f245. Four earlier
+pull requests were closed without their
+modules reaching the main branch: #3 (`Rule30WordExclusions`), #5 (`Rule30Sparse16`), #29
+(`Rule30PeriodThirtyTwoShielding`) and #32 (`Rule30XorCollision`, `Rule30XorSharpness`). Two more reached the kit before
+the pin in other modules: the tail-13 completion of #15 is the pinned `Rule30ZeroBoundaryStripeFourComplete` with
+`Rule30Certificates/StripeTail13Completion`, and the single-cell and high-support absorption of #20 is the pinned
+`Rule30EtherSingleCell`, while its two-cell absorption (`Rule30EtherTwoCell`) is in neither. These six are not
+summarized below. This repository is not yet pinned there, so here the merged ones are results of the kit's main branch
+that the pin does not include; the summaries below that say "claims" were written from the pull request pages before the
+merge, and the merged modules state what they claim. The pull requests still open are claims. Each pull request adds
+Lean modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull
+request pages and from the module sources at each pull request's head (`refs/pull/N/head`), and they are grouped by the
+routes of [the roadmap](../ROADMAP.md). [What the main branch covers here](#what-the-main-branch-covers-here) lists the
+entries here whose results the main branch now proves in part.
 
 ## Least periods four and three: traps for the right half
 
@@ -98,6 +104,30 @@ branch now proves in part.
   `QP 4` gives the kit's `C3` for $0001$, and a bit-sliced checker for bounded starts (`qP_of_chunks`); `QP P` is
   stated open for every $P \ge 2$. *Here:* [LeftLatch](../Rule30Open/Columns/LeftLatch.md) states one condition of
   the same kind for every block of every period.
+- **#75, `Rule30AlternatingTraceBridge`, `Rule30SurvivalBridge` and `Rule30P2Bridge`.** *Merged* (a498c23);
+  credited to D. Condrey. A nonzero finite row whose center satisfies $c(t + 2) = c(t) \ne c(t + 1)$ from time 0
+  gives an auxiliary frontier, a finite word over four symbols read from two adjacent anti-diagonals, that passes
+  every guard (`immortalFromAlternating`), so that mortality of the frontier would give the kit's `Q01`
+  (`Q01_of_mortality`) and exclude an eventual period two of the single cell's center
+  (`center_not_eventually_period_two_of_mortality`); a repeat budget is the same as
+  mortality (`budget_iff_mortality`); and, for every Boolean sequence, four restatements of density $1/2$ by dyadic
+  shell maxima and block energies (`problem2_iff_shellMaxLittleO` and three more), with a sequence showing that the
+  weaker hypotheses do not suffice. Mortality is stated open, as is every bound on these quantities for the center
+  column. Its control `alternatingCenter_without_finiteSupport` is the row of spatial period 7 with center
+  $0101\cdots$, the ether that #65 glues to a finite right half.
+- **#76, `Rule30SEPToPeriodTwo` and three more modules.** *Merged* (cd5466b); credited to D. Condrey. Three open
+  hypotheses on streams over four symbols, `BWH`, `RW` and `SEP` (no stream with a long binary prefix has a long
+  constant wedge, its rotated form, and an orbit separator), are related (`bwh_implies_rw`, which also needs
+  `SmallRW`, the six cases of `RW` below length 7; `separator_equivalence`), and each of `SEP`, `RW`, and `BWH` with
+  `SmallRW` excludes a nonconstant center of period two from time 0 on every nonzero finite row
+  (`sep_implies_period_two`, `rw_implies_period_two`, `bwh_small_implies_period_two`). None of the hypotheses is
+  proved. These read the row's right half as well (`actual_endpoint_hardcore`), and the module states no implication
+  in either direction between them and `Q01` or mortality. *Here, for #75 and #76:* they add open statements, each
+  proved to exclude a center of period two, beside the kit's `Q01`, the gap statement `Q01Gap` of #64 and the integer
+  form of #66. The frontier of #75 is read from the left half that the center rebuilds, the open object of [the white
+  right half](../findings/period-two/white-right-half.md) and [the held column](../Rule30Open/PeriodTwo/HeldColumn.md);
+  the hypotheses of #76 are, by the kit's account, of no known order of strength against it. The Problem 2 forms hold
+  for every sequence, as the kit's catalogued restatements do, and bound nothing about the center column.
 - **#53, `Rule30ResetFreeThree` and four more modules.** *Merged.* Claims that every nonzero finite row of the kit's
   zero-boundary evolution, beside a column held white, contains a word $0\,1^{3m+1}\,0$ in one of its first three rows,
   with two rows not enough, and that a tail avoiding these words for five rows is eventually of period five. *Here:* no
@@ -205,6 +235,18 @@ branch now proves in part.
   clone rays from distinct primitive roots never meet (`clone_ray_disjoint_of_primRoot`); and each of sixteen infinite
   clone rays turns its first cell white at an even time at most $m + 45$ (`rowTail_sixteen_rays_all_odd`). It reports a
   partial claim. *Here:* no route here uses the stripe front windows.
+- **#74, `Rule30ZeroBoundaryStripeCascade` extended.** *Merged* (5b186b7). Adds to #63 a synchronization of the
+  complement waves through the word $010$ (`sync_010_complement_step1`), a period doubling to 6 of the NOR wave under
+  two backward steps (`nor_wave_B_shift_period6`), the cascade for the primitive roots of the second kind
+  (`typeII_step3_and_step4_cascade`), period-3 waves in the low bits of the windows `win3pow n` at backward steps 3
+  and 4, for every $n$ (`bstep1_B_shift_win3pow_low_wave`, `B_shiftIter_two_win3pow_low_wave`), and a shift by 3 of
+  these bits from `win3pow (2 + 3m)` to `win3pow 2` = 13 (`B_shiftIter_two_win3pow_mod3_shift_13`). It states no claim
+  on a prize problem. *Here:* as for #63.
+- **#79, `Rule30ZeroBoundaryStripeCascade` extended again.** Open; its commit is by G.P.J.W. Quint. Claims that the word
+  $010$ in a window makes both backward steps forget the bits below it, so that a tail of period $L$ above $010$ keeps
+  period $L$ (`bstep1_congr_of_010`, `bstep1_periodic_of_010`); that a tail of period $L \ge 2$ above $00$ gets period
+  $2L$ (`bstep1_periodic_two_mul_of_00`); and that every tail of period $L$ gets period $6L$ under one backward step
+  (`bstep1_periodic_six_mul`), by collapsing the backward step to a transducer on pairs of bits. *Here:* as for #63.
 - **#23, `Rule30RunBoundarySources`.** Claims that the center at time $2^{e+1} - 1$ is 1 plus, modulo 2, the
   contribution of run-boundary sources at depths beyond $e$, from an expansion through Rule 90. *Here:* it is of the same kind as
   [the Duhamel form](../findings/structure/duhamel.md), which writes the center column as a sum over adjacent black
@@ -212,6 +254,43 @@ branch now proves in part.
 - *Here, for the group:* no route of the roadmap uses these yet. The right-diagonal results describe the regular part of
   a finite pattern near its right edge, while every open case of Problem 1 here turns on the chaotic part near the
   center.
+
+## Left diagonals
+
+- **#73, `Rule30LeftAntiPeriod`.** *Merged* (1e22121); credited to G.P.J.W. Quint and Gemini. The parity of $L$
+  consecutive cells of a sequence of period $L$ is eventually constant (`par_const_of_periodic`), so when $D_j$ has
+  eventual period $L$ and $D_{j+1}$ is eventually white, $D_{j+2}$ is eventually $L$-periodic or $L$-anti-periodic,
+  $D_{j+2}(t + L) = \lnot D_{j+2}(t)$ (`D_period_or_antiperiodic`); an eventually anti-periodic sequence has $L$ black
+  cells in every $2L$ consecutive cells after its transient, so density $1/2$ (`halfDensity_of_antiperiodic`); and with
+  the unbounded periods of `Rule30LeftUnbounded`, for every $N$ some left diagonal $D_j$, $j > N$, is eventually
+  $2^k$-anti-periodic, not $2^k$-periodic, and of density $1/2$ (`D_infinitely_many_halfDensity`). *Here:* these are
+  `windowParity_periodic` and the second case of `D_period_dichotomy` of
+  [LeftMemory](../Rule30Open/Diagonals/LeftMemory.md) ([below](#what-the-main-branch-covers-here)). The density
+  statement is the form of Problem 2 for a sequence that is eventually periodic, where it reduces to counting one
+  period; it says nothing about the center column, which is not a left diagonal.
+- **#78, `Rule30LeftAntiPeriod` extended.** *Merged* (fba0ae7); credited to G.P.J.W. Quint and Gemini. $D_m$ and
+  $D_{m+1}$ have a common eventual period $Q$ exactly when every $D_i$, $i \le m + 1$, has it (`D_evPer_pair_iff_all`),
+  by the left-permutive backward step; local laws behind an eventually white diagonal (`D_white_prev_three`,
+  `D_post_white_complement`, `D_post_white_no11`); twin anti-periodic diagonals of density $1/2$
+  (`D_twin_antiperiodic_of_not_evPer`); the bound that $D_j$ eventually repeats with period $2^{\lfloor(j+5)/6\rfloor}$
+  (`D_evPer_pow_div_six`), from the white spacing of #46; and for every $k$ a right diagonal $R_j$, $k < j < 2^{k+1}$,
+  that is $2^k$-anti-periodic from time 0 and so of density $1/2$ (`R_infinitely_many_halfDensity`). *Here:* the period
+  bound is exponential in $j$ and says nothing about when a diagonal starts to repeat, so it does not bear on [linear
+  settling](../findings/diagonals/settled-runs.md), which asks an onset at most $3j/2$ with a period $o(j)$.
+
+## Counts over all rows
+
+- **#77, `Rule30WedgeParity`.** *Merged* (8aefaf6); credited to D. Condrey with Claude. For every left-permutive
+  elementary rule $a \oplus g(b, c)$, $g = \gamma \oplus \alpha b \oplus \beta c \oplus \kappa bc$, counts the rows of a
+  window of $2n + 1$ cells with a fixed far-left cell, a fixed boundary diagonal on the right and center cell 1 at time
+  $n$, by the free word that left-permutivity reconstructs them from (`adm_eq_Y`, `rowOf_adm`), and proves the count
+  odd exactly when $\alpha \oplus r = 1$ if $\kappa = 1$ (`wedge_parity_quadratic`), and even from $n = 2$ if
+  $\kappa = 0$ (`wedge_parity_affine`); for Rule 30 with white boundary the count, OEIS A400898, is odd for every $n$
+  (`rule30_wedge_odd`). The module says that the counts are over all initial rows, so nothing follows for the single
+  cell. *Here:* a statement about every row, of the kind [the random-row
+  barrier](../negative-results/random-rows/almost-every-row.md) separates from the single cell. The reconstruction is
+  the left-permutive step by which a right half and a center column fix the one left half that could carry them, the
+  object of [the white right half](../findings/period-two/white-right-half.md).
 
 ## Runs of the center column
 
@@ -255,16 +334,19 @@ branch now proves in part.
   window (`diagonal_canon_window_time_ge`). *Here:* for the center column one pair $m \ge 2^{k-1}$ with
   $c(m) \ne c(m + 2^k)$ per $k$ suffices; [restricted models](../negative-results/complexity/restricted-models.md)
   finds the least such pair for $k \le 20$, always within the first six inputs of the window.
-- **#72, `Rule30Problem3Bounds`, right-head span.** Open. Claims the results of #68 and #70 with the time bound replaced
-  by a bound on how far right the head goes: if the head stays below cell $k$ on an input $n \ge 2^{k-1}$, every
-  $m \ge 2^{k-1}$ with $m \equiv n \pmod{2^k}$ gets the same value (`computes_eq_of_mod_two_pow_of_scansBelow`); a head
-  that eventually stays below cell $k$ forces period $2^k$ from $2^{k-1}$ on (`period_of_eventually_scansBelow`); so with
-  Problem 1 every machine computing the center column reaches cell $k$ on inputs beyond every bound
+- **#72, `Rule30Problem3Bounds`, right-head span.** *Merged* (f218d11). The results of #68 and #70 with the time bound
+  replaced by a bound on how far right the head goes: if the head stays below cell $k$ on an input $n \ge 2^{k-1}$,
+  every $m \ge 2^{k-1}$ with $m \equiv n \pmod{2^k}$ gets the same value (`computes_eq_of_mod_two_pow_of_scansBelow`); a
+  head that eventually stays below cell $k$ forces period $2^k$ from $2^{k-1}$ on (`period_of_eventually_scansBelow`);
+  so with Problem 1 every machine computing the center column reaches cell $k$ on inputs beyond every bound
   (`head_unbounded_of_problem1`), and some left diagonal makes every machine reach cell $k$ on the window
-  $[2^{k-1}, 2^{k-1} + 2^k)$ (`diagonal_canon_window_head_ge`). The span is at most the time
-  (`rightSpan_le_steps`). *Here:* the head must read $k$ input cells to tell residues apart modulo $2^k$, a bound of the
-  order of the input's length, as in #68; it does not approach the linear bound Problem 3 asks
-  ([the barrier](../negative-results/complexity/problem-three-barrier.md)).
+  $[2^{k-1}, 2^{k-1} + 2^k)$ (`diagonal_canon_window_head_ge`). The span is at most the time (`rightSpan_le_steps`). A
+  head that stays below cell $k$ on the $2^k$ inputs of the window also makes the machine halt on every $m \ge 2^{k-1}$
+  within the time it takes on the representative of $m$ in the window, with the same configuration on the cells $i < k$
+  at every step (`period_and_halt_of_canon_window_scansBelow`, `run_congr_canonRep_of_canon_window_scansBelow`). *Here:*
+  the head must read $k$ input cells to tell residues apart modulo $2^k$, a bound of the order of the input's length, as
+  in #68; it does not approach the linear bound Problem 3 asks ([the
+  barrier](../negative-results/complexity/problem-three-barrier.md)).
 - **#71, `Rule30EtherEpisode`.** *Merged* (d41defd). In the frame of the rightmost black cell, the longest run of
   ticks for which two adjacent depths of a black-edge code follow the one-in-four ether has an exact length,
   $\lfloor 2k/3 \rfloor + 4 - [k \equiv 0, 2 \pmod 6]$ (`episode_max`), a quantitative form of #69. *Here:* no
@@ -312,7 +394,9 @@ mark as new or as a refinement.
 - **[LeftMemory](../Rule30Open/Diagonals/LeftMemory.md)** (`kit: refines`). `Rule30LeftReset` proves its reset
   (`D_period_after_reset`, the same statement as `D_periodic_of_black`), the first half of its dichotomy
   (`D_period_or_white`: the next diagonal has the period, or the middle one is white), the doubling
-  (`D_white_double`) and the parity criterion (`D_white_period_iff`), for the single cell's left diagonals.
+  (`D_white_double`) and the parity criterion (`D_white_period_iff`), for the single cell's left diagonals, and
+  `Rule30LeftAntiPeriod` (#73) proves its constant window parity (`par_const_of_periodic`, as `windowParity_periodic`)
+  and the anti-periodic case of its dichotomy (`D_period_or_antiperiodic`).
 - **Unbounded left-diagonal periods.** [SettledRuns](../Rule30Open/Diagonals/SettledRuns.md) and [the driven run
   slopes](../negative-results/diagonals/driven-run-slopes.md) cite Nersissian (2026) for them; `Rule30LeftUnbounded`
   proves them in Lean (`D_period_unbounded`, `D_least_period_unbounded`), with infinitely many eventually white left
