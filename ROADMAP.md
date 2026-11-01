@@ -61,7 +61,7 @@ period at most 21 that this repository's Lean already excludes and no block that
     21](findings/columns/game-blocks-21.md), [BitPhases](Rule30Open/Columns/BitPhases.md)); the game with cyclic
     classes at 16 cells excludes $000000001011$, of period 12, in Lean through a certificate of local checks that
     holds for any block ([class game](findings/columns/class-game.md), [ClassGame](Rule30Open/Columns/ClassGame.md)), and ten blocks of
-    period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes, all in Lean
+    period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes (for periods 17 and 18 the counts include the blocks that the plain game also closes), all in Lean
     except ten of period 18, the certificates too large for one module checked over several ([class
     blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules it
     links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean

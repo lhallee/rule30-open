@@ -13,12 +13,14 @@ evidence: [computations/class_blocks_18.py, computations/class_blocks.py, comput
 # The game with cyclic classes excludes 000000000010010011, of period 18, which nothing else excludes
 
 No column of the orbit of a row with a leftmost 1, the center column of the single cell among them, eventually repeats
-$000000000010010011$, from any time on and in any rotation. Neither the kit nor any other module of this repository excludes it. The
-class-test survey of period 18 at 16 cells ([the class-test survey](../../findings/columns/class-blocks.md)) finds
-fifteen blocks that the game or the class test closes there and that nothing else excludes; the class test closes this
-one at 15 cells, and the plain game does not close it at any width up to 16. The other blocks of period 18 in Lean are
-in [ClassBlocks18](ClassBlocks18.md), [ClassBlocks18Wide](ClassBlocks18Wide.md). The proof is [the game with cyclic classes](../../findings/columns/class-game.md), checked by the kernel
-through the certificate of [ClassGame](ClassGame.md).
+$000000000010010011$, from any time on and in any rotation. Neither the kit nor any other module of this repository
+excludes it. The class-test survey of period 18 at 16 cells ([the class-test
+survey](../../findings/columns/class-blocks.md)) finds fifteen blocks that the game or the class test closes there and
+that nothing else excludes; the class test closes this one at 15 cells, and the plain game does not close it at any
+width up to 16. The other blocks of period 18 in Lean are in [ClassBlocks18](ClassBlocks18.md) and
+[ClassBlocks18Wide](ClassBlocks18Wide.md). The proof is [the game with cyclic
+classes](../../findings/columns/class-game.md), checked by the kernel through the certificate of
+[ClassGame](ClassGame.md).
 
 ## Statement
 

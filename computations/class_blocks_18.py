@@ -2,8 +2,9 @@
 certificates of `Rule30Open.Columns.ClassBlocks18` for the cheapest of them.
 
 `class_survey --periods 18 18 --width 16` classifies the 14,532 primitive blocks of period 18 with both colors. The
-plain game at 16 cells closes 147 of them, the 142 of the game blocks of period 17 and 18 (`findings/columns/game-blocks-18.md`) at widths
-up to 14 and five more, and the class test closes those 147 and ten more. `class_blocks_wide.report` finds the least
+plain game at 16 cells closes 147 of them, the 142 of the game blocks of period 17 and 18
+(`findings/columns/game-blocks-18.md`) at widths up to 14 and five more, and the class test closes those 147 and ten
+more. `class_blocks_wide.report` finds the least
 widths and the other exclusions (`class_survey.elsewhere`): none of the fifteen is excluded by the kit, the wall sets or
 the limit windows of 14 cells. `BLOCKS` lists them with the least width at which the class test closes each and the
 least width at which the plain game does (0 when it does not at 16 cells).
