@@ -16,8 +16,9 @@ No column of the orbit of a row with a leftmost 1, the center column of the sing
 $001111111111011101$, $001001101111111111$ or $000000000100000001$, from any time on and in any rotation. Neither the
 kit nor any other module of this repository excludes them. The class-test survey of period 18 at 16 cells ([the
 class-test survey](../../findings/columns/class-blocks.md)) finds fifteen blocks that the game or the class test closes
-there and that nothing else excludes; these are the three with the smallest certificates, and the next two are in
-[ClassBlocks18Mid](ClassBlocks18Mid.md) and [ClassBlocks18Wide](ClassBlocks18Wide.md). The plain game does not
+there and that nothing else excludes; these are the three with the smallest certificates, the next two are in
+[ClassBlocks18Mid](ClassBlocks18Mid.md) and [ClassBlocks18Wide](ClassBlocks18Wide.md), and the other ten are in
+[ClassBlocks18Split](ClassBlocks18Split.md), each certificate checked over two or three modules. The plain game does not
 close the first two at any width up to 16, and closes $000000000100000001$ at 16 cells and not at 15; the class test
 closes them at 8, 11 and 13 cells. The proof is [the game with cyclic classes](../../findings/columns/class-game.md),
 checked by the kernel through the certificates of [ClassGame](ClassGame.md).

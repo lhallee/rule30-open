@@ -105,6 +105,32 @@ public import Rule30Open.Columns.ClassBlocks17Split
 public import Rule30Open.Columns.ClassBlocks18
 public import Rule30Open.Columns.ClassBlocks18Mid
 public import Rule30Open.Columns.ClassBlocks18Wide
+public import Rule30Open.Columns.ClassBlocks18SplitA1
+public import Rule30Open.Columns.ClassBlocks18SplitA2
+public import Rule30Open.Columns.ClassBlocks18SplitB1
+public import Rule30Open.Columns.ClassBlocks18SplitB2
+public import Rule30Open.Columns.ClassBlocks18SplitC1
+public import Rule30Open.Columns.ClassBlocks18SplitC2
+public import Rule30Open.Columns.ClassBlocks18SplitD1
+public import Rule30Open.Columns.ClassBlocks18SplitD2
+public import Rule30Open.Columns.ClassBlocks18SplitE1
+public import Rule30Open.Columns.ClassBlocks18SplitE2
+public import Rule30Open.Columns.ClassBlocks18SplitF1
+public import Rule30Open.Columns.ClassBlocks18SplitF2
+public import Rule30Open.Columns.ClassBlocks18SplitF3
+public import Rule30Open.Columns.ClassBlocks18SplitG1
+public import Rule30Open.Columns.ClassBlocks18SplitG2
+public import Rule30Open.Columns.ClassBlocks18SplitG3
+public import Rule30Open.Columns.ClassBlocks18SplitH1
+public import Rule30Open.Columns.ClassBlocks18SplitH2
+public import Rule30Open.Columns.ClassBlocks18SplitH3
+public import Rule30Open.Columns.ClassBlocks18SplitI1
+public import Rule30Open.Columns.ClassBlocks18SplitI2
+public import Rule30Open.Columns.ClassBlocks18SplitI3
+public import Rule30Open.Columns.ClassBlocks18SplitJ1
+public import Rule30Open.Columns.ClassBlocks18SplitJ2
+public import Rule30Open.Columns.ClassBlocks18SplitJ3
+public import Rule30Open.Columns.ClassBlocks18Split
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable
@@ -120,10 +146,13 @@ public import Rule30Open.PeriodTwo.SevenLock
 public import Rule30Open.PeriodTwo.EtherCensus
 public import Rule30Open.PeriodTwo.EtherCensus16
 public import Rule30Open.PeriodTwo.NoKTails
+public import Rule30Open.PeriodTwo.NoKTails16
+public import Rule30Open.PeriodTwo.EtherKTree
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Diagonals.SettledSlope
 public import Rule30Open.Diagonals.FrontWalker
+public import Rule30Open.Diagonals.PrefixWalk
 public import Rule30Open.Diagonals.DrivenSkeleton
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
@@ -133,6 +162,7 @@ public import Rule30Open.RandomRows.LeftWindow
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth
+public import Rule30Open.Complexity.RightCorner
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

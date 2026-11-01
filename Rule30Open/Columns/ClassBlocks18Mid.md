@@ -17,8 +17,8 @@ $000000000010010011$, from any time on and in any rotation. Neither the kit nor 
 excludes it. The class-test survey of period 18 at 16 cells ([the class-test
 survey](../../findings/columns/class-blocks.md)) finds fifteen blocks that the game or the class test closes there and
 that nothing else excludes; the class test closes this one at 15 cells, and the plain game does not close it at any
-width up to 16. The other blocks of period 18 in Lean are in [ClassBlocks18](ClassBlocks18.md) and
-[ClassBlocks18Wide](ClassBlocks18Wide.md). The proof is [the game with cyclic
+width up to 16. The other blocks of period 18 in Lean are in [ClassBlocks18](ClassBlocks18.md),
+[ClassBlocks18Wide](ClassBlocks18Wide.md) and [ClassBlocks18Split](ClassBlocks18Split.md). The proof is [the game with cyclic
 classes](../../findings/columns/class-game.md), checked by the kernel through the certificate of
 [ClassGame](ClassGame.md).
 

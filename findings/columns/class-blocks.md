@@ -4,7 +4,7 @@ category: columns
 problems: [1]
 status: computed
 formalization: partial
-evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_blocks_wide.py, computations/class_blocks_split.py, computations/class_blocks_18.py, computations/class_certificate.py]
+evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_blocks_wide.py, computations/class_blocks_split.py, computations/class_blocks_18.py, computations/class_blocks_18_split.py, computations/class_certificate.py]
 ---
 
 # The game with cyclic classes closes ten blocks of period 13 to 16, eight of period 17 and fifteen of period 18 that nothing else excludes
@@ -173,11 +173,12 @@ test closes those 147 and ten more. The 14 blocks of period 18 that the kit excl
 the fifteen does `class_survey.elsewhere` find the kit, the wall sets or the limit windows of 14 cells; no Lean module
 outside those below names any of them, and no rotation of any of them appears in the Lean sources of the pinned kit or
 of the kit's main branch, whose new families (four-category grammars, white runs of at least 17, black runs $1^r u$
-with $u$ of at most five cells) do not contain them. Lean proves the five with the smallest certificates, $001111111111011101$, $001001101111111111$,
-$000000000100000001$, $000000000010010011$ and $000000000000111011$
-([ClassBlocks18](../../Rule30Open/Columns/ClassBlocks18.md),
+with $u$ of at most five cells) do not contain them. Lean proves all fifteen: the five with the smallest certificates,
+$001111111111011101$, $001001101111111111$, $000000000100000001$, $000000000010010011$ and $000000000000111011$, each
+certificate in a single module ([ClassBlocks18](../../Rule30Open/Columns/ClassBlocks18.md),
 [ClassBlocks18Mid](../../Rule30Open/Columns/ClassBlocks18Mid.md),
-[ClassBlocks18Wide](../../Rule30Open/Columns/ClassBlocks18Wide.md)).
+[ClassBlocks18Wide](../../Rule30Open/Columns/ClassBlocks18Wide.md)), and the other ten with each certificate checked
+over two or three modules ([ClassBlocks18Split](../../Rule30Open/Columns/ClassBlocks18Split.md)).
 
 | Block | Closed by | Least width of the class test | Components at that width that can hold a play: nodes (cyclic period) |
 |---|---|---:|---|
@@ -203,12 +204,16 @@ does not at 14 cells, so [BitBlocks18](../../Rule30Open/Columns/BitBlocks18.md) 
 [BitPhases](../../Rule30Open/Columns/BitPhases.md) do not reach it. The class test closes $000000000100000001$ at 13
 cells, three fewer than the plain game needs. Every component mixed by phase has a cyclic period of two or three
 periods of the block. The certificates at the least widths above check 3,696 to 152,538 nodes over the widths and 998
-to 43,557 for the classes (`class_blocks_18`, each checked node by node by `class_certificate.check`); the ten not in
-Lean have certificates of 87,205 to 194,697 nodes in all. For comparison, the part of
-[ClassBlocks17Split](../../Rule30Open/Columns/ClassBlocks17Split.md) with the tables of 119,726 nodes peaks near 3.5 GB.
+to 43,557 for the classes (`class_blocks_18`, each checked node by node by `class_certificate.check`). The ten in
+[ClassBlocks18Split](../../Rule30Open/Columns/ClassBlocks18Split.md) have certificates of 87,205 to 194,697 nodes in
+all; `class_blocks_18_split` checks each over a module of the heights of every width, or two (widths 1 to 15 and width
+16) for the five at 16 cells, and a module of the classes, so that no module holds more than 98,060 nodes of tables,
+the same way as [ClassBlocks17Split](../../Rule30Open/Columns/ClassBlocks17Split.md). The 25 modules peak at 1.1 to
+2.2 GB.
 
 ```bash
 python -m computations.class_survey --periods 18 18 --width 16 --workers 2 --out rows18.jsonl   # about 40 minutes
 python -m computations.class_blocks_wide --report rows18.jsonl   # the fifteen blocks, their widths and other exclusions
 python -m computations.class_blocks_18                           # all fifteen certificates, checked node by node, 45 s
+python -m computations.class_blocks_18_split                     # the ten split certificates, every part's size, 45 s
 ```

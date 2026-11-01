@@ -42,7 +42,9 @@ head. None of the four gives a proof, and the census says where each stops.
    that reaches the ether on the ring after $\tau$ steps when $p + \tau \le 20$, since $H^\tau(U)$ then has an ether tail
    from cell $p + \tau$ on. The heads settled by a repeat keep their top within 24 cells of the wall without entering a
    closed strip. Nothing here uses $K$; the kit has no statement about the zero-boundary left half
-   with an ether tail.
+   with an ether tail. With the condition of $K$, [EtherKTree](../../Rule30Open/PeriodTwo/EtherKTree.md) proves (R) in
+   Lean for every point of $K$ whose tail from cell 28 on is the ether, and computes it to 36 cells: only $2^{h/2}$
+   heads of $h$ cells per alignment can start a point of $K$, and each breaks $K$ by step 63 or settles.
 2. **The closed strips** (computed). The greatest set of strips $D(c - w + 1 .. c)$, with $D$ zero above $c$, that one
    step maps into the set for both values of $D(c - w)$ and that never raise the top above $c$ is empty for $w \le 12$
    and has 1,915 strips at $w = 13$, all at one residue of $c + \text{offset}$ modulo 7, by phase 433, 533, 344 and 605.

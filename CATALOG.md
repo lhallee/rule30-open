@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-133 Lean modules with 632 headline theorems, 49 findings (proved on paper,
-computed or conjectured) and 50 negative results. Prize problem 1 asks whether the center column
+163 Lean modules with 719 headline theorems, 50 findings (proved on paper,
+computed or conjectured) and 54 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,17 +12,17 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 107 | 26 | 14 |
-| [Period two](#period-two) | 9 | 10 | 7 |
-| [Diagonals](#diagonals) | 5 | 3 | 4 |
+| [Columns](#columns) | 133 | 26 | 15 |
+| [Period two](#period-two) | 11 | 10 | 7 |
+| [Diagonals](#diagonals) | 6 | 4 | 5 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
-| [Hidden structure](#hidden-structure) | 0 | 2 | 6 |
+| [Hidden structure](#hidden-structure) | 0 | 2 | 7 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 3 | 3 | 7 |
+| [Complexity](#complexity) | 4 | 3 | 8 |
 
 ## Open work
 
@@ -33,6 +33,7 @@ approach stopped.
 
 - [The three words of period four lock the right half](findings/columns/period-four-locking.md): problem 1
 - [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md): problem 2
+- [Over every row white left of a black cell, the left diagonal j settles by time ceil(3j/2) + 5 for j up to 76, exactly; from depth 9 to 76 the worst row is the single cell delayed by 6 to 8 steps, and the bound is conjectured for every j](findings/diagonals/seed-uniform-onsets.md): problem 2
 - [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md): problem 2
 
 **Findings that want a Lean proof**
@@ -157,6 +158,32 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game with cyclic classes excludes 00000000001000001, of period 17, which nothing else excludes](Rule30Open/Columns/ClassBlocks17Wide.md) | [`Columns.ClassBlocks17Wide`](Rule30Open/Columns/ClassBlocks17Wide.lean) | `column_not_00000000001000001`, `center_not_00000000001000001`, `not_eventually_00000000001000001` | 1 | not in the kit |
 | [The game with cyclic classes excludes 001111111111011101, 001001101111111111 and 000000000100000001, of period 18, which nothing else excludes](Rule30Open/Columns/ClassBlocks18.md) | [`Columns.ClassBlocks18`](Rule30Open/Columns/ClassBlocks18.lean) | `column_not_001111111111011101`, `center_not_001111111111011101`, `not_eventually_001111111111011101`, `column_not_001001101111111111`, `center_not_001001101111111111`, `not_eventually_001001101111111111`, `column_not_000000000100000001`, `center_not_000000000100000001`, `not_eventually_000000000100000001` | 1 | not in the kit |
 | [The game with cyclic classes excludes 000000000010010011, of period 18, which nothing else excludes](Rule30Open/Columns/ClassBlocks18Mid.md) | [`Columns.ClassBlocks18Mid`](Rule30Open/Columns/ClassBlocks18Mid.lean) | `column_not_000000000010010011`, `center_not_000000000010010011`, `not_eventually_000000000010010011` | 1 | not in the kit |
+| [The game with cyclic classes excludes ten more blocks of period 18, which nothing else excludes](Rule30Open/Columns/ClassBlocks18Split.md) | [`Columns.ClassBlocks18Split`](Rule30Open/Columns/ClassBlocks18Split.lean) | `column_not_001010100111111111`, `center_not_001010100111111111`, `not_eventually_001010100111111111`, `column_not_001111001111111111`, `center_not_001111001111111111`, `not_eventually_001111001111111111`, `column_not_011110111111111111`, `center_not_011110111111111111`, `not_eventually_011110111111111111`, `column_not_000000000011000101`, `center_not_000000000011000101`, `not_eventually_000000000011000101`, `column_not_000011111111111101`, `center_not_000011111111111101`, `not_eventually_000011111111111101`, `column_not_000000000011111001`, `center_not_000000000011111001`, `not_eventually_000000000011111001`, `column_not_000000000001000001`, `center_not_000000000001000001`, `not_eventually_000000000001000001`, `column_not_000010111111111001`, `center_not_000010111111111001`, `not_eventually_000010111111111001`, `column_not_001011111111110111`, `center_not_001011111111110111`, `not_eventually_001011111111110111`, `column_not_000000011011111001`, `center_not_000000011011111001`, `not_eventually_000000011011111001` | 1 | not in the kit |
+| [The heights of the certificate of 001010100111111111 at widths 1 to 14, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitA1.md) | [`Columns.ClassBlocks18SplitA1`](Rule30Open/Columns/ClassBlocks18SplitA1.lean) | `cls001010100111111111W14_levels` | 1 | not in the kit |
+| [The classes of the certificate of 001010100111111111 at 14 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitA2.md) | [`Columns.ClassBlocks18SplitA2`](Rule30Open/Columns/ClassBlocks18SplitA2.lean) | `cls001010100111111111_f` | 1 | not in the kit |
+| [The heights of the certificate of 001111001111111111 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitB1.md) | [`Columns.ClassBlocks18SplitB1`](Rule30Open/Columns/ClassBlocks18SplitB1.lean) | `cls001111001111111111W15_levels` | 1 | not in the kit |
+| [The classes of the certificate of 001111001111111111 at 15 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitB2.md) | [`Columns.ClassBlocks18SplitB2`](Rule30Open/Columns/ClassBlocks18SplitB2.lean) | `cls001111001111111111_f` | 1 | not in the kit |
+| [The heights of the certificate of 011110111111111111 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitC1.md) | [`Columns.ClassBlocks18SplitC1`](Rule30Open/Columns/ClassBlocks18SplitC1.lean) | `cls011110111111111111W15_levels` | 1 | not in the kit |
+| [The classes of the certificate of 011110111111111111 at 15 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitC2.md) | [`Columns.ClassBlocks18SplitC2`](Rule30Open/Columns/ClassBlocks18SplitC2.lean) | `cls011110111111111111_f` | 1 | not in the kit |
+| [The heights of the certificate of 000000000011000101 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitD1.md) | [`Columns.ClassBlocks18SplitD1`](Rule30Open/Columns/ClassBlocks18SplitD1.lean) | `cls000000000011000101W15_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000000000011000101 at 15 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitD2.md) | [`Columns.ClassBlocks18SplitD2`](Rule30Open/Columns/ClassBlocks18SplitD2.lean) | `cls000000000011000101_f` | 1 | not in the kit |
+| [The heights of the certificate of 000011111111111101 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitE1.md) | [`Columns.ClassBlocks18SplitE1`](Rule30Open/Columns/ClassBlocks18SplitE1.lean) | `cls000011111111111101W15_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000011111111111101 at 15 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitE2.md) | [`Columns.ClassBlocks18SplitE2`](Rule30Open/Columns/ClassBlocks18SplitE2.lean) | `cls000011111111111101_f` | 1 | not in the kit |
+| [The heights of the certificate of 000000000011111001 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitF1.md) | [`Columns.ClassBlocks18SplitF1`](Rule30Open/Columns/ClassBlocks18SplitF1.lean) | `cls000000000011111001W15_levels` | 1 | not in the kit |
+| [The heights of the certificate of 000000000011111001 at width 16, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitF2.md) | [`Columns.ClassBlocks18SplitF2`](Rule30Open/Columns/ClassBlocks18SplitF2.lean) | `cls000000000011111001W16_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000000000011111001 at 16 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitF3.md) | [`Columns.ClassBlocks18SplitF3`](Rule30Open/Columns/ClassBlocks18SplitF3.lean) | `cls000000000011111001_f` | 1 | not in the kit |
+| [The heights of the certificate of 000000000001000001 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitG1.md) | [`Columns.ClassBlocks18SplitG1`](Rule30Open/Columns/ClassBlocks18SplitG1.lean) | `cls000000000001000001W15_levels` | 1 | not in the kit |
+| [The heights of the certificate of 000000000001000001 at width 16, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitG2.md) | [`Columns.ClassBlocks18SplitG2`](Rule30Open/Columns/ClassBlocks18SplitG2.lean) | `cls000000000001000001W16_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000000000001000001 at 16 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitG3.md) | [`Columns.ClassBlocks18SplitG3`](Rule30Open/Columns/ClassBlocks18SplitG3.lean) | `cls000000000001000001_f` | 1 | not in the kit |
+| [The heights of the certificate of 000010111111111001 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitH1.md) | [`Columns.ClassBlocks18SplitH1`](Rule30Open/Columns/ClassBlocks18SplitH1.lean) | `cls000010111111111001W15_levels` | 1 | not in the kit |
+| [The heights of the certificate of 000010111111111001 at width 16, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitH2.md) | [`Columns.ClassBlocks18SplitH2`](Rule30Open/Columns/ClassBlocks18SplitH2.lean) | `cls000010111111111001W16_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000010111111111001 at 16 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitH3.md) | [`Columns.ClassBlocks18SplitH3`](Rule30Open/Columns/ClassBlocks18SplitH3.lean) | `cls000010111111111001_f` | 1 | not in the kit |
+| [The heights of the certificate of 001011111111110111 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitI1.md) | [`Columns.ClassBlocks18SplitI1`](Rule30Open/Columns/ClassBlocks18SplitI1.lean) | `cls001011111111110111W15_levels` | 1 | not in the kit |
+| [The heights of the certificate of 001011111111110111 at width 16, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitI2.md) | [`Columns.ClassBlocks18SplitI2`](Rule30Open/Columns/ClassBlocks18SplitI2.lean) | `cls001011111111110111W16_levels` | 1 | not in the kit |
+| [The classes of the certificate of 001011111111110111 at 16 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitI3.md) | [`Columns.ClassBlocks18SplitI3`](Rule30Open/Columns/ClassBlocks18SplitI3.lean) | `cls001011111111110111_f` | 1 | not in the kit |
+| [The heights of the certificate of 000000011011111001 at widths 1 to 15, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitJ1.md) | [`Columns.ClassBlocks18SplitJ1`](Rule30Open/Columns/ClassBlocks18SplitJ1.lean) | `cls000000011011111001W15_levels` | 1 | not in the kit |
+| [The heights of the certificate of 000000011011111001 at width 16, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitJ2.md) | [`Columns.ClassBlocks18SplitJ2`](Rule30Open/Columns/ClassBlocks18SplitJ2.lean) | `cls000000011011111001W16_levels` | 1 | not in the kit |
+| [The classes of the certificate of 000000011011111001 at 16 cells, checked in Lean](Rule30Open/Columns/ClassBlocks18SplitJ3.md) | [`Columns.ClassBlocks18SplitJ3`](Rule30Open/Columns/ClassBlocks18SplitJ3.lean) | `cls000000011011111001_f` | 1 | not in the kit |
 | [The game with cyclic classes excludes 000000000000111011, of period 18, which nothing else excludes](Rule30Open/Columns/ClassBlocks18Wide.md) | [`Columns.ClassBlocks18Wide`](Rule30Open/Columns/ClassBlocks18Wide.lean) | `column_not_000000000000111011`, `center_not_000000000000111011`, `not_eventually_000000000000111011` | 1 | not in the kit |
 | [The game with cyclic classes, checked width by width, excludes 000000001011 in Lean](Rule30Open/Columns/ClassGame.md) | [`Columns.ClassGame`](Rule30Open/Columns/ClassGame.lean) | `class_column`, `center_not_class`, `class_not_eventuallyWord`, `column_not_000000001011`, `center_not_000000001011`, `not_eventually_000000001011` | 1 | not in the kit |
 | [A certificate of the game with cyclic classes can be checked over several modules](Rule30Open/Columns/ClassSplit.md) | [`Columns.ClassSplit`](Rule30Open/Columns/ClassSplit.lean) | `ClassCert.tri_append`, `ClassCert.levelOk_append` | 1 | not in the kit |
@@ -259,6 +286,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Kind | Problems |
 |---|---|---|
+| [The Conley index of the windows beside a repeating column excludes no block, and over GF(2) it vanishes for a block that a background repeats](negative-results/columns/conley-index.md) | refuted | 1 |
 | [Constraining the free bits of column -1 by the right half lowers the entropy of the left-half statements for 001 and 011, and no finite left game closes](negative-results/columns/constrained-left-halves.md) | dead end | 1 |
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
 | [Jen's theorem on farther columns, or on periods longer than the block's, does not strengthen the finite game](negative-results/columns/jen-farther-columns.md) | no signal | 1 |
@@ -286,8 +314,10 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [The alternating domains time the period-two condition](Rule30Open/PeriodTwo/Domains.md) | [`PeriodTwo.Domains`](Rule30Open/PeriodTwo/Domains.lean) | `held_domains_odd`, `held_countdown`, `held_disagree`, `held_agree_stepB` | 1 | independent proof of a kit result |
 | [Every head of up to 12 cells on the ether settles, so (R) holds for every 2-adic rational whose tail from cell 12 on is the ether](Rule30Open/PeriodTwo/EtherCensus.md) | [`PeriodTwo.EtherCensus`](Rule30Open/PeriodTwo/EtherCensus.lean) | `ether_tail_clear`, `ether_tail_eventually_periodic`, `ether_tail_itinerary`, `closedOK_true`, `closed_count`, `stripInv_forever`, `runHead_sound`, `census`, `eventually_periodic_of_clear`, `eth_eq_kit_ether` | 1 | not in the kit |
 | [Every head of up to 16 cells on the ether settles, so (R) holds for every 2-adic rational whose tail from cell 16 on is the ether](Rule30Open/PeriodTwo/EtherCensus16.md) | [`PeriodTwo.EtherCensus16`](Rule30Open/PeriodTwo/EtherCensus16.lean) | `ether_tail_clear_16`, `ether_tail_eventually_periodic_16`, `ether_tail_itinerary_16`, `descCensus`, `runDesc_sound`, `descend`, `headsBelow_block`, `headsBelow_chunk`, `headsBelow_12`, `defect_shift` | 1 | not in the kit |
+| [Every point of K whose tail from cell 28 on is the ether keeps its defect below cell 28, so (R) holds for it](Rule30Open/PeriodTwo/EtherKTree.md) | [`PeriodTwo.EtherKTree`](Rule30Open/PeriodTwo/EtherKTree.lean) | `ether_k_tail_clear`, `ether_k_tail_eventually_periodic`, `ether_k_tail_itinerary`, `clear_of_etherTree`, `etherLeaf_sound` | 1 | not in the kit |
 | [Period two reduces to an integer map](Rule30Open/PeriodTwo/HeldColumn.md) | [`PeriodTwo.HeldColumn`](Rule30Open/PeriodTwo/HeldColumn.lean) | `period_two_held`, `period_two_integer`, `center_period_two_integer`, `heldNat_testBit` | 1 | independent proof of a kit result |
 | [No point of K has a tail on the backgrounds with (L, P) = (4, 8), (5, 5), (10, 15) or (12, 3) from cell 12 on](Rule30Open/PeriodTwo/NoKTails.md) | [`PeriodTwo.NoKTails`](Rule30Open/PeriodTwo/NoKTails.lean) | `no_k_tail_48`, `no_k_tail_55`, `no_k_tail_1015`, `no_k_tail_123`, `not_inK_of_tables`, `breakRun_sound`, `column_eq_of_agree`, `ringCell_step` | 1 | not in the kit |
+| [No point of K has a tail from cell 16 on equal to a background of the tail census other than the stripes and the ether](Rule30Open/PeriodTwo/NoKTails16.md) | [`PeriodTwo.NoKTails16`](Rule30Open/PeriodTwo/NoKTails16.lean) | `no_k_tail16_L1P1`, `no_k_tail16_L4P8`, `no_k_tail16_L5P5`, `no_k_tail16_L7P63`, `no_k_tail16_L8P40`, `no_k_tail16_L9P72`, `no_k_tail16_L9P171`, `no_k_tail16_L10P15`, `no_k_tail16_L11P17`, `no_k_tail16_L11P154`, `no_k_tail16_L12P3`, `no_k_tail16_L12P102`, `treeWith_sound`, `treeRun_sound`, `not_inK_of_tree`, `colRaw_eq`, `tabOK_spec` | 1 | not in the kit |
 | [A lock of period seven beside an alternating center excludes period two for every right half that enters it](Rule30Open/PeriodTwo/SevenLock.md) | [`PeriodTwo.SevenLock`](Rule30Open/PeriodTwo/SevenLock.lean) | `sevenLock_check`, `sevenLock_forever`, `sevenLock_periodic`, `sevenLock_not_finSupp_Psi`, `no_alternating_of_sevenLock`, `no_alternating_sevenLock_example` | 1 | not in the kit |
 | [The period-two condition is a full 2-shift on 2-adic halves](Rule30Open/PeriodTwo/ShiftModel.md) | [`PeriodTwo.ShiftModel`](Rule30Open/PeriodTwo/ShiftModel.lean) | `heldOrbit_triangular`, `column_bijective`, `inK_graph`, `itinerary_bijective`, `held_held_two_to_one`, `heldNat_triangular`, `inK_periodic_rational`, `inK_periodic_not_finite`, `positive_integer_not_preperiodic` | 1 | independent proof of a kit result |
 | [Against a white right half, no left half within depth 32,755 keeps the center alternating](Rule30Open/PeriodTwo/WhiteRightHalf.md) | [`PeriodTwo.WhiteRightHalf`](Rule30Open/PeriodTwo/WhiteRightHalf.lean) | `white_right_leaves`, `psi_empty_gaps`, `leaves_by_gap`, `psiBits_spec` | 1 | extends a kit result |
@@ -330,6 +360,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Every configuration white left of a black cell settles to the single cell's pairs of left diagonals up to a time shift, as long as each white diagonal is followed by a doubling period](Rule30Open/Diagonals/DrivenSkeleton.md) | [`Diagonals.DrivenSkeleton`](Rule30Open/Diagonals/DrivenSkeleton.lean) | `shift_of_black`, `shift_or_flip_of_white`, `skeleton_step`, `skeleton_step_of_flip`, `base_shift` | 2 | not in the kit |
 | [A walk that steps down on black cells and down-left on white ones bounds when the left diagonals settle; it advances 2.01 times per depth to depth 200,000, and a walk of slope 2 + o(1) would give black center runs of slope 1/3](Rule30Open/Diagonals/FrontWalker.md) | [`Diagonals.FrontWalker`](Rule30Open/Diagonals/FrontWalker.lean) | `pair_repeats_of_walk`, `black_run_le_of_walk`, `black_run_le_of_steep_walk` | 2 | extends a kit result |
 | [Left diagonals remember only behind a white diagonal](Rule30Open/Diagonals/LeftMemory.md) | [`Diagonals.LeftMemory`](Rule30Open/Diagonals/LeftMemory.lean) | `D_reset`, `D_periodic_of_black`, `D_period_dichotomy`, `D_period_doubles`, `D_two_white`, `D_three_flips` | 1 | extends a kit result |
+| [Behind a walk through its black cells, a left diagonal of any row white left of a cell forgets the cells past a prefix; this bounds the onsets of every extension of the prefix at once](Rule30Open/Diagonals/PrefixWalk.md) | [`Diagonals.PrefixWalk`](Rule30Open/Diagonals/PrefixWalk.lean) | `agree_of_walk`, `Ld_agree_of_prefix`, `Ld_agree_of_walk`, `Ld_repeats_of_walk` | 2 | extends a kit result |
 | [If the left diagonals repeat with period 16 from time 3j/2 to depth J, black center runs have 13L at most 3a + 2400 and white blocks reach left at most (a + 100)/3](Rule30Open/Diagonals/SettledRuns.md) | [`Diagonals.SettledRuns`](Rule30Open/Diagonals/SettledRuns.lean) | `no_alt_pair`, `settled_alt_pair`, `no_white_pair`, `erode_alt`, `black_run_le_of_settled`, `white_block_le_of_settled` | 2 | not in the kit |
 | [If the left diagonals repeat from time 3j/2 with any periods and no settled pair alternates in antiphase more than A times, black center runs have 13L at most 3a + 130A + 260; the reset bound reduces the settling to the white runs of the settled diagonals](Rule30Open/Diagonals/SettledSlope.md) | [`Diagonals.SettledSlope`](Rule30Open/Diagonals/SettledSlope.lean) | `altBound_of_repeats`, `altBound_of_period_le`, `black_run_window`, `black_run_le_of_settling`, `black_run_le_of_fast_settling`, `pair_repeats_of_white_runs`, `black_run_le_of_white_runs` | 2 | not in the kit |
 
@@ -339,6 +370,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 |---|---|---|---|
 | [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md) | conjecture | 2 | wanted |
 | [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md) | computed | 1 | partial |
+| [Over every row white left of a black cell, the left diagonal j settles by time ceil(3j/2) + 5 for j up to 76, exactly; from depth 9 to 76 the worst row is the single cell delayed by 6 to 8 steps, and the bound is conjectured for every j](findings/diagonals/seed-uniform-onsets.md) | conjecture | 2 | wanted |
 | [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md) | conjecture | 2 | partial |
 
 **Negative results**
@@ -349,6 +381,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [A finite automaton over the center column certifies no slope for black runs of the driven left half unless those runs are bounded](negative-results/diagonals/finite-state-slopes.md) | barrier | 2 |
 | [Direct comparison with a true strip of the pattern near the left edge of any fixed depth leaves the slope of black center runs at 3/5](negative-results/diagonals/fixed-depth-strips.md) | barrier | 2 |
 | [Three leads to linear settling of the single cell's left diagonals stop, to depth 200,000, at the transient or at a law of large numbers for the settled left side; the onset phases are uniform, the front shows nothing at the white diagonals, and no settled pair repeats up to a time shift](negative-results/diagonals/linear-settling-leads.md) | dead end | 2 |
+| [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
 
 ## Frames and the seed's past
 
@@ -430,6 +463,7 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 | [Deforming the rule to Rule 150 gives a polynomial of exponential degree](negative-results/structure/deformation-interpolation.md) | dead end | 3 |
 | [No small algebraic equation for the center column, and no Rule 30 signal in the cut ranks of the cone](negative-results/structure/hidden-algebra.md) | no signal | 1, 3 |
 | [No linear relation among subsequences of the center column](negative-results/structure/linear-relations.md) | no signal | 1, 3 |
+| [The single cell's pattern has no periodic domains of short spatial period, so it has no ether walls whose slopes or holonomy could be read](negative-results/structure/pattern-domains.md) | no signal | 1 |
 | [The center cell is a random-looking polynomial](negative-results/structure/polynomial-structure.md) | no signal | 3 |
 
 ## Random rows
@@ -483,6 +517,7 @@ Prize Problem 3, and what an answer either way would imply.
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
 | [A decision tree for the center cell from an arbitrary row spends exactly one query on the leftmost cell, so with the kit's degree bound it reads at least 2t cells; computation gives all 2t + 1 for t ≤ 17](Rule30Open/Complexity/QueryDepth.md) | [`Complexity.QueryDepth`](Rule30Open/Complexity/QueryDepth.lean) | `depth_restrict_succ_le`, `eval_restrict`, `tree_drop_of_flip`, `center_tree_drop`, `center_tree_lift` | 3 | extends a kit result |
+| [The center never depends on all three rightmost cone cells at one row, so its certificate complexity is at most 2t](Rule30Open/Complexity/RightCorner.md) | [`Complexity.RightCorner`](Rule30Open/Complexity/RightCorner.lean) | `right_corner`, `right_corner_certificate`, `corner_white`, `strip_one`, `strip_two`, `strip_three` | 3 | not in the kit |
 
 **Findings**
 
@@ -502,4 +537,5 @@ Prize Problem 3, and what an answer either way would imply.
 | [Crossing sequences prove at most time (log n)² for the center column, and need a spectral hypothesis that implies Problem 1](negative-results/complexity/one-tape-crossing.md) | barrier | 3, 1 |
 | [Probabilistic checking verifies the center cell cheaply, as it does every computation, and does not compute it](negative-results/complexity/probabilistic-checking.md) | barrier | 3, 1, 2 |
 | [Problem 3 asks for a lower bound beyond current complexity theory](negative-results/complexity/problem-three-barrier.md) | barrier | 3, 1 |
+| [Sensitivity, certificates, fixed answers and one-step lifting do not show that the center needs its whole cone](negative-results/complexity/query-depth-routes.md) | barrier | 3 |
 | [Restricted models give the center cell no new lower bound for every n; past reading the digits they imply Problem 1, and spacetime bounds hold for Rule 90](negative-results/complexity/restricted-models.md) | barrier | 3, 1 |

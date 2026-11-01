@@ -61,8 +61,8 @@ period at most 21 that this repository's Lean already excludes and no block that
     21](findings/columns/game-blocks-21.md), [BitPhases](Rule30Open/Columns/BitPhases.md)); the game with cyclic
     classes at 16 cells excludes $000000001011$, of period 12, in Lean through a certificate of local checks that
     holds for any block ([class game](findings/columns/class-game.md), [ClassGame](Rule30Open/Columns/ClassGame.md)), and ten blocks of
-    period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes (for periods 17 and 18 the counts include the blocks that the plain game also closes), all in Lean
-    except ten of period 18, the certificates too large for one module checked over several ([class
+    period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes (for periods 17 and 18 the counts include the blocks that the plain game also closes), all in Lean, the ten largest certificates of period 18 each checked over two or three modules
+    ([ClassBlocks18Split](Rule30Open/Columns/ClassBlocks18Split.md), [class
     blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules it
     links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean
     ([GameBlocksWide](Rule30Open/Columns/GameBlocksWide.md)); the kit excludes every
@@ -90,7 +90,8 @@ period at most 21 that this repository's Lean already excludes and no block that
     ([locking](findings/columns/period-four-locking.md)); column words that fix the cell beside the column without a
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
-    to 20 cells ([window locks](negative-results/columns/window-locks.md)). Wider ones exist for one block or more of
+    to 20 cells ([window locks](negative-results/columns/window-locks.md)). The Conley index of the window graphs, taken as
+    the class of the relation's matrix over GF(2), excludes no block ([Conley index](negative-results/columns/conley-index.md)). Wider ones exist for one block or more of
     each of these periods, the locks of seeds with long runs of 1s carried leftward through columns the rule determines
     ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
@@ -192,11 +193,15 @@ period at most 21 that this repository's Lean already excludes and no block that
   the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
   ether. Beyond the stripes and the ether, every background that a periodic tail of up to 12 cells reaches
   carries fronts on which the tops of most defects run away, provably on 10 of the 12, so there (R) can hold only because
-  $K$ misses those tails; no head of up to 16 cells on them is in $K$, each breaking it by step 47, and for heads of up to 12 cells on four of them
-  in Lean ([NoKTails](Rule30Open/PeriodTwo/NoKTails.md), [the tail census](findings/period-two/tail-census.md), [front backgrounds](negative-results/period-two/front-backgrounds.md)). Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
+  $K$ misses those tails; no head of up to 16 cells on them is in $K$, each breaking it by step 47, in Lean on all twelve, through the tree of
+  $K$, which runs $2^{h/2}$ of the $2^h$ heads of $h$ cells ([NoKTails16](Rule30Open/PeriodTwo/NoKTails16.md),
+  [NoKTails](Rule30Open/PeriodTwo/NoKTails.md), [the tail census](findings/period-two/tail-census.md), [front backgrounds](negative-results/period-two/front-backgrounds.md)). Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
   cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
   census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 16 cells
-  ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
+  ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); with the condition of $K$, (R) holds in Lean for every point of $K$ whose
+  tail from cell 28 on is the ether, whose defect then never leaves the head, and by computation to 36 cells, though the
+  leaves of the tree of $K$ that survive step 63 grow with the head (54, 66, 104 and 701 at 24 to 36 cells)
+  ([EtherKTree](Rule30Open/PeriodTwo/EtherKTree.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain, and real defects follow such cycles: one orbit returns to its own window of 24 cells 14 cells higher, so
   no potential on top windows of up to 28 cells holds even along single orbits ([the ether
   census](findings/period-two/ether-defect-census.md), item 3); no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
@@ -301,7 +306,12 @@ period at most 21 that this repository's Lean already excludes and no block that
   ([FrontWalker](Rule30Open/Diagonals/FrontWalker.md)); the walk advances about $2.01$ per depth to depth 200,000, with
   $\delta = 1$ at slope $41/20$, but it reads only the settled parts, and leads through the onset phase, the front
   at the white diagonals and a finite set of pair types stop at the transient or at a law of large numbers for the
-  settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)).
+  settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)). Over every row white left
+  of a black cell, a later row of which is again such a row, diagonal $j$ settles by $\lceil 3j/2 \rceil + 5$ for
+  $j \le 76$, exactly, with 5 attained at $j = 48$; this seed-uniform bound is conjectured for every $j$ ([seed-uniform
+  onsets](findings/diagonals/seed-uniform-onsets.md)), and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
+  rule that makes the search exact, but induction through later rows, subadditivity over seeds and a fixed delay behind
+  the single cell all stop, the first at slope 2 ([seed-uniform induction](negative-results/diagonals/seed-uniform-induction.md)).
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
   strips](negative-results/diagonals/fixed-depth-strips.md)). *Assessment:* going below linear needs a statement about
   the chaotic left half near the center, here a linear bound on when the left diagonals settle, with a period that may
@@ -316,7 +326,9 @@ period at most 21 that this repository's Lean already excludes and no block that
   Space-time patches of the single cell's chaotic region match the invariant measure under exact tests, and no
   linear or learned projection (PCA, classifiers, an autoencoder, t-SNE) tells them from a random row
   ([patch projections](negative-results/statistics/patch-projections.md)), nor does persistent homology tell its
-  windows from those of random rows ([persistent homology](negative-results/statistics/persistent-homology.md)).
+  windows from those of random rows ([persistent homology](negative-results/statistics/persistent-homology.md)). The
+  single cell's pattern has no periodic domain of spatial period at most 16 to row 8,191, so a route through ether walls
+  needs the walls to come from the hypothesis ([pattern domains](negative-results/structure/pattern-domains.md)).
 
 ## Problem 3: does computing the $n$th cell take effort of order $n$?
 
@@ -366,7 +378,9 @@ period at most 21 that this repository's Lean already excludes and no block that
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
   on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 17$ by computation, where Rule 90 needs only
   $2^{\mathrm{popcount}(t)}$; this bound is linear and says nothing about the single seed
-  ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)).
+  ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)); certificates, sensitivity and fixed answers cannot pass $2t$,
+  since no row is sensitive to all three rightmost cells of the cone, in Lean ([RightCorner](Rule30Open/Complexity/RightCorner.md),
+  [query-depth routes](negative-results/complexity/query-depth-routes.md)).
 
 ## Next steps
 

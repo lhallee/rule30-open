@@ -130,7 +130,9 @@ The census of item 4 is a finite check, each head followed for at most 45 steps 
 no closed strip. For the backgrounds with $L = 4, 5, 10$ and $(L, P) = (12, 3)$ it covers 225,280 heads of 12 cells,
 a smaller kernel computation than the census of [EtherCensus](../../Rule30Open/PeriodTwo/EtherCensus.md), and would
 prove in Lean that no point of $K$ has one of these tails from cell 12 on; [NoKTails](../../Rule30Open/PeriodTwo/NoKTails.md)
-does.
+does. [NoKTails16](../../Rule30Open/PeriodTwo/NoKTails16.md) proves the whole census of item 4 in Lean, all 12
+backgrounds and every head of up to 16 cells, by walking the tree of $K$: at an odd cell only one value keeps $K$, so
+only $2^8$ of the $2^{16}$ heads of a tail word need a run.
 
 ## Reproduce
 

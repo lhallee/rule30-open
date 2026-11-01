@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 133 Lean modules with 632
-headline theorems, 49 findings and 50 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 163 Lean modules with 719
+headline theorems, 50 findings and 54 negative results.
 
 ## The problems
 
