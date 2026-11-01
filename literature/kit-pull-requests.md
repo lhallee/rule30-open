@@ -7,8 +7,13 @@ requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls) into its mai
 modules, and #50 and #58 after them, at commit
 [7beff71](https://github.com/WolframInstitute/Rule30PrizeKit/commit/7beff71ceb40e67010fd0713b1a9aecdded09ef2), which
 brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, #51, #53, #54, #56 and #58, each marked
-*merged* below. This repository is not yet pinned there, so here they are results of the kit's main branch that the pin
-does not include, and the 23 open on October 31, #61 to #69 among them, are claims. Each pull request adds Lean
+*merged* below. Thirteen more followed, #17, #59 and #61 to #71, each in a commit of its own (#17 at
+[da21aa7](https://github.com/WolframInstitute/Rule30PrizeKit/commit/da21aa7), #71 at
+[d41defd](https://github.com/WolframInstitute/Rule30PrizeKit/commit/d41defd)), and the main branch at
+[a09f245](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a09f245) has 184 modules. This repository is not yet
+pinned there, so here the merged ones are results of the kit's main branch that the pin does not include; the summaries
+below that say "claims" were written from the pull request pages before the merge, and the merged modules state what
+they claim. The pull requests still open are claims. Each pull request adds Lean
 modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
 request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
 
@@ -227,3 +232,15 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   problem, and the converse direction, Problem 3 implying Problem 1, is in the kit's equivalent forms. The matching
   upper bound in the same model, a machine that computes the center column in $2n^2 + 2n\ell + O(n)$ steps, is
   [the quadratic-time machine](../Rule30Open/Complexity/QuadraticTime.md).
+  *Merged* (aff827e), with the reviewer's form `time_unbounded_le_thirteen`: for every $k \le 13$ every such machine
+  takes at least $k + 1$ steps on infinitely many inputs.
+- **#70, `Rule30Problem3Bounds` extended.** *Merged* (1053be2). Time at most $k$ on the $2^k$ inputs of the window
+  $[2^{k-1}, 2^{k-1} + 2^k)$ already makes the function $2^k$-periodic from $2^{k-1}$ on
+  (`period_of_canon_window_time_le`), and for every $k$ some left diagonal needs $k + 1$ steps on some input of that
+  window (`diagonal_canon_window_time_ge`). *Here:* for the center column one pair $m \ge 2^{k-1}$ with
+  $c(m) \ne c(m + 2^k)$ per $k$ suffices; [restricted models](../negative-results/complexity/restricted-models.md)
+  finds the least such pair for $k \le 20$, always within the first six inputs of the window.
+- **#71, `Rule30EtherEpisode`.** *Merged* (d41defd). In the frame of the rightmost black cell, the longest run of
+  ticks for which two adjacent depths of a black-edge code follow the one-in-four ether has an exact length,
+  $\lfloor 2k/3 \rfloor + 4 - [k \equiv 0, 2 \pmod 6]$ (`episode_max`), a quantitative form of #69. *Here:* no
+  route uses the edge frame.
