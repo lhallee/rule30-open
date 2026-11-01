@@ -23,6 +23,21 @@ def center_column(left: int, width: int, center: int, right: int, cells: int, st
     return column
 
 
+def alive_steps(left: int, width: int, target: list[int], right: int, cells: int) -> int:
+    """The first time the center column of the finite row of `center_column` (with `target[0]` at cell 0) leaves
+    `target`, or len(target): the same run of whole integers, stopped at the first difference."""
+    steps = len(target)
+    offset = width + steps + 2  # bit offset + x is cell x
+    state = (target[0] << offset) | (right << (offset + 1))
+    for j in range(width):
+        state |= ((left >> j) & 1) << (offset - j - 1)
+    for t in range(steps):
+        if (state >> offset) & 1 != target[t]:
+            return t
+        state = (state << 1) ^ (state | (state >> 1))
+    return steps
+
+
 def test_slices_match_big_integers() -> None:
     """The bit-sliced Psi equals `coupled.psi` for every right half, for blocks of several periods and phases."""
     for word, phase, cells, depth in (("01", 1, 7, 150), ("011", 2, 4, 90), ("00101", 3, 6, 120),
@@ -44,8 +59,7 @@ def test_best_left_half_against_whole_rows() -> None:
             for right in range(8):
                 best, best_left = -1, -1
                 for left in range(1 << width):
-                    column = center_column(left, width, target[0], right, 3, steps)
-                    alive = next((t for t in range(steps) if column[t] != target[t]), steps)
+                    alive = alive_steps(left, width, target, right, 3)
                     if alive > best:
                         best, best_left = alive, left
                 blacks = [j + 1 for j in range(width, steps) if rows[j, right]]

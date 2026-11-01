@@ -59,9 +59,14 @@ def held(x: int) -> int:
     return (x >> 1) ^ (x | (x << 1))
 
 
+BACKGROUNDS = [[_background(a, o, WIDTH) for o in range(7)] for a in range(4)]  # `background` by phase and offset
+
+
 def step(a: int, o: int, n: int) -> int:
-    """One step of the defect n at phase a and offset o (the Lean `dstep`)."""
-    return (held(n ^ background(a, o)) ^ background(a + 1, o)) & MASK
+    """One step of the defect n at phase a and offset o (the Lean `dstep`): `held` of n xor `background(a, o)`, xor
+    `background(a + 1, o)`, read from `BACKGROUNDS` and written out, since the checkers call it millions of times."""
+    x = n ^ BACKGROUNDS[a % 4][o % 7]
+    return (((x >> 1) ^ (x | (x << 1))) ^ BACKGROUNDS[(a + 1) % 4][o % 7]) & MASK
 
 
 def closed_bits() -> list[int]:

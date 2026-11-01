@@ -62,14 +62,16 @@ def canonical(labels: np.ndarray) -> np.ndarray:
     return out
 
 
-def linear_step(labels: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
+def linear_step(labels: np.ndarray, moves: np.ndarray, col: int,
+                components: tuple[np.ndarray, np.ndarray, int] | None = None) -> np.ndarray:
     """One step of the annihilator of the linear limit. `labels` (shape (n,)) gives each window the disjoint set Q of
     the annihilator's basis it lies in (-1 for none); the annihilator is spanned by the indicators of these sets. A
     functional after the step lies in the new annihilator when it equals, on every move, a functional of the old
     annihilator at the move's start: it is constant on each component of the step, zero on the components that meet a
-    window in no set, constant across the components that meet one set, and free on a window that no move reaches."""
+    window in no set, constant across the components that meet one set, and free on a window that no move reaches.
+    `components` is `step_components(moves, col)` when the caller has it."""
     n = moves.shape[1]
-    before, after, count = step_components(moves, col)
+    before, after, count = step_components(moves, col) if components is None else components
     sets = int(labels.max()) + 1
     zero = count + sets  # one node for 'must vanish'
     other = np.where(labels >= 0, count + labels, zero)  # (n,) the set of each window, or the zero node
@@ -86,23 +88,40 @@ def linear_step(labels: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
     return canonical(new)
 
 
+LIMITS: dict[tuple[str, tuple[int, ...], str, bytes], list[np.ndarray]] = {}  # `linear_limit` by block and moves, the last 64 asked
+
+
 def linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """The annihilator of the linear limit at each phase, as labels (shape (n,) each) of disjoint sets of windows: for
     each phase i, before the column reads block[i]. The annihilator grows period by period until the labels at phase
-    0 repeat."""
+    0 repeat. Kept, read-only, for the 64 blocks and moves asked last, since each test of a block reads it."""
+    key = (block, moves.shape, moves.dtype.str, moves.tobytes())
+    if key not in LIMITS:
+        while len(LIMITS) >= 64:
+            del LIMITS[next(iter(LIMITS))]
+        LIMITS[key] = compute_linear_limit(block, moves)
+        for labels in LIMITS[key]:
+            labels.flags.writeable = False
+    LIMITS[key] = LIMITS.pop(key)  # the latest asked last
+    return LIMITS[key]
+
+
+def compute_linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
+    """`linear_limit`, computed."""
     n = moves.shape[1]
+    components = [step_components(moves, col) for col in (0, 1)]  # the two graphs of one step, built once
     labels = np.full(n, -1, dtype=np.int64)  # (n,) the annihilator of all windows is zero
     while True:
         after = labels
         for ch in block:
-            after = linear_step(after, moves, int(ch))
+            after = linear_step(after, moves, int(ch), components[int(ch)])
         if np.array_equal(after, labels):
             break
         labels = after
     out = []
     for ch in block:
         out.append(labels)
-        labels = linear_step(labels, moves, int(ch))
+        labels = linear_step(labels, moves, int(ch), components[int(ch)])
     return out
 
 

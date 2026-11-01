@@ -73,24 +73,30 @@ def double_steps(windows: np.ndarray, width: int) -> np.ndarray:
 def gap_states(width: int = GAP_WIDTH) -> np.ndarray:
     """good[w, d]: from window w at a white step, d white steps after the last black cell of column 1 (d = 5: none
     yet), every later black cell of column 1 comes 3 or 5 white steps after the one before, whatever the input from
-    the right. The greatest fixed point, by removing bad states until none is left."""
-    succ = double_steps(np.arange(1 << width), width)  # (2^width, 4)
+    the right. The greatest fixed point: a state is bad when one of its four double steps breaks the rule at once or
+    leads to a bad state, so the bad states are those that can reach a breaking step, found by one backward search
+    (`locks.back_closure`)."""
+    from computations import locks
+    n = 1 << width
+    succ = double_steps(np.arange(n), width)  # (2^width, 4)
     black = (succ & 1).astype(bool)  # (2^width, 4)
-    good = np.ones((1 << width, 6), dtype=bool)  # (2^width, 6)
-    while True:
-        new = good.copy()
-        for d in range(6):
-            for j in range(4):
-                v, b = succ[:, j], black[:, j]  # (2^width,) each
-                if d == 5:
-                    ok = np.where(b, good[v, 0], good[v, 5])
-                else:
-                    gap = d + 1
-                    ok = np.where(b, (gap in (3, 5)) & good[v, 0], (gap < 5) & good[v, min(gap, 4)])
-                new[:, d] &= ok
-        if np.array_equal(new, good):
-            return good  # (2^width, 6)
-        good = new
+    state = np.arange(n)  # (2^width,)
+    breaks = np.zeros((n, 6), dtype=bool)  # (2^width, 6), some double step breaks the rule at once
+    source, target = [], []  # the other double steps, state w * 6 + d to the next state
+    for d in range(6):
+        for j in range(4):
+            v, b = succ[:, j], black[:, j]  # (2^width,) each
+            if d == 5:
+                ok, after = np.ones(n, dtype=bool), np.where(b, 0, 5)  # (2^width,) each
+            else:
+                gap = d + 1
+                ok = np.where(b, gap in (3, 5), gap < 5)  # (2^width,)
+                after = np.where(b, 0, min(gap, 4))  # (2^width,)
+            breaks[:, d] |= ~ok
+            source.append((state * 6 + d)[ok])
+            target.append((v * 6 + after)[ok])
+    bad = locks.back_closure(breaks.reshape(-1), np.concatenate(source), np.concatenate(target))  # (6 2^width,)
+    return ~bad.reshape(n, 6)  # (2^width, 6)
 
 
 def gap_entry(width: int = GAP_WIDTH) -> np.ndarray:

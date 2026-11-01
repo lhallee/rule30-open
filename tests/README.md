@@ -17,13 +17,23 @@ on small cases; the large runs belong to the reproduce commands of the entries.
   have a small analog that runs the same function (the natural trap of 0001111110011 at 17 cells for the walls and the
   unreached nodes) and are left to the entries' reproduce commands.
 - **Shared objects.** `coverage.module_blocks`, `coverage.trap_blocks`, `lock_chain.tables`, `carried`,
-  `extra_tables`, `census_tables`, `gap_entries` and `game.kit_blocks` keep their results for the arguments asked
-  again, and the certificates of the coin finding are module-scoped fixtures. No test calls `lock_chain.block_traps`
-  (about 570 s for its 1,648 traps) or builds every trap.
+  `extra_tables`, `census_tables`, `gap_entries`, `reach_nodes`, `game.kit_blocks`, `game.game_ranks`,
+  `game.game_moves`, `coin_lock.certificate`, `defect_potential.closed_strips`, `absorption.family_terms`,
+  `locks.back_table` and `sheaf_sections.linear_limit` keep their results for the arguments asked again, as read-only
+  arrays, and the certificates of the coin finding and the long center column are module-scoped fixtures. No test
+  calls `lock_chain.block_traps` (about 570 s for its 1,648 traps) or builds every trap.
 - **Reverse search and vectorized stepping.** `locks.back_closure` runs a breadth-first search on the reversed graph
-  (`locks.reverse_graph`), `game.game_graph` takes its moves from `game.moves`, `lock_word.unreachable` is a backward
-  search, and `game.necklaces` marks necklaces with integer rotations. Their results are unchanged, and the tests that
-  check them against forward searches and the old counts still pass.
+  (`locks.reverse_graph`), `locks.back_search` sorts a small frontier instead of scanning the game, and
+  `locks.predecessors` reads 11 cells at a time from a table. `game.game_graph` takes its moves from
+  `game.game_moves`, `lock_word.unreachable` and `gate_census.gap_states` are backward searches, and
+  `game.necklaces` marks necklaces with integer rotations. `coin_lock` iterates on the windows outside the
+  certificate only, `absorption.family_depth` tests every alignment at once, `tail_census.ring_backgrounds` steps each
+  ring state once (`orbit_entry`), `space_time_periodic.cycles` stops squaring once the image stops shrinking, and
+  `right_half.column_one` and `slip_geometry.column_one` cut the row to the light cone. Their results are unchanged,
+  and the tests that check them against forward searches, direct runs with `step` and the quoted counts still pass.
+- **Tests that run many rows at once.** The brute-force checks in the tests (`test_ring_orbits`, `test_ten_coin`,
+  `test_natural_coin`, the direct runs of `test_ether_descent.py`) step every state together as numpy arrays or
+  integer rows and stop at the first difference, and `direct_runs` is itself checked against `ether_certificate.step`.
 - **No plugins that the suite does not use.** `pyproject.toml` switches off pytest plugins of the global environment
   (`addopts`), which took about 20 s to load.
 
@@ -41,9 +51,10 @@ them (the command is in `computations/README.md`):
 | Own locks of 20 and 22 cells, the census of apart traps | `--own-census`, `--census-apart`, `--apart-census` |
 | The search over cell counts 16 to 64 of the white half under 001 | `--white` |
 | Chain families with the full scan of seeds | `--short`, `--chain-family` |
-| Scans of 20,000 steps in `halves_apart` for the split walls | `--halves-apart` |
-| The survey of the game at period 10 | `python -m computations.game --max-period 10 --workers 2` |
-| Rings of 12 to 16 cells, backgrounds of period 12 and `witnesses(12)` | `python -m computations.space_time_periodic --witnesses`, `--table`, `--walls` |
+| Scans of 10,000 and 20,000 steps in `halves_apart` for the split walls (three halves of 000000101101 in its second trap) | `--halves-apart` |
+| The survey of the game at periods 9 and 10 | `python -m computations.game --max-period 10 --workers 2` |
+| Rings of 12 to 16 cells, backgrounds of period 12 and `witnesses(12)` | `python -m computations.space_time_periodic --witnesses`, `--table` |
+| The walls the backgrounds seed at 16 cells | `python -m computations.space_time_periodic 8,9,10,11,12,13 --walls 16` |
 | Width 16 expected entry times and decay factor of the coin finding | `python -m computations.coin_lock 0001 0011 0111 --widths 14 16 18` |
 | The census at 12 cells (latest entries 544, 980, 416) | `python -m computations.absorption census --cells 12 --steps 1200` |
 | Entry of half 2 into `t001` at step 35,536 | `python -m computations.period_three --trap --cells 10 --steps 400000` |
@@ -52,22 +63,29 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q` ran 210 tests, all passing, in 69.4 s serially on 2026-10-31. The limit is 60 s, so the suite
-is about 9 s over. Before this pass the same suite took
-80 minutes (4,768 s, 143 tests, 8 failing for the missing kit and one encoding error).
+`python -m pytest -q --durations=0` collected 405 tests: 404 passed and 1 was skipped (`test_late_onset.py` needs
+`pysat`, which this environment lacks), in 58.6 s and 59.7 s (`time`: 60.8 s real) serially on 2026-11-01. The
+machine was not idle: a Lean build ran on one of its four cores (load average 1.2 to 1.4), and the suite runs on one
+core, so the idle time is about the same. The per-test durations of the run sum to 56.8 s; collection and imports take
+the other 2 s. The target of 50 s is not met.
 
-The slowest tests, in seconds: `test_period_rate` 3.0, `test_wall_natural` 2.9, `test_space_time_periodic` 1.6,
-`test_mixed_nodes` 1.7, `test_long_window` 1.7, `test_reach_wide_carried` 1.6, `test_game_survey` 1.5,
-`test_trap_sets` 1.5, `test_forcing` 1.4. About 70 further tests take 0.3 to 1.5 s each, which is where the remaining
-time is. What does not help: `period_rate` in `test_period_rate` runs 1,876 and 2,995 steps for its two settled rates
-because its tolerance sets them, and the assertions need that tolerance; the scan of `halves_apart` in
-`test_wall_natural` gives a different split below 10,000 steps (21 halves at 3,000 steps, three in a trap of 24,128
-states at 5,000); `gap_entries` vectorized over all halves with `absorption.step_rows` gives the same entries but
-runs three times slower than the loop over integers; and `coin_step` vectorized over the phases runs slower too. Two
-ways to get under a minute remain: smaller samples in the tests of 0.3 s and more, about a third of their time, or
-running the suite on four worker processes with pytest-xdist, which this file's rule of no worker processes excludes.
+The slowest tests in the full run, in seconds: `test_period_rate` 1.8, `test_lock_word` 1.3,
+`test_universal_word` 1.3, `test_mixed_nodes` 1.3, `test_census_traps` 1.2, `test_coin_chain` 1.2,
+`test_trap_pairs` 1.2, `test_lock_avoid_growth` 1.0, `test_natural_traps` 0.9, `test_trap_sets` 0.9,
+`test_reach_wide_carried` 0.9, `test_second_nine_wall` 0.9, `test_bit_blocks` 0.9, `test_space_time_periodic` 0.8,
+`test_apart_traps` 0.8, `test_game_masks` 0.8. Run alone, without the results the earlier tests leave in the caches,
+`test_census_traps` takes 1.9 s, `test_trap_pairs` 1.5 s and `test_natural_traps` 1.4 s. About 25 further tests take
+0.5 to 0.8 s each. `test_class_blocks_wide.py::test_certificate_checks` takes 0.7 s.
 
-The tests of other collaborators in this folder (`test_background_halves.py`, `test_held_shift.py`,
-`test_crossing_bounds.py`, `test_obdd_orders.py`, `test_space_window.py`, `test_alternating_horizon.py`,
-`test_diagonal_cones.py`, `test_limit_windows.py`) count toward the limit like the others; together they take about
-3 s, and none takes over 2 s.
+What is left is the work the checks need, not repeated work. `test_period_rate` runs power iterations of 500 periods
+and to the tolerance 1e-10 because its assertions compare rates to 1e-6 and 1e-9; `test_lock_word` and
+`test_universal_word` run each universal word over every window of the game, which is the claim; `test_mixed_nodes`,
+`test_census_traps` and `test_trap_pairs` build games of 16 cells and their reverse searches once each. What does not
+help: `gap_entries` vectorized over all halves with `absorption.step_rows` gives the same entries but runs three times
+slower than the loop over integers; `coin_lock.entry_paths` over the windows outside the certificate only runs slower
+than over every window; and `np.take` in place of indexing in the run of a lock word saves under 0.1 s. Getting under
+50 s would take smaller samples in the tests of 0.5 s and more, or running the suite on worker processes with
+pytest-xdist, which this file's rule of no worker processes excludes.
+
+The tests of other collaborators in this folder count toward the limit like the others; outside `test_computations.py`
+the files together take about 16 s, and no test there takes over 0.7 s.

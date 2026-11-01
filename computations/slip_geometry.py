@@ -50,8 +50,15 @@ def right_rows(steps: int, width: int, phase: int = 0, start: int = 0, progress:
 
 
 def column_one(steps: int, phase: int = 0, start: int = 0, progress: bool = False) -> np.ndarray:
-    """Column 1 at times 0 .. steps - 1 (the first column of `right_rows`)."""
-    return right_rows(steps, 1, phase, start, progress)[:, 0]  # (steps,)
+    """Column 1 at times 0 .. steps - 1, the first column of `right_rows`, by the same run reading only bit 0."""
+    column = bytearray(steps)  # (steps,)
+    row = start
+    for t in tqdm(range(steps), disable=not progress, mininterval=5.0):
+        column[t] = row & 1
+        row = ((row << 1) | ((t + phase) & 1)) ^ (row | (row >> 1))
+        if t % 4096 == 0:
+            row &= (1 << (steps - t + 3)) - 1
+    return np.frombuffer(bytes(column), dtype=np.uint8).copy()  # (steps,)
 
 
 def direct_rows(steps: int, width: int, phase: int = 0) -> np.ndarray:

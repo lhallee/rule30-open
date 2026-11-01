@@ -41,6 +41,7 @@ that region settles every head that ends in it. Words not settled are extended b
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 
 import numpy as np
@@ -62,7 +63,13 @@ def ether_cell(phase: int, j: int) -> int:
 def background(phase: int, offset: int, low: int, cells: int) -> int:
     """The background cells low .. low + cells - 1 at ether phase `phase` and alignment `offset`, as an integer whose
     bit i is cell low + i."""
-    return sum(ether_cell(phase, low + i + offset) << i for i in range(cells))
+    return _background(phase % 4, (low + offset) % 7, cells)
+
+
+@functools.lru_cache(maxsize=None)
+def _background(phase: int, shift: int, cells: int) -> int:
+    """`background` for a phase below 4 and low + offset below 7, which is all it depends on, computed once."""
+    return sum(ether_cell(phase, shift + i) << i for i in range(cells))
 
 
 def defect_step(D: int, phase: int, offset: int, width: int) -> int:
@@ -109,10 +116,19 @@ def step128(lo: np.ndarray, hi: np.ndarray, phase: int, offset: int) -> tuple[np
     return (up_lo ^ (x_lo | down_lo)) ^ n_lo, (up_hi ^ (x_hi | down_hi)) ^ n_hi
 
 
+@functools.lru_cache(maxsize=None)
 def closed_strips(width: int) -> np.ndarray:
     """The greatest set of strips D(c - width + 1 .. c), bit i the cell c - width + 1 + i, with D zero above c, that one
     step maps into the set at the next phase for both values of D(c - width) and that never makes cell c + 1 a defect.
-    Indexed by (ether phase, (c + offset) mod 7, strip): (4, 7, 2^width)."""
+    Indexed by (ether phase, (c + offset) mod 7, strip): (4, 7, 2^width). Kept for the widths asked again, so the
+    array is read-only."""
+    alive = greatest_strips(width)  # (4, 7, 2^w)
+    alive.flags.writeable = False
+    return alive
+
+
+def greatest_strips(width: int) -> np.ndarray:
+    """`closed_strips`, computed."""
     n = 1 << width
     m = np.arange(n, dtype=np.int64)  # (2^w,) the strips
     alive = np.ones((4, 7, n), dtype=bool)  # (4, 7, 2^w)

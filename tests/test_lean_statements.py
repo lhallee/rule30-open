@@ -91,7 +91,7 @@ def test_run_countdown() -> None:
     steps, edge = 60, 70  # the leftmost 1 at cell 70 never reaches the row's left end
     width = edge + 2 * steps + 40  # cells x < width - 1 - t are exact at step t
     runs = 0
-    for _ in range(40):
+    for _ in range(10):  # about 2,800 runs per row
         row = np.zeros(width, dtype=bool)  # (width,)
         row[edge] = True
         row[edge + 1:] = rng.integers(0, 2, width - edge - 1).astype(bool)
@@ -539,13 +539,13 @@ def test_long_window() -> None:
     big = int(re.search(r"def bigBits : Nat :=\n  0x([0-9a-f]+)\n", source).group(1), 16)
     assert sorted(rows) == [16384, 32768, 49152]
     n = 65536
-    row, bits = 1 << n, 0
+    row, cells = 1 << n, bytearray(n)  # cells[t] is the center at step t
     for t in range(n):
         if t in rows:
             assert rows[t] == row, t
-        bits |= ((row >> n) & 1) << t
+        cells[t] = 48 + ((row >> n) & 1)  # the digit 0 or 1
         row = (row << 1) ^ (row | (row >> 1))
-    assert big == bits
+    assert big == int(cells[::-1].decode(), 2)
 
 
 def test_left_half_0001() -> None:

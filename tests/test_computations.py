@@ -773,8 +773,8 @@ def in_family_slow(word: str, row: int, phase: int, wall: np.ndarray) -> bool:
     for j0, shift in absorption.ALIGNMENTS[word]:
         psi = (phase + shift) % 4
         for k in range(52):
-            if (j0 + k) % 7 == 2 and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, psi) for p in range(1, k + 1)) \
-                    and wall[psi][(row >> k) & 0x1FFF]:
+            if (j0 + k) % 7 == 2 and wall[psi][(row >> k) & 0x1FFF] \
+                    and all((row >> (p - 1)) & 1 == absorption.ether(j0 + p, psi) for p in range(1, k + 1)):
                 return True
     return False
 
@@ -860,10 +860,12 @@ def test_ether_prefix() -> None:
     assert ether_prefix.decode(ether_prefix.encode(13, entries[:13], entries[13:])) == (13, entries[:13], entries[13:])
     wall = absorption.kit_wall()  # (4, 2^13)
 
-    def stepped(word: str, phase: int, row: int, t: int) -> int:
+    def stepped(word: str, phase: int, row: int, t: int) -> list[int]:
+        rows = [row]  # the rows at steps 0 .. t
         for s in range(t):
             row = ((row << 1) | int(word[(s + phase) % 4])) ^ (row | (row >> 1))
-        return row
+            rows.append(row)
+        return rows
 
     def own_depth(word: str, j0: int, shift: int, row: int, phase: int) -> int:
         psi = (phase + shift) % 4
@@ -875,15 +877,15 @@ def test_ether_prefix() -> None:
         psi = (phase + shift) % 4
         b, direct, bases = ether_prefix.certificate(word, j0, shift, phase, tail)
         for length, (t, k) in enumerate(direct):
-            row = ether_prefix.prefix_half(j0, psi, length, tail)
-            assert all(least_depth_slow(word, stepped(word, phase, row, s), (s + phase) % 4, wall) < 0 for s in range(t))
-            assert least_depth_slow(word, stepped(word, phase, row, t), (t + phase) % 4, wall) == k
+            rows = stepped(word, phase, ether_prefix.prefix_half(j0, psi, length, tail), t)
+            assert all(least_depth_slow(word, rows[s], (s + phase) % 4, wall) < 0 for s in range(t))
+            assert least_depth_slow(word, rows[t], (t + phase) % 4, wall) == k
         for i, (t, k) in enumerate(bases):
             for extra in range(3):
-                row = ether_prefix.prefix_half(j0, psi, b + i + 7 * extra, tail)
+                rows = stepped(word, phase, ether_prefix.prefix_half(j0, psi, b + i + 7 * extra, tail), t)
                 for s in range(t):
-                    assert (stepped(word, phase, row, s) & 1) == absorption.ether(j0 + 1, (s + psi) % 4)
-                assert own_depth(word, j0, shift, stepped(word, phase, row, t), (t + phase) % 4) == k + 7 * extra
+                    assert (rows[s] & 1) == absorption.ether(j0 + 1, (s + psi) % 4)
+                assert own_depth(word, j0, shift, rows[t], (t + phase) % 4) == k + 7 * extra
 
 
 def test_ether_agreement() -> None:
@@ -900,12 +902,18 @@ def test_ether_agreement() -> None:
         assert ether_prefix.ether_agreement(half, 16) == best
 
 
-def test_long_window() -> None:
+@pytest.fixture(scope="module")
+def long_column() -> np.ndarray:
+    """The first `long_window.N` center cells by `center_column`, for the window tests at both scales."""
+    return center_column(long_window.N)  # (N,)
+
+
+def test_long_window(long_column: np.ndarray) -> None:
     """The window of `LongWindow`: the packed center cells against `center_column`, the first checkpoint row against the
     integer rows stepped to its time (the later ones are checked at the scale of `WideWindow`), and the new factor
     against the set of every earlier factor, read as strings."""
     bits, checkpoints = long_window.simulate()
-    column = center_column(long_window.N)  # (N,)
+    column = long_column  # (N,)
     assert np.array_equal(np.frombuffer(format(bits, f"0{long_window.N}b")[::-1].encode(), dtype=np.uint8) - 48, column)
     row = 1 << long_window.N
     for t in range(1, 16385):
@@ -921,13 +929,13 @@ def test_long_window() -> None:
     assert length == 19
 
 
-def test_wide_window() -> None:
+def test_wide_window(long_column: np.ndarray) -> None:
     """The window of `WideWindow`, at 49,152 cells instead of 262,144 (the same functions, `long_window.simulate` and
     `new_factor`): the packed center cells against `center_column`, the checkpoint rows against the integer rows stepped
     to their times, and the new factor of length 16 against the sets of earlier factors."""
     n = 3 * 16384
     bits, checkpoints = long_window.simulate(n)
-    column = center_column(n)  # (n,)
+    column = long_column[:n]  # (n,)
     assert np.array_equal(np.frombuffer(format(bits, f"0{n}b")[::-1].encode(), dtype=np.uint8) - 48, column)
     assert sorted(checkpoints) == [16384 * q for q in range(1, 3)]
     row = 1 << n
@@ -1207,7 +1215,7 @@ def test_bit_phases() -> None:
             assert decided == (game.bad_pairs(pattern, 6) == 0), pattern
     lean = {name: (ROOT / "Rule30Open" / "Columns" / f"{name}.lean").read_text(encoding="utf-8")
             for name in ("BitPhases", "BitPhases19", "BitPhases20", "BitPhases21")}
-    block = "00000000000101101"  # one block tests the generator; the kernel checks every listed block
+    block = "000101111111111001"  # one block, the fastest to build, tests the generator; the kernel checks every one
     assert bit_game.lean_block(block, bit_game.WIDE[block]) in lean["BitPhases"]
     listed = {}
     for text in lean.values():
@@ -1247,9 +1255,11 @@ def test_space_time_periodic() -> None:
     orbit under Rule 30 returns within 6 steps has a temporal period P <= 6, and its least spatial period is the length
     of a cycle of `column_map` for P; conversely each cycle of length up to 16 is such a row, by a direct run of the
     ring (`ring_period`). The backgrounds of period 4 are the white row, the stripe and the kit's ether, of spatial
-    period 7, and the walls of periods 9 to 11 lie on cycles of the lengths their chains repeat with (the rings of up to
-    16 cells, period 12 and its witnesses are the entry's reproduce command); every row repeating with a period
-    dividing P, read from the cycles, matches the counts of A New Kind of Science for P up to 8."""
+    period 7, and the walls of periods 9 to 11 lie on cycles of the lengths their chains repeat with; at period 10 the
+    windows of 13 cells right of the columns of the background of 155 cells close into walls at 45 of its 150 columns
+    of period 10 (`background_walls`; the rings of up to 16 cells, the walls at 16 cells, period 12 and its witnesses
+    are the entry's reproduce command); every row repeating with a period dividing P, read from the cycles, matches
+    the counts of A New Kind of Science for P up to 8."""
     import itertools
     from computations import space_time_periodic as stp
 
@@ -1275,7 +1285,8 @@ def test_space_time_periodic() -> None:
     found = {period: {length for length, _, _ in stp.backgrounds(period)} for period in (9, 10, 11)}
     assert 135 in found[9] and 155 in found[10] and {143, 275} <= found[11]
     assert stp.witnesses(8) == {("01", 2), ("0001", 4)}
-    assert stp.background_walls(10, 16) == [(30, 30, 0), (90, 85, 0), (155, 150, 60)]
+    # the walls at the background's edge, at 13 cells (16 cells, 60 of the 150, is the entry's reproduce command)
+    assert stp.background_walls(10, 13) == [(30, 30, 0), (90, 85, 0), (155, 150, 45)]
     # every row that repeats with a period dividing P, from each cycle's row run directly and read in every rotation: as
     # many as the states on cycles, against the list of A New Kind of Science, which the second count matches only at
     # periods 1 to 4, 6 and 7
@@ -1461,12 +1472,11 @@ def test_ring_orbits() -> None:
             right = ((s >> 1) | (s << (cells - 1))) & full
             return left ^ (s | right)
 
-        cyclic = set()
-        for start in range(1 << cells):
-            s = start
-            for _ in range(1 << cells):
-                s = nxt(s)
-            cyclic.add(s)  # after 2^M steps the state is on its cycle
+        states = np.arange(1 << cells, dtype=np.int64)  # (2^M,), every start, stepped together
+        for _ in range(1 << cells):
+            states = ((((states << 1) | (states >> (cells - 1))) & full)
+                      ^ (states | (((states >> 1) | (states << (cells - 1))) & full)))
+        cyclic = set(states.tolist())  # after 2^M steps the state is on its cycle
         classes = set()
         for s in cyclic:
             orbit, x = [s], nxt(s)
@@ -1506,14 +1516,14 @@ def test_kit_families() -> None:
 
 
 def test_game_survey() -> None:
-    """The survey of `excluded_blocks` over worker processes agrees, at period 8, with the survey in one process, which
-    agrees with `least_width`, block by block, on every primitive block of period 8 and 9 (period 10 is the reproduce
-    command of the survey)."""
-    one, tried = game.excluded_blocks(9, [6, 10], min_period=8)
+    """The survey of `excluded_blocks` over worker processes agrees, at period 8, where it excludes 00000011 and
+    01111111 at width 6, with the survey in one process, which agrees with `least_width`, block by block, on every
+    primitive block of period 7 and 8 (periods 9 and 10 are the reproduce command of the survey)."""
+    one, tried = game.excluded_blocks(8, [6, 10], min_period=7)
     two, tried2 = game.excluded_blocks(8, [6, 10], min_period=8, workers=2)
-    assert tried == len(game.necklaces(8)) + len(game.necklaces(9)) and tried2 == len(game.necklaces(8))
-    assert two == {block: width for block, width in one.items() if len(block) == 8}
-    for period in range(8, 10):
+    assert tried == len(game.necklaces(7)) + len(game.necklaces(8)) and tried2 == len(game.necklaces(8))
+    assert two == {block: width for block, width in one.items() if len(block) == 8} == {"00000011": 6, "01111111": 6}
+    for period in range(7, 9):
         for block in game.necklaces(period):
             width = game.least_width(block, 10)
             assert (block in one) == (width is not None)
@@ -1580,14 +1590,16 @@ def test_lock_avoid_growth() -> None:
     assert abs(rate - lock_word.avoid_growth("0111", member)) < 1e-3
 
 
-def test_period_rate(coin_certificate: np.ndarray) -> None:
+def test_period_rate() -> None:
     """`coin_lock.period_rate` where the power iteration of `decay_rate` oscillates: for the kit's block 0000000001 at
     width 13, two eigenvalues of one period of the coin step share the largest modulus, and the rate equals that of a
-    power iteration shifted by the identity, which converges; for the certificate of 0111 at width 14 the rate is
-    0.98204; `locks.growth` gives the locked share and growth rate of 0111 at width 13 that `locks.profile` gives; and
-    for a trap that some window cannot reach the factor is 1, not the 0 that a vector gone to 0 on some windows would
-    give: the natural trap of 0010101111111 passes the test of reach in the game of 6 cells, with factor below 1, and
-    fails it in that of 8, with factor 1."""
+    power iteration shifted by the identity, which converges; `locks.growth`, which iterates to the tolerance 1e-10,
+    gives twice that rate, 1.903817, and the locked share 28.1% that the steerable-locks finding quotes;
+    `locks.growth` gives the locked share and growth rate of 0111 at width 13 that `locks.profile` gives, its locked
+    nodes are the certificate of 0111 at width 13, and there the power iteration of `decay_rate` settles to the same
+    rate; and for a trap that some window cannot reach the factor is 1, not the 0 that a vector gone to 0 on some
+    windows would give: the natural trap of 0010101111111 passes the test of reach in the game of 6 cells, with factor
+    below 1, and fails it in that of 8, with factor 1."""
     from computations import coin_lock, locks
     from scipy.sparse.linalg import LinearOperator, eigs
     block = "0000000001"
@@ -1606,15 +1618,19 @@ def test_period_rate(coin_certificate: np.ndarray) -> None:
         y = one_period(x) + x  # (2^13,)
         shifted = np.linalg.norm(y) / np.linalg.norm(x)
         x = y / np.linalg.norm(y)
-    rate = coin_lock.period_rate(block, member)
-    assert abs((shifted - 1) ** (1 / len(block)) - rate) < 1e-6 and round(2 * rate, 6) == 1.903817
+    share, twice = locks.growth(block, 13)  # 2 `period_rate` of the locked nodes, to the tolerance 1e-10
+    assert abs((shifted - 1) ** (1 / len(block)) - twice / 2) < 1e-6 and round(twice, 6) == 1.903817
+    assert round(100 * share, 1) == 28.1
     top = np.sort(np.abs(eigs(LinearOperator((1 << 13, 1 << 13), matvec=one_period, dtype=float), k=4, which="LM",
                               return_eigenvectors=False)))[::-1]  # (4,)
     assert abs(top[0] - top[1]) < 1e-9 and top[2] < 0.9 * top[0]
-    assert round(coin_lock.period_rate("0111", coin_certificate), 5) == 0.98204
-    # `locks.growth`, the profile without the steering sequence: for 0111 at width 13 the share and rate of the table
+    # `locks.growth`, the profile without the steering sequence: for 0111 at width 13 the share and rate of the table;
+    # its locked nodes are the certificate of 0111 at 13 cells, where `decay_rate` settles to the same rate
     share, rate = locks.growth("0111", 13)
     assert round(share, 4) == 0.0584 and round(rate, 6) == 1.969279
+    certificate13 = coin_lock.certificate("0111", 13)  # (4, 2^13)
+    assert (locks.lock_info("0111", 13)[0].reshape(4, -1) == certificate13).all() and int(certificate13.sum()) == 1915
+    assert abs(rate / 2 - coin_lock.decay_rate("0111", certificate13)) < 1e-9
     # the factor is below 1 exactly when every window can reach the trap: the natural trap of 0010101111111 passes the
     # test of reach in the game of 6 cells and fails in that of 8, where windows that never enter leave the iteration
     # 0 elsewhere and the bound is the step's own, 1
@@ -2137,17 +2153,13 @@ def test_ten_coin() -> None:
     successors = successor_table(word, 16)  # (10, 2, 2^16)
     out = coin_lock.stay_out(word, member, 12)  # (10, 2^16)
     outside = np.flatnonzero(~member[0])  # (m,)
+    values = np.arange(1 << 12)  # (4096,), every sequence of column 17 over 12 steps, bit t at step t
     for window in outside[::7919][:3].tolist():
-        kept = 0
-        for values in range(1 << 12):
-            w, inside = window, False
-            for t in range(12):
-                w = int(successors[t % 10, (values >> t) & 1, w])
-                if member[(t + 1) % 10, w]:
-                    inside = True
-                    break
-            kept += not inside
-        assert abs(out[0, window] - kept / 4096) < 1e-12, window
+        w, inside = np.full(values.size, window), np.zeros(values.size, dtype=bool)  # (4096,) each
+        for t in range(12):
+            w = successors[t % 10, (values >> t) & 1, w]
+            inside |= member[(t + 1) % 10, w]
+        assert abs(out[0, window] - int((~inside).sum()) / 4096) < 1e-12, window
     values = coin_lock.universal_word(word, member)
     end = coin_lock.run_word(word, member, values, 0)  # (2^16,)
     assert member[len(values) % 10][end].all()
@@ -2166,17 +2178,13 @@ def test_natural_coin() -> None:
         assert member.sum() == len({(label % 11, window) for label, window in t["states"]})
         successors = successor_table(word, 16)  # (11, 2, 2^16)
         out = coin_lock.stay_out(word, member, 11)  # (11, 2^16)
+        values = np.arange(1 << 11)  # (2048,), every sequence of column 17 over 11 steps, bit t at step t
         for window in np.flatnonzero(~member[0])[::9973][:2].tolist():
-            kept = 0
-            for values in range(1 << 11):
-                w, inside = window, False
-                for step_ in range(11):
-                    w = int(successors[step_ % 11, (values >> step_) & 1, w])
-                    if member[(step_ + 1) % 11, w]:
-                        inside = True
-                        break
-                kept += not inside
-            assert abs(out[0, window] - kept / 2048) < 1e-12, (word, window)
+            w, inside = np.full(values.size, window), np.zeros(values.size, dtype=bool)  # (2048,) each
+            for step_ in range(11):
+                w = successors[step_ % 11, (values >> step_) & 1, w]
+                inside |= member[(step_ + 1) % 11, w]
+            assert abs(out[0, window] - int((~inside).sum()) / 2048) < 1e-12, (word, window)
 
 
 def test_wall_gaps() -> None:
@@ -2520,17 +2528,18 @@ def test_trap_reach_lifted() -> None:
 
 def test_predecessors() -> None:
     """`locks.predecessors` lists exactly the nodes with a move to each node, against the moves of `game.moves` at
-    small widths, and `lock_chain.successors` gives those moves; `reach_nodes` agrees with `locks.back_closure` over
-    `game.moves`."""
+    small widths and at 13 cells, which it reads in two pieces (`locks.CHUNK`), and `lock_chain.successors` gives
+    those moves; `reach_nodes` agrees with `locks.back_closure` over `game.moves`."""
     from computations import game, lock_chain, locks
 
-    for word, width in (("001", 5), ("0001011", 6), ("0010111", 4)):
+    assert locks.CHUNK < 13
+    for word, width, every in (("001", 5, 7), ("0001011", 6, 7), ("0010111", 4, 7), ("0001011", 13, 997)):
         source, target = game.moves(word, width)  # (2 p n,), (2 p n,)
         nodes = np.arange(len(word) << width, dtype=np.uint64)  # (p n,)
         after = lock_chain.successors(word, width, nodes)  # (2, p n)
         assert sorted(zip(source.tolist(), target.tolist())) == sorted(
             zip(np.tile(nodes, 2).tolist(), after.reshape(-1).tolist()))
-        for node in range(0, len(word) << width, 7):
+        for node in range(0, len(word) << width, every):
             want = sorted(set(source[target == node].tolist()))
             got = sorted(set(locks.predecessors(word, width, np.array([node], dtype=np.uint64)).tolist()))
             assert got == want
@@ -2634,10 +2643,12 @@ def test_cut_entries() -> None:
             cells[:3] = [(half >> i) & 1 for i in range(3)]
             want = [-1] * len(widths)
             for t in range(steps):
+                if min(want) >= 0:
+                    break  # every width found, so later steps change nothing
                 drive = (t + phase) % 3
+                value = int.from_bytes(np.packbits(cells[:max(widths)], bitorder="little").tobytes(), "little")
                 for j, w in enumerate(widths):
-                    value = int.from_bytes(np.packbits(cells[:w], bitorder="little").tobytes(), "little")
-                    if want[j] < 0 and (value, drive) in cuts[j]:
+                    if want[j] < 0 and (value & ((1 << w) - 1), drive) in cuts[j]:
                         want[j] = t
                 row = np.concatenate([[int("001"[drive])], cells, [0]]).astype(bool)  # (n + 2,)
                 cells = row[:-2] ^ (row[1:-1] | row[2:])  # (n,)
@@ -2864,7 +2875,8 @@ def test_six_refuted() -> None:
     inside = np.zeros(6 << 22, dtype=bool)  # (6 2^22,)
     for label, row in enumerate(s["rows"]):
         inside[[label << 22 | w for w in row]] = True
-    outside = np.flatnonzero(~inside)[::97].astype(np.uint64)  # (m,)
+    outside = np.arange(0, 6 << 22, 97, dtype=np.uint64)  # (6 2^22 / 97,), one node in 97
+    outside = outside[~inside[outside.astype(np.int64)]]  # (m,)
     after = lock_chain.successors("001011", 22, outside)  # (2, m)
     assert not inside[after.astype(np.int64)].any()
     assert all(inside[(label % 6) << 22 | window & ((1 << 22) - 1)] for label, window in t["states"])
@@ -3113,9 +3125,11 @@ def test_wall_natural(monkeypatch: pytest.MonkeyPatch) -> None:
     12,000; the block of each of the 54 and 6 is one whose only traps, walls carried to it, fail the test of reach;
     for the first two blocks of `WALL_SPLIT`, its two traps are locks, with labels modulo their own multiple of the
     period, apart from each other at the narrower width, so a half inside either never enters the other, and every
-    node of the game of 16 cells can reach one of the two; three halves of the scan of 000000101101 are inside its
-    second trap, apart from the first (`halves_apart`, over 10,000 steps); and `lean_wall_natural`, restricted to the first trap of
-    `WALL_NATURAL` and to the first block of `WALL_SPLIT`, is text of the module."""
+    node of the game of 16 cells can reach one of the two; the two traps of 000000101101 have 150 and 116 states (that
+    three halves of its scan are inside the second, apart from the first, takes a scan of 10,000 steps and more, the
+    entry's reproduce command `--halves-apart`; `test_trap_sets` runs `halves_apart` on a shorter scan); and
+    `lean_wall_natural`, restricted to the first trap of `WALL_NATURAL` and to the first block of `WALL_SPLIT`, is text
+    of the module."""
     from computations import coverage, lock_chain
     walls = {"TenTraps", "ElevenTraps", "TwelveTraps", "ThirteenTraps", "FourteenTraps"}
     held: dict[str, set[str]] = {}
@@ -3140,12 +3154,9 @@ def test_wall_natural(monkeypatch: pytest.MonkeyPatch) -> None:
         others = held[word] - {"NaturalTrapsWalls", "ApartTraps"}
         assert others and others <= walls and all(word in lock_chain.UNREACHED[m] for m in others)
     # the trap of 17 cells of 000000101101 passes the test of reach at 20 cells, but three halves of its scan are inside
-    # the trap of 26 cells, apart from it, and the other 23 inside it
+    # the trap of 26 cells, apart from it (`--halves-apart`)
     first, second = lock_chain.split_tables("000000101101")
-    apart = lock_chain.halves_apart(first, 10000)  # the scan over 10,000 steps; the entry's runs are 20,000
-    assert sorted((cells, size) for _, cells, _, size, away in apart if away) == [(26, 116)] * 3
-    assert all(not away and (cells, size) == (17, 150) for _, cells, _, size, away in apart if (cells, size) != (26, 116))
-    assert len(apart) == 26 and len(second["states"]) == 116
+    assert (first["cells"], len(first["states"]), second["cells"], len(second["states"])) == (17, 150, 26, 116)
     lean = (ROOT / "Rule30Open" / "Columns" / "NaturalTrapsWalls.lean").read_text(encoding="utf-8")
     entries, split = lock_chain.WALL_NATURAL, lock_chain.WALL_SPLIT
     for kept, kept_split in ((entries[:1], []), ([], split[:1])):
@@ -3181,7 +3192,7 @@ def test_natural_traps(monkeypatch: pytest.MonkeyPatch) -> None:
     states, the others up to 15,752, the long ones 3,000 or fewer and the long large ones more. From the lists alone:
     the 35 blocks of periods 10 to 12 and the 70 of periods 13 and 14 are distinct, and neither the kit's nor a block of
     another trap module; the 12 large ones of periods 13 and 14 are census blocks too. `lean_extra`, restricted to
-    the first entry, `lean_extra` for the first long one and `lean_long_large` restricted to its first entry are text
+    the first entry, `lean_extra` for the first long one and `lean_long_large` restricted to its third entry are text
     of the modules (`lean_large` writes the 61,857 states of the large one by the same `lean_parts`, in 5 s, and is
     left to the entry's reproduce command); and `lean_number` writes numbers in pieces that sum back to them."""
     from computations import coverage, lock_chain
@@ -3217,7 +3228,7 @@ def test_natural_traps(monkeypatch: pytest.MonkeyPatch) -> None:
         assert (t["word"], t["cells"], t["modulus"]) == (word, cells, modulus) and len(t["states"]) > 3000
         assert lock_chain.is_lock(word, t["states"], cells) and word in census
     assert {word for word, *_ in lock_chain.LONG_LARGE}.isdisjoint(set(long_blocks))
-    monkeypatch.setattr(lock_chain, "LONG_LARGE", lock_chain.LONG_LARGE[:1])
+    monkeypatch.setattr(lock_chain, "LONG_LARGE", lock_chain.LONG_LARGE[2:3])  # the smallest of the three, 3,377 states
     assert lock_chain.lean_long_large() in (lean_dir / "NaturalTrapsLongLarge.lean").read_text(encoding="utf-8")
     for x in (0, 5, (7 << 40) + 3, 3 ** 200):
         terms = lock_chain.lean_number(x, 16).split("+")

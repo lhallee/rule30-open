@@ -50,7 +50,7 @@ from dataclasses import dataclass
 import numpy as np
 from tqdm.auto import tqdm
 
-from computations.held_shift import held, ring_cycle
+from computations.held_shift import held, ring_cycle, ring_next
 
 U64 = np.uint64
 MASK64 = (1 << 64) - 1
@@ -121,15 +121,38 @@ class Ring:
     transient: dict[int, int]
 
 
+def orbit_entry(word: int, length: int, reach: dict[int, tuple[int, int]]) -> tuple[int, int]:
+    """The transient of `ring_cycle(word, length)` and the first state of its cycle, from `reach`, which holds both for
+    the states seen before and gets them for the states of this orbit, so that each state is stepped once."""
+    path: list[int] = []
+    place: dict[int, int] = {}
+    x = word
+    while x not in reach and x not in place:
+        place[x] = len(path)
+        path.append(x)
+        x = ring_next(x, length)
+    if x in reach:  # the orbit runs into a state seen before, (0, x) when x is on its cycle
+        known, entry = reach[x]
+        for i, y in enumerate(path):
+            reach[y] = (known + len(path) - i, entry)
+    else:  # a new cycle, from path[place[x]] on
+        start = place[x]
+        for i, y in enumerate(path):
+            reach[y] = (0, y) if i >= start else (start - i, x)
+    return reach[word]
+
+
 def ring_backgrounds(max_q: int) -> list[Ring]:
     """Every cycle of the ring map reached by a word of q <= max_q cells, up to rotation, sorted by spatial period L,
     temporal period P and name."""
     found: dict[str, Ring] = {}
     for q in tqdm(range(1, max_q + 1), desc="ring sizes", file=sys.stderr, leave=False):
         name_of: dict[int, str] = {}  # a state on a cycle -> the name of its background
+        reach: dict[int, tuple[int, int]] = {}  # a state -> its transient and the first state of its cycle it meets
         for w in range(1 << q):
-            transient, cycle = ring_cycle(w, q)
-            if cycle[0] not in name_of:
+            transient, entry = orbit_entry(w, q, reach)
+            if entry not in name_of:
+                _, cycle = ring_cycle(entry, q)  # the cycle from the state where w meets it, as `ring_cycle(w)` has it
                 length = least_spatial_period(cycle[0], q)
                 name = Background(tuple(c & ((1 << length) - 1) for c in cycle), length).name()
                 for c in cycle:
@@ -138,7 +161,7 @@ def ring_backgrounds(max_q: int) -> list[Ring]:
                     _, states = ring_cycle(int(name[::-1], 2), length)
                     bg = Background(tuple(states), length)
                     found[name] = Ring(name, bg, shift_period(bg), {}, {})
-            ring = found[name_of[cycle[0]]]
+            ring = found[name_of[entry]]
             ring.words[q] = ring.words.get(q, 0) + 1
             ring.transient[q] = max(ring.transient.get(q, 0), transient)
     return sorted(found.values(), key=lambda r: (r.bg.length, r.bg.period, r.name))

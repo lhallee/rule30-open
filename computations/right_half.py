@@ -25,21 +25,49 @@ from computations.game import necklaces
 
 
 def column_one(word: str, start: int, steps: int) -> np.ndarray:
-    """Column 1 at times 0 .. steps - 1 of the right half `start` driven by the center repeating `word`."""
+    """Column 1 at times 0 .. steps - 1 of the right half `start` driven by the center repeating `word`. Cell i + 1
+    reaches column 1 only after i steps, so every 1,024 steps or so (a whole number of periods) the row is cut to the
+    cells that can still reach it before the end, which keeps the integer from growing with the run."""
     centers = [int(bit) for bit in word]
-    row = start
-    column = np.zeros(steps, dtype=np.uint8)  # (steps,)
-    for t in range(steps):
-        column[t] = row & 1
-        row = ((row << 1) | centers[t % len(centers)]) ^ (row | (row >> 1))
-    return column  # (steps,)
+    block = centers * max(1, 1024 // len(centers))  # the centers of whole periods, read between two cuts
+    column = bytearray(steps)  # (steps,)
+    row, t = start, 0
+    while t < steps:
+        row &= (1 << (steps - t)) - 1  # bits 0 .. steps - t - 1, the cells that reach column 1 by time steps - 1
+        for center in block:
+            if t == steps:
+                break
+            column[t] = row & 1
+            row = ((row << 1) | center) ^ (row | (row >> 1))
+            t += 1
+    return np.frombuffer(bytes(column), dtype=np.uint8).copy()  # (steps,)
 
 
-def locked_period(word: str, start: int, steps: int, max_multiple: int = 400) -> int | None:
+def driven_row(word: str, row: int, phase: int, steps: int, keep: int) -> int:
+    """The right half `row` after `steps` steps driven by the center repeating `word` from `phase` (the center reads
+    word[phase] first), exact on its first `keep` cells. Cell i + 1 reaches cell `keep` only after i - keep + 1 steps,
+    so every 1,024 steps or so the row is cut to the cells that can still reach the first `keep` before the end."""
+    period = len(word)
+    turned = [int(bit) for bit in word[phase % period:] + word[:phase % period]]
+    block = turned * max(1, 1024 // period)  # the centers of whole periods, read between two cuts
+    t = 0
+    while t < steps:
+        row &= (1 << (keep + steps - t)) - 1  # the cells that reach the first `keep` by the end
+        for center in block:
+            if t == steps:
+                break
+            row = ((row << 1) | center) ^ (row | (row >> 1))
+            t += 1
+    return row & ((1 << keep) - 1)
+
+
+def locked_period(word: str, start: int, steps: int, max_multiple: int = 400,
+                  column: np.ndarray | None = None) -> int | None:
     """The least multiple of the word's length with which column 1, read at the word's white times, repeats over the
-    second half of the run, or None. Masked Jen needs only some common period of the center and that column."""
+    second half of the run, or None. Masked Jen needs only some common period of the center and that column. `column`
+    is `column_one` of the run when the caller has it already."""
     p = len(word)
-    column = column_one(word, start, steps)  # (steps,)
+    column = column_one(word, start, steps) if column is None else column[:steps]  # (steps,)
     white = np.array([word[t % p] == "0" for t in range(steps)])  # (steps,)
     half = steps // 2
     for multiple in range(1, max_multiple + 1):
@@ -51,12 +79,13 @@ def locked_period(word: str, start: int, steps: int, max_multiple: int = 400) ->
     return None
 
 
-def lock_breaks(word: str, start: int, steps: int, shift: int, after: int) -> tuple[int, int, int | None]:
+def lock_breaks(word: str, start: int, steps: int, shift: int, after: int,
+                column: np.ndarray | None = None) -> tuple[int, int, int | None]:
     """For the right half `start` driven by `word`: the last time at which column 1, at a white time of the word,
     differs from its value `shift` steps later (-1 if never), how many such times come after `after`, and the first of
-    them. A lock that holds stays without such times."""
+    them. A lock that holds stays without such times. `column` is `column_one` of the run when the caller has it."""
     p = len(word)
-    column = column_one(word, start, steps)  # (steps,)
+    column = column_one(word, start, steps) if column is None else column[:steps]  # (steps,)
     white = np.array([word[t % p] == "0" for t in range(steps - shift)])  # (steps - shift,)
     breaks = np.flatnonzero((column[:-shift] != column[shift:]) & white)  # (b,)
     late = breaks[breaks > after]  # (c,)
