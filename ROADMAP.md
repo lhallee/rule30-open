@@ -256,7 +256,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   kit's main branch since October 30, after the commit this repository is pinned at ([the kit's pull
   requests](literature/kit-pull-requests.md#runs-of-the-center-column)). Numerically the longest runs are logarithmic.
   Every configuration whose left half starts white has a left half that is a function of the center column alone, and
-  over every possible center column the left half allows, from time $t \le 175$, a black run of at most 0.13t to 0.17t
+  over every possible center column the left half allows, from time $t \le 175$, a black run of at most 0.13t to 0.18t
   and a white run of at most 0.15t to 0.28t (exact maxima over all drivers); a proof of such slopes would cut the kit's
   slopes 3/5 and 1 and raise the count of black cells before $n$ to about $2.8 \log_2 n$
   ([driven left runs](findings/diagonals/driven-left-runs.md)).

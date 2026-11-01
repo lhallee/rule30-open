@@ -1,5 +1,5 @@
 ---
-title: Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.17t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1
+title: Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1
 category: diagonals
 problems: [2]
 status: conjecture
@@ -7,7 +7,7 @@ formalization: wanted
 evidence: [computations/run_mechanism.py]
 ---
 
-# Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.17t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1
+# Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1
 
 **Conjecture (driven runs).** There are $\beta < 3/5$ and $\omega < 1$, and constants, such that for every sequence
 $c(0) = 1, c(1), c(2), \ldots$ the left half driven by $c$ from a white start (defined below) allows a black run of
@@ -59,15 +59,15 @@ with the left half white for $a = 4, 6$). The single cell's left half lies in $\
 | 150 | 2,268,163 | 21.11 | 21 | 0.140 | 25 | 0.167 |
 | 175 | 10,778,684 | 23.36 | 25 | 0.143 | 27 | 0.154 |
 
-Over $75 \le t \le 175$ in steps of 5 the ratio $R_B(t)/t$ lies between 0.129 and 0.165 and $R_W(t)/t$ between 0.154
+Over $75 \le t \le 175$ in steps of 5 the ratio $R_B(t)/t$ lies between 0.129 and 0.178 and $R_W(t)/t$ between 0.154
 and 0.280, falling from 0.20 to 0.24 near $t = 100$ to 0.15 to 0.18 near $t = 170$. For comparison the kit's bounds at $t = 175$ are $L \le 175 - 2 \lfloor 174/5 \rfloor = 107$ (black,
 `black_run_le_erosion` in the kit's main branch) and $L \le 172$ (white, `white_run_le_three`), and the single cell's
 longest runs up to $2^{20}$ are 22 (black) and 19 (white).
 
 Two regularities, both measured and not proved:
 
-- $R_B(t)$ tracks $\log_2 N(t)$ within about 2 (16 against 16.4 at $t = 100$, 21 against 21.1 at 150, 25 against 23.4
-  at 175), and $R_W(t)$ exceeds it by 3 to 8: the right ends of the reachable rows behave like $\log_2 N(t)$ fair bits,
+- $R_B(t)$ tracks $\log_2 N(t)$ within 2.5 (16 against 16.4 at $t = 100$, 21 against 21.1 at 150, 25 against 23.4
+  at 175), and $R_W(t)$ exceeds it by 2.9 to 9.1: the right ends of the reachable rows behave like $\log_2 N(t)$ fair bits,
   so the longest alternating one has about that length. This is a heuristic.
 - $N(t)$ is tiny against the $2^{t-1}$ drivers. A driver value $c(j)$ reaches the left half only through the `or` with
   $x_{-1}(j)$, so only when column $-1$ is white, and different drivers then merge. The growth rate of $\log_2 N(t)$ per
@@ -94,7 +94,8 @@ runs).
   have $\ell = z$ (column 1 turns black when column $-1$ does) and then last while column $-1$ stays black; $\ell / L$
   has median 0.08 and maximum 0.58. So a long white run is a short white block followed by the alternating tail of the
   kit's `row_at_start`, and its length is set by the same kind of alternating domain as a black run, through the tail
-  erosion `white_run_le_erosion` of the kit's main branch ($L \le (3a + 2\ell + 6)/5$).
+  erosion `white_run_le_erosion` of the kit's main branch ($L + 2 \lfloor (a - \ell - 3)/5 \rfloor \le a$, so
+  $L \le (3a + 2\ell + 14)/5$).
 
 ## Why the kit's methods stop where they do
 
@@ -104,9 +105,9 @@ runs).
   left diagonals $D_0, D_1$ gives the slope $3/5$ and nothing below
   ([fixed-depth strips](../../negative-results/diagonals/fixed-depth-strips.md)).
 - **White.** A black or a white block has no forced cell at all in any earlier row ($s \le 5$, 40 cells). With the
-  center's own value $c(a - 1) = 1$, the white block of row $a$ forces row $a - 1$ black on the same cells and nothing
-  earlier. Given the tail erosion above, the white slope is below 1 exactly when the white block of row $a$ reaches at
-  most $\theta a$ cells left of the center for some $\theta < 1$: then $L \le \max(\theta a + 1, (3 + 2\theta) a/5 + 2)$.
+  center's own value $c(a - 1) = 1$, the white cells $0 .. \ell$ of row $a$ force cells $-1 .. \ell - 1$ of row $a - 1$
+  black (one step of the rule, solved cell by cell). Given the tail erosion above, the white slope is below 1 if the
+  white block of row $a$ reaches at most $\theta a$ cells right of the center for some $\theta < 1$: then $L \le \max(\theta a + 1, (3 + 2\theta) a/5 + 3)$.
   The preimages of a black block are a family of $4^s$ rows, not a cone: the third of each preimage farthest from the
   right end is periodic with period 3 for $s \le 2$ and 6 for $3 \le s \le 8$ (`far_periods`, 120 cells), with the
   phase set by the boundary values, so direct comparison stops at row $a - 1$ and the white slope stays 1.
@@ -124,7 +125,9 @@ runs).
   $R_B(t)$, which grows like $0.14 t$ on the range. A bound $o(a)$, or $O(\log a)$ as the data for the single cell
   suggest, has to use that the driver is the center column itself, a statement about the right half's dynamics, which
   is the same kind of statement as the problem. Whether the maximizing drivers are center columns of some
-  configuration is open past $a = 26$; for $3 \le a \le 26$ they are at 12 of the 24 values of $a$.
+  configuration is open past $a = 26$; for $3 \le a \le 26$ they are at 12 of the 24 values of $a$. The relaxation
+  also drops a constraint that needs no right half: a black center cell fixes the next one, $c(t + 1) = \lnot
+  x_{-1}(t)$ when $c(t) = 1$ (so $c(1) = 1$). How much that constraint lowers $R_B$ and $R_W$ is not measured here.
 
 ## Reproduce
 

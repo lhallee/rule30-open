@@ -121,18 +121,23 @@ Rule 150 has rank at most 2 at every cut.
 **Outcome.** The rank of $c_t$ is far below the random control, but the deficit belongs to the rule's shape, not to
 Rule 30:
 
-- On the right cuts the rank is within a few percent of the number of distinct rows, which is the right channel's
-  narrowness already counted in [the screening finding](../../findings/complexity/cone-screening.md) ($N_{\mathrm{R}}$);
-  for $b \le t + 2$ it depends only on $b$ in this range: 2, 2, 4, 5, 9, 12, 19, 26, 39, 53, 79, 104, 153 for
-  $b = 1, \dots, 13$.
+- On the right cuts, $a \ge t - 1$ at $t = 9, 10, 11$, the rank is within 9 percent of the number of distinct rows,
+  which is the right channel's narrowness already counted in
+  [the screening finding](../../findings/complexity/cone-screening.md) ($N_{\mathrm{R}}$). At $t = 9, 10, 11$ it
+  depends only on $b$ for $b \le t + 2$: 2, 2, 4, 5, 9, 12, 19, 26, 39, 53, 79, 104, 153 for $b = 1, \dots, 13$. At
+  smaller $t$ the agreement covers fewer cuts: $b \le t + 1$ for $t = 6, 7, 8$ and $b \le t$ for $t \le 5$ (at $t = 8$,
+  $b = 10$ gives 44, not 53).
 - On the left cuts, $a \le t - 2$, the rank is $2 + (J_{a+1} - 1)/2$ for every $t \le 11$, with $J_n = (2^n - (-1)^n)/3$
   the Jacobsthal numbers: 2, 3, 4, 7, 12, 23, 44, 87, 172 for $a = 1, \dots, 9$, about a third of the $2^a$ distinct
-  columns. Rule 45 has the same values for $a \le 8$ (153 at $a = 9$, $t = 11$); Rule 120 for $a \le 5$, and a few fewer
-  beyond. This is an observation on
-  the range computed, without a proof; it fits the staircase in which the leftmost cells enter a left-permutive rule
-  (the kit's `AlgebraicDegree`, `coef_evol_eq_zero`).
-- Wherever both profiles are known, the rank at a cut is the smaller of the two, and the largest rank over cuts grows like that of Rules 45
-  and 120.
+  columns. At $t = 12$ the formula holds for $a \le 9$ and fails at $a = t - 2 = 10$ (rank 295, formula 343), so the
+  range $a \le t - 2$ does not persist. Probably (not checked beyond $t = 12$) the formula, which doubles with each
+  cell, meets the right profile, which grows by a factor of about 1.5 per cell, at smaller $a$ relative to $t$ as $t$
+  grows. Rule 45 has the same values for $a \le 8$ (153 at $a = 9$, $t = 11$); Rule 120 for
+  $a \le 5$, and a few fewer beyond. This is an observation on the range computed, without a proof; it fits the
+  staircase in which the leftmost cells enter a left-permutive rule (the kit's `AlgebraicDegree`, `coef_evol_eq_zero`).
+- For $6 \le t \le 11$, at every cut with $a \le 9$ and $b \le 13$, the rank is the smaller of
+  $2 + (J_{a+1} - 1)/2$ and the right value for $b$ listed above; at $t = 5$, $a = 5$ it is 10, below both (12). The
+  largest rank over cuts grows like that of Rules 45 and 120.
 
 So GF(2) rank adds nothing to the distinct-subfunction counts on the right, and on the left it shows a structure that
 two other left-permutive rules share. A bound on the rank across one cut also cannot give more than the crossing
@@ -151,10 +156,11 @@ have seen the structure it looks for.
 python -m computations.wild_ideas ore --cells 8192 --max-k 5    # table 1, n = 8,192 (minutes)
 python -m computations.wild_ideas lll --bits 4096 --max-degree 8 # table 2 and the constants (minutes)
 python -m computations.wild_ideas rank --max-t 11                # table 3 (a few minutes)
+python -c "from computations.wild_ideas import cone_table, cut_rank; T = cone_table(12); print([cut_rank(T, 12, a) for a in range(1, 11)])"  # t = 12 left cuts
 ```
 
 The $n = 32{,}768$ rows of table 1 come from `ore_profile(center_column(32768), k, 32768, 32768 // (k + 2) + 4)` in
-[computations/wild_ideas.py](../../computations/wild_ideas.py), about ten minutes for each $k$.
+[computations/wild_ideas.py](../../computations/wild_ideas.py), 10 to 16 minutes for each $k$ on a shared CPU.
 [tests/test_wild_ideas.py](../../tests/test_wild_ideas.py) checks the Ore solution space against enumeration of every
 coefficient vector, the GF(2) ranks against a second elimination, the LLL output against the Lovász condition and the
 lattice determinant, the planted roots, the constants against floating point, and $c_t$ against

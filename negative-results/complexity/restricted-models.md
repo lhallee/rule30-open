@@ -57,8 +57,8 @@ $k = 1, \dots, 20$, is $2^{k-1}$ plus
 | offset | 1 | 1 | 0 | 1 | 5 | 0 | 4 | 0 | 0 | 3 | 2 | 4 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
 
 so for every $k \le 20$ every machine computing $c$ takes more than $k$ steps on some input of the window and on
-infinitely many inputs (the kit's own bound stops at $k = 13$, from `Rule30FactorWindow`). The offsets are those of a
-sequence with no structure: the first pair already differs for 8 of the 20 values of $k$, and no offset exceeds 5.
+infinitely many inputs (the kit's own bound stops at $k = 13$, from `Rule30FactorWindow`). The offsets show no pattern (a heuristic reading, not a
+test): the first pair already differs for 9 of the 20 values of $k$, about half as for a random sequence, and no offset exceeds 5.
 For all $k$ this is the statement that $c$ has no eventual period $2^a$, which Problem 1 implies and nothing here
 proves.
 
@@ -124,7 +124,7 @@ when the center parent is black derives at most six cells more for even $n \le 6
 $n = 800$: short-circuiting the OR saves about a sixth of the $n^2/2$ cells of the dependency cone, and the bound
 $n^2/8$ is a factor of about 3.3 below what is achieved. For Rule 90 both outer parents are always needed, the certificate is
 forced, and it has $\sum_{s=1}^{n} \#\{ j : |j| \le \min(s, n - s),\ j \equiv n - s \pmod 2 \}$ cells, $0.251 n^2$ at
-$n = 800$: a quadratic bound for a function that the machine "output 0" computes.
+$n = 800$: a quadratic bound for a function that is 0 at every $n \ge 1$.
 
 ## What it means
 

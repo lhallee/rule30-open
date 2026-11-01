@@ -20,10 +20,10 @@ Three computations.
 3. `forced`: the cells of row a - s that every s-step preimage of a word shares, by enumeration. An alternating word
    forces a trapezoid (right end 4 cells further left per step); a black or a white block forces nothing.
 
-    python -m computations.run_mechanism mechanism --steps 1048576   # about 2 min
-    python -m computations.run_mechanism driven --steps 150          # about 1 min
-    python -m computations.run_mechanism class --steps 24            # about 30 s
-    python -m computations.run_mechanism forced
+    python -m computations.run_mechanism mechanism --steps 1048576      # about 2 min
+    python -m computations.run_mechanism driven --steps 175 --every 5   # about 20 min, 3 GB of memory
+    python -m computations.run_mechanism class --steps 26               # about 1 min
+    python -m computations.run_mechanism forced                         # about 1 s
 """
 
 from __future__ import annotations
@@ -145,6 +145,8 @@ class Mechanism:
     white_identity_failures: int  # runs whose length is not the one read off column -1 and ell
     white_end_counts: dict[str, int]  # 'before front', 'at front', 'after front', over white runs of length >= min_len
     long_black: list[tuple[int, int, int, int]]  # (a, L, domain lifetime, longest domain length seen)
+    long_black_offset: list[int]  # for each long black run, max over s of |right end + 4s| (0: exactly the trapezoid)
+    long_white: list[tuple[int, int]]  # (ell, L) for white runs of length >= min_len
 
 
 def mechanism(steps: int, half: int = 64, min_len: int = 12, progress: bool = True) -> Mechanism:
@@ -155,6 +157,8 @@ def mechanism(steps: int, half: int = 64, min_len: int = 12, progress: bool = Tr
     black_fail = white_fail = 0
     ends = {"before front": 0, "at front": 0, "after front": 0}
     long_black: list[tuple[int, int, int, int]] = []
+    long_black_offset: list[int] = []
+    long_white: list[tuple[int, int]] = []
     tail = 2 * half
     for k, (a, L, c) in enumerate(zip(starts.tolist(), lengths.tolist(), colors.tolist())):
         if a == 0 or a + L + 1 >= steps:
@@ -167,6 +171,7 @@ def mechanism(steps: int, half: int = 64, min_len: int = 12, progress: bool = Tr
             if L >= min_len and a > tail:
                 prof = domain_profile(cells, half, a, L)
                 long_black.append((a, L, len(prof), max(q + L + s for s, q in prof)))
+                long_black_offset.append(max(abs(q + 4 * s) for s, q in prof))
         else:
             ell, z, o = white_reading(cells, half, a, L)
             # the run lasts while column -1 reads 0^z 1^o with the switch at the front's arrival a + ell
@@ -178,11 +183,13 @@ def mechanism(steps: int, half: int = 64, min_len: int = 12, progress: bool = Tr
             if L >= min_len:
                 key = "before front" if L <= ell else ("at front" if L == ell + 1 else "after front")
                 ends[key] += 1
+                long_white.append((ell, L))
     bl = lengths[colors == 1]
     wl = lengths[colors == 0]
     ib, iw = int(np.argmax(bl)), int(np.argmax(wl))
     return Mechanism(steps, len(bl), len(wl), (int(bl[ib]), int(starts[colors == 1][ib])),
-                     (int(wl[iw]), int(starts[colors == 0][iw])), black_fail, white_fail, ends, long_black)
+                     (int(wl[iw]), int(starts[colors == 0][iw])), black_fail, white_fail, ends, long_black,
+                     long_black_offset, long_white)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -417,6 +424,9 @@ def run_mechanism(args: argparse.Namespace) -> None:
     print(f"black runs whose length is not the alternating length of row a: {m.black_identity_failures}")
     print(f"white runs whose length is not read off column -1 and ell: {m.white_identity_failures}")
     print(f"white runs of length >= {args.min_len} by how they end: {m.white_end_counts}")
+    if m.long_white:
+        ratio = np.array([e / L for e, L in m.long_white])  # (r,)
+        print(f"  ell / L: min {ratio.min():.2f}, median {np.median(ratio):.2f}, max {ratio.max():.2f}")
     lb = m.long_black
     if lb:
         life = np.array([x[2] for x in lb])  # (r,)
@@ -429,6 +439,8 @@ def run_mechanism(args: argparse.Namespace) -> None:
         excess = life - ((L - 2) // 3 + 1)  # (r,), steps beyond the forced lifetime
         vals, counts = np.unique(excess, return_counts=True)
         print(f"  lifetime beyond the forced trapezoid's: {dict(zip(vals.tolist(), counts.tolist()))}")
+        off, cnt = np.unique(np.array(m.long_black_offset), return_counts=True)
+        print(f"  max over s of |right end + 4s| (0: the forced trapezoid): {dict(zip(off.tolist(), cnt.tolist()))}")
         print(f"  longest domain behind the run / L: min {np.min(grow / L):.2f}, median {np.median(grow / L):.2f}, "
               f"max {np.max(grow / L):.2f}")
 

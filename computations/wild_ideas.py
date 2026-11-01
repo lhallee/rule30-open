@@ -384,7 +384,8 @@ def jacobsthal(n: int) -> int:
 
 
 def left_cut_formula(left: int) -> int:
-    """2 + (J_(left+1) - 1) / 2: the rank of c_t at the left cuts with left <= t - 2 for t <= 12."""
+    """2 + (J_(left+1) - 1) / 2: the rank of c_t at the left cuts with left <= t - 2 for t <= 11. At t = 12 it holds
+    for left <= 9 and fails at left = 10 (rank 295)."""
     return 2 + (jacobsthal(left + 1) - 1) // 2
 
 
