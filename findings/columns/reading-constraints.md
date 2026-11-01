@@ -105,6 +105,22 @@ For $011$ one word is forced with no exception: read at its white step, column 1
 read both colors. So 22 of the 23 blocks have a set of words of entropy below 1 that every right half falls into, or
 that only halves with constant readings escape.
 
+## Periods 8 and 9
+
+The same survey at width 14, with halves of up to 8 cells for the census, over the 30 primitive blocks of period 8
+and the 56 of period 9:
+
+| period | blocks | entry forced | not forced | empty trap | no word missing | entropy where forced | forced within |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 8 | 30 | 8 | 8 | 12 | 2 | 0.200 to 0.643 | 16 to 45 steps |
+| 9 | 56 | 31 | 2 | 23 | 0 | 0.231 to 0.644 | 15 to 68 steps |
+
+Three learned lists of period 8 have entropy 0, those of $00000001$, $00011111$ and $00111111$, so inside their traps
+the readings are eventually periodic and masked Jen applies; entry is not forced for any of the three, and the three
+blocks are among those the finite game excludes ($00000001$, [game blocks](game-blocks.md)) or that lock from every
+start ([period-four locking](period-four-locking.md)). No list of period 9 has entropy 0; the lowest is 0.116, for
+$000001011$, whose entry is not forced. So the reading constraints exclude no block of period 9.
+
 ## Two examples
 
 - **$001$.** Write the white steps as $a_i, b_i$ (the center reads $0, 0, 1$). The kit proves that column 1 is
@@ -154,6 +170,7 @@ python -m computations.gap_traps --block 001 --width 13 --words 11 1001 00100 10
 python -m computations.gap_traps --block 011 --width 16 --words 00 010 01110 011110 --cells 16   # every half enters
 python -m computations.gap_traps --block 011 --width 14 --words 00 --forced   # escaping paths read only white
 python -m computations.gap_traps --block 00111 --width 14 --words 111 0000 1011 --forced   # forced within 22 steps
+for b in $(python -c "from computations.gap_traps import necklace_blocks; print(' '.join(necklace_blocks(9)))"); do python -m computations.gap_traps --block $b --width 14 --cells 8 --steps 3000 --forced; done   # period 9, hours
 ```
 
 The forced column of the table comes from `--block <b> --width 14 --forced` for each block, a few seconds to about a
