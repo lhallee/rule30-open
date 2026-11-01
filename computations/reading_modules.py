@@ -3,10 +3,17 @@ written in the form of `Rule30Open.Columns.ThreeRuns`.
 
 `module_text` writes the whole module from a `Module` (the certificate and its prose); the tables are the ranks of
 `reading_certificates.certificate`, packed by `reading_certificates.tables`. `MODULES` holds the modules of the
-repository.
+repository with one block.
 
-    python -m computations.reading_modules Runs00001            # print the module
-    python -m computations.reading_modules Runs00001 --check    # the file in Rule30Open/Columns is this text
+`collection_text` writes several blocks into one module (a `Collection`): the body of each block's module in a section
+of its own, with its helpers in the namespace `ReadingWords.B<block>` and its headline theorems `readings_<block>`,
+`readings_<block>_evolve` and `no_<word>_time_<block>` in `Rule30Open`. `COLLECTIONS` holds them; the rows of
+`ReadingWords` (`READING_WORDS`) are, for each block, the forced list of lowest entropy that
+`reading_certificates.strongest` finds at a single white phase within 120,000 states.
+
+    python -m computations.reading_modules Runs00001               # print the module
+    python -m computations.reading_modules Runs00001 --check       # the file in Rule30Open/Columns is this text
+    python -m computations.reading_modules ReadingWords --check    # the 15 blocks of ReadingWords, about 1 s
 """
 
 from __future__ import annotations
@@ -16,6 +23,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from computations.gap_traps import word_entropy
 from computations.reading_certificates import Spec, certificate, tables
 
 COLUMNS = Path(__file__).resolve().parent.parent / "Rule30Open" / "Columns"
@@ -78,8 +86,9 @@ def nested(k: int, period: int) -> str:
     return "u" + f" + {period}" * k
 
 
-def module_text(mod: Module) -> str:
-    """The Lean module of a reading certificate."""
+def module_parts(mod: Module) -> tuple[str, str]:
+    """The head of the module of a reading certificate (imports, docstring, `namespace Rule30Open`, the opens) and its
+    body (the certificate, its proof and the headline theorems)."""
     name, block, q, width, words, title, summary = mod.name, mod.block, mod.q, mod.width, mod.words, mod.title, \
         mod.summary
     pred, pred_doc, headline, headline_doc, evolve_doc, suffix = mod.pred, mod.pred_doc, mod.headline, \
@@ -127,6 +136,7 @@ def module_text(mod: Module) -> str:
         lines.append(f"  rw [bad_{u} _ (suf_lt _ _ _)] at hb")
         lines.append("  exact absurd hb (by decide)")
         word_thms.append("\n".join(lines))
+    decide = "decide" if S <= 8 else "decide +kernel"  # plain decide for few stored readings, as Runs00001
     bad_lemmas = []
     for u in words:
         expr = "s"
@@ -134,14 +144,20 @@ def module_text(mod: Module) -> str:
             expr = f"push ({expr}) {'true' if c == '1' else 'false'}"
         expr = expr.replace("push (s)", "push s")
         last = "true" if u[-1] == "1" else "false"
-        bad_lemmas.append(f"theorem bad_{u} : ∀ s, s < {S} → badB ({expr}) {last} = true := by decide")
+        line = f"theorem bad_{u} : ∀ s, s < {S} → badB ({expr}) {last} = true := by {decide}"
+        stmt = line.removesuffix(f" := by {decide}").split(" ")
+        bad_lemmas.append(line if len(line) <= 120 else wrap("", stmt + [f":= by {decide}"], "", "", "    "))
     # predicate
     pred_terms = []
     for u in words:
         conj = " ∧ ".join(f"b {'i' if k == 0 else f'(i + {k})'} = {'true' if c == '1' else 'false'}"
                           for k, c in enumerate(u))
-        pred_terms.append(f"¬ ({conj})")
-    pred_body = " ∧\n    ".join(pred_terms)
+        pred_terms.append(conj)
+    lead = len(f"  ∀ i, {i0} ≤ i → ")
+    pred_body = " ∧\n    ".join(
+        wrap(" " * (lead if k == 0 else 4) + "¬ (", conj.split(" ∧ "), " ∧",
+             ")" + (" ∧" if k < len(pred_terms) - 1 else ""), " " * 6)[(lead if k == 0 else 4):].removesuffix(" ∧")
+        for k, conj in enumerate(pred_terms))
     maxm = max(len(u) for u in words)
     eqs = []
     for k in range(1, maxm):
@@ -154,7 +170,7 @@ def module_text(mod: Module) -> str:
     parts_cases = "\n".join(f"  | {p}, _ => ok_{p}" for p in range(P))
     hdrwords = ", ".join(f"`{u}`" for u in words)
     tabtext = ",\n".join(f"  {hex(v)}" for v in tabs)
-    src = f"""module
+    head = f"""module
 
 public import Rule30Open.Foundations.Evolve
 public import Ruliology.CellularAutomata.Rule30EtherThree
@@ -183,7 +199,8 @@ namespace Rule30Open
 
 open Ruliology.CellularAutomata Rule30Ether Rule30EtherThree Rule30StripCertificates
 
-/-! The certificate and the helpers live in `{name}`; the headline theorems are in `Rule30Open`. -/
+"""
+    body = f"""/-! The certificate and the helpers live in `{name}`; the headline theorems are in `Rule30Open`. -/
 
 namespace {name}
 
@@ -399,7 +416,7 @@ theorem {headline} (R : Nat → Bool) (ph : Nat) : {pred} (reading R ph) {i0} :=
   have hp : ({P} * i + {off} + ph) % {P} = {q} := by omega
 {chr(10).join(eqs)}
   rw [{erw}]
-  exact ⟨{tup}⟩
+{wrap("  exact ⟨", tup.split(", "), ",", "⟩", "    ") if len(words) > 1 else "  exact " + tup}
 
 /-! ### Every row whose center column repeats `{block}` -/
 
@@ -442,18 +459,154 @@ theorem {headline}_evolve (init : Int → Bool) (T : Nat)
     exact evolve_eq_drv init T h ({P} * i + {off.replace('ph', '0')}) 1
   rw [e]
   exact {headline} _ 0
-
-end Rule30Open
 """
-    return src
+    return head, body
+
+
+def module_text(mod: Module) -> str:
+    """The Lean module of a reading certificate."""
+    head, body = module_parts(mod)
+    return head + body + "\nend Rule30Open\n"
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Several blocks in one module
+
+
+ORDINALS = {1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth"}
+
+
+@dataclass(frozen=True)
+class Statement:
+    """What the certificate of a module proves: its states, the good states, the largest rank, the first reading from
+    which the words are avoided, and the entropy of the sequences without the words."""
+
+    states: int
+    good: int
+    max_rank: int
+    first: int
+    entropy: float
+
+
+def statement(mod: Module) -> Statement:
+    """The statement of the certificate of a module, as the module states it."""
+    spec = Spec(mod.block, (mod.q,), mod.width, mod.words)
+    good, rank = certificate(spec)  # (P, 2^W, 2^keep)
+    assert (rank >= 0).all(), "entry is not forced"
+    top, period = int(rank.max()), len(mod.block)
+    first = max(-(-max(0, top - period * (len(u) - 1)) // period) for u in mod.words)
+    return Statement(spec.states, int(good.sum()), top, first, word_entropy(mod.words))
+
+
+def reading_module(block: str, q: int, width: int, words: tuple[str, ...]) -> Module:
+    """The module record of one block in a collection: namespace `ReadingWords.B<block>`, headline
+    `readings_<block>`, word theorems `no_<word>_time_<block>`, predicate `Avoids`."""
+    whites = [p for p, c in enumerate(block) if c == "0"]
+    step_name = f"{ORDINALS[whites.index(q) + 1]} white step"
+    listed = ", ".join(f"`{u}`" for u in words)
+    return Module(
+        name=f"ReadingWords.B{block}", block=block, q=q, width=width, words=words,
+        title=f"Under the center column `{block}`, column 1 at the {step_name} avoids {listed}",
+        summary="", pred="Avoids",
+        pred_doc=f"A sequence of bits has none of the factors {listed} from index `i0` on.",
+        headline=f"readings_{block}", headline_doc="Readings.", evolve_doc="Readings of every row.",
+        step_name=step_name, suffix=f"_{block}")
+
+
+@dataclass(frozen=True)
+class Collection:
+    """Several reading certificates in one Lean module, one section and one namespace per block."""
+
+    name: str
+    title: str
+    summary: str
+    modules: tuple[Module, ...]
+
+
+def collection_text(col: Collection) -> str:
+    """The Lean module of several reading certificates: the body of `module_parts` for each block, in a section of its
+    own, so that the `open` of its namespace ends with it."""
+    bullets, sections = [], []
+    for mod in col.modules:
+        st = statement(mod)
+        listed = ", ".join(f"`{u}`" for u in mod.words)
+        bullets.append(wrap(f"* `{mod.headline}`, `{mod.headline}_evolve`: ", f"`{mod.block}` at the {mod.step_name} "
+                            f"(phase {mod.q}), no {listed} from reading {st.first} on; width {mod.width}, ranks at "
+                            f"most {st.max_rank}.".split(" "), "", "", "  "))
+        _, body = module_parts(mod)
+        sections.append(f"/-! ## Block `{mod.block}` -/\n\nsection B{mod.block}\n\n{body}\nend B{mod.block}\n")
+    bullet_text = "\n".join(bullets)
+    head = f"""module
+
+public import Rule30Open.Foundations.Evolve
+public import Ruliology.CellularAutomata.Rule30EtherThree
+
+/-!
+# {col.title}
+
+{col.summary}
+
+{bullet_text}
+
+Each block has the certificate of `Rule30Open.Columns.Runs00001` in the namespace `ReadingWords.B<block>`
+(`rankTabs`, `nodeOK`, `ok_p`, `parts_ok`, `rank_bound`, `no_bad`, `suf_period`, `evolve_eq_drv`) and its headline
+theorems in `Rule30Open`: `no_<word>_time_<block>` by times, `readings_<block>` by readings and
+`readings_<block>_evolve` for every row whose center column repeats the block.
+
+The natural-language argument is `{col.name}.md`, beside this file.
+-/
+
+@[expose] public section
+
+namespace Rule30Open
+
+open Ruliology.CellularAutomata Rule30Ether Rule30EtherThree Rule30StripCertificates
+
+"""
+    return head + "\n".join(sections) + "\nend Rule30Open\n"
+
+
+READING_WORDS: tuple[tuple[str, int, int, tuple[str, ...]], ...] = (  # (block, read phase, width, words)
+    ("00011", 0, 7, ("00", "01010")),
+    ("00101", 0, 6, ("010", "101", "1111")),
+    ("00111", 0, 8, ("11", "1001")),
+    ("01011", 2, 2, ("11",)),
+    ("000001", 0, 7, ("11", "101")),
+    ("000011", 0, 7, ("010", "101110")),
+    ("000111", 0, 8, ("11", "101", "1001")),
+    ("001101", 0, 6, ("11", "101")),
+    ("010111", 0, 6, ("111", "1101")),
+    ("0000001", 2, 10, ("00", "0110")),
+    ("0000101", 5, 6, ("11",)),
+    ("0001001", 0, 9, ("11",)),
+    ("0001011", 0, 9, ("101", "1001", "10001")),
+    ("0011011", 0, 10, ("000", "00111")),
+    ("0110111", 0, 10, ("11", "101")),
+)
+
+COLLECTIONS = {
+    "ReadingWords": Collection(
+        name="ReadingWords",
+        title="Beside a center column repeating a block, column 1 at one white step avoids a list of words",
+        summary=("For each block below, let the center column repeat it and look at the right half it drives (the "
+                 "kit's\n`Rule30Ether.drv`), from any initial right half, finite or not. At one white step of each "
+                 "period column 1\nnever reads a word of the block's list once the last reading of the word is at "
+                 "the block's largest rank or\nlater."),
+        modules=tuple(reading_module(*row) for row in READING_WORDS)),
+}
+
+
+def text_of(name: str) -> str:
+    """The text of the module or the collection of this name."""
+    return module_text(MODULES[name]) if name in MODULES else collection_text(COLLECTIONS[name])
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("name", choices=sorted(MODULES))
+    parser.add_argument("name", choices=sorted(MODULES) + sorted(COLLECTIONS))
     parser.add_argument("--check", action="store_true", help="compare with the file in Rule30Open/Columns")
     args = parser.parse_args()
-    text = module_text(MODULES[args.name])
+    text = text_of(args.name)
     if args.check:
         same = (COLUMNS / f"{args.name}.lean").read_text(encoding="utf-8") == text
         print(f"{args.name}.lean is this text" if same else f"{args.name}.lean differs", file=sys.stderr)

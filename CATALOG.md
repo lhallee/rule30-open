@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-102 Lean modules with 455 headline theorems, 44 findings (proved on paper,
+103 Lean modules with 485 headline theorems, 44 findings (proved on paper,
 computed or conjectured) and 43 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 83 | 23 | 12 |
+| [Columns](#columns) | 84 | 23 | 12 |
 | [Period two](#period-two) | 6 | 9 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -171,6 +171,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Right halves white on their first 91,129 to 201,172 cells enter the walls of period 9](Rule30Open/Columns/NineWhite.md) | [`Columns.NineWhite`](Rule30Open/Columns/NineWhite.lean) | `highRightW_of_entry`, `white_first_wall`, `white_first_wall_eight`, `white_second_wall`, `white_second_wall_zero` | 1 | not in the kit |
 | [The period-four certificates are traps, and entry into one excludes its word](Rule30Open/Columns/PeriodFourCertificate.md) | [`Columns.PeriodFourCertificate`](Rule30Open/Columns/PeriodFourCertificate.lean) | `cert0001_check`, `cert0011_check`, `cert0111_check`, `not_eventually_0001_of_certificate`, `not_eventually_0011_of_certificate`, `not_eventually_0111_of_certificate` | 1 | not in the kit |
 | [Refuting entry into a trap from the few windows that can reach it](Rule30Open/Columns/ReachRefuted.md) | [`Columns.ReachRefuted`](Rule30Open/Columns/ReachRefuted.lean) | `pre_move`, `not_absorption_back`, `not_absorption_fwd`, `tw0_40_not_absorption_back`, `fo0_46_not_absorption_back` | 1 | not in the kit |
+| [Beside a center column repeating one of 15 blocks of period 5 to 7, column 1 at one white step avoids a list of words](Rule30Open/Columns/ReadingWords.md) | [`Columns.ReadingWords`](Rule30Open/Columns/ReadingWords.lean) | `readings_00011`, `readings_00011_evolve`, `readings_00101`, `readings_00101_evolve`, `readings_00111`, `readings_00111_evolve`, `readings_01011`, `readings_01011_evolve`, `readings_000001`, `readings_000001_evolve`, `readings_000011`, `readings_000011_evolve`, `readings_000111`, `readings_000111_evolve`, `readings_001101`, `readings_001101_evolve`, `readings_010111`, `readings_010111_evolve`, `readings_0000001`, `readings_0000001_evolve`, `readings_0000101`, `readings_0000101_evolve`, `readings_0001001`, `readings_0001001_evolve`, `readings_0001011`, `readings_0001011_evolve`, `readings_0011011`, `readings_0011011_evolve`, `readings_0110111`, `readings_0110111_evolve` | 1 | not in the kit |
 | [Lean refutations of entry into 102 traps of the trap modules](Rule30Open/Columns/RefutedTraps.md) | [`Columns.RefutedTraps`](Rule30Open/Columns/RefutedTraps.lean) | `refutedTraps_not_absorption`, `nine15_not_absorption`, `tw1_4_not_absorption`, `cen0011111101111_not_absorption` | 1 | not in the kit |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |
 | [Under a center column repeating 00001, column 1 at the first white step has isolated 1s and no run of exactly two 0s](Rule30Open/Columns/Runs00001.md) | [`Columns.Runs00001`](Rule30Open/Columns/Runs00001.lean) | `runs_00001`, `runs_00001_evolve`, `no_11_time_00001`, `no_1001_time_00001` | 1 | not in the kit |

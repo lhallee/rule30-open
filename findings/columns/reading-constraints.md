@@ -138,7 +138,9 @@ avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half. F
 [Runs00001](../../Rule30Open/Columns/Runs00001.md) proves that column 1 at the first white step avoids $11$ and $1001$
 from reading 5 on (readings counted from 0), for every right half. Each further block is one entry of
 `computations/reading_modules.py`, which writes the module from the certificate of
-`computations/reading_certificates.py`. [ConstrainedLeft001](../../Rule30Open/Columns/ConstrainedLeft001.md)
+`computations/reading_certificates.py`. [ReadingWords](../../Rule30Open/Columns/ReadingWords.md) kernel-checks a list read at one white step for
+15 more blocks of period 5 to 7 (entropy 0.465 to 0.831). None of these lists excludes a block: each keeps positive
+entropy, so masked Jen does not apply. [ConstrainedLeft001](../../Rule30Open/Columns/ConstrainedLeft001.md)
 reduces $001$ in Lean to the left statement with those free bits, and [the constrained left
 halves](../../negative-results/columns/constrained-left-halves.md) shows why no finite left game closes it: halves with
 periodic free bits are eventually periodic in space and dense among the solutions.

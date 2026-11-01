@@ -406,8 +406,9 @@ In order of the assessment above.
      constrained free bits ([ConstrainedLeft001](Rule30Open/Columns/ConstrainedLeft001.md)). The constraint lowers
      the left statement's entropy from 1/3 to 0.2042 bits per step, but no finite left game closes it ([constrained left
      halves](negative-results/columns/constrained-left-halves.md)). The kernel also checks $00001$
-     ([Runs00001](Rule30Open/Columns/Runs00001.md)); `reading_modules.py` writes the module for any further block, and
-     certificates for the other 13 forced blocks are next.
+     ([Runs00001](Rule30Open/Columns/Runs00001.md)) and, read at one white step, 15 blocks of period 5 to 7
+     ([ReadingWords](Rule30Open/Columns/ReadingWords.md)). Every list kernel-checked so far keeps positive entropy;
+     an exclusion would need a forced list of entropy 0 read at every white step.
    - *Period two, the right half.* Every finite right half entering the gap trap, the kit's ether family or the lock of
      period seven ([the census](findings/period-two/gate-census.md)) would leave the left statement `Q01Gap` alone; the
      census reaches 20 cells, and wider locks, or a test of reach for the three sets together, are next.
