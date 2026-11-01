@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-119 Lean modules with 588 headline theorems, 49 findings (proved on paper,
+120 Lean modules with 595 headline theorems, 49 findings (proved on paper,
 computed or conjectured) and 49 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -14,7 +14,7 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 96 | 26 | 14 |
 | [Period two](#period-two) | 9 | 10 | 7 |
-| [Diagonals](#diagonals) | 3 | 3 | 3 |
+| [Diagonals](#diagonals) | 4 | 3 | 3 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
@@ -319,6 +319,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Every configuration white left of a black cell settles to the single cell's pairs of left diagonals up to a time shift, as long as each white diagonal is followed by a doubling period](Rule30Open/Diagonals/DrivenSkeleton.md) | [`Diagonals.DrivenSkeleton`](Rule30Open/Diagonals/DrivenSkeleton.lean) | `shift_of_black`, `shift_or_flip_of_white`, `skeleton_step`, `skeleton_step_of_flip`, `base_shift` | 2 | not in the kit |
 | [Left diagonals remember only behind a white diagonal](Rule30Open/Diagonals/LeftMemory.md) | [`Diagonals.LeftMemory`](Rule30Open/Diagonals/LeftMemory.lean) | `D_reset`, `D_periodic_of_black`, `D_period_dichotomy`, `D_period_doubles`, `D_two_white`, `D_three_flips` | 1 | extends a kit result |
 | [If the left diagonals repeat with period 16 from time 3j/2 to depth J, black center runs have 13L at most 3a + 2400 and white blocks reach left at most (a + 100)/3](Rule30Open/Diagonals/SettledRuns.md) | [`Diagonals.SettledRuns`](Rule30Open/Diagonals/SettledRuns.lean) | `no_alt_pair`, `settled_alt_pair`, `no_white_pair`, `erode_alt`, `black_run_le_of_settled`, `white_block_le_of_settled` | 2 | not in the kit |
+| [If the left diagonals repeat from time 3j/2 with any periods and no settled pair alternates in antiphase more than A times, black center runs have 13L at most 3a + 130A + 260; the reset bound reduces the settling to the white runs of the settled diagonals](Rule30Open/Diagonals/SettledSlope.md) | [`Diagonals.SettledSlope`](Rule30Open/Diagonals/SettledSlope.lean) | `altBound_of_repeats`, `altBound_of_period_le`, `black_run_window`, `black_run_le_of_settling`, `black_run_le_of_fast_settling`, `pair_repeats_of_white_runs`, `black_run_le_of_white_runs` | 2 | not in the kit |
 
 **Findings**
 

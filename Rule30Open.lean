@@ -111,6 +111,7 @@ public import Rule30Open.PeriodTwo.EtherCensus16
 public import Rule30Open.PeriodTwo.NoKTails
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
+public import Rule30Open.Diagonals.SettledSlope
 public import Rule30Open.Diagonals.DrivenSkeleton
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods

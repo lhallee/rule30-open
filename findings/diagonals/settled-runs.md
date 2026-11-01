@@ -24,6 +24,10 @@ consecutive times inside the forced pattern:
 
 [The Lean module](../../Rule30Open/Diagonals/SettledRuns.md) proves the black-run and white-block bounds for the fixed
 period 16 at $\gamma = 3/2$ up to a finite depth $J$; that case has no asymptotic content (see the module).
+[SettledSlope](../../Rule30Open/Diagonals/SettledSlope.md) proves the black-run bound with periods that may grow, from
+a bound on the antiphase alternations of the settled pairs (at most 9 for $j \le 200{,}000$), at $\gamma = 3/2$ and
+$27/20$, and from the white runs of the settled diagonals at $\gamma = 6$; there every $j \le 200{,}000$ repeats from
+time $\lceil 3j/2 \rceil$ with some period.
 
 The unconditional bounds stay at slope $3/5$ for black runs and $1$ for white runs. The hypothesis is not proved. The
 pinned kit proves each left diagonal eventually periodic with period $2^j$ (`Rule30Diagonals.D_periodic`), without a

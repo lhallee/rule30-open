@@ -71,8 +71,10 @@ depth of the window at time $t$, which makes the game infinite: that is route 2.
   cover the pair for more than $A_j + 1$ consecutive times after $T_j$. If $T_j \le \gamma j$ for every $j$ and
   $A_j = o(j)$, black runs have slope at most $3(\gamma - 1)/(5\gamma - 1) < 3/5$.
   [SettledRuns](../../Rule30Open/Diagonals/SettledRuns.md) proves the argument in Lean for period 16 and
-  $\gamma = 3/2$; with $A_j + 1$ in place of $P + 1$ the same window computation applies (on paper). Always
-  $A_j < P_j$: a pair that alternated for a whole period would alternate forever, which `no_alt_pair` forbids.
+  $\gamma = 3/2$; [SettledSlope](../../Rule30Open/Diagonals/SettledSlope.md) proves it with $A + 1$ in place of $P + 1$
+  and any periods, at $\gamma = 3/2$ and $27/20$. Always
+  $A_j \le P_j$ (`altBound_of_period_le`): a pair that alternated for $P_j + 1$ settled times would alternate forever,
+  which `no_alt_pair` forbids.
 - [DrivenSkeleton](../../Rule30Open/Diagonals/DrivenSkeleton.md): every driver's eventual pair at depth $j$ is the
   single cell's read with a time shift, for $j \le 53{,}207$ (Lean step and base, a computed check at the four white
   diagonals 2, 7, 28, 399). So there $A_j$ and the period $P_j$ are the single cell's, and only $T_j$ depends on the
@@ -81,7 +83,9 @@ depth of the window at time $t$, which makes the game infinite: that is route 2.
 - The reset bound: by `shift_of_black` (and `D_periodic_of_black` of [LeftMemory](../../Rule30Open/Diagonals/LeftMemory.md)),
   $T_{j+1} \le \max(T_j, j + 1) + g_j + 1$, where $g_j$ is the longest cyclic white run of the periodic part of
   $D_j$ ($g_j = -1$ for a white diagonal). With $T_1 = 2$ this gives a bound $B_j$ for every driver,
-  `onset_bound`; the test checks $T_j \le B_j$ over every driver for $j \le 32$.
+  `onset_bound`; the test checks $T_j \le B_j$ over every driver for $j \le 32$. For the single cell the bound is
+  proved in Lean as `pair_repeats_of_white_runs` of [SettledSlope](../../Rule30Open/Diagonals/SettledSlope.md): the pair
+  $(D_j, D_{j+1})$ repeats from $1 + \sum_{i \le j} (g_i + 1)$ (white diagonals counting 0).
 
 **The numbers.** Over every driver (`driver_pairs`, all pairs $(D_{j-1}, D_j)$ on a horizon of $4j + 128$ steps,
 deduplicated):

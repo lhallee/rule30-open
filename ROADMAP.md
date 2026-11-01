@@ -60,9 +60,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     21](findings/columns/game-blocks-21.md), [BitPhases](Rule30Open/Columns/BitPhases.md)); the game with cyclic
     classes at 16 cells excludes $000000001011$, of period 12, in Lean through a certificate of local checks that
     holds for any block ([class game](findings/columns/class-game.md), [ClassGame](Rule30Open/Columns/ClassGame.md)), and ten blocks of
-    period 13 to 16 and six of period 17 that nothing else excludes, with two more of period 17 by computation only
-    ([class blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules
-    it links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean
+    period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes, all in Lean
+    except twelve of period 18, the certificates too large for one module checked over several ([class
+    blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules it
+    links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean
     ([GameBlocksWide](Rule30Open/Columns/GameBlocksWide.md)); the kit excludes every
     $1\,0^q$ with $q \ge 9$ and every block followed by exponentially many white cells. After nine 1s, following the
     cells beside the column extends the kit's long black runs to every period whose runs of nine or more 1s are
@@ -286,8 +287,14 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
   about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
   The hypothesis holds for $j < 80{,}000$ up to time $2^{17}$ by computation, with onsets near $4j/3$, and fails past depth 87,866, where the period becomes 32, so as
-  stated the theorem reaches only starts below about 143,000, where computation already bounds the runs; a version
-  with a period that grows with the depth is what would give a slope.
+  stated the theorem reaches only starts below about 143,000, where computation already bounds the runs; with a
+  period that grows, [SettledSlope](Rule30Open/Diagonals/SettledSlope.md) proves in Lean that black runs from time
+  $a$ have $13 L \le 3a + 130 A + 130 \delta + 260$ if every left diagonal $j \le J + 1$ repeats, with any period,
+  from time $\lceil 3j/2 \rceil + \delta$, and adjacent settled diagonals alternate in antiphase at most $A$ times
+  ($A$ equal to the period always suffices), for $\lfloor 8a/13 \rfloor \le J$; it also proves the reset bound, so a
+  bound on the white runs of the settled diagonals gives slope $15/29$. Computation checks the hypotheses for every
+  $j \le 200{,}000$ with $\delta = 0$ and $A = 9$. The slope $3/13$ for every $a$ needs $T_j \le 3j/2 + o(j)$ and
+  $A_j = o(j)$ at every depth, which is linear settling with the period freed, and is open.
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
   strips](negative-results/diagonals/fixed-depth-strips.md)). *Assessment:* going below linear needs a statement about
   the chaotic left half near the center, here a linear bound on when the left diagonals settle, with a period that may
