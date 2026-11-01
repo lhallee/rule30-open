@@ -82,6 +82,7 @@ public import Rule30Open.Columns.ThreeRuns
 public import Rule30Open.Columns.ConstrainedLeft001
 public import Rule30Open.Columns.Runs00001
 public import Rule30Open.Columns.ReadingWords
+public import Rule30Open.Columns.ClassGame
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable

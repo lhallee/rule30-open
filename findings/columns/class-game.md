@@ -3,7 +3,7 @@ title: The game with cyclic classes at 16 cells excludes 000000001011, a block o
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/zero_entropy.py, computations/game.py, computations/bit_game.py]
 ---
 
@@ -11,7 +11,8 @@ evidence: [computations/zero_entropy.py, computations/game.py, computations/bit_
 
 No column of a row with a leftmost 1, the center column of the single cell among them, eventually repeats
 $000000001011$ ($0^8 1011$), in any rotation. Neither the finite game at any width up to 18, nor the kit, nor any other
-exclusion of this repository reaches this block. The proof is a finite computation at 16 cells; it is not yet in Lean.
+exclusion of this repository reaches this block. The proof is a finite computation at 16 cells, checked by the kernel in
+[ClassGame](../../Rule30Open/Columns/ClassGame.md) (`center_not_000000001011`, `column_not_000000001011`).
 
 ## The argument
 
@@ -74,12 +75,11 @@ surveys of the game skip because they run over primitive blocks only.
 
 ## Lean
 
-The kernel route is [BitPhases](../../Rule30Open/Columns/BitPhases.md) on $b^3$: `center_not_phases` applies to
-`wordOf 36` of $b^3$, since a center that repeats $b$ repeats $b^3$, and one `phaseCheck` per phase at width 16. It does
-not fit this machine: one phase with no images (36 phases of $2^{18}$ bits per table) ran out of memory at 13 GB, and
-the 106 images of the block itself at width 16 alone took 29 seconds and 10 GB. A proof needs a lighter check: the
-refinement restricted to the set reached (14,476 of the 786,432 nodes of $b$, so 43,428 of $b^3$), whose images a
-coarser window can bound, or a certificate of ranks and classes on that set.
+[ClassGame](../../Rule30Open/Columns/ClassGame.md) proves the exclusion. The plain route, `BitPhases.center_not_phases`
+on `wordOf 36` of $b^3$ at width 16, does not fit this machine (one phase ran out of memory at 13 GB). ClassGame
+instead checks a certificate of local conditions: heights that bring every play into the set reached, width by width
+from 1 to 16, and on that set of 14,476 nodes ranks and labels modulo 12 or 36 on which the column left of $k$ is a
+function of the label. Its soundness, `class_column`, holds for any block with such a certificate.
 
 ## Reproduce
 
