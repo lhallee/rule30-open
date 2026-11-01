@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-103 Lean modules with 485 headline theorems, 44 findings (proved on paper,
+103 Lean modules with 485 headline theorems, 45 findings (proved on paper,
 computed or conjectured) and 44 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -14,7 +14,7 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 84 | 23 | 12 |
 | [Period two](#period-two) | 6 | 9 | 6 |
-| [Diagonals](#diagonals) | 2 | 2 | 1 |
+| [Diagonals](#diagonals) | 2 | 3 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
@@ -32,6 +32,7 @@ approach stopped.
 **Conjectures to prove or refute**
 
 - [The three words of period four lock the right half](findings/columns/period-four-locking.md): problem 1
+- [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.17t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md): problem 2
 - [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md): problem 2
 
 **Findings that want a Lean proof**
@@ -296,6 +297,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
+| [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.17t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md) | conjecture | 2 | wanted |
 | [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md) | computed | 1 | partial |
 | [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md) | conjecture | 2 | partial |
 
