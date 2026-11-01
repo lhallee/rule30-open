@@ -15,8 +15,8 @@ one step later). Column 1 nearly repeats $AAAB$ of 36 steps and slips about once
 same event: a front that closes a thin locked layer next to the center and crosses it along one fixed path. The
 front is set off at the far edge of the layer by what arrives from the chaotic region beyond it, and that information
 travels leftward at about a quarter of a column per step, the speed at which damage spreads leftward in Rule 30;
-256 steps back, column 1 uses less than a third of its light cone. A window of up to 32 columns with a white edge
-locks. Where the slips fall looks like coin flips:
+256 steps back, column 1 uses less than a third of its light cone. A window of 8, 12, 16, 24 or 32 columns with a
+white edge locks (one of 20 columns does not). Where the slips fall looks like coin flips:
 the number of $AAAB$ blocks between slips is geometric with no serial correlation detected, and a window of 48 to 64
 columns fed by fair coin flips at its right edge has the same slips as the true half.
 
@@ -87,11 +87,11 @@ column 1 depends on, since a dependence that few completions expose can be misse
 ## What it means
 
 The slips do not need information from far away: column 1 is fed through a layer of about 16 columns, the width of the
-gap trap, which without input locks, and what drives it across that layer is generic: a coin at column 33 to 65 does as
-well as the true right half. The far right half matters only through the chaotic region next to the layer, whose
-information comes in at the leftward speed of Rule 30. So the right channel behaves like a finite-state transducer
-from a nearly random column to column 1, with a positive rate of slips because every block gives the lock a fixed
-chance to break.
+gap trap, which with a white edge mostly locks, and what drives it across that layer is generic: a coin at column 49
+to 65 does as well as the true right half. The far right half matters only through the chaotic region next to the
+layer, whose information comes in at the leftward speed of Rule 30. So the right channel behaves like a finite-state
+transducer from a nearly random column to column 1, with a positive rate of slips because every block gives the lock a
+fixed chance to break.
 
 For a proof this is a picture, not a lever. That column 1 never locks is the statement that the chaotic region keeps
 delivering the patterns that set off the front, forever; that is a statement about the chaotic region of the same
