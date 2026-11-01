@@ -50,7 +50,8 @@ admissible black runs are bounded; the other three are computations on the state
   black exactly for even $j$), reached at time 3 ($w \le 5$), 6, 7, 7, 8 and 8. It is a fixed point for every $w$: with
   the free cell set to continue the pattern, one step with a black center reproduces it and keeps cell $-1$ white. It
   is reachable whenever some reachable left half alternates on $w$ cells, which holds for $w \le 20$ by the black runs
-  of 21 above. So a fixed-window abstraction is weaker than the light cone ($L \le a + 1$), the same lesson as
+  of 21 above; the window game of [driven run slopes](driven-run-slopes.md) (route 3) is the same automaton without
+  the constraint. So a fixed-window abstraction is weaker than the light cone ($L \le a + 1$), the same lesson as
   [fixed-depth strips](fixed-depth-strips.md): the depth a comparison uses has to grow in proportion to $a$.
 - **The carry valuation restates the alternating domain.** Read the left half at $t$ as the integer $N_t$ with bit
   $k - 1$ the cell $-k$. Then the black run from $t$ is $v_2(3 N_t + 2) + 1$ at all 1,935 black times $t < 3{,}900$ of

@@ -271,7 +271,12 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   ([driven left runs](findings/diagonals/driven-left-runs.md)). The constraint that a black center fixes the next one cuts the
   reachable left halves by a factor of about 1.6 and leaves those maxima almost unchanged, and no finite automaton over
   the center column certifies a slope unless the admissible black runs are bounded ([finite-state
-  slopes](negative-results/diagonals/finite-state-slopes.md)).
+  slopes](negative-results/diagonals/finite-state-slopes.md)). Every configuration white left of a black cell settles to
+  the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
+  ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
+  followed by a doubling period, which the computation confirms below depth 53,207; so over all drivers the slope
+  question is the single cell's question of when its left diagonals settle, and the forced-word, diagonal and
+  window-rank routes stop there ([driven run slopes](negative-results/diagonals/driven-run-slopes.md)).
   In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
   about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
