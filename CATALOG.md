@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 103 Lean modules with 485 headline theorems, 44 findings (proved on paper,
-computed or conjectured) and 43 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 44 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -18,7 +18,7 @@ takes effort of order `n`.
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
-| [Hidden structure](#hidden-structure) | 0 | 2 | 5 |
+| [Hidden structure](#hidden-structure) | 0 | 2 | 6 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
@@ -383,6 +383,7 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 | [Rule 30 has no coarse-graining with blocks of up to 8 cells](negative-results/structure/coarse-graining.md) | no signal | 1, 3 |
 | [Rule 30 has no additive conservation law](negative-results/structure/conservation-laws.md) | no signal | 1, 2 |
 | [Deforming the rule to Rule 150 gives a polynomial of exponential degree](negative-results/structure/deformation-interpolation.md) | dead end | 3 |
+| [No small algebraic equation for the center column, and no Rule 30 signal in the cut ranks of the cone](negative-results/structure/hidden-algebra.md) | no signal | 1, 3 |
 | [No linear relation among subsequences of the center column](negative-results/structure/linear-relations.md) | no signal | 1, 3 |
 | [The center cell is a random-looking polynomial](negative-results/structure/polynomial-structure.md) | no signal | 3 |
 

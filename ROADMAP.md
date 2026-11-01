@@ -304,7 +304,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
 - **A shortcut.** *No signal.* Automata, linear recurrences, learned predictors and exact structure searches find none
   ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$
-  on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)). *Assessment:* a
+  on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)), the column's series
+  satisfies no Mahler equation over GF(2)(x) of small size, the column as a 2-adic or real number is a root of no integer
+  polynomial of degree at most 8 with small coefficients, and the GF(2) cut ranks of the cone show nothing that rules of
+  the same form lack ([hidden algebra](negative-results/structure/hidden-algebra.md)). *Assessment:* a
   lower bound in a restricted model is within reach only for finite ranges; an asymptotic one, even "the column is not
   automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides. Crossing
   sequences, the kit's method for one tape, give at most time of order $(\log n)^2$ for any function, and for $c$ only
