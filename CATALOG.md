@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-106 Lean modules with 511 headline theorems, 47 findings (proved on paper,
-computed or conjectured) and 47 negative results. Prize problem 1 asks whether the center column
+106 Lean modules with 511 headline theorems, 48 findings (proved on paper,
+computed or conjectured) and 48 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -13,7 +13,7 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 85 | 25 | 14 |
-| [Period two](#period-two) | 8 | 9 | 6 |
+| [Period two](#period-two) | 8 | 10 | 7 |
 | [Diagonals](#diagonals) | 2 | 3 | 2 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
@@ -45,6 +45,7 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
+- [Beyond the stripes and the ether, every periodic tail of up to 12 cells falls onto a background where the tops of most defects run away, and no head of up to 16 cells on one of them is in K](findings/period-two/tail-census.md): problem 1
 
 **Findings proved in Lean in part**
 
@@ -278,6 +279,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
 | [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md) | computed | 1 | partial |
 | [The slips of the right channel are one front crossing a locked layer, fed from the chaotic region at the leftward speed of Rule 30](findings/period-two/slip-geometry.md) | computed | 1 | not applicable |
+| [Beyond the stripes and the ether, every periodic tail of up to 12 cells falls onto a background where the tops of most defects run away, and no head of up to 16 cells on one of them is in K](findings/period-two/tail-census.md) | computed | 1 | wanted |
 | [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | partial |
 
 **Negative results**
@@ -289,6 +291,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [Windows of 5, 8, 10 and 12 cells at the top of a defect on the ether do not bound it, with or without the condition of K](negative-results/period-two/ether-front-windows.md) | barrier | 1 |
 | [The left half is not a patchwork of ether domains](negative-results/period-two/ether-patchwork.md) | refuted | 1 |
 | [The first twelve forced bits of the period-two condition are dense polynomials of full degree](negative-results/period-two/forced-bits-dense.md) | dead end | 1 |
+| [A bounded defect top does not give (R) for the periodic tails of up to 12 cells beyond the stripes and the ether, since the tops run away, provably on 10 of the 12 backgrounds](negative-results/period-two/front-backgrounds.md) | refuted | 1 |
 | [No finite certificate settles period two](negative-results/period-two/no-finite-certificate.md) | dead end | 1 |
 
 ## Diagonals
