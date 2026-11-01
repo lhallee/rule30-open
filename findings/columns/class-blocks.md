@@ -1,13 +1,13 @@
 ---
-title: The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes
+title: The game with cyclic classes closes ten blocks of period 13 to 16, eight of period 17 and fifteen of period 18 that nothing else excludes
 category: columns
 problems: [1]
 status: computed
 formalization: partial
-evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_blocks_wide.py, computations/class_certificate.py]
+evidence: [computations/class_survey.py, computations/game.py, computations/class_blocks.py, computations/class_blocks_wide.py, computations/class_blocks_split.py, computations/class_blocks_18.py, computations/class_certificate.py]
 ---
 
-# The game with cyclic classes closes ten blocks of period 13 to 16 and eight of period 17 that nothing else excludes
+# The game with cyclic classes closes ten blocks of period 13 to 16, eight of period 17 and fifteen of period 18 that nothing else excludes
 
 [The game with cyclic classes](class-game.md) was run at 16 cells on every primitive block of period 13 to 16 with both
 colors, 8,053 blocks. It closes 186 of them; the plain game at 16 cells closes 176, and the class test closes ten more,
@@ -141,9 +141,14 @@ cyclic period 51, and of 151 nodes and cyclic period 34), and both tests close $
 any of the three at 16 cells. At 17 cells the plain game also closes $00000000010010001$, which the class test closes
 at 14. So at 17 cells the plain game closes 122 blocks of period 17 and the class test 127, and the blocks that nothing
 else excludes number eight. The certificates of the three at 17 cells check 175,714 to 227,810 nodes over the widths
-and 51,430 to 65,607 for the classes. [ClassBlocks17Cells](../../Rule30Open/Columns/ClassBlocks17Cells.md) proves
-$01010111111111111$, the smallest; $00011111111110101$ (205,288 nodes) and $01111011111111111$ (227,810) are not in
-Lean.
+and 51,430 to 65,607 for the classes. Lean proves all three:
+[ClassBlocks17Cells](../../Rule30Open/Columns/ClassBlocks17Cells.md) proves $01010111111111111$, the smallest, in one
+module, and [ClassBlocks17Split](../../Rule30Open/Columns/ClassBlocks17Split.md) proves $00011111111110101$ (205,288
+nodes over the widths and 58,385 for the classes) and $01111011111111111$ (227,810 and 65,607), each certificate checked
+over three modules: widths 1 to 15, widths 16 and 17, and the classes (`class_blocks_split`). The check of a width reads
+only the heights of that width and the one before, so the checks on a certificate with the first widths carry to the
+full one ([ClassSplit](../../Rule30Open/Columns/ClassSplit.md)). So all eight blocks of period 17 that the class test
+closes at 16 or 17 cells and nothing else excludes are excluded in Lean.
 
 The three blocks of period 14 and 16 that the plain game closes at 15 or 16 cells are proved in
 [GameBlocksWide](../../Rule30Open/Columns/GameBlocksWide.md) with the same certificates; the class test closes
@@ -155,4 +160,55 @@ python -m computations.class_blocks_wide --report rows17.jsonl   # the five bloc
 python -m computations.class_survey --periods 17 17 --width 17 --workers 2 --out rows17w.jsonl  # about 75 minutes
 python -m computations.class_blocks_wide --report rows17w.jsonl  # the eight blocks at 17 cells
 python -m computations.class_blocks_wide                         # all eleven certificates, checked node by node, 40 s
+python -m computations.class_blocks_split                        # the two split certificates, checked, 20 s
+```
+
+## Period 18
+
+The same survey at 16 cells on every primitive block of period 18 with both colors, 14,532 blocks, finds fifteen blocks
+that the plain game at widths up to 14 leaves open, that the game or the class test closes at 16 cells, and that
+nothing else excludes. The plain game at 16 cells closes 147 blocks: the 142 that [the game blocks of period 17 and
+18](game-blocks-18.md) find at widths up to 14, and five more, one first at 15 cells and four first at 16. The class
+test closes those 147 and ten more. The 14 blocks of period 18 that the kit excludes are among the 147. For none of
+the fifteen does `class_survey.elsewhere` find the kit, the wall sets or the limit windows of 14 cells; no Lean module
+outside those below names any of them, and no rotation of any of them appears in the Lean sources of the pinned kit or
+of the kit's main branch, whose new families (four-category grammars, white runs of at least 17, black runs $1^r u$
+with $u$ of at most five cells) do not contain them. Lean proves the five with the smallest certificates, $001111111111011101$, $001001101111111111$,
+$000000000100000001$, $000000000010010011$ and $000000000000111011$
+([ClassBlocks18](../../Rule30Open/Columns/ClassBlocks18.md),
+[ClassBlocks18Mid](../../Rule30Open/Columns/ClassBlocks18Mid.md),
+[ClassBlocks18Wide](../../Rule30Open/Columns/ClassBlocks18Wide.md)).
+
+| Block | Closed by | Least width of the class test | Components at that width that can hold a play: nodes (cyclic period) |
+|---|---|---:|---|
+| $001111111111011101$ | classes only | 8 | 369 (18); 129 (36, mixed by phase); 64 (18); 22 (18) |
+| $001001101111111111$ | classes only | 11 | 393 (18); 333 (36, mixed by phase); 149 (18); 41 (18) |
+| $000000000100000001$ | the game at 16 cells | 13 | 3,083 (18); 90 (54, mixed by phase); 29 (18) |
+| $001010100111111111$ | classes only | 14 | 8,745 (18); 542 (36, mixed by phase) |
+| $000000000000111011$ | classes only | 15 | 6,861 (18); 459 (36, mixed by phase); 32 (18); 20 (18) |
+| $000000000010010011$ | classes only | 15 | 2,538 (18); 1,292 (36, mixed by phase); 88 (18); 73 (18); 42 (18) |
+| $000011111111111101$ | classes only | 15 | 7,701 (18); 292 (18); 214 (18); 161 (36, mixed by phase); 63 (18); 59 (18) |
+| $011110111111111111$ | classes only | 15 | 4,864 (18); 219 (18); 166 (54, mixed by phase) |
+| $000000000011000101$ | the game at 16 cells | 15 | 8,227 (18); 57 (36, mixed by phase); 53 (18); 30 (18); 27 (18); 24 (18) |
+| $001111001111111111$ | the game at 15 cells | 15 | 12,331 (18); 52 (18); 26 (18) |
+| $000000000011111001$ | classes only | 16 | 13,724 (18); 1,505 (18); 119 (36, mixed by phase) |
+| $000010111111111001$ | classes only | 16 | 14,726 (18); 470 (36, mixed by phase); 222 (36, mixed by phase) |
+| $001011111111110111$ | classes only | 16 | 14,228 (18); 576 (36, mixed by phase); 145 (36); 55 (18); 53 (18) |
+| $000000000001000001$ | the game at 16 cells | 16 | 12,331 (18); 52 (18); 26 (18) |
+| $000000011011111001$ | the game at 16 cells | 16 | 6,774 (18); 105 (18); 24 (18) |
+
+"Classes only" means the plain game does not close the block at 16 cells (`game.bad_pairs` at 16 cells is 1 to 4 for
+the ten). "The game at 15 cells" and "at 16 cells" give the least width at which the plain game closes the block; it
+does not at 14 cells, so [BitBlocks18](../../Rule30Open/Columns/BitBlocks18.md) and
+[BitPhases](../../Rule30Open/Columns/BitPhases.md) do not reach it. The class test closes $000000000100000001$ at 13
+cells, three fewer than the plain game needs. Every component mixed by phase has a cyclic period of two or three
+periods of the block. The certificates at the least widths above check 3,696 to 152,538 nodes over the widths and 998
+to 43,557 for the classes (`class_blocks_18`, each checked node by node by `class_certificate.check`); the ten not in
+Lean have certificates of 87,205 to 194,697 nodes in all. For comparison, the part of
+[ClassBlocks17Split](../../Rule30Open/Columns/ClassBlocks17Split.md) with the tables of 119,726 nodes peaks near 3.5 GB.
+
+```bash
+python -m computations.class_survey --periods 18 18 --width 16 --workers 2 --out rows18.jsonl   # about 40 minutes
+python -m computations.class_blocks_wide --report rows18.jsonl   # the fifteen blocks, their widths and other exclusions
+python -m computations.class_blocks_18                           # all fifteen certificates, checked node by node, 45 s
 ```

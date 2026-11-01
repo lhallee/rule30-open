@@ -21,7 +21,8 @@ through the certificate of [ClassGame](ClassGame.md). The class-test survey at p
 survey](../../findings/columns/class-blocks.md)) finds eight such blocks: five at 16 cells, in
 [ClassBlocks17](ClassBlocks17.md), [ClassBlocks17Mid](ClassBlocks17Mid.md) and
 [ClassBlocks17Wide](ClassBlocks17Wide.md), and three at 17 cells, this one and $00011111111110101$ and
-$01111011111111111$, whose certificates of 205,288 and 227,810 nodes are not in Lean.
+$01111011111111111$, whose certificates of 205,288 and 227,810 nodes over the widths are checked over three modules
+each in [ClassBlocks17Split](ClassBlocks17Split.md).
 
 ## Statement
 

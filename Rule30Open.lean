@@ -94,6 +94,17 @@ public import Rule30Open.Columns.ClassBlocks17
 public import Rule30Open.Columns.ClassBlocks17Mid
 public import Rule30Open.Columns.ClassBlocks17Wide
 public import Rule30Open.Columns.ClassBlocks17Cells
+public import Rule30Open.Columns.ClassSplit
+public import Rule30Open.Columns.ClassBlocks17SplitA1
+public import Rule30Open.Columns.ClassBlocks17SplitA2
+public import Rule30Open.Columns.ClassBlocks17SplitA3
+public import Rule30Open.Columns.ClassBlocks17SplitB1
+public import Rule30Open.Columns.ClassBlocks17SplitB2
+public import Rule30Open.Columns.ClassBlocks17SplitB3
+public import Rule30Open.Columns.ClassBlocks17Split
+public import Rule30Open.Columns.ClassBlocks18
+public import Rule30Open.Columns.ClassBlocks18Mid
+public import Rule30Open.Columns.ClassBlocks18Wide
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable
