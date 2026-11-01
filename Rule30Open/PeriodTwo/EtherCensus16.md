@@ -69,9 +69,9 @@ $H^t(u)$. `eventually_periodic_of_clear` and `itinerary_of_eventually_periodic` 
 
 **Why blocks.** A bound shared by the heads of a block costs few rounds: on the heads from $2^{12}$ to $2^{14}$,
 descent below the head itself takes 2,166,087 rounds, and descent below the first head of a block of 64, 256, 1,024 or
-4,096 heads takes 2,167,489, 2,173,644, 2,263,946 and 2,765,786. A shared bound is also a little cheaper per round in
-the kernel. On the 4,096 heads from $2^{12}$ at the alignment $(0, 0)$, the kernel took 4.6 s for `runHead` (67,976
-rounds), 2.4 s for `descChunk` with blocks of 256 (9,932 rounds), 2.1 s with blocks of 16 and 3.2 s with blocks of 1
+4,096 heads takes 2,167,489, 2,173,644, 2,263,946 and 2,765,786. At the same number of rounds, a bound shared by a block
+is also cheaper in the kernel than descent below each head. On the 4,096 heads from $2^{12}$ at the alignment
+$(0, 0)$, the kernel took 4.6 s for `runHead` (67,976 rounds), 2.4 s for `descChunk` with blocks of 256 (9,932 rounds), 2.1 s with blocks of 16 and 3.2 s with blocks of 1
 (9,369 rounds each), as `profiler` reports them. So a round of the checker with descent costs the kernel more than a
 round of `runHead`, and on this chunk descent saves a factor of about 2 in kernel time against 6.8 in rounds. The
 timings come from one machine with another Lean build running; they are a measurement, not a cost model.
