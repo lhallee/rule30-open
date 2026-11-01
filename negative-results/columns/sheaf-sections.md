@@ -60,7 +60,8 @@ sets does not carry.
 Cech cohomology with coefficients needs an abelian group, so each set of sections is replaced by the GF(2) vector
 space on it, as in the cohomological obstruction of Abramsky, Mansfield and Barbosa (*The cohomology of non-locality
 and contextuality*, QPL 2011). One step beside a column value becomes the linear relation
-$\{(\mathrm{tail}(a), \mathrm{head}(a)) : a \in \mathrm{GF}(2)^{\text{moves}}\}$; the obstruction of a window $y$ over
+$\{(\mathrm{tail}(a), \mathrm{head}(a)) : a \in \mathrm{GF}(2)^{\text{moves}}\}$, which is the cover by
+slabs of one step that meet in rows; the obstruction of a window $y$ over
 $m$ steps vanishes when $e_y$ lies in the image $L^{(m)}$ of the whole space under $m$ such steps, and $L_i$ is the
 limit at phase $i$. Call $T_i$ the windows whose obstruction vanishes at every depth.
 
@@ -92,8 +93,9 @@ $y'$ is then 0 only if the next-to-last cell of $x'$ is 1, and then $x'$ with it
 leads to $y'$ and reaches both $y'0$ and $y'1$, so $y'0$ is in the component of $x'1$. In each case the windows the lemma names are joined to a window of
 $T^{(m)}$. Cell $k + 1$ of $y'1$ is that of $y'$, so constancy on $T_i(K)$ gives constancy on $S_i(K - 1)$. $\square$
 
-`one_cell_short` checks the lemma's statement directly: it holds for all 747 primitive blocks of period at most 12 at
-every width from 2 to 10 (`--lemma`).
+The lemma and items 1 to 5 of the presheaf are proved by hand, not in Lean. The lemma concerns the cover by
+one-step slabs and says nothing about a cover by deeper slabs. `one_cell_short` checks the lemma's statement
+directly: it holds for all 747 primitive blocks of period at most 12 at every width from 2 to 10 (`--lemma`).
 
 **Counts** (`survey`): primitive blocks excluded, by width $K$ and period, by the functional and pointwise linear tests
 at $K$, the exact limit at $K - 1$ and at $K$, and the game at $K$. Every block passes the chain

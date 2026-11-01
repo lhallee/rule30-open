@@ -8,7 +8,7 @@ past, the limit of the presheaf over the slabs, are the sets `limit_windows.limi
 
 Cech cohomology needs coefficients in an abelian group, so the presheaf of sets is linearized: a section over a slab
 becomes a formal sum of plays with coefficients in GF(2), and a window y extends over m steps when the vector e_y is
-the end of a compatible family of such sums (the cohomological obstruction of Abramsky, Barbosa and Mansfield vanishes).
+the end of a compatible family of such sums (the cohomological obstruction of Abramsky, Mansfield and Barbosa vanishes).
 One step beside a column value is a relation between windows; its linearization is the subspace
 {(tail(a), head(a)) : a in GF(2)^moves}, and the windows that extend linearly over every past form the limit
 `linear_limit`. Its annihilator is spanned by the indicators of disjoint sets of windows (`linear_step` keeps them as

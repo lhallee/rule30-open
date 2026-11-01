@@ -55,27 +55,35 @@ between $x/t = -0.25$ and $0.95$, $\chi^2 \lesssim 0.0036$ and no classifier of 
 0.515 held-out accuracy; pooled over the chaotic region, about 0.502 (a heuristic bound: two standard deviations of
 $\hat D$ under independent sampling, which the control diagram supports).
 
-- **The front is at $x / t \approx -1/4$, not $-1/3$.** At resolution 0.01 and $t$ from $2^{16}$ to $2^{17}$ (18,000
-  patches per bin), $\hat D$ stays between 0.076 and 0.145 from $x/t = -0.5$ to $-0.25$ and drops to noise ($|z| \le
-  2.1$) in the next bin; the band from $2^{15}$ to $2^{16}$ (4,500 patches per bin) puts the drop in the same bin,
+- **The front is at $x / t \approx -1/4$, not at the $-1/3$ that settling at time $3j/2$ would give.** At resolution
+  0.01 and $t$ from $2^{16}$ to $2^{17}$ (18,000 patches per bin), $\hat D$ stays between 0.076 and 0.145 from
+  $x/t = -0.5$ to $-0.25$ and drops to noise ($|z| \le 2.1$) in the next bin; the band from $2^{15}$ to $2^{16}$ (4,500 patches per bin) puts the drop in the same bin,
   and the band from $2^{14}$ to $2^{15}$ (1,140 per bin) is too small to resolve it. A direct computation of the diagonals
   locates it: with $\mathrm{onset}(j)$ the least $s$ with $D_j(t + 16) = D_j(t)$ for $s \le t \le 2^{17} - 16$, the
   first diagonal not yet repeating at $t = 2^{14}, 2^{15}, 2^{16}$ sits at $x/t = -0.2502, -0.2534, -0.2520$; the
   median of $\mathrm{onset}(j)/j$ is 1.3302 to 1.3407 on each dyadic range of depths from 4,096 to 79,999, and its
-  largest value there is 1.3455 (depth 28,584). So the left diagonals start repeating at about $4j/3$, and the regular
+  largest value there is 1.3455 (depth 28,584). So the left diagonals start repeating at about $4j/3$ (sharpening the
+  $1.35j$ of [the left records](../../findings/diagonals/left-records.md)), and the regular
   phase is the cone $x < -t/4$. No diagonal $8 \le j < 80{,}000$ has $\mathrm{onset}(j) > \lceil 3j/2 \rceil$ (every
   onset is at most 126,976, confirmed by at least 4,096 later steps), which extends the direct check of
   [the settled-runs hypothesis](../../findings/diagonals/settled-runs.md) from depth 7,999 to depth 79,999, on times up
   to $2^{17}$.
-- **The right edge has a boundary layer about 38 cells wide, a width in cells, not in $x / t$.** Patches of $3 \times 4$ (128 patterns,
-  about 900 per distance $d$) fail the exact test at every $d \le 34$ ($z$ from 4.96 to 7,217) and pass from $d = 35$
-  on, apart from $z = 2.27$ and 3.22 at $d = 37, 38$; each wider bin from 40 to 4,096 has $|z| \le 1.73$ with up to
-  1.8 million patches. The layer is made of the right diagonals $R_k(t) = \mathrm{cell}(t, t - k)$, which are
-  periodic from the start with period $2^k$ (the kit's `Rule30Diagonals.R_periodic`), so their law does not change
-  with $t$; over the times 32,768 to
-  65,535 their least periods are 4,096 at $k = 29$ to 33, 8,192 at $k = 34$ and 35, and above 8,192 from $k = 36$.
-  A patch at distance $d$ covers the diagonals $d - 3$ to $d + 2$, so the test stops seeing the layer about where the
-  periods pass 8,192.
+- **The right edge has a boundary layer a few dozen cells wide, whose measured width is set by the time lattice.**
+  Patches of $3 \times 4$ (128 patterns, about 900 per distance $d$) read at times that are multiples of 16 fail the
+  exact test at every $d \le 34$ ($z$ from 4.96 to 7,217) and pass from $d = 35$ on, apart from $z = 2.27$ and 3.22 at
+  $d = 37, 38$; each wider bin from 40 to 4,096 has $|z| \le 1.73$ with up to 1.8 million patches. The layer is made
+  of the right diagonals $R_k(t) = \mathrm{cell}(t, t - k)$, which repeat from time 0 with a power-of-two period (the
+  kit's `Rule30Diagonals.R_periodic` and `Rule30RightPeriods`), so their law does not change with $t$; over the times
+  32,768 to 65,535 their least periods are 4,096 at $k = 29$ to 33, 8,192 at $k = 34$ and 35, and above 8,192 from
+  $k = 36$. A patch at distance $d$ covers the diagonals $d - 3$ to $d + 2$, so over the run it takes at most $P$
+  values, $P$ the largest of their periods, and its law differs from the invariant one by roughly $K / P$ (a
+  heuristic, $K = 128$), which decays with $d$ but does not vanish at any fixed $d$. Times on multiples of 16 see only
+  $P / 16$ of those phases: at $d = 4$ to 6, whose diagonals have periods at most 32, every patch read is the same
+  pattern ($\hat D \approx 127 = K - 1$), and $\hat D$ is 0.26 to 0.28 at $d = 32, 33$, where $P = 8{,}192$, against
+  $16 K / P = 0.25$. Read every 17 steps (`edge --spacing 17`), which sees every phase, the layer ends sooner: $z \ge
+  2.21$ for $d \le 25$, $|z| \le 1.25$ for $26 \le d \le 39$ apart from $-2.78$ at $d = 34$, and $|z| \le 2.32$ in the
+  wider bins. So the width, about 38 cells with spacing 16 and 26 with spacing 17, measures the resolution of the test,
+  not a property of the dynamics.
 
 **Outcome: the projections** ($8 \times 16$ patches; invariant reference eigenvalues from 2.89 down to 0.255, so the
 null PCA spectrum is far from flat; covariance distance of 20,000 invariant patches $0.927 \pm 0.021$).
@@ -102,8 +110,9 @@ The projections are much weaker instruments than the exact test: they see the re
 the far left, and none clearly sees the planted contamination (the covariance distance at 1.9 standard deviations is
 the most) that the exact test would find at $z \approx 7$.
 With 25% and 50% of the patches planted (exact $\chi^2$ on $4 \times 8$ patches 0.039 and 0.155), the covariance
-distance is 1.119 and 1.511, gradient boosting 0.526 and 0.573, and the raw kNN test $z = 2.75$ and 5.54: the
-projections need a contamination several times larger than one the exact test resolves in a single bin.
+distance is 1.119 and 1.511, gradient boosting 0.526 and 0.573, and the raw kNN test $z = 2.75$ and 5.54 (at 25% the
+kNN score is unstable: 0.08 with `recheck --samples 10000`, whose random state differs): the projections need a
+contamination several times larger than one the exact test resolves in a single bin.
 
 **Outcome: the center column as a matrix.** First $2^{20}$ cells in $\pm 1$ encoding, against 100 sequences of fair
 coins each (two-sided rank $p$-values).
@@ -125,8 +134,8 @@ the null, and its reference is the Marchenko-Pastur law with ratio $\min(m, r)/\
 informative $p$-values is 0.040, as expected among 17.
 
 **What it means.** Up to the resolution stated, the single cell's diagram is in local equilibrium with the invariant
-measure everywhere right of the front $x = -t/4$ and more than about 38 cells inside the right edge, including near
-$x = 0$: no patch statistic, linear or learned, separates it from the control diagram, and the exact test bounds what
+measure everywhere right of the front $x = -t/4$ and more than about 26 to 38 cells (by the time lattice) inside the
+right edge, including near $x = 0$: no patch statistic, linear or learned, separates it from the control diagram, and the exact test bounds what
 any classifier of $4 \times 8$ or $6 \times 6$ patches could find. The structure the projections do find is the
 structure already known: the periodic left diagonals, now located at $x/t \approx -1/4$ with onsets near $4j/3$, and
 the periodic right diagonals. None of this reaches the single cell's column beyond the range tested or proves anything
@@ -140,6 +149,7 @@ smoothed periodogram, whose null is not the Marchenko-Pastur law.
 python -m computations.projections profile                     # 4 x 8 profile, about 1 min
 python -m computations.projections profile --height 6 --width 6 --bands 1   # about 30 s
 python -m computations.projections edge                        # right edge and its diagonals, about 1 min
+python -m computations.projections edge --spacing 17           # the same, every phase of the periods, about 1 min
 python -m computations.projections front                       # onsets to depth 80,000, about 1 min
 python -m computations.projections learned                     # projections, about 40 min on a loaded 4-core machine
 python -m computations.projections recheck                     # refits and stronger plants, about 12 min
