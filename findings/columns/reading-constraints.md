@@ -99,7 +99,9 @@ and `forced_layers`, by `--words ... --forced`):
 
 For $011$ the list $00$ is not entered from 28 of the 98,304 states of width 14, and every input sequence that keeps a
 state out reads white at every later white step, so its readings are eventually constant, which masked Jen excludes.
-For $0011111$ none of the lists tried ($11$; $11, 1001$; all five learned words) is forced, and the paths that stay out
+For $011$ one word is forced with no exception: read at its white step, column 1 never has a run of exactly four 1s
+($011110$, forced at width 7 within 15 steps, entropy 0.976; `reading_certificates.py --block 011 --phases 0 --width 7
+--words 011110`), a weak companion to the conditional list $00$. For $0011111$ none of the lists tried ($11$; $11, 1001$; all five learned words) is forced, and the paths that stay out
 read both colors. So 22 of the 23 blocks have a set of words of entropy below 1 that every right half falls into, or
 that only halves with constant readings escape.
 
@@ -132,7 +134,11 @@ left statement with constrained free bits is still of the kind of the problem (a
 produce a sequence from an uncountable set of positive entropy), so this narrows the problem and does not close it.
 The forced cases are finite computations of a few million states each and can be checked by a kernel. For $001$ the
 kernel checks one: [ThreeRuns](../../Rule30Open/Columns/ThreeRuns.md) proves that column 1 at the second white step
-avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half. [ConstrainedLeft001](../../Rule30Open/Columns/ConstrainedLeft001.md)
+avoids $010$, $101$ and $1001$ from the 14th reading on, for every right half. For $00001$ the kernel checks another:
+[Runs00001](../../Rule30Open/Columns/Runs00001.md) proves that column 1 at the first white step avoids $11$ and $1001$
+from reading 5 on (readings counted from 0), for every right half. Each further block is one entry of
+`computations/reading_modules.py`, which writes the module from the certificate of
+`computations/reading_certificates.py`. [ConstrainedLeft001](../../Rule30Open/Columns/ConstrainedLeft001.md)
 reduces $001$ in Lean to the left statement with those free bits, and [the constrained left
 halves](../../negative-results/columns/constrained-left-halves.md) shows why no finite left game closes it: halves with
 periodic free bits are eventually periodic in space and dense among the solutions.

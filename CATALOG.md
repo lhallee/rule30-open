@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-101 Lean modules with 451 headline theorems, 42 findings (proved on paper,
+102 Lean modules with 455 headline theorems, 42 findings (proved on paper,
 computed or conjectured) and 41 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 82 | 23 | 12 |
+| [Columns](#columns) | 83 | 23 | 12 |
 | [Period two](#period-two) | 6 | 7 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -172,6 +172,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Refuting entry into a trap from the few windows that can reach it](Rule30Open/Columns/ReachRefuted.md) | [`Columns.ReachRefuted`](Rule30Open/Columns/ReachRefuted.lean) | `pre_move`, `not_absorption_back`, `not_absorption_fwd`, `tw0_40_not_absorption_back`, `fo0_46_not_absorption_back` | 1 | not in the kit |
 | [Lean refutations of entry into 102 traps of the trap modules](Rule30Open/Columns/RefutedTraps.md) | [`Columns.RefutedTraps`](Rule30Open/Columns/RefutedTraps.lean) | `refutedTraps_not_absorption`, `nine15_not_absorption`, `tw1_4_not_absorption`, `cen0011111101111_not_absorption` | 1 | not in the kit |
 | [The cells left of a column count down its runs of 1s](Rule30Open/Columns/RunCountdown.md) | [`Columns.RunCountdown`](Rule30Open/Columns/RunCountdown.lean) | `run_countdown`, `run_bound`, `no_ones_column`, `center_not_eventually_ones` | 1 | extends a kit result |
+| [Under a center column repeating 00001, column 1 at the first white step has isolated 1s and no run of exactly two 0s](Rule30Open/Columns/Runs00001.md) | [`Columns.Runs00001`](Rule30Open/Columns/Runs00001.lean) | `runs_00001`, `runs_00001_evolve`, `no_11_time_00001`, `no_1001_time_00001` | 1 | not in the kit |
 | [Entry into the only trap of period 6 is false](Rule30Open/Columns/SixRefuted.md) | [`Columns.SixRefuted`](Rule30Open/Columns/SixRefuted.lean) | `back_trap001011_check`, `trap001011_not_absorption_back` | 1 | not in the kit |
 | [A right half with at most two black cells among its first cells enters the ether-and-wall family](Rule30Open/Columns/SparseRight.md) | [`Columns.SparseRight`](Rule30Open/Columns/SparseRight.lean) | `inFamily_of_fast`, `stateAt_eq`, `two_absorption`, `sparse_0001`, `sparse_0011`, `sparse_0111`, `oneCell_0011`, `oneCell_0111`, `sparseRight_0001`, `sparseRight_0011`, `sparseRight_0111` | 1 | extends a kit result |
 | [A right half white past its first ten cells enters the ether-and-wall family, whatever lies beyond the gap](Rule30Open/Columns/TenCells.md) | [`Columns.TenCells`](Rule30Open/Columns/TenCells.lean) | `ten_absorption`, `ten_0001`, `ten_0011`, `ten_0111`, `tenRight_0001`, `tenRight_0011`, `tenRight_0111`, `smallTen_0001`, `smallTen_0011`, `smallTen_0111` | 1 | extends a kit result |
