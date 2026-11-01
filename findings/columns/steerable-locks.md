@@ -134,6 +134,8 @@ Wielandt), so each entropy in the table is an upper bound. A power iteration of 
 eigenvalues of one modulus, as it does for $0000000001$. The Lean modules prove only the sequences. At 16 cells the
 same bound holds, by computation only, for column $k + 17$ and 350 blocks of periods 10 to 15 that nothing excludes:
 0.991 bits per step at the median, and at the least 0.630, for $000000001101001$, below every bound at 13 cells.
+[ClassBlocks](../../Rule30Open/Columns/ClassBlocks.md) excludes $000000001101001$ outright, by the game with
+cyclic classes.
 
 ## Reproduce
 

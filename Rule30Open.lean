@@ -83,6 +83,11 @@ public import Rule30Open.Columns.ConstrainedLeft001
 public import Rule30Open.Columns.Runs00001
 public import Rule30Open.Columns.ReadingWords
 public import Rule30Open.Columns.ClassGame
+public import Rule30Open.Columns.ClassBlocks
+public import Rule30Open.Columns.ClassBlocks13
+public import Rule30Open.Columns.ClassBlocks14
+public import Rule30Open.Columns.ClassBlocks16
+public import Rule30Open.Columns.ClassBlocks16Wide
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
 public import Rule30Open.Columns.ClosingObservable
