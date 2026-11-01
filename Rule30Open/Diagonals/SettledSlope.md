@@ -126,7 +126,8 @@ So for every $j \le 200{,}000$, on this table:
   200,000, and grows with the depth while $T_j/j$ exceeds $4/3$.
 - $c_1 + \dots + c_j \le 6j$: `black_run_le_of_white_runs` applies with $\delta = 0$, $A = 9$, $J = 199{,}999$ and gives
   $29 L \le 15a + 990$ for $1 \le a \le 1{,}449{,}999$. With $5j$ in place of $6j$ the excess is 0 to depth 10,000 and
-  26,601 up to depth 200,000, growing at the rate $5.524 - 5$ per depth since the period became 32.
+  26,601 up to depth 200,000, growing at the rate $5.524 - 5$ per depth since the period became 32. [FrontWalker](FrontWalker.md) replaces the
+  longest white run by the white run the reset actually meets, which gives a walk of about $2.01j$.
 
 The table checks each equality only up to time 300,535. It extends to all later times by the reset step: once $D_j$
 and $D_{j+1}$ repeat from some time, one equality $D_{j+2}(t_0 + 64) = D_{j+2}(t_0)$ at a later $t_0$ gives it for every

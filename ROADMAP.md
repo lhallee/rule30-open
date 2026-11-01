@@ -296,6 +296,12 @@ period at most 21 that this repository's Lean already excludes and no block that
   bound on the white runs of the settled diagonals gives slope $15/29$. Computation checks the hypotheses for every
   $j \le 200{,}000$ with $\delta = 0$ and $A = 9$. The slope $3/13$ for every $a$ needs $T_j \le 3j/2 + o(j)$ and
   $A_j = o(j)$ at every depth, which is linear settling with the period freed, and is open.
+  The least front walk, which steps down on a black cell of $D_j$ and down-left on a white one (the kit main branch's
+  `frontBound`), bounds every onset, and a walk of slope $41/20$ gives black runs of slope $63/185$, in Lean
+  ([FrontWalker](Rule30Open/Diagonals/FrontWalker.md)); the walk advances about $2.01$ per depth to depth 200,000, with
+  $\delta = 1$ at slope $41/20$, but it reads only the settled parts, and leads through the onset phase, the front
+  at the white diagonals and a finite set of pair types stop at the transient or at a law of large numbers for the
+  settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)).
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
   strips](negative-results/diagonals/fixed-depth-strips.md)). *Assessment:* going below linear needs a statement about
   the chaotic left half near the center, here a linear bound on when the left diagonals settle, with a period that may
@@ -356,7 +362,11 @@ period at most 21 that this repository's Lean already excludes and no block that
   `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$ and a computation here for $k \le 20$, and
   $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$. Two bounds hold for every $n$, a strip of width at
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
-  they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)).
+  they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
+  given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
+  on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 17$ by computation, where Rule 90 needs only
+  $2^{\mathrm{popcount}(t)}$; this bound is linear and says nothing about the single seed
+  ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)).
 
 ## Next steps
 

@@ -123,6 +123,7 @@ public import Rule30Open.PeriodTwo.NoKTails
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Diagonals.SettledSlope
+public import Rule30Open.Diagonals.FrontWalker
 public import Rule30Open.Diagonals.DrivenSkeleton
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
@@ -131,6 +132,7 @@ public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.RandomRows.LeftWindow
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
+public import Rule30Open.Complexity.QueryDepth
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

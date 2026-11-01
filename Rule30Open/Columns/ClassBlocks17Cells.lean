@@ -9,8 +9,9 @@ public import Rule30Open.Columns.ClassGame
 leftmost 1 repeats it (`class_column`). The class-test survey at period 17 and 17 cells finds three blocks that the
 class test closes at 17 cells and not at 16 and that nothing else in this repository or the kit excludes. This module
 proves the exclusion of `01010111111111111`, from a certificate at 17 cells, made by
-`computations/class_blocks_wide.py`; the other two, `00011111111110101` and `01111011111111111`, are not in Lean. The
-blocks of period 17 that the class test closes at 16 cells are in [ClassBlocks17](ClassBlocks17.md),
+`computations/class_blocks_wide.py`; the other two, `00011111111110101` and `01111011111111111`, have larger
+certificates and are in [ClassBlocks17Split](ClassBlocks17Split.md), checked over several modules. The blocks of period
+17 that the class test closes at 16 cells are in [ClassBlocks17](ClassBlocks17.md),
 [ClassBlocks17Mid](ClassBlocks17Mid.md), [ClassBlocks17Wide](ClassBlocks17Wide.md).
 
 For each block `b` there is one section with the certificate `cls<b>`, one kernel check per width and phase and one per

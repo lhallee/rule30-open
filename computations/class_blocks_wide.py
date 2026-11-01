@@ -1,7 +1,8 @@
 """Certificates of the game with cyclic classes for blocks beyond `class_blocks`: the three blocks the plain game closes
 at 15 or 16 cells and nothing else excludes (`Rule30Open.Columns.GameBlocksWide`), and the blocks of period 17 that the
 class test closes at 16 or 17 cells and nothing else excludes (`Rule30Open.Columns.ClassBlocks17`, `ClassBlocks17Mid`,
-`ClassBlocks17Wide` and `ClassBlocks17Cells`; two blocks at 17 cells are not in Lean).
+`ClassBlocks17Wide` and `ClassBlocks17Cells`; the other two blocks at 17 cells, with larger certificates, are in
+`ClassBlocks17Split`, written by `class_blocks_split`).
 
 The plain game asks the column left of the repeating one to be a function of the phase, the class test a function of
 the cyclic class; every move advances the phase by one, so every cycle of a component has a length divisible by the
@@ -47,7 +48,7 @@ WIDTH = dict(GAME_BLOCKS + CLASS_BLOCKS_17 + CELLS_17)
 
 # The Lean modules and their blocks, split so that no Lean process holds more than about 180,000 nodes of tables (one
 # of 176,000 nodes peaks near 4.8 GB). The other two blocks of `CELLS_17`, with certificates of 205,288 and 227,810
-# nodes, are not in Lean.
+# nodes, are checked over several modules by `class_blocks_split`.
 MODULES = {
     "GameBlocksWide": tuple(b for b, _ in GAME_BLOCKS),
     "ClassBlocks17": ("00000000011111001", "00011011111111001", "00000000010010001"),
@@ -80,8 +81,9 @@ INTRO["ClassBlocks17Cells"] = (
     "a leftmost 1 repeats it (`class_column`). The class-test survey at period 17 and 17 cells finds three blocks that "
     "the class test closes at 17 cells and not at 16 and that nothing else in this repository or the kit excludes. "
     "This module proves the exclusion of {listed}, {each} at 17 cells, made by `computations/class_blocks_wide.py`; "
-    "the other two, `00011111111110101` and `01111011111111111`, are not in Lean. The blocks of period 17 that the "
-    "class test closes at 16 cells are in {others}.")
+    "the other two, `00011111111110101` and `01111011111111111`, have larger certificates and are in "
+    "[ClassBlocks17Split](ClassBlocks17Split.md), checked over several modules. The blocks of period 17 that the class "
+    "test closes at 16 cells are in {others}.")
 
 
 def header(module: str, blocks: tuple[str, ...]) -> str:

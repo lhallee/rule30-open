@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-131 Lean modules with 624 headline theorems, 49 findings (proved on paper,
-computed or conjectured) and 49 negative results. Prize problem 1 asks whether the center column
+133 Lean modules with 632 headline theorems, 49 findings (proved on paper,
+computed or conjectured) and 50 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -14,7 +14,7 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 107 | 26 | 14 |
 | [Period two](#period-two) | 9 | 10 | 7 |
-| [Diagonals](#diagonals) | 4 | 3 | 3 |
+| [Diagonals](#diagonals) | 5 | 3 | 4 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 2 | 3 | 7 |
+| [Complexity](#complexity) | 3 | 3 | 7 |
 
 ## Open work
 
@@ -328,6 +328,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
 | [Every configuration white left of a black cell settles to the single cell's pairs of left diagonals up to a time shift, as long as each white diagonal is followed by a doubling period](Rule30Open/Diagonals/DrivenSkeleton.md) | [`Diagonals.DrivenSkeleton`](Rule30Open/Diagonals/DrivenSkeleton.lean) | `shift_of_black`, `shift_or_flip_of_white`, `skeleton_step`, `skeleton_step_of_flip`, `base_shift` | 2 | not in the kit |
+| [A walk that steps down on black cells and down-left on white ones bounds when the left diagonals settle; it advances 2.01 times per depth to depth 200,000, and a walk of slope 2 + o(1) would give black center runs of slope 1/3](Rule30Open/Diagonals/FrontWalker.md) | [`Diagonals.FrontWalker`](Rule30Open/Diagonals/FrontWalker.lean) | `pair_repeats_of_walk`, `black_run_le_of_walk`, `black_run_le_of_steep_walk` | 2 | extends a kit result |
 | [Left diagonals remember only behind a white diagonal](Rule30Open/Diagonals/LeftMemory.md) | [`Diagonals.LeftMemory`](Rule30Open/Diagonals/LeftMemory.lean) | `D_reset`, `D_periodic_of_black`, `D_period_dichotomy`, `D_period_doubles`, `D_two_white`, `D_three_flips` | 1 | extends a kit result |
 | [If the left diagonals repeat with period 16 from time 3j/2 to depth J, black center runs have 13L at most 3a + 2400 and white blocks reach left at most (a + 100)/3](Rule30Open/Diagonals/SettledRuns.md) | [`Diagonals.SettledRuns`](Rule30Open/Diagonals/SettledRuns.lean) | `no_alt_pair`, `settled_alt_pair`, `no_white_pair`, `erode_alt`, `black_run_le_of_settled`, `white_block_le_of_settled` | 2 | not in the kit |
 | [If the left diagonals repeat from time 3j/2 with any periods and no settled pair alternates in antiphase more than A times, black center runs have 13L at most 3a + 130A + 260; the reset bound reduces the settling to the white runs of the settled diagonals](Rule30Open/Diagonals/SettledSlope.md) | [`Diagonals.SettledSlope`](Rule30Open/Diagonals/SettledSlope.lean) | `altBound_of_repeats`, `altBound_of_period_le`, `black_run_window`, `black_run_le_of_settling`, `black_run_le_of_fast_settling`, `pair_repeats_of_white_runs`, `black_run_le_of_white_runs` | 2 | not in the kit |
@@ -347,6 +348,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Three routes to a run slope below 3/5 over every driven left half stop at the settling time of the left diagonals, which over every driver is the single cell's open problem with a transient added](negative-results/diagonals/driven-run-slopes.md) | dead end | 2 |
 | [A finite automaton over the center column certifies no slope for black runs of the driven left half unless those runs are bounded](negative-results/diagonals/finite-state-slopes.md) | barrier | 2 |
 | [Direct comparison with a true strip of the pattern near the left edge of any fixed depth leaves the slope of black center runs at 3/5](negative-results/diagonals/fixed-depth-strips.md) | barrier | 2 |
+| [Three leads to linear settling of the single cell's left diagonals stop, to depth 200,000, at the transient or at a law of large numbers for the settled left side; the onset phases are uniform, the front shows nothing at the white diagonals, and no settled pair repeats up to a time shift](negative-results/diagonals/linear-settling-leads.md) | dead end | 2 |
 
 ## Frames and the seed's past
 
@@ -480,6 +482,7 @@ Prize Problem 3, and what an answer either way would imply.
 |---|---|---|---|---|
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
+| [A decision tree for the center cell from an arbitrary row spends exactly one query on the leftmost cell, so with the kit's degree bound it reads at least 2t cells; computation gives all 2t + 1 for t ≤ 17](Rule30Open/Complexity/QueryDepth.md) | [`Complexity.QueryDepth`](Rule30Open/Complexity/QueryDepth.lean) | `depth_restrict_succ_le`, `eval_restrict`, `tree_drop_of_flip`, `center_tree_drop`, `center_tree_lift` | 3 | extends a kit result |
 
 **Findings**
 
