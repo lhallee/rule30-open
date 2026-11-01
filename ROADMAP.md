@@ -186,8 +186,8 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
   ether. Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
   cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
-  census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 12 cells
-  ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
+  census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 16 cells
+  ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain; no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
   a fixed lag removes none of its moves, since it does not restrict the cells above the lag (in Lean,
   [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)), so

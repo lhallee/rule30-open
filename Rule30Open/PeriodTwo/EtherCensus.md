@@ -106,8 +106,8 @@ The counts by way of settling are those of the census entry, whose checker tests
 at every fourth; the last settling step is 300 here against 298 there for that reason. The kernel check of the 112
 chunks takes about two and a half minutes of one core and under 2 GB of memory. The census to
 heads of 20 cells in the census entry is a computation, not a proof. The rounds the checker runs grow by a factor of
-about 4.2 from heads of 10 cells (442,640 rounds, `--bits 10`) to heads of 12 (1,841,076), so heads of 14 cells would
-cost roughly ten minutes of kernel time; that is an estimate, not a run.
+about 4.2 from heads of 10 cells (442,640 rounds, `--bits 10`) to heads of 12 (1,841,076), and
+[EtherCensus16](EtherCensus16.md) checks the heads of 16 cells, adding descent to smaller heads to cut the rounds.
 
 ```bash
 python -m computations.ether_certificate          # the census above

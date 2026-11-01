@@ -36,7 +36,8 @@ the census says where each stops.
 
    Every head is settled, none reaches the 120 cells the computation can follow, and the repeats have period 4, 8 or 16.
    [EtherCensus](../../Rule30Open/PeriodTwo/EtherCensus.md) checks the closed strips and the census for $p \le 12$ in
-   Lean. So every 2-adic rational whose tail from cell $p \le 20$ on is the ether, in $K$ or not, has an eventually periodic
+   Lean, and [EtherCensus16](../../Rule30Open/PeriodTwo/EtherCensus16.md) extends it to $p \le 16$ with descent to
+   smaller heads. So every 2-adic rational whose tail from cell $p \le 20$ on is the ether, in $K$ or not, has an eventually periodic
    orbit, with its top at most 102, and **(R) holds for every point of $K$ with such a tail.** The same holds for a tail
    that reaches the ether on the ring after $\tau$ steps when $p + \tau \le 20$, since $H^\tau(U)$ then has an ether tail
    from cell $p + \tau$ on. The heads settled by a repeat keep their top within 24 cells of the wall without entering a

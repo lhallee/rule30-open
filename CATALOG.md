@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-105 Lean modules with 501 headline theorems, 46 findings (proved on paper,
+106 Lean modules with 511 headline theorems, 46 findings (proved on paper,
 computed or conjectured) and 45 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -13,7 +13,7 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 85 | 24 | 13 |
-| [Period two](#period-two) | 7 | 9 | 6 |
+| [Period two](#period-two) | 8 | 9 | 6 |
 | [Diagonals](#diagonals) | 2 | 3 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
@@ -257,6 +257,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [The period-two condition is invisible at a bounded lag](Rule30Open/PeriodTwo/BoundedLag.md) | [`PeriodTwo.BoundedLag`](Rule30Open/PeriodTwo/BoundedLag.lean) | `held_preimage`, `pull_back`, `complete_window`, `invisible_at_bounded_lag`, `inK_window_invisible`, `invisible_at_bounded_lag_rational` | 1 | not in the kit |
 | [The alternating domains time the period-two condition](Rule30Open/PeriodTwo/Domains.md) | [`PeriodTwo.Domains`](Rule30Open/PeriodTwo/Domains.lean) | `held_domains_odd`, `held_countdown`, `held_disagree`, `held_agree_stepB` | 1 | independent proof of a kit result |
 | [Every head of up to 12 cells on the ether settles, so (R) holds for every 2-adic rational whose tail from cell 12 on is the ether](Rule30Open/PeriodTwo/EtherCensus.md) | [`PeriodTwo.EtherCensus`](Rule30Open/PeriodTwo/EtherCensus.lean) | `ether_tail_clear`, `ether_tail_eventually_periodic`, `ether_tail_itinerary`, `closedOK_true`, `closed_count`, `stripInv_forever`, `runHead_sound`, `census`, `eventually_periodic_of_clear`, `eth_eq_kit_ether` | 1 | not in the kit |
+| [Every head of up to 16 cells on the ether settles, so (R) holds for every 2-adic rational whose tail from cell 16 on is the ether](Rule30Open/PeriodTwo/EtherCensus16.md) | [`PeriodTwo.EtherCensus16`](Rule30Open/PeriodTwo/EtherCensus16.lean) | `ether_tail_clear_16`, `ether_tail_eventually_periodic_16`, `ether_tail_itinerary_16`, `descCensus`, `runDesc_sound`, `descend`, `headsBelow_block`, `headsBelow_chunk`, `headsBelow_12`, `defect_shift` | 1 | not in the kit |
 | [Period two reduces to an integer map](Rule30Open/PeriodTwo/HeldColumn.md) | [`PeriodTwo.HeldColumn`](Rule30Open/PeriodTwo/HeldColumn.lean) | `period_two_held`, `period_two_integer`, `center_period_two_integer`, `heldNat_testBit` | 1 | independent proof of a kit result |
 | [A lock of period seven beside an alternating center excludes period two for every right half that enters it](Rule30Open/PeriodTwo/SevenLock.md) | [`PeriodTwo.SevenLock`](Rule30Open/PeriodTwo/SevenLock.lean) | `sevenLock_check`, `sevenLock_forever`, `sevenLock_periodic`, `sevenLock_not_finSupp_Psi`, `no_alternating_of_sevenLock`, `no_alternating_sevenLock_example` | 1 | not in the kit |
 | [The period-two condition is a full 2-shift on 2-adic halves](Rule30Open/PeriodTwo/ShiftModel.md) | [`PeriodTwo.ShiftModel`](Rule30Open/PeriodTwo/ShiftModel.lean) | `heldOrbit_triangular`, `column_bijective`, `inK_graph`, `itinerary_bijective`, `held_held_two_to_one`, `heldNat_triangular`, `inK_periodic_rational`, `inK_periodic_not_finite`, `positive_integer_not_preperiodic` | 1 | independent proof of a kit result |

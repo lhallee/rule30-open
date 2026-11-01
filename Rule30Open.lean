@@ -96,6 +96,7 @@ public import Rule30Open.PeriodTwo.ShiftModel
 public import Rule30Open.PeriodTwo.BoundedLag
 public import Rule30Open.PeriodTwo.SevenLock
 public import Rule30Open.PeriodTwo.EtherCensus
+public import Rule30Open.PeriodTwo.EtherCensus16
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Frames.SeedPast
