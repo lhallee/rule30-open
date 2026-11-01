@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-104 Lean modules with 491 headline theorems, 46 findings (proved on paper,
+105 Lean modules with 501 headline theorems, 46 findings (proved on paper,
 computed or conjectured) and 45 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -13,7 +13,7 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 85 | 24 | 13 |
-| [Period two](#period-two) | 6 | 9 | 6 |
+| [Period two](#period-two) | 7 | 9 | 6 |
 | [Diagonals](#diagonals) | 2 | 3 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
@@ -44,7 +44,6 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
-- [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md): problem 1
 
 **Findings proved in Lean in part**
 
@@ -71,6 +70,7 @@ approach stopped.
 - [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md): problem 1
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
+- [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md): problem 1
 - [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md): problem 1
 - [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md): problem 1
 - [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md): problem 1
@@ -256,6 +256,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 |---|---|---|---|---|
 | [The period-two condition is invisible at a bounded lag](Rule30Open/PeriodTwo/BoundedLag.md) | [`PeriodTwo.BoundedLag`](Rule30Open/PeriodTwo/BoundedLag.lean) | `held_preimage`, `pull_back`, `complete_window`, `invisible_at_bounded_lag`, `inK_window_invisible`, `invisible_at_bounded_lag_rational` | 1 | not in the kit |
 | [The alternating domains time the period-two condition](Rule30Open/PeriodTwo/Domains.md) | [`PeriodTwo.Domains`](Rule30Open/PeriodTwo/Domains.lean) | `held_domains_odd`, `held_countdown`, `held_disagree`, `held_agree_stepB` | 1 | independent proof of a kit result |
+| [Every head of up to 12 cells on the ether settles, so (R) holds for every 2-adic rational whose tail from cell 12 on is the ether](Rule30Open/PeriodTwo/EtherCensus.md) | [`PeriodTwo.EtherCensus`](Rule30Open/PeriodTwo/EtherCensus.lean) | `ether_tail_clear`, `ether_tail_eventually_periodic`, `ether_tail_itinerary`, `closedOK_true`, `closed_count`, `stripInv_forever`, `runHead_sound`, `census`, `eventually_periodic_of_clear`, `eth_eq_kit_ether` | 1 | not in the kit |
 | [Period two reduces to an integer map](Rule30Open/PeriodTwo/HeldColumn.md) | [`PeriodTwo.HeldColumn`](Rule30Open/PeriodTwo/HeldColumn.lean) | `period_two_held`, `period_two_integer`, `center_period_two_integer`, `heldNat_testBit` | 1 | independent proof of a kit result |
 | [A lock of period seven beside an alternating center excludes period two for every right half that enters it](Rule30Open/PeriodTwo/SevenLock.md) | [`PeriodTwo.SevenLock`](Rule30Open/PeriodTwo/SevenLock.lean) | `sevenLock_check`, `sevenLock_forever`, `sevenLock_periodic`, `sevenLock_not_finSupp_Psi`, `no_alternating_of_sevenLock`, `no_alternating_sevenLock_example` | 1 | not in the kit |
 | [The period-two condition is a full 2-shift on 2-adic halves](Rule30Open/PeriodTwo/ShiftModel.md) | [`PeriodTwo.ShiftModel`](Rule30Open/PeriodTwo/ShiftModel.lean) | `heldOrbit_triangular`, `column_bijective`, `inK_graph`, `itinerary_bijective`, `held_held_two_to_one`, `heldNat_triangular`, `inK_periodic_rational`, `inK_periodic_not_finite`, `positive_integer_not_preperiodic` | 1 | independent proof of a kit result |
@@ -267,7 +268,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 |---|---|---|---|
 | [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md) | computed | 1 | wanted |
 | [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md) | computed | 1 | wanted |
-| [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md) | computed | 1 | wanted |
+| [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md) | computed | 1 | partial |
 | [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md) | computed | 1 | partial |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
