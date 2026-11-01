@@ -114,3 +114,10 @@ The search confirmed these records but could not read the texts; check a claim a
   *Natural Computing* 16(3), 367 to 381.
 - **Törmä (2019).** [Countable sofic shifts with a periodic direction](https://doi.org/10.1007/s00224-019-09962-8).
   *Theory of Computing Systems* 64(6), 1042 to 1066.
+- **Ben Ramdhane, Dennunzio, Margara and Menara (2025).** [Structural properties of non-linear cellular automata:
+  permutivity, surjectivity and reversibility](https://arxiv.org/abs/2504.15949). arXiv:2504.15949, and ICTCS 2025,
+  CEUR Workshop Proceedings; the record was seen through a search. Gives conditions under which non-linear automata of a
+  separated form over $\mathbb{Z}_m$ are permutive, and relates permutivity to surjectivity and reversibility. *Here:*
+  Rule 30 is already known to be left-permutive and onto; a criterion for permutivity says nothing about one column of
+  one orbit, and Rule 90, in the same class as Rule 30 for [Kopra (2023)](#traces), has an eventually periodic center
+  column.

@@ -10,8 +10,9 @@ The kit's own status table, in its
 [lean/README.md](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/README.md#status-by-period),
 summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
-kit's commit 932cf8d; the kit's main branch has since gained 29 modules from eleven pull requests (7beff71, October 30),
-and moving the pin there, after the build, the audit and the tests pass, is pending.
+kit's commit 932cf8d; the kit's main branch has since gained 43 modules (a09f245, October 31), which exclude 133 blocks of
+period at most 21 that this repository's Lean already excludes and no block that it does not
+([kit pull requests](literature/kit-pull-requests.md)), and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
 
@@ -61,7 +62,7 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
     classes at 16 cells excludes $000000001011$, of period 12, in Lean through a certificate of local checks that
     holds for any block ([class game](findings/columns/class-game.md), [ClassGame](Rule30Open/Columns/ClassGame.md)), and ten blocks of
     period 13 to 16, eight of period 17 and fifteen of period 18 (at 16 cells) that nothing else excludes, all in Lean
-    except twelve of period 18, the certificates too large for one module checked over several ([class
+    except ten of period 18, the certificates too large for one module checked over several ([class
     blocks](findings/columns/class-blocks.md), [ClassBlocks](Rule30Open/Columns/ClassBlocks.md) and the modules it
     links); the plain game at 15 and 16 cells closes three more blocks of periods 14 to 16, in Lean
     ([GameBlocksWide](Rule30Open/Columns/GameBlocksWide.md)); the kit excludes every

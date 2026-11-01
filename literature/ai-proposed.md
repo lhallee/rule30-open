@@ -170,3 +170,41 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   constructions and improving several. A method rather than a result; searches for finite certificates here
   ([the coin-lock finding](../findings/columns/coin-lock.md), [the finite game](../findings/columns/game-blocks.md)) are
   of the same constructive kind.
+
+- **Nagda, Raghavan and Thakurta (2025).** *Reinforced generation of combinatorial structures: applications to
+  complexity theory*, later versions titled *... hardness of approximation*.
+  [arXiv:2509.18057](https://arxiv.org/abs/2509.18057), versions from September 2025 to March 2026, and the Google
+  Research post *AI as a research partner: advancing theoretical computer science with AlphaEvolve*; the record and the
+  abstracts were seen through a search, the text was not read. By the abstracts, AlphaEvolve finds gadgets for
+  reductions from Håstad's probabilistically checkable proofs that raise the NP-hardness of approximating MAX-4-CUT to
+  0.987 (from 0.9883) and give 0.9649 for MAX-3-CUT by gadgets, short of the best bound by other means, and nearly
+  extremal Ramanujan graphs of up to 163 vertices for average-case bounds for MAX-CUT and maximum independent set on
+  random 3- and 4-regular graphs. AlphaEvolve made the gadgets' verifier about 10,000 times faster, and the final gadgets
+  were checked by the original brute-force verifier. *Here:* the theorems are hardness under P $\ne$ NP for problems
+  whose input varies, while Problem 3 asks an unconditional bound for one fixed function, so they cannot bear on it
+  ([the barrier](../negative-results/complexity/problem-three-barrier.md), [the hardness
+  hypotheses](../negative-results/complexity/hardness-hypotheses.md)). The method, a search for a finite object whose
+  check is exhaustive, with the search made faster and the check kept plain, is the shape of [the finite
+  game](../findings/columns/game-blocks.md), whose certificates the kernel checks.
+
+- **Hubert et al. (2025).** *Olympiad-level formal mathematical reasoning with reinforcement learning.* *Nature*,
+  [doi:10.1038/s41586-025-09833-y](https://doi.org/10.1038/s41586-025-09833-y), November 2025; the record, through the
+  Google Research publication page and Nature's press release, was seen through a search, the text was not read. AlphaProof,
+  a language model trained with the AlphaZero method to prove statements in Lean, on problems translated automatically
+  into Lean, with reinforcement learning at test time on variants of the hardest problems; at the 2024 International
+  Mathematical Olympiad it solved three of the five problems other than geometry. *Here:* every route of the roadmap
+  stops at a statement that is open, not at a true statement without a written proof: `Lock` for $001$
+  ([Traps001](../Rule30Open/Columns/Traps001.md)), the kit's `Q01` ([HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)),
+  `LeftLatch` for each block ([LeftLatch](../Rule30Open/Columns/LeftLatch.md)). A prover of this kind bears on the cost
+  of writing the Lean of a finding whose argument is known, not on those steps; its proofs would also have to pass
+  the axiom audit here, which refuses compiled evaluation.
+
+- **Lau (2026).** *Explicit positive lower density for the Collatz conjecture.* Hexagon preprint 2610.00249, version 2
+  of October 21, 2026 (hexagonmath.org, outside this session's network); the record and the abstract were seen through a
+  search, the text was not read. It credits AxiomProver with the mathematics and its Lean formalization. Claims that at
+  least $\lfloor N / 2^{2^{2^{163}}} \rfloor$ odd integers below $N$ reach 1 within $10.46 \log n$ steps, a quantitative
+  form of a positive-density theorem of L. Mazur. *Here:* the kit's `Q01_iff_integer` restates period two as a statement
+  about every natural number under the iterates of $G = F \circ F$, and [HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)
+  asks the same of every $U > 0$; a positive density of starts that behave says nothing about each start, the gap of
+  [the random-row barrier](../negative-results/random-rows/almost-every-row.md). By computation here, every integer
+  below $2^{52}$ already breaks the condition of period two ([the left half alone](../findings/period-two/left-half-alone.md)).

@@ -10,16 +10,26 @@ brings its catalog to 170 modules. The eleven are #36, #43, #45, #46, #49, #50, 
 *merged* below. Thirteen more followed, #17, #59 and #61 to #71, each in a commit of its own (#17 at
 [da21aa7](https://github.com/WolframInstitute/Rule30PrizeKit/commit/da21aa7), #71 at
 [d41defd](https://github.com/WolframInstitute/Rule30PrizeKit/commit/d41defd)), and the main branch at
-[a09f245](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a09f245) has 184 modules. This repository is not yet
+[a09f245](https://github.com/WolframInstitute/Rule30PrizeKit/commit/a09f245) has 184 modules, 43 more than the pin. On
+November 1, 2026 the main branch was still at a09f245, its equivalent forms (`equivalents/`) had not changed since the
+pin, and thirteen pull requests were open: #23, #33, #38, #39, #40, #41, #47, #48, #52, #55, #57, #60 and #72, the last
+opened that day. Four earlier pull requests were closed without their modules reaching the main branch: #3
+(`Rule30WordExclusions`), #5 (`Rule30Sparse16`), #29 (`Rule30PeriodThirtyTwoShielding`) and #32 (`Rule30XorCollision`,
+`Rule30XorSharpness`). Two more reached the kit before the pin in other modules: the tail-13 completion of #15 is the
+pinned `Rule30ZeroBoundaryStripeFourComplete` with `Rule30Certificates/StripeTail13Completion`, and the single-cell and
+high-support absorption of #20 is the pinned `Rule30EtherSingleCell`, while its two-cell absorption
+(`Rule30EtherTwoCell`) is in neither. These six are not summarized below. This repository is not yet
 pinned there, so here the merged ones are results of the kit's main branch that the pin does not include; the summaries
 below that say "claims" were written from the pull request pages before the merge, and the merged modules state what
 they claim. The pull requests still open are claims. Each pull request adds Lean
 modules that its author reports as checked by the kit's `Check.lean`. The summaries below come from the pull request pages and from the module sources at each pull
 request's head (`refs/pull/N/head`), and they are grouped by the routes of [the roadmap](../ROADMAP.md).
+[What the main branch covers here](#what-the-main-branch-covers-here) lists the entries here whose results the main
+branch now proves in part.
 
 ## Least periods four and three: traps for the right half
 
-- **#17, `Rule30CoupledEmptyRight` and `Rule30ParametricStripCertificates`.** Claims that no finite configuration
+- **#17, `Rule30CoupledEmptyRight` and `Rule30ParametricStripCertificates`.** *Merged* (da21aa7). Claims that no finite configuration
   whose right half is white has a center column repeating $0001$, $0011$, $0111$ or $001$, in any phase
   (`no_empty_right_coupled_0001` and the others), and a checker that excludes a whole family $a^r u$, $r \ge r_0$,
   with one strip certificate (`not_eventually_param_word`), which lowers several black-run thresholds of the kit.
@@ -31,7 +41,7 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   columns of the trap differ at arbitrarily late times. *Here:* exclusion through `t001` needs only entry
   ([EmptyRight](../Rule30Open/Columns/EmptyRight.md), `emptyRight_001`); this concerns the trap's interior.
 
-- **#65, `Rule30Ether.Lock` and `Rule30EtherWallWitness`.** Claims a hypothesis weaker than `Absorption`, `Lock w`:
+- **#65, `Rule30Ether.Lock` and `Rule30EtherWallWitness`.** *Merged* (d2a091e). Claims a hypothesis weaker than `Absorption`, `Lock w`:
   every finitely supported right half driven by $w$ has column 1 eventually periodic at the white times, or some column
   eventually periodic. For the kit's alignments `Absorption` implies it (`lock_of_absorption`), and it still excludes
   $w$ for every transient (`lock_excludes`), so the locks of $0001$, $0011$ and $0111$ would exclude least period four
@@ -73,16 +83,16 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   alternating column, under the double step, inside which the black cells of column 1 come 3 or 5 double steps apart;
   the white half enters it at time 293. Claims that a new statement `Q01Gap`, implied by the kit's `Q01`
   (`Q01Gap_of_Q01`), gives `CQ01Empty` (`CQ01Empty_of_Q01Gap`). `Q01Gap` is stated open, and 96% of a sample of random
-  finite right halves enter the set, which is not proved. Merged (e5e1728), after the commit pinned here. *Here:* the
+  finite right halves enter the set, which is not proved. Merged (2d7e9c4), after the commit pinned here. *Here:* the
   white right half's gate is the object of [WhiteRightHalf](../Rule30Open/PeriodTwo/WhiteRightHalf.md); every right half
   of up to 20 cells enters the gap trap (computed as the greatest such set, which holds the 829 windows), the kit's
   ether family or a lock of period seven ([the census](../findings/period-two/gate-census.md),
   [SevenLock](../Rule30Open/PeriodTwo/SevenLock.md)).
-- **#66, `Q01_iff_integer`.** Restates `Q01` as: every natural number reaches an even number under some iterate of
+- **#66, `Q01_iff_integer`.** *Merged* (01677a0). Restates `Q01` as: every natural number reaches an even number under some iterate of
   $G = F \circ F$, with $F(Y) = (Y \gg 1) \oplus (Y \lor (Y \ll 1))$. *Here:* this is the map $H$ of [the held
   column](../Rule30Open/PeriodTwo/HeldColumn.md), where period two needs some $U > 0$ with $H^{2s+1}(U)$ odd for every
   $s$, and no integer below $2^{52}$ has that property ([the left half alone](../findings/period-two/left-half-alone.md)).
-- **#67, `Rule30ZeroBoundaryPeriodLanes`.** States `QP P` for every $P$: no start of the zero-driven left half with a
+- **#67, `Rule30ZeroBoundaryPeriodLanes`.** *Merged* (276d92c). States `QP P` for every $P$: no start of the zero-driven left half with a
   leftmost black cell keeps column $-1$ black at every $P$th step. Claims that it excludes $(0^{P-1}1)^\infty$ for
   every transient (`not_eventuallyWord_oneBlack_of_QP`), that `QP 2` is the kit's `Q01` and `QP 3` its `Q001`, that
   `QP 4` gives the kit's `C3` for $0001$, and a bit-sliced checker for bounded starts (`qP_of_chunks`); `QP P` is
@@ -139,19 +149,19 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   47649.
 - **#48, `Rule30EdgeClockDrop`.** Claims restrictions on how temporal periods of edge columns can drop, and finite
   observations that imitate a drop for bounded time.
-- **#61, `Rule30EdgeClock` and `Rule30DefectClockBudget`.** In the frame of the right edge, for any infinite code with
+- **#61, `Rule30EdgeClock` and `Rule30DefectClockBudget`.** *Merged* (a5ad97f). In the frame of the right edge, for any infinite code with
   a black edge and any starting time, claims that every positive digit $j$ changes within $\lceil j/2 \rceil$ updates,
   sharp at the single cell, and that a first difference at digit $j + 1$ escapes into digit $j + 3$ or $j + 4$ within
   $\lceil j/2 \rceil + 2$ updates, and into $j + 5$ or $j + 6$ within $7(\lceil j/2 \rceil + 1)$, recurrently. The
   pull request reports a partial replay by `Check.lean` and states that neither module proves escape at every width
   or that the center column is not periodic.
-- **#62, `Rule30GateClocks`.** Replaces the OR of the right-edge map with any two-input gate at each depth and claims,
+- **#62, `Rule30GateClocks`.** *Merged* (6246dcf). Replaces the OR of the right-edge map with any two-input gate at each depth and claims,
   for every choice of gates, that the least period of the first $n$ bits of the edge code is a power of two
   (`prefix_period_iff`), that $2m$ more bits raise its exponent by at most $m$ plus a correction from earlier records
   (`prefix_window_bound`), so the first $n$ bits have a period dividing $2^{B(n)}$, and that with affine gates the
   period divides $2^r$ once $n + 1 \le 2^r$ (`affine_prefix_bound`). It extends the kit's half-rate bound
   `Rule30RightPeriods.per_upper_half` from the OR to every gate, and claims no lower bound.
-- **#69, `Rule30EtherGrounding`.** In the frame of the rightmost black cell, claims that the one-in-four ether cannot
+- **#69, `Rule30EtherGrounding`.** *Merged* (0d1c95e). In the frame of the rightmost black cell, claims that the one-in-four ether cannot
   eventually hold two adjacent columns at fixed distances behind the edge, for every row, depth, spatial and temporal
   phase and starting time, without a common temporal period (`no_moving_ether_pair`, carried through the edge map
   `Rule30FrozenRuler.edge_evol`): a property of the pair closed under going back is carried by a checked local step to
@@ -184,12 +194,12 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   after eight steps exactly when it returns after two once its three newest cells are dropped.
 - **#45, `Rule30ZeroBoundaryStripeStructure`.** *Merged.* Claims structure for the front windows of the kit's
   zero-boundary stripes: a two-step clone map, lifting of certified cycles to wider windows, and a backward dichotomy.
-- **#59, `Rule30ZeroBoundaryStripePrimitiveRoots`.** Builds on #45: explicit backward operators for the two-step map of
+- **#59, `Rule30ZeroBoundaryStripePrimitiveRoots`.** *Merged* (9f903cb). Builds on #45: explicit backward operators for the two-step map of
   the stripe front windows, a trichotomy for the preimages of a window (a clone regime with a white tail, and two
   primitive regimes, with a black tail or with the period-3 NOR wave $(100)^\infty$, `primitive_or_clone_trichotomy`,
   `backward_nor_period_three`), a classification of the primitive roots of 8 cells, and projections of the orbits of
   wider windows onto narrower ones. It states no claim on a prize problem.
-- **#63, `Rule30ZeroBoundaryStripeCascade`.** Builds on #45 and #59: every primitive root of the first kind reaches the
+- **#63, `Rule30ZeroBoundaryStripeCascade`.** *Merged* (cad25c9). Builds on #45 and #59: every primitive root of the first kind reaches the
   NOR wave $(100)^\infty$ at backward step 3, the next step maps it to $(011)^\infty$ and the one after to
   $(000101)^\infty$ (`typeI_step3_nor_wave`, `wave_011_to_period6_step0`); the backward reduction is injective, so
   clone rays from distinct primitive roots never meet (`clone_ray_disjoint_of_primRoot`); and each of sixteen infinite
@@ -205,11 +215,16 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
 
 ## Runs of the center column
 
-- **#66, `Rule30BlackRuns`, self-shielded.** Claims sharper forms of the kit's Theorems B and D on the black runs of an
-  eventual period: a black run of $9j$ leaves $(01)^j$ in columns 1 to $2j$, which moves right without reading the
-  cells beyond and keeps column 1 fixed by the center for $4j$ steps, so a black run of $r$ in a period of $P$ needs
-  $9 \lceil (P - r)/4 \rceil \le r$ (`no_black_run_quarter`), and a word $1^r u$ needs $r \ge 9$ when
-  $1 \le |u| \le 4$ and $r \ge 18$ when $|u| \le 8$. *Here:* [WallSegments](../Rule30Open/Columns/WallSegments.md)
+- **#66, `Rule30BlackRuns`, self-shielded.** *Merged* (01677a0). Sharper forms of the kit's Theorems B and D on the
+  black runs of an eventual period: a black run of $9j$ leaves $(01)^j$ in columns 1 to $2j$, which moves right without
+  reading the cells beyond and keeps column 1 fixed by the center for $4j$ steps. So a period of $P$ cannot hold a black
+  run of $r < P$ followed by a white cell once $9 \lceil (P - r)/4 \rceil \le r$ (`no_long_black_run_quarter`), nor a
+  black run of $s \ge 9$, then exactly $r$ white cells and a black cell, with $s + r < P$, once
+  $1 + 9 \lfloor (P - s - r + 1)/4 \rfloor \le r$ (`no_black_white_run_quarter`); a word $1^r u$ with $u$ starting white
+  is excluded for $r \ge 9$ when $1 \le |u| \le 4$ (`no_black_run_ge9_len_le4`) and for $r \ge 18$ when $|u| \le 8$
+  (`no_black_run_ge18_len_le8`). Both conditions are those of
+  [WideWall](../Rule30Open/Columns/WideWall.md) for the center column ([below](#what-the-main-branch-covers-here)).
+  *Here:* [WallSegments](../Rule30Open/Columns/WallSegments.md)
   and [WideWall](../Rule30Open/Columns/WideWall.md) use runs of nine 1s the same way, through the cells beside the
   column.
 - **#46, `Rule30BlackRunErosion`, `Rule30WhiteSpacing` and five more modules.** *Merged.* Claims that a black run of
@@ -240,7 +255,78 @@ request's head (`refs/pull/N/head`), and they are grouped by the routes of [the 
   window (`diagonal_canon_window_time_ge`). *Here:* for the center column one pair $m \ge 2^{k-1}$ with
   $c(m) \ne c(m + 2^k)$ per $k$ suffices; [restricted models](../negative-results/complexity/restricted-models.md)
   finds the least such pair for $k \le 20$, always within the first six inputs of the window.
+- **#72, `Rule30Problem3Bounds`, right-head span.** Open. Claims the results of #68 and #70 with the time bound replaced
+  by a bound on how far right the head goes: if the head stays below cell $k$ on an input $n \ge 2^{k-1}$, every
+  $m \ge 2^{k-1}$ with $m \equiv n \pmod{2^k}$ gets the same value (`computes_eq_of_mod_two_pow_of_scansBelow`); a head
+  that eventually stays below cell $k$ forces period $2^k$ from $2^{k-1}$ on (`period_of_eventually_scansBelow`); so with
+  Problem 1 every machine computing the center column reaches cell $k$ on inputs beyond every bound
+  (`head_unbounded_of_problem1`), and some left diagonal makes every machine reach cell $k$ on the window
+  $[2^{k-1}, 2^{k-1} + 2^k)$ (`diagonal_canon_window_head_ge`). The span is at most the time
+  (`rightSpan_le_steps`). *Here:* the head must read $k$ input cells to tell residues apart modulo $2^k$, a bound of the
+  order of the input's length, as in #68; it does not approach the linear bound Problem 3 asks
+  ([the barrier](../negative-results/complexity/problem-three-barrier.md)).
 - **#71, `Rule30EtherEpisode`.** *Merged* (d41defd). In the frame of the rightmost black cell, the longest run of
   ticks for which two adjacent depths of a black-edge code follow the one-in-four ether has an exact length,
   $\lfloor 2k/3 \rfloor + 4 - [k \equiv 0, 2 \pmod 6]$ (`episode_max`), a quantitative form of #69. *Here:* no
   route uses the edge frame.
+
+## What the main branch covers here
+
+The entries here state their relation to the kit at the pinned commit. The main branch proves part of what some of them
+mark as new or as a refinement.
+
+- **Blocks of period at most 21.** Of the primitive blocks of period at most 21, 133 are excluded by a family that the
+  main branch adds and not by the pinned kit: one each of periods 11, 12 and 13, then 11, 14, 15, 15, 15, 16, 20 and 24
+  of periods 14 to 21 ([computations/kit_main.py](../computations/kit_main.py), which reads each family's statement as
+  a test on the block). The families are the self-shielded Theorems B and D of #66 (68 blocks), the black-run families
+  $1^r u$ of #17 (`not_eventually_paramBlackTable`, 60), the new white-padding bounds of `Rule30PaddedWords.no_padded_word`
+  for the tails $1011$, $10011$, $11011$, $101111$ (from 9 white cells), $1101$ (11), $1111$ (7) and $1^k$, $k \ge 3$
+  (17) (42), the four-category grammar of #36 (14) and the white runs of at least 17 of #36 (3); 53 blocks fall in more
+  than one. The reset mixtures of #43 add no block of period at most 21: their blocks there, $1\,0^q$ with $q \ge 17$,
+  are the pinned kit's padded words. Every one of the 133 is already excluded
+  in Lean here, by a module whose entry is marked `kit: new`: 14 of the 32 blocks of
+  [GameBlocks](../Rule30Open/Columns/GameBlocks.md), 29 of the 97 of
+  [GameBlocksLong](../Rule30Open/Columns/GameBlocksLong.md), and 15 of the 99 of
+  [BitBlocks17](../Rule30Open/Columns/BitBlocks17.md), 15 of the 122 of
+  [BitBlocks18](../Rule30Open/Columns/BitBlocks18.md), 16 of the 133 of
+  [BitBlocks19](../Rule30Open/Columns/BitBlocks19.md), 17 of the 160 of
+  [BitBlocks20](../Rule30Open/Columns/BitBlocks20.md), 2 of the 55 of
+  [BitBlocks20Mid](../Rule30Open/Columns/BitBlocks20Mid.md), 1 of the 44 of
+  [BitBlocks20Wide](../Rule30Open/Columns/BitBlocks20Wide.md), 21 of the 220 of
+  [BitBlocks21](../Rule30Open/Columns/BitBlocks21.md), 2 of the 97 of
+  [BitBlocks21Mid](../Rule30Open/Columns/BitBlocks21Mid.md) and 1 of the 62 of
+  [BitBlocks21Wide](../Rule30Open/Columns/BitBlocks21Wide.md). The block $01110111111111$ of period 14 also has traps in
+  [FourteenTraps](../Rule30Open/Columns/FourteenTraps.md), [NaturalTrapsWalls](../Rule30Open/Columns/NaturalTrapsWalls.md)
+  and [ApartTraps](../Rule30Open/Columns/ApartTraps.md). So the main branch adds no block of period at most 21 to those
+  that the kit and this repository exclude together; it changes which of them the kit excludes. The block lists here
+  come from the literals of each module's Lean source and from the trap and steering reductions of
+  [computations/coverage.py](../computations/coverage.py); a block that a module states in another form would be
+  missed.
+- **[WideWall](../Rule30Open/Columns/WideWall.md)** (`kit: refines`). Its statements 1 and 2 for the center column of
+  the single cell are `no_long_black_run_quarter` and `no_black_white_run_quarter` of #66: $9 \lceil x/4 \rceil \le r$
+  exactly when $x \le 4 \lfloor r/9 \rfloor$, and $1 + 9 \lfloor (m + 1)/4 \rfloor \le b$ exactly when
+  $m \le 4 \lfloor (b - 1)/9 \rfloor + 2$. The kit's forms ask a tail $x \ge 1$ or $m \ge 1$ ending the run, where WideWall
+  allows $x = 0$ and $m = 0$; those words, $1^P$ and $1^s 0^b$ with $s \ge 9$, are excluded by the pinned kit's
+  theorem on runs of at least nine 1s. Its forms for every column of every row with a leftmost 1
+  (`long_run_tail_column`, `black_white_tail_column`, `wide_wall_column`) are not in the kit.
+- **[LeftMemory](../Rule30Open/Diagonals/LeftMemory.md)** (`kit: refines`). `Rule30LeftReset` proves its reset
+  (`D_period_after_reset`, the same statement as `D_periodic_of_black`), the first half of its dichotomy
+  (`D_period_or_white`: the next diagonal has the period, or the middle one is white), the doubling
+  (`D_white_double`) and the parity criterion (`D_white_period_iff`), for the single cell's left diagonals.
+- **Unbounded left-diagonal periods.** [SettledRuns](../Rule30Open/Diagonals/SettledRuns.md) and [the driven run
+  slopes](../negative-results/diagonals/driven-run-slopes.md) cite Nersissian (2026) for them; `Rule30LeftUnbounded`
+  proves them in Lean (`D_period_unbounded`, `D_least_period_unbounded`), with infinitely many eventually white left
+  diagonals (`D_infinitely_many_white`) and never two adjacent ones (`D_no_two_white`).
+- **Not covered.** `Rule30Ether.Lock` of #65 is an open hypothesis on every finitely supported right half, so it does not
+  cover [LockWord](../Rule30Open/Columns/LockWord.md) or [LockBlocks](../Rule30Open/Columns/LockBlocks.md), which prove
+  for one sequence of one column that the center does not repeat the block once the column reads it; "lock" means
+  different things there. [DrivenSkeleton](../Rule30Open/Diagonals/DrivenSkeleton.md) compares the diagonals of two
+  configurations, which no module of the main branch does; [QuadraticTime](../Rule30Open/Complexity/QuadraticTime.md) is
+  an upper bound, where `Rule30Problem3Bounds` gives lower ones; `Rule30CoupledEmptyRight` of #17 is the white right
+  half of [EmptyRight](../Rule30Open/Columns/EmptyRight.md), which also covers every right half of at most six cells.
+  The period-two entries [SevenLock](../Rule30Open/PeriodTwo/SevenLock.md),
+  [EtherCensus](../Rule30Open/PeriodTwo/EtherCensus.md), [NoKTails](../Rule30Open/PeriodTwo/NoKTails.md) and
+  [BoundedLag](../Rule30Open/PeriodTwo/BoundedLag.md) meet `Rule30GateTrap`, `Q01_iff_integer` and
+  `Rule30ZeroBoundaryPeriodLanes` in their objects, the gate of the alternating-driven right half and the held map;
+  those modules prove reductions to open statements (`Q01Gap`, `QP P`) and a restatement, not the census, the lock of
+  period seven, the tails or the lag of these entries.
