@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-102 Lean modules with 455 headline theorems, 42 findings (proved on paper,
-computed or conjectured) and 41 negative results. Prize problem 1 asks whether the center column
+102 Lean modules with 455 headline theorems, 44 findings (proved on paper,
+computed or conjectured) and 42 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -13,14 +13,14 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 83 | 23 | 12 |
-| [Period two](#period-two) | 6 | 7 | 6 |
+| [Period two](#period-two) | 6 | 9 | 6 |
 | [Diagonals](#diagonals) | 2 | 2 | 1 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 2 | 5 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
-| [Statistics](#statistics) | 0 | 0 | 3 |
+| [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 2 | 3 | 6 |
 
@@ -43,6 +43,7 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
+- [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md): problem 1
 
 **Findings proved in Lean in part**
 
@@ -260,10 +261,12 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 |---|---|---|---|
 | [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md) | computed | 1 | wanted |
 | [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md) | computed | 1 | wanted |
+| [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make](findings/period-two/ether-defect-census.md) | computed | 1 | wanted |
 | [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md) | computed | 1 | partial |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
 | [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md) | computed | 1 | partial |
+| [The slips of the right channel are one front crossing a locked layer, fed from the chaotic region at the leftward speed of Rule 30](findings/period-two/slip-geometry.md) | computed | 1 | not applicable |
 | [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md) | computed | 1 | partial |
 
 **Negative results**
@@ -408,6 +411,7 @@ Tests of the center column against randomness.
 |---|---|---|
 | [No compressor or Markov model beats one bit per cell](negative-results/statistics/compression.md) | no signal | 3 |
 | [No linear or learned projection tells the chaotic region of the single cell from the invariant measure](negative-results/statistics/patch-projections.md) | no signal | 2 |
+| [Persistent homology does not tell the single cell's center from random rows](negative-results/statistics/persistent-homology.md) | no signal | 1, 2 |
 | [The center column passes every randomness test tried](negative-results/statistics/randomness-tests.md) | no signal | 2, 3 |
 
 ## Learned models

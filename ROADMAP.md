@@ -182,7 +182,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   proves in its own encoding (`Rule30ZeroBoundaryStripe.stripe_absorb`); every rational
   point with a head and period of at most 64 cells together, 2,592 of them, is preperiodic and falls onto a stripe or
   the ether, and no integer below $2^{63}$ is a point, by computation; what remains is to bound a defect in front of the
-  ether, which the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
+  ether. Every head of up to 20 cells on the ether settles, entering a closed strip of 13 cells or repeating within 24
+  cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
+  census](findings/period-two/ether-defect-census.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain; no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
   a fixed lag removes none of its moves, since it does not restrict the cells above the lag (in Lean,
   [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)), so
@@ -197,6 +199,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   Lean for every half that enters it, whatever lies beyond column 32 ([SevenLock](Rule30Open/PeriodTwo/SevenLock.md)),
   so `Q01Gap` alone would exclude every configuration whose right half has at most 20 cells when its center starts to
   alternate.
+  Beside the alternating center, every slip of column 1 out of its lock is one front crossing a locked layer of about 7
+  columns along a single depth trace, decided about 20 steps ahead from the chaotic region, which feeds it at about
+  0.26 columns per step ([slip geometry](findings/period-two/slip-geometry.md)).
   The structure of this shift and the aperiodic itinerary of a positive integer in it are in Lean
   ([ShiftModel](Rule30Open/PeriodTwo/ShiftModel.md)). Condrey's proof for a constant center does not extend: only the
   uniqueness of the left half carries over, the forced left half is not a finite-state function of the right half, and
@@ -267,7 +272,8 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   ([randomness tests](negative-results/statistics/randomness-tests.md), [compression](negative-results/statistics/compression.md)).
   Space-time patches of the single cell's chaotic region match the invariant measure under exact tests, and no
   linear or learned projection (PCA, classifiers, an autoencoder, t-SNE) tells them from a random row
-  ([patch projections](negative-results/statistics/patch-projections.md)).
+  ([patch projections](negative-results/statistics/patch-projections.md)), nor does persistent homology tell its
+  windows from those of random rows ([persistent homology](negative-results/statistics/persistent-homology.md)).
 
 ## Problem 3: does computing the $n$th cell take effort of order $n$?
 
