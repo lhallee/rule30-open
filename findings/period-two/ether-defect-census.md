@@ -38,8 +38,8 @@ the census says where each stops.
    So every 2-adic rational whose tail from cell $p \le 20$ on is the ether, in $K$ or not, has an eventually periodic
    orbit, with its top at most 102, and **(R) holds for every point of $K$ with such a tail.** The same holds for a tail
    that reaches the ether on the ring after $\tau$ steps when $p + \tau \le 20$, since $H^\tau(U)$ then has an ether tail
-   from cell $p + \tau$ on. The heads settled by a repeat keep their top within 24 cells of the wall, where a closed
-   strip of 13 cells does not fit. Nothing here uses $K$; the kit has no statement about the zero-boundary left half
+   from cell $p + \tau$ on. The heads settled by a repeat keep their top within 24 cells of the wall without entering a
+   closed strip. Nothing here uses $K$; the kit has no statement about the zero-boundary left half
    with an ether tail.
 2. **The closed strips** (computed). The greatest set of strips $D(c - w + 1 .. c)$, with $D$ zero above $c$, that one
    step maps into the set for both values of $D(c - w)$ and that never raise the top above $c$ is empty for $w \le 12$
@@ -49,7 +49,7 @@ the census says where each stops.
    one keeps its top at or below $c$ whatever lies below $c - 12$: the property is closed under one step for both
    inputs, so it holds at every step by induction. In the census, 99.85% of the heads of 20 cells settle this way.
 3. **No potential on top windows, not even on the moves real defects make** (computed). Write $\lambda(w)$ for the
-   largest mean gain per step over the cycles of the window automaton of `held_shift.front_rate` (the top, the $w - 1$
+   largest mean gain per automaton step (a pass through the node for a lost top counts as a step) over the cycles of the window automaton of `held_shift.front_rate` (the top, the $w - 1$
    cells below it, free cells below, a lost top passing through one node per phase). A potential $\varphi$ on its
    states with $\text{gain} + \varphi(\text{after}) - \varphi(\text{before}) \le 0$ on every move exists exactly when
    $\lambda(w) \le 0$. Karp's algorithm gives exactly $\lambda(5) = 7/25$, $\lambda(6) = 7/24$, $\lambda(7) = 7/32$ and
@@ -78,8 +78,8 @@ the census says where each stops.
    37 cells above the head, with median 8 or 9, whatever the length. Among the heads of 16 cells the share whose top
    rises more than $x$ cells above the head is 0.84, 0.39, 0.12, 0.022, 0.0051, 0.0029 and 0.00075 at
    $x = 0, 10, 20, 30, 40, 50, 60$. The largest rise over all heads of $p$ cells, 40, 48, 62, 69 and 82 at
-   $p = 8, 12, 16, 18, 20$, grows by about 4 cells per cell of head. A head of 16 cells with the largest rise, 62,
-   settles at step 401, a climb of about 0.15 cells per step, with no visible order in the cells below its top. A climb
+   $p = 8, 12, 16, 18, 20$, grows by about 3.5 cells per cell of head. A head of 16 cells with the largest rise, 62,
+   settles at step 401, a climb of about 0.15 cells per step. A climb
    that stops at a rate per step that does not depend on the head gives a rise with an exponential tail, and its maximum over $28 \cdot 2^p$ heads then grows linearly in $p$, as
    observed. Under that model every head settles with probability one and almost every head settles early, which is the
    shape of the heuristic for the Collatz map; it says nothing about a single head.
