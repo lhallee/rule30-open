@@ -34,7 +34,8 @@ columns are eventually constant.
 **What it means.** The finite-row form of Problem 1 has no counterexample among small rows in this sense, and the
 nearest misses sit at or below chance. The search covers repetition from time 0 only, with period at most 32 within
 256 steps. A column of one of these rows that becomes periodic only at time $T > 0$ repeats from time 0 in the row at
-time $T$, whose support has $w + 2T$ cells, so the search does not exclude it.
+time $T$, whose support has at most $w + 2T$ cells, so the search does not exclude it. Onsets $T > 0$ are measured in
+[late onsets](late-onset.md).
 
 **Reproduce.**
 

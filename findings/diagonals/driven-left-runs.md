@@ -4,7 +4,7 @@ category: diagonals
 problems: [2]
 status: conjecture
 formalization: wanted
-evidence: [computations/run_mechanism.py]
+evidence: [computations/run_mechanism.py, computations/constrained_runs.py]
 ---
 
 # Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1
@@ -127,7 +127,50 @@ runs).
   is the same kind of statement as the problem. Whether the maximizing drivers are center columns of some
   configuration is open past $a = 26$; for $3 \le a \le 26$ they are at 12 of the 24 values of $a$. The relaxation
   also drops a constraint that needs no right half: a black center cell fixes the next one, $c(t + 1) = \lnot
-  x_{-1}(t)$ when $c(t) = 1$ (so $c(1) = 1$). How much that constraint lowers $R_B$ and $R_W$ is not measured here.
+  x_{-1}(t)$ when $c(t) = 1$ (so $c(1) = 1$). [The left-only constraint](#the-left-only-constraint) measures how much
+  it lowers $R_B$ and $R_W$.
+
+## The left-only constraint
+
+Keeping the constraint $c(t + 1) = \lnot x_{-1}(t)$ when $c(t) = 1$ changes the count of left halves by a constant
+factor and leaves the black maximum almost unchanged. `constrained_runs table` lists every reachable pair (left half,
+$c(t)$) under drivers that obey it, by breadth-first search (checked against every driver word for $t \le 12$; the
+single cell's pair lies in the set at every $t \le 48$). For $75 \le t \le 150$ in steps of 5, $N(t)$ is smaller by a
+factor between 1.58 and 1.64 (55,582 against 89,070 at $t = 100$, 1,390,291 against 2,268,163 at $t = 150$), and
+$\log_2 N(t)$ still grows by 0.090 per step from $t = 125$ to 150. $R_B$ is unchanged at 14 of those 16 times and 2
+lower at $t = 130$ and 140 (18 against 20); below 75, on the same grid, it is lower only at $t = 5, 25, 45, 55$ (1
+against 5, 7 against 8, 7 against 11, 9 against 10). $R_W$ is lower at 6 of the 16 times, by 1 to 4
+($t = 75, 100, 105, 110, 120, 135$; 17 against 21 at $t = 75$, 20 against 24 at $t = 100$), and equal at the others, 25
+at $t = 125$ and 150 among them. On $75 \le t \le 150$ the ratios with the constraint are 0.129 to 0.178 (black) and
+0.167 to 0.263 (white), against 0.133 to 0.178 and 0.167 to 0.280 without it. So the constraint does not change the
+picture, and it cannot carry a proof by itself either: no finite automaton over the driver, the constrained language
+included, certifies a black slope unless the admissible black runs are bounded
+([finite-state slopes](../../negative-results/diagonals/finite-state-slopes.md)).
+
+## Long runs against fair bits, a heuristic
+
+The first regularity above reads the right ends of the reachable rows as fair bits. Under the constraint, long black
+runs are rarer than fair bits give, among words and among states, up to the far tail at $t = 175$. This is a heuristic:
+a count bounds no maximum, and the same statement for every state is the conjecture itself.
+
+- **Words.** Among admissible words of length $n$ (exact counts by dynamic programming, checked against every word for
+  $n \le 10$), the share whose longest black run is at least $0.2 n$ is 0.009 to 0.060 times the share among uniform
+  words with $c(0) = 1$, for even $n$ from 22 to 40. No admissible word of even length $8 \le n \le 40$ has a run of
+  $0.4 n$; the longest at $n = 40$ is 10. Counting words cannot give the slope: $\log_2$ of the number of admissible
+  words, over $n$, rises from 0.468 at $n = 12$ to 0.546 at $n = 40$ (3,774,663 words), so a first-moment bound over words would allow
+  a slope above 1/2.
+- **States.** Of the $N_1$ reachable states with $c(t) = 1$, the number whose black run from $t$ is at least $r$ is
+  below the fair-bit count $N_1 2^{-(r - 1)}$ for every $r \ge 4$ at $t = 50$, 100 and 150, by a factor of at most
+  0.87, 0.79 and 0.81. At $t = 100$ ($N_1 = 51{,}704$) it is 5,119 against 6,463 at $r = 4$, 259 against 404 at
+  $r = 8$ and 1 against 1.6 at $r = 16$; at $t = 150$ ($N_1 = 1{,}297{,}738$) it is 6,566 against 10,139 at $r = 8$
+  and 1 against 1.2 at $r = 21$. At $t = 175$ ($N_1 = 6{,}133{,}008$) the factor is 0.59 to 0.94 for $4 \le r \le 23$,
+  and the single states with runs of 24 and 25 sit 1.37 and 2.74 times above the fair-bit count of 0.73 and 0.37.
+
+So on this range the right ends behave like fair bits or fewer, up to a factor below 3 in the far tail, which is what
+makes $R_B(t)$ track $\log_2 N(t)$. A proof along this line needs two pieces: $N(t) \le 2^{\gamma t}$ for some
+$\gamma < 3/5$ (the growth is about 0.09 per step on the range, the only bound known is $2^{t - 1}$), and a count
+$\#\{\text{states with black run} \ge r\} \le K N(t) 2^{-r}$ for every $t$ and $r$, which is a statement about every
+state.
 
 ## Reproduce
 
@@ -136,4 +179,7 @@ python -m computations.run_mechanism driven --steps 175 --every 5   # the table,
 python -m computations.run_mechanism class --steps 26               # configurations against drivers, about 1 min
 python -m computations.run_mechanism mechanism --steps 1048576      # the single cell's runs, about 2 min
 python -m computations.run_mechanism forced                         # forced cells and far periods, about 1 s
+python -m computations.constrained_runs table --steps 150 --every 5 --compare    # with the constraint, about 5 min
+python -m computations.constrained_runs bernoulli --words 40 --states 50,100,150  # words and states, about 2 min
+python -m computations.constrained_runs bernoulli --words 4 --states 175          # states at t = 175, about 2 min
 ```

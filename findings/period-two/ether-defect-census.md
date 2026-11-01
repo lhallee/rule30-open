@@ -1,22 +1,22 @@
 ---
-title: Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make
+title: Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even along one real orbit
 category: period-two
 problems: [1]
 status: computed
 formalization: partial
-evidence: [computations/defect_potential.py, computations/held_shift.py]
+evidence: [computations/defect_potential.py, computations/held_shift.py, computations/defect_returns.py]
 ---
 
-# Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even on the moves real defects make
+# Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even along one real orbit
 
 Let $H(U) = (U \gg 1) \oplus (U \lor (U \ll 1))$ be the held map and $K$ the set of 2-adic $U$ with $H^t(U)$ odd at
 every odd $t$ ([the shift model](shift-model.md)). Conjecture (R) says that every rational point of $K$ has an
 eventually periodic itinerary. For a point whose tail is the ether, the cycle of four states on seven cells, item 5 of
 the shift model reduces (R) to a bounded top of the defect $D_t = H^t(U) \oplus B_t$, where $B_t$ is the ether laid
 on the cells $j \ge 0$ at one of its 28 alignments (four phases, seven offsets). This entry settles the defect for every
-head of up to 20 cells, with or without $K$, and tests three ideas for a bound in general: a potential on the cells at
-the top, the top cells as a finite certificate, and the statistics of the climb. None of the three gives a proof, and
-the census says where each stops.
+head of up to 20 cells, with or without $K$, and tests four ideas for a bound in general: a potential on the cells at
+the top, the top cells as a finite certificate, the statistics of the climb, and a finite automaton on the cells of a
+head. None of the four gives a proof, and the census says where each stops.
 
 ## Result
 
@@ -50,7 +50,7 @@ the census says where each stops.
    rotation of the phases ([ether fronts](../../negative-results/period-two/ether-front-windows.md)). A defect inside
    one keeps its top at or below $c$ whatever lies below $c - 12$: the property is closed under one step for both
    inputs, so it holds at every step by induction. In the census, 99.85% of the heads of 20 cells settle this way.
-3. **No potential on top windows, not even on the moves real defects make** (computed). Write $\lambda(w)$ for the
+3. **No potential on top windows, not even along one real orbit** (computed). Write $\lambda(w)$ for the
    largest mean gain per automaton step (a pass through the node for a lost top counts as a step) over the cycles of the window automaton of `held_shift.front_rate` (the top, the $w - 1$
    cells below it, free cells below, a lost top passing through one node per phase). A potential $\varphi$ on its
    states with $\text{gain} + \varphi(\text{after}) - \varphi(\text{before}) \le 0$ on every move exists exactly when
@@ -59,9 +59,19 @@ the census says where each stops.
    $w = 8$ that real defects make (300 random heads of 40 cells at random alignments, 1,500 steps each, moves with the
    top at least 16 cells above the wall), the largest mean gain is still $7/32$, on a cycle of 32 moves. So the positive
    cycles are not made of moves that never occur: every move of a cycle of the largest gain is made by some real
-   defect, and a potential on the window states fails even on the moves that occur. Whether one real defect follows a
-   whole cycle of positive gain is not tested here; a potential that uses memory of the past moves would have to
-   exclude exactly that.
+   defect, and a potential on the window states fails even on the moves that occur. One real defect also follows a whole
+   cycle of positive gain. Take as the window state at width $k$ the phase, the residue of top + offset modulo 7 and the
+   $k - 1$ cells below the top, which together fix the $k$ actual cells at the top. Head `0x8f7ff206dd` at phase 3,
+   offset 0 has its top at 52 at step 112 and at 66 at step 272 with the same window state at $k = 24$, keeps its top at
+   50 or more in between, and enters a closed strip only at step 354. So for every function $\varphi$ of the window
+   state, top $+ \varphi$ rises by 14 from step 112 to step 272 of this one orbit. Among 30,000 random heads of 40 cells
+   at random alignments, followed until entry and counting only steps with the top at least $2k$, the orbits with such a
+   return number 4,190, 2,029, 349, 33, 1 and 0 at $k = 13, 16, 20, 24, 28$ and 32, with gains of up to 63 cells, and at
+   $k = 13$ an orbit passes through one cycle of positive gain twice in a row. Every one of the 30,000 defects still has
+   a step at which its top rises within 56 steps after entry. So no potential top $+ \varphi$(window) on windows of up
+   to 28 cells is nonincreasing even along single real orbits, and a certificate has to read more of the defect than a
+   window of fixed width at the top. The counts fall with $k$ as random coincidences of window states during a climb
+   would; that every fixed width fails on enough heads is a heuristic from this, not a result.
 4. **The top cells do not force entry** (computed). The cells at or above $t$ at step $t$ read only the cells at or
    above 0 at step 0, so a word of $n$ cells at the top of a head, with anything at all below it and the wall anywhere,
    is followed exactly in a region that shrinks by one cell per step. If the defect enters a closed strip inside that
@@ -85,14 +95,23 @@ the census says where each stops.
    that stops at a rate per step that does not depend on the head gives a rise with an exponential tail, and its maximum over $28 \cdot 2^p$ heads then grows linearly in $p$, as
    observed. Under that model every head settles with probability one and almost every head settles early, which is the
    shape of the heuristic for the Collatz map; it says nothing about a single head.
+6. **No sign of a finite index for prefixes of up to 8 cells** (computed). Take as the outcome of a defect below $2^{16}$ its highest top over
+   600 steps (at most 78), and call two words of $m$ cells equivalent when every word of 8 cells on the other side
+   gives the same outcome. Over all 28 alignments the classes number exactly $2^m$ for $m = 1$ to 8, with the word
+   read at the bottom (the 8 cells above it free) or at the top (the 8 cells below it free), for the exact highest top,
+   the top divided by 4, and the binary outcome that the highest top reaches 10 or more cells above the highest of the
+   $m + 8$ cells: no two prefixes are equivalent. At one alignment (0 or 13) and the binary outcome, the bottom words give 2, 4, 7, 12, 21, 35, 60 and 100
+   classes, a ratio of 1.67 to 1.75 per cell from $m = 4$ on, against 1.96 per cell for the tree of top words of item
+   4. Counts that keep growing geometrically to 8 cells give no sign of a finite automaton that decides settling, but
+   do not prove that none exists.
 
 ## What it means
 
 For ether tails, (R) is checked for every head of up to 20 cells, and the mechanism is uniform: the top enters a
 closed strip of 13 cells, or stays within 24 cells of the wall. What a proof needs is that every defect enters, the
 mirror of the kit's `Absorption` for the ether ([ether fronts](../../negative-results/period-two/ether-front-windows.md)),
-and items 3 and 4 show that the two local routes to it, a potential and a finite set of top words, do not reach it. A potential on top windows fails even on the moves real defects
-make, and the top cells of a head decide entry for a share of words that does not beat the doubling of their number,
+and items 3 and 4 show that the two local routes to it, a potential and a finite set of top words, do not reach it. A potential on top windows fails even along a single real
+orbit, and the top cells of a head decide entry for a share of words that does not beat the doubling of their number,
 because a chaotic region below the top can keep the top climbing for hundreds of steps before the strip forms. The
 stopping is a property of the chaotic region below the top, as in the Collatz problem: random heads stop early and the
 largest rise grows only like the logarithm of the number of heads, but no argument here turns that into a bound for one
@@ -107,6 +126,9 @@ python -m computations.defect_potential closed --width 14
 python -m computations.defect_potential karp --window 8
 python -m computations.defect_potential realized --window 8 --length 40 --steps 1500 --count 300   # about 30 s
 python -m computations.defect_potential tree --bits 4 --length 18  # about a minute
+python -m computations.defect_returns example --window 24 --seed 7
+python -m computations.defect_returns returns --count 30000 --windows 13,16,20,24,28,32 --seed 11   # about 40 s
+python -m computations.defect_returns nerode --bits 16 --suffix 8 --steps 600   # about a minute
 python -m computations.defect_potential random --length 800 --count 100 --steps 3000
 ```
 
@@ -115,3 +137,6 @@ python -m computations.defect_potential random --length 800 --count 100 --steps 
 `background_halves.wall_set` and against direct runs with random cells below; the census, its repeats and its bounds
 against direct runs; the soundness of a settled top word under random cells below and the wall at three depths; and
 the window automaton against `held_shift.front_rate`, with Karp's value against the longest walks.
+`tests/test_defect_returns.py` checks the recorded return cell by cell against `defect_step` and the tops of
+`held_shift.defect_tops`, the count of returns and of passes in a row against a hand count, and the Nerode count
+against direct runs and a dictionary of outcome vectors.

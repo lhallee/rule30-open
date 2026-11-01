@@ -188,7 +188,9 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   cells of the wall, so (R) holds for those ether tails, in $K$ or not ([the ether
   census](findings/period-two/ether-defect-census.md)), in Lean for heads of up to 16 cells
   ([EtherCensus](Rule30Open/PeriodTwo/EtherCensus.md) for 12, [EtherCensus16](Rule30Open/PeriodTwo/EtherCensus16.md) for 16 with descent to smaller heads); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
-  of positive gain; no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
+  of positive gain, and real defects follow such cycles: one orbit returns to its own window of 24 cells 14 cells higher, so
+  no potential on top windows of up to 28 cells holds even along single orbits ([the ether
+  census](findings/period-two/ether-defect-census.md), item 3); no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
   a fixed lag removes none of its moves, since it does not restrict the cells above the lag (in Lean,
   [BoundedLag](Rule30Open/PeriodTwo/BoundedLag.md)), so
   bounding it is the mirror of the kit's `Absorption` for the ether
@@ -244,7 +246,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   ([Traps001](Rule30Open/Columns/Traps001.md)); entry into 360 single traps of the trap modules is false ([what
   failed](negative-results/columns/missed-traps.md), [ApartTraps](Rule30Open/Columns/ApartTraps.md)). No chain of a seed
   with a long run of 1s, of periods 16 to 40, reaches a word of period four, so no trap found misses the kit's family
-  ([lock chains](findings/columns/lock-chains.md)).
+  ([lock chains](findings/columns/lock-chains.md)). Finiteness on both sides adds no signal either: no row finite on both sides at the onset, with a right half of
+  at most 11 to 14 cells and a left half of fewer than 1,000 cells, keeps its center on any of the 92 blocks of period 2,
+  3, 5, 6, 7 or 9 ([finite onset census](findings/columns/finite-onset-census.md)), and from a late onset a small row
+  follows a periodic word no longer than a random one ([late onsets](negative-results/columns/late-onset.md)).
 
 ## Problem 2: does each color occur with density 1/2?
 
@@ -260,7 +265,10 @@ and moving the pin there, after the build, the audit and the tests pass, is pend
   over every possible center column the left half allows, from time $t \le 175$, a black run of at most 0.13t to 0.18t
   and a white run of at most 0.15t to 0.28t (exact maxima over all drivers); a proof of such slopes would cut the kit's
   slopes 3/5 and 1 and raise the count of black cells before $n$ to about $2.8 \log_2 n$
-  ([driven left runs](findings/diagonals/driven-left-runs.md)).
+  ([driven left runs](findings/diagonals/driven-left-runs.md)). The constraint that a black center fixes the next one cuts the
+  reachable left halves by a factor of about 1.6 and leaves those maxima almost unchanged, and no finite automaton over
+  the center column certifies a slope unless the admissible black runs are bounded ([finite-state
+  slopes](negative-results/diagonals/finite-state-slopes.md)).
   In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
   about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
