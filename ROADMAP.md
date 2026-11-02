@@ -12,7 +12,7 @@ summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
 kit's commit 932cf8d; the kit's main branch has since gained 52 modules (27060a7, November 1), which exclude 133 blocks of
 period at most 21 that this repository's Lean already excludes and no block that it does not; its new period-two theorems
-each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW, of which SmallRW is proved here)
+each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW; here BWH alone implies `Q01`)
 ([kit pull requests](literature/kit-pull-requests.md)), and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
@@ -236,8 +236,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   Lean for every half that enters it, whatever lies beyond column 32 ([SevenLock](Rule30Open/PeriodTwo/SevenLock.md)),
   so `Q01Gap` alone would exclude every configuration whose right half has at most 20 cells when its center starts to
   alternate.
-  The kit's main branch also excludes period two from its wedge hypotheses, BWH together with SmallRW. SmallRW is proved
-  here ([WedgeSmall](Rule30Open/PeriodTwo/WedgeSmall.md)), so that exclusion needs only BWH. Past a free prefix of $n$
+  The kit's main branch also excludes period two from its wedge hypotheses, BWH together with SmallRW. Here BWH alone
+  suffices, and so does its weakening to infinitely many depths with any horizon: these imply BinaryCTS, the kit's
+  constant-tail separator for binary rather than hard-core streams, and BinaryCTS is exactly the kit's `Q01`, which is
+  also equivalent to some horizon working at every depth, all in Lean ([WedgeLadder](Rule30Open/PeriodTwo/WedgeLadder.md),
+  [WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)). So BWH implies `Q01`, and `Q01` implies the kit's SEP; read
+  through the chart, BWH at depth $n$ is `Q01` for starts of width about $2n$ with a time horizon about twice the width,
+  as simulation confirms for $n \le 12$. SmallRW is proved here ([WedgeSmall](Rule30Open/PeriodTwo/WedgeSmall.md)). Past a free prefix of $n$
   symbols each binary symbol is forced, so BWH and RW are statements about $2^n$ forced runs; no witness of BWH exists
   for $7 \le n \le 31$ and none of RW for $n \le 26$, by search ([forced runs](findings/period-two/wedge-forced-runs.md)).
   A run dies exactly when the constant is off an edge of a square that the step's symmetries preserve, and the four
@@ -308,7 +313,17 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([driven left runs](findings/diagonals/driven-left-runs.md)). The constraint that a black center fixes the next one cuts the
   reachable left halves by a factor of about 1.6 and leaves those maxima almost unchanged, and no finite automaton over
   the center column certifies a slope unless the admissible black runs are bounded ([finite-state
-  slopes](negative-results/diagonals/finite-state-slopes.md)). Every configuration white left of a black cell settles to
+  slopes](negative-results/diagonals/finite-state-slopes.md)). Over the same constrained drivers, the most black cells
+  among $c(0..T)$ is 141 at $T = 190$ exactly and at least 2,254 at $T = 3{,}000$ (a beam that is exact to 190), a rate
+  near 3/4, and chaining dense periodic words does not raise it, since a long stretch is mostly followed by a gap of
+  comparable length; so the conjecture that the black count is at most $\rho T + C$ with $\rho < 1$ would give the single
+  cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). A potential over
+  27 row features certifies only 12/13 ([driver-density potentials](negative-results/diagonals/driver-density-potential.md)).
+  With right cells $1 .. k$ exact and cell $k + 1$ free, the most white cells among $c(0..150)$ is 117 at $k = 1$, where
+  the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
+  both colors' rates fall with $k$, to 0.66 and 0.68 at $k = 16$ ([the right ladder](findings/diagonals/right-ladder.md)).
+  A proof that the white rate stays below 1 at one exact right column would give the single cell a positive lower
+  density of black cells. Every configuration white left of a black cell settles to
   the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
   ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
   followed by a doubling period, which the computation confirms below depth 53,207. Behind a white diagonal with no
@@ -413,7 +428,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)), the column's series
   satisfies no Mahler equation over GF(2)(x) of small size, the column as a 2-adic or real number is a root of no integer
   polynomial of degree at most 8 with small coefficients, and the GF(2) cut ranks of the cone show nothing that rules of
-  the same form lack ([hidden algebra](negative-results/structure/hidden-algebra.md)). *Assessment:* a
+  the same form lack ([hidden algebra](negative-results/structure/hidden-algebra.md)). In a model that reads the digits of
+  both the diagonal $j$ and the time $t$, periodicity of the column does not help: a 2-automatic array of two indices
+  with eventually periodic rows has row periods $O(j)$, so Rule 30's array of right diagonals is not 2-automatic if the
+  right-edge cycle length $L_n$ grows faster than linearly, while Rule 90's is 2-automatic, in Lean
+  ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 25 of the levels $n \le 61$ and reaches $2^{25}$
+  ([right-edge cycles](findings/complexity/right-edge-cycles.md)); the transducers of the powers of the right-edge step
+  grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)). *Assessment:* a
   lower bound in a restricted model is within reach only for finite ranges; an asymptotic one, even "the column is not
   automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides. Crossing
   sequences, the kit's method for one tape, give at most time of order $(\log n)^2$ for any function, and for $c$ only
@@ -552,7 +573,11 @@ In order of the assessment above.
      play enters them from 61% of the states of 22 cells ([the three-set game](findings/period-two/three-set-game.md)),
      but no forced basin at a fixed width covers the deep members of the family, whose windows stay the aligned ether
      ([the residue](negative-results/period-two/game-residue.md)); an argument that uses the finiteness of the half, or
-     wider locks, is next.
+     wider locks, is next. The left statement gets no help from a uniform run bound: in its stream form over the gap
+     shift the inverse diagonal has constant runs as a fair coin predicts, 15 at $s = 149$, so no run bound below 15
+     holds, with counts within 0.3% of the coin's for run lengths up to 7 to $s = 180$
+     ([gap inverse runs](negative-results/period-two/gap-inverse-runs.md)). What is left is the statement that every
+     forced run dies, as for the kit's `BWH`.
    - *Period two.* (R) on ether tails is what the computations leave; it needs every defect on the ether to have a
      bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5, 8, 10 and 12 cells at the top
      cannot certify that, with or without $K$ ([ether fronts](negative-results/period-two/ether-front-windows.md),

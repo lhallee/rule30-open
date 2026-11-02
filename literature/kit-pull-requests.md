@@ -124,11 +124,13 @@ entries here whose results the main branch now proves in part.
   proved in the kit; `SmallRW` is proved here ([WedgeSmall](../Rule30Open/PeriodTwo/WedgeSmall.md)), so the route of
   `BWH` needs only `BWH`, which holds for $7 \le n \le 31$ by search ([forced
   runs](../findings/period-two/wedge-forced-runs.md)). These read the row's right half as well (`actual_endpoint_hardcore`), and the module states no implication
-  in either direction between them and `Q01` or mortality. *Here, for #75 and #76:* they add open statements, each
+  in either direction between them and `Q01` or mortality. Here `BWH` implies `Q01` and `Q01` implies `SEP`, through a
+  binary separator that is equivalent to `Q01` ([WedgeLadderQ01](../Rule30Open/PeriodTwo/WedgeLadderQ01.md)). *Here, for #75 and #76:* they add open statements, each
   proved to exclude a center of period two, beside the kit's `Q01`, the gap statement `Q01Gap` of #64 and the integer
   form of #66. The frontier of #75 is read from the left half that the center rebuilds, the open object of [the white
   right half](../findings/period-two/white-right-half.md) and [the held column](../Rule30Open/PeriodTwo/HeldColumn.md);
-  the hypotheses of #76 are, by the kit's account, of no known order of strength against it. The Problem 2 forms hold
+  of the hypotheses of #76, `BWH` is at least as strong as `Q01` and `SEP` at most as strong, by the
+  implications above. The Problem 2 forms hold
   for every sequence, as the kit's catalogued restatements do, and bound nothing about the center column.
 - **#53, `Rule30ResetFreeThree` and four more modules.** *Merged.* Claims that every nonzero finite row of the kit's
   zero-boundary evolution, beside a column held white, contains a word $0\,1^{3m+1}\,0$ in one of its first three rows,
