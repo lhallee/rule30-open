@@ -25,20 +25,20 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
-| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean) |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 360 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game, from where sampled halves settle or from another trap of the block, and so does the kit's own reduction of $001$ to its trap `t001` |
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
 | 2 | Conservation laws | closed | none over four steps |
-| 2 | Bounds on runs | open | runs at most linear in their start time |
+| 2 | Bounds on runs | open | runs at most linear in their start time; slope 3/13 for black runs if the onset edge gains 2/3 per step (Lean) |
 | 2 | Statistics | no signal | the column passes every test tried |
 | 3 | An upper bound | proved in Lean | a one-tape machine of the kit's model computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps, so Problem 3 is the question whether the exponent 2 can fall to 1 |
 | 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
 | 3 | A space lower bound | open, as hard | space $O(\sqrt{n \log n})$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
 | 3 | A shortcut | no signal | automata, recurrences and learned predictors find none |
-| 3 | Restricted models | open | no automaton below 131,070 states on the range searched |
+| 3 | Restricted models | open | no automaton below 131,070 states on the range searched; in models fed an arbitrary row, linear bounds that separate Rule 30 from the linear rules (Lean); not 2-automatic in two indices if the right-edge cycles grow superlinearly (Lean) |
 
 ## Problem 1: is the center column eventually periodic?
 
