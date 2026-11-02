@@ -121,7 +121,9 @@ entries here whose results the main branch now proves in part.
   `SmallRW`, the six cases of `RW` below length 7; `separator_equivalence`), and each of `SEP`, `RW`, and `BWH` with
   `SmallRW` excludes a nonconstant center of period two from time 0 on every nonzero finite row
   (`sep_implies_period_two`, `rw_implies_period_two`, `bwh_small_implies_period_two`). None of the hypotheses is
-  proved. These read the row's right half as well (`actual_endpoint_hardcore`), and the module states no implication
+  proved in the kit; `SmallRW` is proved here ([WedgeSmall](../Rule30Open/PeriodTwo/WedgeSmall.md)), so the route of
+  `BWH` needs only `BWH`, which holds for $7 \le n \le 31$ by search ([forced
+  runs](../findings/period-two/wedge-forced-runs.md)). These read the row's right half as well (`actual_endpoint_hardcore`), and the module states no implication
   in either direction between them and `Q01` or mortality. *Here, for #75 and #76:* they add open statements, each
   proved to exclude a center of period two, beside the kit's `Q01`, the gap statement `Q01Gap` of #64 and the integer
   form of #66. The frontier of #75 is read from the left half that the center rebuilds, the open object of [the white

@@ -3,7 +3,7 @@ title: Windows of 14 cells followed through the column's whole history exclude e
 category: columns
 problems: [1]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/limit_windows.py]
 ---
 
@@ -55,6 +55,10 @@ $q \ge 57$ depends only on $q \bmod 4$, and the $q \le 60$ decide every $q$.
 | 6 | 16 | 16 | 22 | |
 | 7 | 32 | 30 | 26 | 1010001, 1100001 |
 | 8 | 64 | 60 | 30 | 10000111, 10011101, 10110001, 11100001 |
+
+The families of at most six cells that start and end with 1 are proved in Lean with these thresholds
+([TailFamilies14](../../Rule30Open/Columns/TailFamilies14.md)); at 20 cells every tail of up to eight cells but
+$1100001$ has a threshold, $10101$ at 26 ([tail families](tail-families.md)).
 
 So no column repeats $0^q t$ for any $q \ge 22$ and any tail $t$ of at most six cells but $10101$, nor for $q \ge 30$ and
 a tail of at most eight cells but those seven. The thresholds of the tails of up to five cells are 10 for $1$, 8 for $11$,

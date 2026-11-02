@@ -12,7 +12,7 @@ summarizes the formal frontier of Problem 1, and agents add to the kit every day
 ([the literature](literature/rule-30.md#work-on-the-prize-problems-since-2019)). This repository is pinned at the
 kit's commit 932cf8d; the kit's main branch has since gained 52 modules (27060a7, November 1), which exclude 133 blocks of
 period at most 21 that this repository's Lean already excludes and no block that it does not; its new period-two theorems
-each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW)
+each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW, of which SmallRW is proved here)
 ([kit pull requests](literature/kit-pull-requests.md)), and moving the pin there, after the build, the audit and the tests pass, is pending.
 
 ## At a glance
@@ -82,8 +82,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
     requests](literature/kit-pull-requests.md#excluding-eventual-periods-by-families-of-blocks)). Windows of 14 cells
     followed through the column's whole history, the limit of the windows that any history leaves, exclude 1,672 blocks
     of period at most 22 and infinite families with white runs: every tail of at most six cells but $10101$ after a white
-    run of at least 22, against 74 in the kit, by computation, Lean pending ([limit
-    windows](findings/columns/limit-windows.md)); up to period 21 they add no block to the game's list, and no white run
+    run of at least 22, against 74 in the kit's general family ([limit windows](findings/columns/limit-windows.md)); for
+    the 31 tails of at most six cells that start and end with 1, each from its own threshold of 8 to 22, this is in Lean
+    ([TailFamilies14](Rule30Open/Columns/TailFamilies14.md); the kit already has sharper thresholds for the tails 1, 11
+    and 10111, and its main branch for 111 and 1111). With windows of 20 cells, $10101$ is excluded from 26 and every
+    tail of up to eight cells but $1100001$ from 30, and $1100001$ from 37 at 22 cells, by computation ([tail
+    families](findings/columns/tail-families.md)); up to period 21 they add no block to the game's list, and no white run
     is a wall, so the kit's threshold of 17 for mixed black runs drops only to 16 ([window
     thresholds](negative-results/columns/window-thresholds.md)).
   - *Where it stops.* The share of blocks the game excludes falls from 2.7% at period 12 to 0.56% at period 20, and
@@ -228,6 +232,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   Lean for every half that enters it, whatever lies beyond column 32 ([SevenLock](Rule30Open/PeriodTwo/SevenLock.md)),
   so `Q01Gap` alone would exclude every configuration whose right half has at most 20 cells when its center starts to
   alternate.
+  The kit's main branch also excludes period two from its wedge hypotheses, BWH together with SmallRW. SmallRW is proved
+  here ([WedgeSmall](Rule30Open/PeriodTwo/WedgeSmall.md)), so that exclusion needs only BWH. Past a free prefix of $n$
+  symbols each binary symbol is forced, so BWH and RW are statements about $2^n$ forced runs; no witness of BWH exists
+  for $7 \le n \le 31$ and none of RW for $n \le 26$, by search ([forced runs](findings/period-two/wedge-forced-runs.md)).
+  A run dies exactly when the constant is off an edge of a square that the step's symmetries preserve, and the four
+  edges occur about equally often, so BWH is a fair-coin statement like `Q01Gap`
+  ([survivor mechanism](negative-results/period-two/wedge-survivor-mechanism.md)).
   Beside the alternating center, every slip of column 1 out of its lock is one front crossing a locked layer of about 7
   columns along a single depth trace, decided about 20 steps ahead from the chaotic region, which feeds it at about
   0.26 columns per step ([slip geometry](findings/period-two/slip-geometry.md)).
@@ -332,7 +343,17 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   diagonals before it without shortening it ([RunTransfer](Rule30Open/Diagonals/RunTransfer.md)), so it bounds the runs
   only by the period ([white-run potential](negative-results/diagonals/white-run-potential.md)). To depth 200,000 the
   settled words look like fair words of their period and the largest white run stays below $\log_2 j + 6$ ([settled
-  words](findings/diagonals/settled-words.md)), so a logarithmic bound on it is a conjecture; and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
+  words](findings/diagonals/settled-words.md)), so a logarithmic bound on it is a conjecture. The periods grow only at
+  doublings, and the gap from a doubling to period $2p$ to the next white diagonal is at least $m(p)$, with
+  $m(1), \dots, m(4) = 5, 21, 56, 88$ in Lean and $m(p)$ computed to $p = 16$ (414,989 there); diagonal $j + 4$ is
+  eventually white exactly when diagonal $j$ is eventually the AND of the next two
+  ([DoublingGaps](Rule30Open/Diagonals/DoublingGaps.md)). A shift of finite type that contains the start words gives
+  $m(p) > 49$ for every $p$ but 1, 2 and 5; a bound that grows with $p$, which would give periods $O(\log j)$, is open
+  ([doubling gaps](findings/diagonals/doubling-gaps.md)). Over every pair word of period $P \le 16$ the least front walk
+  has largest cycle mean at most $5/2$ and an excess over slope $5/2$ between $4P$ and $5.6P$ for $P$ from 10 to 16
+  ([walk eigenvalue](findings/diagonals/walk-eigenvalue.md)); no potential that reads the white run ahead and a window
+  of at most three cells holding the phase or ending just before it proves this at the periods 5 to 10 ([local walk
+  potentials](negative-results/diagonals/local-walk-potential.md)). And [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
   rule that makes the search exact, but induction through later rows, subadditivity over seeds and a fixed delay behind
   the single cell all stop, the first at slope 2 ([seed-uniform induction](negative-results/diagonals/seed-uniform-induction.md)).
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
@@ -523,4 +544,9 @@ In order of the assessment above.
    - *Problem 3.* The cone of the center is screened by alternating left halves
      ([ConeScreening](Rule30Open/Complexity/ConeScreening.md)), so its $2^t$ left halves are not pairwise distinguishable
      for $t \ge 9$; the counts for other variable orders are in [cone screening](findings/complexity/cone-screening.md)
-     to $t = 10$, and a proof of a lower bound for some order is open.
+     to $t = 10$. Two cells further left, the settings of $x_{-t}, \dots, x_{-3}$ are pairwise distinguishable for
+     $3 \le t \le 17$, in Lean, so every left-to-right ordered decision diagram of $c_t$ has $2^{t-2}$ nodes at that
+     level, where every linear rule has 2 ([LeftCut](Rule30Open/Complexity/LeftCut.md)); for $18 \le t \le 22$
+     alternating stripes ending at $-3$ and $-4$ fix the center and the exact statement fails (Lean at 18, computed to
+     22; [the left cut](negative-results/complexity/left-cut.md)). A lower bound for every $t$ that allows for stripe
+     prefixes, such as $N_{\mathrm{L}}(t, t-2) \ge 2^{t-3}$, which every count to $t = 20$ satisfies, is open.

@@ -96,7 +96,7 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q --durations=40 -p no:cacheprovider` collects 533 tests: 532 pass and 1 is skipped
+`python -m pytest -q --durations=40 -p no:cacheprovider` collects 565 tests: 564 pass and 1 is skipped
 (`test_late_onset.py` needs `pysat`, which this environment lacks). Serially on one core of a machine with four, with no
 other job running, the suite takes 44 to 49 s of wall time; the per-test durations (setup and call) sum to 42 to 46 s,
 and collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for `test_persistence.py`
