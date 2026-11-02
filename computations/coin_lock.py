@@ -23,6 +23,7 @@ Whether a run enters it depends only on what column W + 1 does. This module comp
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 import time
 import numpy as np
@@ -30,38 +31,71 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from computations import absorption
-from computations.lock_certificate import entry_time, greatest_invariant_set, jen_seeds, successor_table
+from computations.lock_certificate import entry_time, jen_sets, successor_table
 from computations.right_half import random_starts
+from computations.rule30 import distinct
 
 
 UNREACHED = np.iinfo(np.int64).max // 4
 
 
+@functools.lru_cache(maxsize=16)
 def certificate(word: str, width: int) -> np.ndarray:
     """The certificate of the `jen` seed at this width: the union over the white-phase values of column 1 of the
-    greatest invariant families, as membership masks."""
-    members = [greatest_invariant_set(word, seed, width)[0] for seed in jen_seeds(word)]  # each (period, 2^W)
-    return np.logical_or.reduce(members)  # (period, 2^W)
+    greatest invariant families, as membership masks; kept for the words and widths asked again, so read-only."""
+    member = np.logical_or.reduce(jen_sets(word, width))  # (period, 2^W), the union over the seeds of `jen_seeds`
+    member.flags.writeable = False
+    return member  # (period, 2^W)
 
 
 def entry_paths(word: str, member: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """dist[ph, s], the fewest steps after which some values of column W + 1 bring window s at phase ph into the
-    certificate (UNREACHED if none do), and first[ph, s], the value of column W + 1 at the first of those steps."""
+    certificate (UNREACHED if none do), and first[ph, s], the value of column W + 1 at the first of those steps.
+
+    The relaxation sweeps the phases in order until nothing changes, each window taking the better of its two
+    successors at the next phase. After its first sweep a phase looks only at the windows with a successor that changed
+    since then (`back`, the moves reversed): the others would find what they found before. The updates, and so the
+    choice of `first` between two successors at the same distance, are those of relaxing every window each sweep."""
     # member: (period, 2^W)
     period, size = member.shape
     successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
     dist = np.where(member, 0, UNREACHED).astype(np.int64)  # (period, 2^W)
     first = np.zeros((period, size), dtype=np.int8)  # (period, 2^W)
+    back = []  # by phase: for each window of the next phase, the windows with a move to it, as pointers and sources
+    for ph in range(period):
+        targets = successors[ph].reshape(-1)  # (2 2^W,)
+        pointers = np.zeros(size + 1, dtype=np.int64)  # (2^W + 1,)
+        np.cumsum(np.bincount(targets, minlength=size), out=pointers[1:])
+        back.append((pointers, np.argsort(targets, kind="stable") % size))  # (2^W + 1,), (2 2^W,)
+    pending = [np.zeros(0, dtype=np.int64) for _ in range(period)]  # by phase, windows changed since the phase before
+    swept = [False] * period  # whether the phase has had its first, full sweep
     changed = True
     while changed:
         changed = False
         for ph in range(period):
-            after = dist[(ph + 1) % period][successors[ph]] + 1  # (2, 2^W)
-            best = np.minimum(after[0], after[1])  # (2^W,)
-            better = (best < dist[ph]) & ~member[ph]  # (2^W,)
+            nxt = (ph + 1) % period
+            if not swept[ph]:
+                windows = np.arange(size)  # (2^W,)
+                swept[ph] = True
+            else:
+                moved = distinct(pending[nxt])  # (c,)
+                pointers, sources = back[ph]
+                counts = pointers[moved + 1] - pointers[moved]  # (c,)
+                ends = np.cumsum(counts)  # (c,)
+                offsets = np.arange(int(ends[-1]) if ends.size else 0) + np.repeat(pointers[moved] - (ends - counts),
+                                                                                    counts)  # (e,)
+                windows = distinct(sources[offsets])  # (m,)
+            pending[nxt] = pending[nxt][:0]
+            if windows.size == 0:
+                continue
+            after = dist[nxt][successors[ph][:, windows]] + 1  # (2, m)
+            best = np.minimum(after[0], after[1])  # (m,)
+            better = (best < dist[ph][windows]) & ~member[ph][windows]  # (m,)
             if better.any():
-                dist[ph][better] = best[better]
-                first[ph][better] = (after[1] < after[0])[better]
+                chosen = windows[better]  # (b,)
+                dist[ph][chosen] = best[better]
+                first[ph][chosen] = (after[1] < after[0])[better]
+                pending[ph] = np.concatenate([pending[ph], chosen])
                 changed = True
     return dist, first  # (period, 2^W) each
 
@@ -86,7 +120,7 @@ def universal_word(word: str, member: np.ndarray) -> list[int]:
         while not member[ph][window]:
             value = int(first[ph][window])
             values.append(value)
-            windows = np.unique(successors[ph, value][windows])  # (n,)
+            windows = distinct(successors[ph, value][windows])  # (n,)
             window = int(successors[ph, value][window])
             ph = (ph + 1) % period
 
@@ -104,7 +138,8 @@ def run_word(word: str, member: np.ndarray, values: list[int], phase: int = 0) -
 
 def coin_step(word: str, member: np.ndarray, values: np.ndarray, successors: np.ndarray) -> np.ndarray:
     """One step back of a quantity on windows with a fair coin beyond: the average over the coin of its value one step
-    later, set to 0 on the certificate."""
+    later, set to 0 on the certificate. The iterations below run it on the windows outside the certificate alone
+    (`coin_moves`); this form, phase by phase, is the reference they are tested against."""
     # member: (period, 2^W); values: (period, 2^W); successors: (period, 2, 2^W)
     period = member.shape[0]
     out = np.empty_like(values)  # (period, 2^W)
@@ -115,29 +150,55 @@ def coin_step(word: str, member: np.ndarray, values: np.ndarray, successors: np.
     return out  # (period, 2^W)
 
 
+def coin_moves(word: str, member: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """The windows outside the certificate, as positions ph * 2^W + s in increasing order, and the moves of `coin_step`
+    on them: for each, the position in that list of its successor when column W + 1 is 0 and when it is 1, or the
+    list's length for a successor in the certificate. A quantity padded with one 0 after the list then steps as
+    0.5 * (padded[first] + padded[second])."""
+    # member: (period, 2^W)
+    period, size = member.shape
+    successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
+    outside = np.flatnonzero(~member.reshape(-1))  # (n,)
+    position = np.full(period * size, outside.size, dtype=np.int64)  # (period 2^W,)
+    position[outside] = np.arange(outside.size)
+    later = ((np.arange(period) + 1) % period)[:, None] * size  # (period, 1), the next phase's first position
+    first = position[(successors[:, 0] + later).reshape(-1)[outside]]  # (n,), read at position ph * 2^W + s
+    second = position[(successors[:, 1] + later).reshape(-1)[outside]]  # (n,)
+    return first, second, outside  # (n,) each
+
+
+def spread(member: np.ndarray, outside: np.ndarray, values: np.ndarray) -> np.ndarray:
+    """A quantity on the windows outside the certificate (`coin_moves`) as an array on every window, 0 inside."""
+    # member: (period, 2^W); outside: (n,); values: (n,)
+    out = np.zeros(member.size)  # (period 2^W,)
+    out[outside] = values
+    return out.reshape(member.shape)  # (period, 2^W)
+
+
 def stay_out(word: str, member: np.ndarray, steps: int) -> np.ndarray:
     """out[ph, s], the probability that window s at phase ph stays out of the certificate for `steps` steps when column
     W + 1 is a fair coin."""
     # member: (period, 2^W)
-    successors = successor_table(word, member.shape[1].bit_length() - 1)  # (period, 2, 2^W)
-    out = np.where(member, 0.0, 1.0)  # (period, 2^W)
+    first, second, outside = coin_moves(word, member)  # (n,) each
+    padded = np.zeros(outside.size + 1)  # (n + 1,), the probability outside, then 0 for the certificate
+    padded[:-1] = 1.0
     for _ in tqdm(range(steps), desc=f"stay out, {word}", file=sys.stderr, leave=False):
-        out = coin_step(word, member, out, successors)
-    return out  # (period, 2^W)
+        padded[:-1] = 0.5 * (padded[first] + padded[second])
+    return spread(member, outside, padded[:-1])  # (period, 2^W)
 
 
 def expected_entry(word: str, member: np.ndarray, tolerance: float = 1e-7) -> np.ndarray:
     """out[ph, s], the expected entry time of window s at phase ph when column W + 1 is a fair coin, by value
     iteration from 0; the iterates increase to the solution, and stop when no value moves by `tolerance`."""
     # member: (period, 2^W)
-    successors = successor_table(word, member.shape[1].bit_length() - 1)  # (period, 2, 2^W)
-    out = np.zeros(member.shape)  # (period, 2^W)
+    first, second, outside = coin_moves(word, member)  # (n,) each
+    padded = np.zeros(outside.size + 1)  # (n + 1,), the time outside, then 0 for the certificate
     with tqdm(desc=f"expected entry, {word}", file=sys.stderr, leave=False) as bar:
         while True:
-            new = coin_step(word, member, out, successors) + np.where(member, 0.0, 1.0)  # (period, 2^W)
-            if np.abs(new - out).max() < tolerance:
-                return new  # (period, 2^W)
-            out = new
+            new = 0.5 * (padded[first] + padded[second]) + 1.0  # (n,)
+            if outside.size == 0 or np.abs(new - padded[:-1]).max() < tolerance:
+                return spread(member, outside, new)  # (period, 2^W)
+            padded[:-1] = new
             bar.update()
 
 
@@ -148,21 +209,55 @@ def decay_rate(word: str, member: np.ndarray, settle: int = 100, tolerance: floa
     `settle` periods. When the leading factors share a modulus the factor per period oscillates; after `limit` periods,
     if given, the geometric mean of the last `settle` factors is the rate."""
     # member: (period, 2^W)
-    period = member.shape[0]
-    successors = successor_table(word, member.shape[1].bit_length() - 1)  # (period, 2, 2^W)
-    values = np.where(member, 0.0, 1.0)  # (period, 2^W)
+    period, size = member.shape
+    first, second, outside = coin_moves(word, member)  # (n,) each
+    zero = int(np.searchsorted(outside, size))  # the windows at phase 0 come first
+    padded = np.zeros(outside.size + 1)  # (n + 1,)
+    padded[:-1] = 1.0
     factors: list[float] = []
     with tqdm(desc=f"decay, {word}", file=sys.stderr, leave=False) as bar:
         while len(factors) <= settle or abs(factors[-1] - factors[-1 - settle]) >= tolerance:
             if limit is not None and len(factors) >= limit:
                 return float(np.exp(np.mean(np.log(factors[-settle:]))) ** (1 / period))
-            before = values[0].sum()
+            before = padded[:zero].sum()
             for _ in range(period):
-                values = coin_step(word, member, values, successors)
-            factors.append(float(values[0].sum() / before))
-            values /= values[0].sum()
+                padded[:-1] = 0.5 * (padded[first] + padded[second])
+            factors.append(float(padded[:zero].sum() / before))
+            padded /= padded[:zero].sum()
             bar.update()
     return factors[-1] ** (1 / period)
+
+
+def power_bound(word: str, first: np.ndarray, second: np.ndarray, chance: np.ndarray | None, tolerance: float,
+                settle: int, limit: int) -> float:
+    """The bound of `period_rate` and `biased_rate` for the step that moves a quantity on n windows to
+    (1 - chance) * padded[first] + chance * padded[second], padded with a 0 for the certificate, and to their mean
+    when `chance` is None, the fair coin."""
+    # first, second: (n,); chance: (n,) or None
+    n = first.size
+    if n == 0:
+        return 0.0
+    padded = np.zeros(n + 1)  # (n + 1,)
+    values = padded[:-1]  # (n,), a view, positive on every window
+    values[:] = 1.0
+
+    def step() -> np.ndarray:
+        if chance is None:
+            return 0.5 * (padded[first] + padded[second])  # (n,)
+        return (1 - chance) * padded[first] + chance * padded[second]  # (n,)
+
+    estimates: list[float] = []
+    with tqdm(desc=f"rate, {word}", file=sys.stderr, leave=False, mininterval=10) as bar:
+        while len(estimates) < limit and (len(estimates) <= settle
+                                          or abs(estimates[-1] - estimates[-1 - settle]) >= tolerance):
+            shifted = step() + values  # (n,)
+            estimates.append(float(shifted.sum() / values.sum()) - 1)
+            values[:] = shifted / shifted.max()
+            bar.update()
+    image = step()  # (n,)
+    if (values <= 0).any():
+        return 1.0
+    return float((image / values).max())
 
 
 def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle: int = 200,
@@ -178,24 +273,8 @@ def period_rate(word: str, member: np.ndarray, tolerance: float = 1e-12, settle:
     does when some windows never enter and others enter fast, the ratios do not bound the radius, and the step's own
     bound of 1 is returned: it averages over the coin, so its radius is at most 1."""
     # member: (period, 2^W)
-    period, size = member.shape
-    successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
-    values = np.where(member, 0.0, 1.0)  # (period, 2^W), positive outside the certificate
-    estimates: list[float] = []
-    with tqdm(desc=f"rate, {word}", file=sys.stderr, leave=False, mininterval=10) as bar:
-        while len(estimates) < limit and (len(estimates) <= settle
-                                          or abs(estimates[-1] - estimates[-1 - settle]) >= tolerance):
-            shifted = coin_step(word, member, values, successors) + values  # (period, 2^W)
-            estimates.append(float(shifted.sum() / values.sum()) - 1)
-            values = shifted / shifted.max()
-            bar.update()
-    image = coin_step(word, member, values, successors)  # (period, 2^W)
-    outside = ~member  # (period, 2^W)
-    if not outside.any():
-        return 0.0
-    if (values[outside] <= 0).any():
-        return 1.0
-    bound = float((image[outside] / values[outside]).max())
+    first, second, _ = coin_moves(word, member)  # (n,) each
+    bound = power_bound(word, first, second, None, tolerance, settle, limit)
     return bound if bound >= 0.5 else 0.0
 
 
@@ -205,30 +284,8 @@ def biased_rate(word: str, member: np.ndarray, prob: np.ndarray, tolerance: floa
     instead of 1/2: the spectral radius of one step of the biased coin on the windows outside the certificate, bounded
     from above as `period_rate` bounds it."""
     # member: (period, 2^W); prob: (period, 2^W)
-    period, size = member.shape
-    successors = successor_table(word, size.bit_length() - 1)  # (period, 2, 2^W)
-
-    def step(values: np.ndarray) -> np.ndarray:
-        out = np.empty_like(values)  # (period, 2^W)
-        for ph in range(period):
-            later = values[(ph + 1) % period]  # (2^W,)
-            out[ph] = (1 - prob[ph]) * later[successors[ph, 0]] + prob[ph] * later[successors[ph, 1]]
-        out[member] = 0.0
-        return out  # (period, 2^W)
-
-    values = np.where(member, 0.0, 1.0)  # (period, 2^W)
-    estimates: list[float] = []
-    while len(estimates) < limit and (len(estimates) <= settle
-                                      or abs(estimates[-1] - estimates[-1 - settle]) >= tolerance):
-        shifted = step(values) + values  # (period, 2^W)
-        estimates.append(float(shifted.sum() / values.sum()) - 1)
-        values = shifted / shifted.max()
-    image, outside = step(values), ~member  # (period, 2^W), (period, 2^W)
-    if not outside.any():
-        return 0.0
-    if (values[outside] <= 0).any():
-        return 1.0
-    return float((image[outside] / values[outside]).max())
+    first, second, outside = coin_moves(word, member)  # (n,) each
+    return power_bound(word, first, second, prob.reshape(-1)[outside], tolerance, settle, limit)
 
 
 def sample(word: str, member: np.ndarray, count: int, steps: int) -> tuple[np.ndarray, np.ndarray]:

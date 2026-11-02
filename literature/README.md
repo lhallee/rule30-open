@@ -1,9 +1,11 @@
 # Literature
 
 The published work around the three Rule 30 Prize problems, by theme. Every source here was checked against a
-bibliographic record: a publisher or DOI page, an arXiv abstract, Crossref, Semantic Scholar, or the source itself.
-Each summary says only what that record or the source supports, an unrefereed claim is reported as a claim, and each
-entry says where the source bears on this repository. The search covers sources available in October 2026.
+bibliographic record: a publisher or DOI page, an arXiv abstract, Crossref, Semantic Scholar, or the source itself. Each
+summary says only what that record or the source supports, an unrefereed claim is reported as a claim, and each entry
+says where the source bears on this repository. The search covers sources available on November 1, 2026; on that date
+arXiv, ECCC, Zenodo and the prize site were outside this session's network, so their newest records were seen only
+through search results, and each such entry says so.
 
 | File | Problems | What it covers |
 |---|---|---|
@@ -45,8 +47,11 @@ that the center column of a random row is normal and of density 1/2 almost surel
 left half are proved independent and fair for every fixed rest of the row, and the step from almost every row to the
 single cell is recorded as a barrier ([the random-row barrier](../negative-results/random-rows/almost-every-row.md)).
 Theorems that drive measures to the uniform one exist only for linear rules, whose single-cell center columns are
-periodic. The evidence for density 1/2 is statistical: the first million cells counted in *A New Kind of Science*, a
-billion published, and test batteries that find no deviation.
+periodic. The kit's main branch proves density 1/2 for infinitely many left diagonals of the single cell, those that are
+eventually anti-periodic (`Rule30LeftAntiPeriod`, [kit pull requests](kit-pull-requests.md#left-diagonals)); a left
+diagonal is eventually periodic, so this is a count over one period and does not reach the center column. The evidence
+for density 1/2 is statistical: the first million cells counted in *A New Kind of Science*, a billion published, and
+test batteries that find no deviation.
 
 **Problem 3.** Only upper bounds are known: about $n^2$ cell updates by direct simulation, $O(n^2/\log n)$ for whole
 rows, $O(n)$ operations on a random-access machine with bitwise operations, and space $O(\sqrt{n} \log n)$ by tree
@@ -110,6 +115,12 @@ The search found these but could not confirm the record or read the text. Check 
   October 2026 unique-games claim to prove a variant of Khot's 2-to-1 games conjecture with four values in place of
   two; seen only in secondary reports, the record was not reached. It would bear on Problem 3 only as the Unique Games
   Conjecture does, which is not at all ([the hardness hypotheses](../negative-results/complexity/hardness-hypotheses.md)).
+
+- *Rule 30 Resolved: Synchronization, Uniform Cylinder Frequencies, and Unconditional Convergence from First
+  Principles*, [Zenodo record 18838239](https://zenodo.org/records/18838239), version 3 of March 2, 2026, with a later
+  version; seen only in search results, the author was not shown and the text was not read. Self-published; by the
+  search summary it treats Rule 30 as an energetic system and rests on two companion works of the same project. Its
+  title claims a resolution; no refereed version or independent check was found.
 
 Kumar (2024), arXiv:2411.03468, which claimed to settle Mahler's 3/2 problem, was withdrawn; do not cite it.
 

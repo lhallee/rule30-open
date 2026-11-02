@@ -32,7 +32,8 @@ Three consequences follow by standard arguments:
 - **Problem 3 for a row given as input.** The center cell at time $t$ has degree $2t - 1$ over GF(2) as a function of
   the $2t + 1$ cells of its cone ([the degree finding](../../findings/structure/center-degree.md)), and a decision tree
   of depth $d$ computes a polynomial of degree at most $d$. So an algorithm that reads the row to find the cell reads
-  at least $2t - 1$ cells on some row, and on every row it reads cell $-t$, whose flip flips the cell.
+  at least $2t - 1$ cells on some row, and on every row it reads cell $-t$, whose flip flips the cell. Together these give at least $2t$ cells, and all
+  $2t + 1$ for $t \le 17$ by computation ([QueryDepth](../../Rule30Open/Complexity/QueryDepth.md)).
 
 So none of these models yields a counterexample: the events a counterexample needs have probability 0.
 

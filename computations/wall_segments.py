@@ -16,6 +16,7 @@ function of the column, and no column of a row with a leftmost 1 can repeat the 
 from __future__ import annotations
 
 import argparse
+import functools
 import itertools
 import sys
 import numpy as np
@@ -167,14 +168,15 @@ def stripe_known_steps(length: int) -> int:
     unknown, can lose the cell right of the column, over every column it may read (Lean: `stripe_agree` proves that it
     does not before step 2 L)."""
     start = tuple(stripe(length) + [None] * 2)
+    rule = {(left, cell, right): t_xor(left, t_or(cell, right))
+            for left, cell, right in itertools.product((0, 1, None), repeat=3)}  # one cell, from its three neighbors
     frontier = {start}
     for s in range(1, 4 * length + 4):
         nxt = set()
         for cells in frontier:
             for col in (0, 1):
-                nxt.add(tuple(t_xor(col if i == 0 else cells[i - 1],
-                                    t_or(cells[i], cells[i + 1] if i + 1 < len(cells) else None))
-                              for i in range(len(cells))))
+                row = (col,) + cells + (None,)  # the column, the cells, and the unknown cell beyond them
+                nxt.add(tuple(rule[row[i - 1], row[i], row[i + 1]] for i in range(1, len(row) - 1)))
         frontier = nxt
         if any(cells[0] is None for cells in frontier):
             return s
@@ -221,14 +223,21 @@ def longest_tail(run: int) -> tuple[int, int]:
 
 
 def necklaces(period: int) -> list[str]:
-    """The primitive binary necklaces of length `period`, each as its least rotation."""
+    """The primitive binary necklaces of length `period`, each as its least rotation; each call gets its own list of
+    the words that `necklace_words` finds once."""
+    return list(necklace_words(period))
+
+
+@functools.lru_cache(maxsize=None)
+def necklace_words(period: int) -> tuple[str, ...]:
+    """The words of `necklaces`, found by trying every word of the length."""
     out = []
     for bits in itertools.product("01", repeat=period):
         word = "".join(bits)
         rotations = [word[i:] + word[:i] for i in range(period)]
         if word == min(rotations) and len(set(rotations)) == period:
             out.append(word)
-    return out
+    return tuple(out)
 
 
 def long_runs(block: str) -> bool:

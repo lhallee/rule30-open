@@ -12,6 +12,10 @@ dependencies = ["numpy>=2.5.3", "pyyaml>=6.0.3", "scipy>=1.18.1", "tqdm>=4.70.1"
 
 [project.optional-dependencies]
 test = ["pytest>=9.1.1"]
+# computations.persistence and computations.projections: persistent homology and learned projections.
+topology = ["ripser>=0.6", "scikit-learn>=1.5"]
+# computations.late_onset.sat_longest: the SAT form of the late-onset search.
+sat = ["python-sat>=1.8"]
 
 [tool.setuptools]
 packages = ["computations"]

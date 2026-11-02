@@ -52,7 +52,9 @@ into a problem of the same kind as the kit's, not into an easier one. A proof th
 grows with the top, through the identities between the ether cells above the top and the forced bits below, which are
 dense polynomials ([the forced bits](forced-bits-dense.md)). Over every head of 6 bits, most of them outside $K$, no defect top passes $p + 27$ in 1,500 steps (item 8 of the
 shift model, `--ether 6`), and the ether-tail points of $K$ found in item 7 are preperiodic, so their tops are bounded;
-the stall is therefore not evidence that $K$ matters here.
+the stall is therefore not evidence that $K$ matters here. [The ether census](../../findings/period-two/ether-defect-census.md) follows every
+head of up to 20 cells to entry into those strips or to a repeat, and computes the exact largest mean gains of the
+window automaton, $7/25$, $7/24$, $7/32$ and $7/32$ at 5 to 8 cells, which stay $7/32$ on the moves real defects make.
 
 **Reproduce.**
 

@@ -52,6 +52,7 @@ ALIGNMENTS = {"0001": [(5, 0), (6, 0)], "0011": [(0, 0), (1, 3), (4, 0)], "0111"
 WORDS = ("0001", "0011", "0111")
 WALL_CELLS = 13
 ONE = np.uint64(1)
+LAST = np.uint64(63)  # the shift that carries a bit from one 64-bit word to the next
 
 
 def ether(j: int, phase: int) -> int:
@@ -89,8 +90,10 @@ def greatest_wall() -> np.ndarray:
     return member  # (4, 2^13)
 
 
+@functools.lru_cache(maxsize=None)
 def kit_wall() -> np.ndarray:
-    """The unique terminal strongly connected component of the greatest wall: the kit's 109 wall states."""
+    """The unique terminal strongly connected component of the greatest wall: the kit's 109 wall states. Built once and
+    kept, read-only, for the many callers that ask for it."""
     successors, _ = wall_graph()  # (4, 2, 2^13)
     member = greatest_wall().reshape(-1)  # (4 2^13,)
     size = 1 << WALL_CELLS
@@ -105,7 +108,9 @@ def kit_wall() -> np.ndarray:
     exits[label[source][member[source] & leaving]] = True
     sinks = [c for c in np.unique(label[member]).tolist() if not exits[c]]
     assert len(sinks) == 1, f"the greatest wall has {len(sinks)} terminal components"
-    return (label == sinks[0]).reshape(4, size)  # (4, 2^13)
+    wall = (label == sinks[0]).reshape(4, size)  # (4, 2^13)
+    wall.flags.writeable = False
+    return wall  # (4, 2^13)
 
 
 @functools.lru_cache(maxsize=None)
@@ -115,21 +120,39 @@ def ether_pattern(j0: int, psi: int) -> np.uint64:
     return np.uint64(sum(ether(j0 + p, psi) << (p - 1) for p in range(1, 65)))
 
 
-def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np.ndarray:
-    """For each right half whose columns 1 .. 64 are the bits of `low`, at drive phase `phase` (the center reads
-    word[phase] now), the least depth k at which it is in the family with that wall, or -1."""
-    # low: (n,), bit j is column j + 1
-    depth = np.full(low.size, -1, dtype=np.int64)  # (n,)
+@functools.lru_cache(maxsize=None)
+def family_terms(word: str, phase: int) -> tuple[np.ndarray, ...]:
+    """The tests of `family_depth` at drive phase `phase`, one per alignment of the word and depth k at which a wall can
+    start within 64 columns (column j0 + k a B3 column): k, as an integer and as a shift; the mask of columns 1 .. k;
+    the ether right of column j0 there; and the offset of the ether phase's wall states in the flattened wall.
+    Read-only."""
+    depths, patterns, offsets = [], [], []
     for j0, shift in ALIGNMENTS[word]:
         psi = (phase + shift) % 4  # the ether phase of now
-        differ = low ^ ether_pattern(j0, psi)  # (n,)
-        depths = np.array([k for k in range(64 - WALL_CELLS + 1) if (j0 + k) % 7 == 2], dtype=np.int64)  # (K,)
-        masks = (np.uint64(1) << depths.astype(np.uint64)) - np.uint64(1)  # (K,), columns 1 .. k
-        strip = ((low[:, None] >> depths.astype(np.uint64)) & np.uint64((1 << WALL_CELLS) - 1)).astype(np.int64)  # (n, K)
-        ok = ((differ[:, None] & masks) == 0) & wall[psi][strip]  # (n, K), columns 1 .. k carry the ether, then the wall
-        first = np.where(ok.any(axis=1), depths[ok.argmax(axis=1)], -1)  # (n,), the least such k, or -1
-        depth = np.where(first >= 0, np.where(depth < 0, first, np.minimum(depth, first)), depth)
-    return depth  # (n,)
+        for k in range(64 - WALL_CELLS + 1):
+            if (j0 + k) % 7 == 2:
+                depths.append(k)
+                patterns.append(ether_pattern(j0, psi))
+                offsets.append(psi << WALL_CELLS)
+    depth = np.array(depths, dtype=np.int64)  # (K,)
+    shifts = depth.astype(np.uint64)  # (K,)
+    masks = (np.uint64(1) << shifts) - np.uint64(1)  # (K,), columns 1 .. k
+    out = (depth, shifts, masks, np.array(patterns, dtype=np.uint64), np.array(offsets, dtype=np.int64))  # (K,) each
+    for array in out:
+        array.flags.writeable = False
+    return out
+
+
+def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np.ndarray:
+    """For each right half whose columns 1 .. 64 are the bits of `low`, at drive phase `phase` (the center reads
+    word[phase] now), the least depth k at which it is in the family with that wall, or -1, over every alignment of
+    the word at once (`family_terms`)."""
+    # low: (n,), bit j is column j + 1; wall: (4, 2^13)
+    depths, shifts, masks, patterns, offsets = family_terms(word, phase % 4)  # (K,) each
+    strip = ((low[:, None] >> shifts) & np.uint64((1 << WALL_CELLS) - 1)).astype(np.int64)  # (n, K)
+    ok = (((low[:, None] ^ patterns) & masks) == 0) & wall.reshape(-1)[offsets + strip]  # (n, K), ether, then wall
+    least = np.where(ok, depths, 64).min(axis=1)  # (n,), the least such k, 64 for none
+    return np.where(least < 64, least, -1)  # (n,)
 
 
 def family_cut(word: str, width: int, wall: np.ndarray) -> np.ndarray:
@@ -170,11 +193,14 @@ def step_rows(rows: np.ndarray, center: int) -> np.ndarray:
     column 1."""
     # rows: (n, words)
     left = rows << ONE  # (n, words)
-    left[:, 1:] |= rows[:, :-1] >> np.uint64(63)
-    left[:, 0] |= np.uint64(center)
     right = rows >> ONE  # (n, words)
-    right[:, :-1] |= rows[:, 1:] << np.uint64(63)
-    return left ^ (rows | right)  # (n, words)
+    if rows.shape[1] > 1:  # the carries between words
+        left[:, 1:] |= rows[:, :-1] >> LAST
+        right[:, :-1] |= rows[:, 1:] << LAST
+    left[:, 0] |= np.uint64(center)
+    right |= rows
+    left ^= right
+    return left  # (n, words)
 
 
 def absorb(word: str, rows: np.ndarray, phase: int, steps: int, wall: np.ndarray, reach: int) -> np.ndarray:
@@ -186,8 +212,9 @@ def absorb(word: str, rows: np.ndarray, phase: int, steps: int, wall: np.ndarray
     rows = rows.copy()  # (n, words)
     for t in range(steps):
         inside = family_depth(word, rows[:, 0], (t + phase) % 4, wall) >= 0  # (n,)
-        times[index[inside]] = t
-        rows, index = rows[~inside], index[~inside]
+        if inside.any():  # the halves still outside, copied only when one entered
+            times[index[inside]] = t
+            rows, index = rows[~inside], index[~inside]
         if index.size == 0:
             break
         active = min(rows.shape[1], (reach + t + 2) // 64 + 1)
@@ -281,13 +308,13 @@ def entry_certificate(word: str, cells: int, phase: int, wall: np.ndarray, steps
     rows[:, 0] = np.arange(1 << cells, dtype=np.uint64)
     times = absorb(word, rows, phase, steps, wall, cells)  # (2^cells,)
     assert (times >= 0).all(), "a right half did not enter"
-    entries = []
-    for half, entry in enumerate(times.tolist()):
-        row = rows[half:half + 1].copy()  # (1, words)
-        for t in range(entry):
-            row = step_rows(row, int(word[(t + phase) % 4]))
-        entries.append((entry, int(family_depth(word, row[:, 0], (entry + phase) % 4, wall)[0])))
-    return entries
+    depth = np.full(times.size, -1, dtype=np.int64)  # (2^cells,), the depth at the entry step, all halves stepped again
+    for t in range(int(times.max()) + 1):
+        now = times == t  # (2^cells,)
+        if now.any():
+            depth[now] = family_depth(word, rows[now, 0], (t + phase) % 4, wall)
+        rows = step_rows(rows, int(word[(t + phase) % 4]))
+    return list(zip(times.tolist(), depth.tolist()))
 
 
 def lean_entries(cells: int, wall: np.ndarray) -> str:

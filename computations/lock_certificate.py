@@ -23,6 +23,7 @@ some fixed value at each white phase (where the word reads 0), which is what mas
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 import numpy as np
 
@@ -193,6 +194,16 @@ def jen_seeds(word: str) -> list[list[dict[int, int]]]:
     return seeds
 
 
+@functools.lru_cache(maxsize=16)
+def jen_sets(word: str, width: int) -> tuple[np.ndarray, ...]:
+    """The greatest invariant set of each seed of `jen_seeds`, in their order, as membership masks; kept for the words
+    and widths asked again (`coin_lock.certificate` and `certificate_tables` read the same sets), so read-only."""
+    out = tuple(greatest_invariant_set(word, seed, width)[0] for seed in jen_seeds(word))  # each (period, 2^W)
+    for member in out:
+        member.flags.writeable = False
+    return out
+
+
 def seed_mask(states: np.ndarray, condition: dict[int, int]) -> np.ndarray:
     """Which windows meet `condition`, a map from columns to values."""
     # states: (n,)
@@ -268,8 +279,7 @@ def certificate_tables(word: str, width: int) -> dict:
     nonempty greatest invariant sets of the assignments of column 1 at the white phases, which must be exactly one."""
     from computations import lock_chain
     found = []
-    for seed in jen_seeds(word):
-        member, _ = greatest_invariant_set(word, seed, width)  # (period, 2^W)
+    for member in jen_sets(word, width):  # (period, 2^W) each
         if member.any():
             found.append({(ph, int(w)) for ph in range(len(word)) for w in np.flatnonzero(member[ph])})
     assert len(found) == 1, "one assignment of the white phases carries the certificate"

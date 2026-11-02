@@ -36,10 +36,10 @@ def module_blocks() -> list[tuple[str, str]]:
     found: list[tuple[str, str]] = [("001", "Traps001")]
     found += [(lock_chain.tables(name)["word"], "WordTraps") for name, *_ in lock_chain.TRAPS]
     found.append((lock_chain.tables("trap001011111")["word"], "WordTraps"))
-    found += [(lock_chain.carried("trap001011111", distance)["word"], "NineTraps")
+    found += [(lock_chain.carried_word("trap001011111", distance), "NineTraps")
               for distance in lock_chain.nine_distances()]
     found.append((lock_chain.tables("trap001010011")["word"], "NineTraps"))
-    found += [(lock_chain.carried("trap0000010001", distance)["word"], "TenTraps")
+    found += [(lock_chain.carried_word("trap0000010001", distance), "TenTraps")
               for distance in lock_chain.ten_distances()]
     for period, module in ((11, "ElevenTraps"), (12, "TwelveTraps"), (13, "ThirteenTraps"), (14, "FourteenTraps")):
         found += [(word, module) for _, _, word in lock_chain.wall_distances(period, lock_chain.WALL_DEPTHS[period])]
@@ -47,13 +47,13 @@ def module_blocks() -> list[tuple[str, str]]:
                             ("NaturalTrapsLong", lock_chain.LONG_TRAPS),
                             ("NaturalTrapsLongLarge", lock_chain.LONG_LARGE)):
         found += [(word, module) for word, *_ in entries]
-    found += [(lock_chain.carried(name, distance)["word"], "FarWalls")
+    found += [(lock_chain.carried_word(name, distance), "FarWalls")
               for entries in lock_chain.FAR_WALLS.values() for name, distance in entries]
     for period, entries in lock_chain.CENSUS_TRAPS.items():
         found += [(block, f"CensusTraps{period}") for block, *_ in entries]
     found += [(block, "CensusTrapsLarge") for block, *_ in lock_chain.CENSUS_LARGE]
     found += [(block, "CensusTrapsLarge15") for block, *_ in lock_chain.CENSUS_LARGE15]
-    found += [(lock_chain.fifteen_tables(wall, distance)["word"], "FifteenWalls")
+    found += [(lock_chain.carried_block(lock_chain.fifteen_wall(wall), distance), "FifteenWalls")
               for wall, distance in lock_chain.FIFTEEN_DISTANCES]
     carried = {(module, name): build for module, name, build in lock_chain.module_entries()}
     found += [(carried[key]()["word"], "WideWalls") for key in lock_chain.WIDE_WALLS]

@@ -31,19 +31,28 @@ from computations.absorption import ETHER
 WORDS = ("01", "0001", "0011", "0111")
 
 
+def number(digits: bytearray) -> int:
+    """The number whose bit t is digits[t], given as the characters 0 and 1: read at once, rather than by setting one
+    bit of a growing number per step, which takes time quadratic in the length."""
+    return int(digits[::-1].decode(), 2) if digits else 0
+
+
 def center(word: str, phase: int, steps: int) -> int:
     """The center column c(t) = word[(t + phase) mod len(word)] for t < steps, bit t being time t."""
-    return sum(int(word[(t + phase) % len(word)]) << t for t in range(steps))
+    return number(bytearray(ord(word[(t + phase) % len(word)]) for t in range(steps)))
 
 
 def drive_column(word: str, phase: int, right: int, steps: int) -> int:
     """Column 1 at times 0 .. steps - 1 of the right half `right` (bit i is column i + 1) driven by that center, bit t
-    being time t."""
-    column, row = 0, right
+    being time t. Cell i + 1 reaches column 1 only after i steps, so every 4,096 steps the row is cut to the cells
+    that can still reach it before the end."""
+    column, row = bytearray(steps), right  # column[t], the character of column 1 at time t
     for t in range(steps):
-        column |= (row & 1) << t
+        if t % 4096 == 0:
+            row &= (1 << (steps - t)) - 1  # bits 0 .. steps - t - 1, the cells that reach column 1 by time steps - 1
+        column[t] = 48 | (row & 1)
         row = ((row << 1) | int(word[(t + phase) % len(word)])) ^ (row | (row >> 1))
-    return column
+    return number(column)
 
 
 def psi(word: str, phase: int, right: int, depth: int) -> int:
@@ -51,24 +60,25 @@ def psi(word: str, phase: int, right: int, depth: int) -> int:
     at the times below depth + 1 - j, so its cell at time 0 is known for every j up to `depth`."""
     c = center(word, phase, depth + 1)
     a = ((c >> 1) ^ (c | drive_column(word, phase, right, depth + 1))) & ((1 << depth) - 1)  # column -1, times < depth
-    b, row = c, 0
+    b, row = c, bytearray(depth)  # row[j], the character of the cell at depth j + 1
     for j in range(depth):
-        row |= (a & 1) << j
+        row[j] = 48 | (a & 1)
         a, b = (a >> 1) ^ (a | b), a  # column -j - 2 from columns -j - 1 and -j
-    return row
+    return number(row)
 
 
 def white_literals(depth: int) -> tuple[int, int]:
     """The numbers that `Rule30Open.PeriodTwo.WhiteRightHalf` checks: column -1 of the row that keeps the center
     alternating against the white right half at times 0 .. depth - 1 (`yLoop`), and that row at depths 1 .. depth as
     bits 1 .. depth (`psiLoop`), rebuilt column by column beside a white wall."""
-    column = drive_column("10", 0, 0, depth)  # column 1, bit t being time t
-    y = sum(1 << t for t in range(depth) if t % 2 == 0 or not (column >> t) & 1)
-    prev, cur, bits = 0, y, 0
+    column = format(drive_column("10", 0, 0, depth), "b").zfill(depth)[::-1]  # column 1, character t at time t
+    y = number(bytearray(49 if t % 2 == 0 or column[t] == "0" else 48 for t in range(depth)))
+    prev, cur, bits = 0, y, bytearray(depth + 1)  # bits[k], the character of bit k
+    bits[0] = 48
     for k in range(1, depth + 1):
-        bits |= (cur & 1) << k
+        bits[k] = 48 | (cur & 1)
         prev, cur = cur, (cur >> 1) ^ (cur | prev)
-    return y, bits
+    return y, number(bits)
 
 
 def white_runs(row: int, depth: int) -> list[tuple[int, int]]:

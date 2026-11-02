@@ -22,6 +22,7 @@ the drive's phase modulo 3. The trap is closed (`t001_check`), so the half stays
 from __future__ import annotations
 
 import argparse
+import functools
 import re
 import sys
 import time
@@ -32,6 +33,7 @@ from pathlib import Path
 from tqdm.auto import tqdm
 
 from computations.absorption import step_rows
+from computations.rule30 import distinct
 
 
 WORDS = ("001", "011")
@@ -94,8 +96,10 @@ def settled_from(word: str, half: int, phase: int, steps: int, period: int) -> i
     return int(times[min(first, len(times) - 1)])
 
 
+@functools.lru_cache(maxsize=None)
 def trap_keys() -> np.ndarray:
-    """The states of the kit's trap t001 as sorted keys strip * 4 + (label mod 3), read from the kit's source."""
+    """The states of the kit's trap t001 as sorted keys strip * 4 + (label mod 3), read from the kit's source once and
+    kept, read-only."""
     packed = dict(re.findall(r"def t001_(\w+) : Nat := (\d+)", TRAP.read_text(encoding="utf-8")))
     digits = sys.get_int_max_str_digits()
     sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
@@ -105,7 +109,9 @@ def trap_keys() -> np.ndarray:
         sys.set_int_max_str_digits(digits)
     keys = {((states >> (TRAP_WIDTH * i)) % (1 << TRAP_WIDTH)) * 4 + ((labels >> (label_bits * i)) % (1 << label_bits)) % 3
             for i in range(count)}
-    return np.array(sorted(keys), dtype=np.uint64)  # (n,)
+    out = np.array(sorted(keys), dtype=np.uint64)  # (n,)
+    out.flags.writeable = False
+    return out  # (n,)
 
 
 def in_sorted(values: np.ndarray, keys: np.ndarray) -> np.ndarray:
@@ -119,7 +125,7 @@ def in_sorted(values: np.ndarray, keys: np.ndarray) -> np.ndarray:
 
 def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) -> np.ndarray:
     """The first step before `steps` at which each right half, driven by 001 from `phase`, is in t001, or -1."""
-    keys = np.unique(keys)  # (k,), sorted
+    keys = distinct(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
@@ -146,14 +152,14 @@ def cut_entries(halves: list[int], phase: int, steps: int, widths: tuple[int, ..
     has its columns 1 .. w equal to those of a state of t001 whose label agrees with the drive's phase, or -1: entry
     into t001 cut to w cells, the event whose rate `lock_chain.t001_coin` gives for a coin in column w + 1. At 47 cells
     it is entry into t001 (`trap_entries`)."""
-    keys = np.unique(keys)  # (k,), sorted
+    keys = distinct(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
         for j in range(0, width, 64):
             rows[i, j // 64] = np.uint64((half >> j) & ((1 << 64) - 1))
     masks = [np.uint64((1 << w) - 1) for w in widths]
-    cuts = [np.unique(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3))) for mask in masks]
+    cuts = [distinct(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3))) for mask in masks]
     first = np.full((len(halves), len(widths)), -1, dtype=np.int64)  # (n, k)
     alive = np.arange(len(halves))  # (m,), the halves still outside t001, row i of `rows` being half alive[i]
     full = np.uint64((1 << TRAP_WIDTH) - 1)
@@ -183,7 +189,7 @@ def coin_entries(halves: list[int], phase: int, steps: int, width: int, keys: np
     `steps` at which the window is that of a state of t001 whose label agrees with the drive's phase, or -1."""
     assert width <= 62
     mask, top = np.uint64((1 << width) - 1), np.uint64(width - 1)
-    cut = np.unique(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3)))  # (c,)
+    cut = distinct(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3)))  # (c,)
     window = np.array(halves, dtype=np.uint64) & mask  # (m,)
     first = np.full(len(halves), -1, dtype=np.int64)  # (n,)
     alive = np.arange(len(halves))  # (m,), the halves still outside, window i being half alive[i]
@@ -230,7 +236,7 @@ def beyond_stats(halves: list[int], phase: int, steps: int, width: int, context:
     white and black, by the phase of the drive and the last `context` cells of the window of `width` cells, as counts
     out[phase, cells, value], the cells read as bits, cell `width` highest."""
     assert context <= width <= 62
-    keys = np.unique(keys)  # (k,), sorted
+    keys = distinct(keys)  # (k,), sorted
     wide = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (wide + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):

@@ -62,13 +62,11 @@ def forced_value(word: str) -> int | None:
     """The value `word` forces on cell k + 1, or None: brute force over every start of the n + 1 cells that can reach
     it, one row per start, independent of `forcing_words`."""
     n = len(word)
-    starts = np.arange(1 << (n + 1), dtype=np.int64)  # (2^(n + 1),)
-    cells = ((starts[:, None] >> np.arange(n + 1)) & 1).astype(np.uint8)  # (2^(n + 1), n + 1), cell k + 1 + j at j
+    mask = (1 << (n + 1)) - 1
+    rows = np.arange(1 << (n + 1), dtype=np.int64)  # (2^(n + 1),), every start, bit j the cell k + 1 + j
     for ch in word:
-        left = np.concatenate([np.full((len(cells), 1), int(ch), dtype=np.uint8), cells[:, :-1]], axis=1)  # (s, n + 1)
-        right = np.concatenate([cells[:, 1:], np.zeros((len(cells), 1), dtype=np.uint8)], axis=1)  # (s, n + 1)
-        cells = left ^ (cells | right)
-    values = np.unique(cells[:, 0])
+        rows = (((rows << 1) | int(ch)) & mask) ^ (rows | (rows >> 1))  # cell k + n + 2 and beyond read white
+    values = np.unique(rows & 1)
     return int(values[0]) if len(values) == 1 else None
 
 

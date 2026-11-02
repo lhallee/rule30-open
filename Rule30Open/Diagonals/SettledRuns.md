@@ -36,7 +36,8 @@ The depth $J$ matters: the periods of the left diagonals grow, from 16 to 32 at 
 ([the records](../../findings/diagonals/left-records.md)), so (S$_J$) is false for $J \ge 87{,}867$. The left-diagonal
 periods are unbounded (Nersissian 2026, in [the literature](../../literature/rule-30.md)), so a fixed period cannot hold
 for all $j$; a version with a period parameter $P$ in place of 16, concluding $13L \le 3a + O(P)$, is the natural
-general form and is not proved here.
+general form and is not proved here. [SettledSlope](SettledSlope.md) proves the black-run bound with any periods,
+from a bound $A$ on the antiphase alternations of the settled pairs in place of the period ($A = P$ always suffices).
 
 The two parts that need no hypothesis, and drive both:
 

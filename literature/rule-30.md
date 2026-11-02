@@ -127,6 +127,26 @@ None of the following is refereed, and the prize site lists no winner.
   the horizon bound of Condrey (2026). *Here:* that bound concerns constancy from time 0; [the adjacent-column
   theorem](../Rule30Open/Columns/AdjacentColumns.md) (`no_constant_column`) excludes constancy from any time on, for
   every row with a leftmost black cell, as the kit's `Rule30FiniteConfigs.no_column_eventually_constant` does.
+- **Afflom (2026).** [rule30](https://github.com/afflom/rule30), a Lean 4 library with documents generated from its
+  statements, bridged to the kit's definitions and checked, by its README, under `propext` and `Quot.sound` alone; the
+  Lean was not built here. Its claim register (`frontier.toml`) states Problem 1 as open and lists claims marked
+  proved, refuted or open; among those marked proved: Problem 1 is equivalent to the absence of late central
+  collisions under every hypothetical period, a periodic center has a finite 2-kernel and so a dyadic self-similarity
+  $c(2^{k'} t) = c(2^k t)$ for some $k < k'$, and for every transient $T \le 512$ and period $0 < P \le 128$ the
+  center differs from its shift by $P$ within $[T, T + 32)$, a kernel-checked certificate. *Here:* that certificate
+  lies inside the kit's bound $T + P \ge 16{,}359$; the open step, that the column is not 2-automatic, is the one
+  [the automaton search](../negative-results/complexity/automaton-lower-bounds.md) bounds by computation and the kit
+  derives from Problem 3.
+- **Fractastical (2026).** [Rule 30 Open Problem B: lower bound on diagonal synchronization
+  delay](https://github.com/fractastical/morpholib/issues/15), an issue in the repository fractastical/morpholib.
+  Measures the time $T_{\mathrm{lock}}(k)$ from which the left diagonal $d_k(t) = a_{t, k - t}$, which is $D_k$ here,
+  repeats with its eventual period, and fits $T_{\mathrm{lock}}(k) \approx 1.2441\,k + 7.89$ for $30 \le k < 400$
+  (period 8) and a slope of 1.3358 for $400 \le k < 87{,}867$ (period 16), with a two-diagonal horizon
+  $H(87{,}867) = 117{,}324$, a ratio of 1.335; it poses $\liminf T_{\mathrm{lock}}(k)/k > 1$ as open, and the
+  results it calls verified are checks over finite ranges. Its numbers were not reproduced here. *Here:* the onsets
+  are those of [linear settling](../findings/diagonals/settled-runs.md), whose computation finds onsets near $4j/3$
+  and none above $\lceil 3j/2 \rceil$ for $j < 80{,}000$, in agreement with the issue's slopes; a lower bound on the
+  onsets, which the issue asks, is the direction the run bounds there do not use.
 - **Agents on the prize kit (2026).** [Rule30PrizeKit](https://github.com/WolframInstitute/Rule30PrizeKit), its main
   branch and [pull requests](https://github.com/WolframInstitute/Rule30PrizeKit/pulls). After the agents' invitation,
   the kit's catalog grew from 128 modules on October 26, 2026 to 141 on October 28, with contributed modules that are
@@ -137,14 +157,18 @@ None of the following is refereed, and the prize site lists no winner.
   `Rule30FrozenRuler` and `Rule30EdgeStaircases` (structure near the two edges of the pattern),
   `Rule30SpatialPeriodLifting` and `Rule30DelayedDefectPeriods`. On October 30 it merged eleven pull requests into its
   main branch, at commit 7beff71, 170 modules in all, among them exclusions of every eventual period whose white runs
-  are all long (#36, #43), $\log\log$ margins for runs of the center column (#46), spatially periodic orbits that
-  return with a shift (#56) and the absence of local group-valued invariants (#58); its 23 open pull requests claim
-  more, among them a Lean proof that the ether-and-wall family cannot give period two (#39). All are summarized, by route, in [kit-pull-requests.md](kit-pull-requests.md).
-  The kit's own status table puts least period 4 at its open `Absorption`, period 2 at the open Q01, and any eventual
-  period at $T + P \ge 16{,}359$. *Here:* the repository is pinned at the kit's commit 932cf8d, so the modules merged by
-  then count as kit results, those merged since are results of the kit's main branch that the pin does not include, and
-  an open pull request counts as a claim. [The roadmap](../ROADMAP.md) tracks where they meet the routes here, and [a
-  window of 65,536 cells](../Rule30Open/Columns/LongWindow.md) raises the last bound to $T + P \ge 65{,}518$.
+  are all long (#36, #43), $\log\log$ margins for runs of the center column (#46), spatially periodic orbits that return
+  with a shift (#56) and the absence of local group-valued invariants (#58). On November 1, 2026 its main branch, at
+  commit 27060a7, has 193 modules, among them lower bounds on the time and the head span of one-tape machines that
+  compute the center column (#68, #70, #72), infinitely many left diagonals of density $1/2$ (#73) and open
+  hypotheses, each proved to exclude period two (#75, #76); its 13 open pull requests claim more, among them a Lean
+  proof that the ether-and-wall family cannot give period two (#39). All are summarized, by route, in
+  [kit-pull-requests.md](kit-pull-requests.md). The kit's own status table puts least period 4 at its open `Absorption`,
+  period 2 at the open Q01, and any eventual period at $T + P \ge 16{,}359$. *Here:* the repository is pinned at the
+  kit's commit 932cf8d, so the modules merged by then count as kit results, those merged since are results of the kit's
+  main branch that the pin does not include, and an open pull request counts as a claim. [The roadmap](../ROADMAP.md)
+  tracks where they meet the routes here, and [a window of 65,536 cells](../Rule30Open/Columns/LongWindow.md) raises the
+  last bound to $T + P \ge 65{,}518$.
 - Faster simulation of the whole pattern, and Boolean functions computed by Rule 30's orbits, are in
   [complexity.md](complexity.md). Results proposed by AI systems outside the prize are in
   [ai-proposed.md](ai-proposed.md).

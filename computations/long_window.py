@@ -30,20 +30,21 @@ CHUNK = 16384
 def simulate(n: int = N) -> tuple[int, dict[int, int]]:
     """The center cells c(0) .. c(n - 1) as bits of one number, and the packed rows at the checkpoints, the seed at bit
     n."""
-    row, bits, checkpoints = 1 << n, 0, {}
+    row, cells, checkpoints = 1 << n, bytearray(n), {}  # cells[t], the digit of c(t)
     for t in range(n):
         if t and t % CHUNK == 0:
             checkpoints[t] = row
-        bits |= ((row >> n) & 1) << t
+        cells[t] = 48 + ((row >> n) & 1)
         row = (row << 1) ^ (row | (row >> 1))
-    return bits, checkpoints
+    return int(cells[::-1].decode(), 2), checkpoints  # bit t is c(t)
 
 
 def new_factor(bits: int, n: int = N) -> int:
-    """The least L such that the factor of length L at n - L occurs at no earlier position."""
+    """The least L such that the factor of length L at n - L occurs at no earlier position, found in the cells as a
+    string, character t the cell c(t)."""
+    cells = format(bits & ((1 << n) - 1), f"0{n}b")[::-1]  # the cells c(0) .. c(n - 1) only
     for length in range(1, n):
-        last = (bits >> (n - length)) & ((1 << length) - 1)
-        if all(((bits >> j) & ((1 << length) - 1)) != last for j in range(n - length)):
+        if cells.find(cells[n - length:]) == n - length:  # its first occurrence is the last one
             return length
     raise ValueError("no new factor")
 

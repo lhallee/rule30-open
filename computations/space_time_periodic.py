@@ -49,9 +49,16 @@ def cycles(period: int) -> tuple[np.ndarray, np.ndarray]:
     # out: (c,), (c,)
     f = column_map(period)  # (4^P,)
     g = f.copy()  # (4^P,), f^(2^k) after k squarings
+    size = f.size + 1  # the number of states in the image of g
     for _ in tqdm(range(2 * period), desc=f"squarings, period {period}", file=sys.stderr, leave=False):
         g = g[g]  # f^(2^(2P)) takes every state onto its cycle, since no tail is longer than 4^P
-    nodes = np.unique(g)  # (c,), the image of f^(2^(2P)): exactly the states on cycles
+        image = np.zeros(f.size, dtype=bool)  # (4^P,)
+        image[g] = True
+        # the images shrink; once one squaring keeps the size, f permutes the image, which is then the cycles
+        if int(image.sum()) == size:
+            break
+        size = int(image.sum())
+    nodes = np.flatnonzero(image).astype(f.dtype)  # (c,), the image of the last g: exactly the states on cycles
     index = np.full(f.size, -1, dtype=f.dtype)  # (4^P,)
     index[nodes] = np.arange(nodes.size, dtype=f.dtype)
     step = index[f[nodes]]  # (c,), position of each state's successor
@@ -168,11 +175,12 @@ def background_walls(period: int, cells: int, cap: int = 100000) -> list[tuple[i
     nodes, label = cycles(period)  # (c,), (c,)
     f = column_map(period)  # (4^P,)
     mask = (1 << period) - 1
+    sizes = Counter(label.tolist())  # the states of each cycle
     found = []
     for length, count, blocks in backgrounds(period):
         if not blocks:
             continue
-        lab = next(int(lab) for lab in set(label.tolist()) if (label == lab).sum() == length and
+        lab = next(int(lab) for lab in set(label.tolist()) if sizes[lab] == length and
                    necklace(word_of(lab >> period, period)) in blocks | {necklace(word_of(lab >> period, period))}
                    and {necklace(word_of(int(st) >> period, period)) for st in nodes[label == lab]
                         if least_period(word_of(int(st) >> period, period)) == period} == blocks)

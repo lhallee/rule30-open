@@ -25,7 +25,7 @@ import sys
 import numpy as np
 from tqdm.auto import tqdm
 
-from computations import game
+from computations import game, locks
 
 # The seven blocks of period at most 16 that the game excludes and the certificates of GameBlocks, GameBlocksLong and
 # the kit leave out, with the least width at which the game excludes each.
@@ -115,16 +115,16 @@ def phase_rounds(block: str, width: int) -> list[int]:
     source, target, _, _, column = game.game_graph(block, width)  # (2 p n,), (2 p n,), (p n,)
     nodes = column.size
     phase_of = np.arange(nodes) >> width  # (p n,)
+    # each direction's moves as a graph for `locks.back_closure`, which searches its moves backward: the reverse of the
+    # reversed moves runs forward
+    graphs = {True: locks.reverse_graph(target, source, nodes), False: locks.reverse_graph(source, target, nodes)}
 
     def close(seed: np.ndarray, src: np.ndarray, tgt: np.ndarray) -> np.ndarray:
-        found = np.zeros(nodes, dtype=bool)  # (p n,)
-        frontier = seed.copy()  # (p n,)
-        while frontier.any():
-            reached = np.zeros(nodes, dtype=bool)  # (p n,)
-            reached[tgt[frontier[src]]] = True
-            frontier = reached & ~found
-            found |= frontier
-        return found
+        """The nodes that walks of one move or more along src -> tgt reach from the seed: those that walks of any
+        length reach from the seed's successors, by one breadth-first search."""
+        after = np.zeros(nodes, dtype=bool)  # (p n,)
+        after[tgt[seed[src]]] = True
+        return locks.back_closure(after, tgt, src, graphs[src is source])  # (p n,)
 
     rounds = []
     for phase in range(len(block)):

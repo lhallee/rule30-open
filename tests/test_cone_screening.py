@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Iterator
 
 import numpy as np
 import pytest
@@ -78,14 +79,18 @@ def test_pair_step_and_lemmas() -> None:
     cs.check_pair_model(4, 20)
 
 
-def trajectories(horizon: int):
-    """Every pair trajectory p_0 .. p_horizon for every initial pair and every sequence of third cells."""
-    for start in itertools.product((0, 1), repeat=2):
-        for thirds in itertools.product((0, 1), repeat=horizon):
-            path = [start]
-            for third in thirds:
-                path.append(cs.pair_step(path[-1], third))
+def trajectories(horizon: int) -> Iterator[list]:
+    """Every pair trajectory p_0 .. p_horizon for every initial pair and every sequence of third cells, in the order of
+    the sequences, the paths that share a prefix of third cells sharing its steps."""
+    def extend(path: list) -> Iterator[list]:
+        if len(path) > horizon:
             yield path
+            return
+        for third in (0, 1):
+            yield from extend(path + [cs.pair_step(path[-1], third)])
+
+    for start in itertools.product((0, 1), repeat=2):
+        yield from extend([start])
 
 
 def test_pair_induction_from_the_base_values() -> None:

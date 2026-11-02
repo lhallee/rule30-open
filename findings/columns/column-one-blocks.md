@@ -3,7 +3,7 @@ title: Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, 
 category: columns
 problems: [1]
 status: paper
-formalization: wanted
+formalization: partial
 ---
 
 # Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether
@@ -269,6 +269,9 @@ These come from scratch scripts that are not in the repository.
 
 ## Check
 
-The proof is on paper. A check that is not in the repository runs every right half with support in cells 1 to 10,
-driven by $0001$ from each of the 4 phases, for 72 steps, and finds no violation of the block form, of the graph, of
-the forcing (B) on repeated blocks, or of the white cell after B3 at phase 2; all 13 edges occur.
+Statements (A), (B) and (C) are proved in Lean for every half driven by $0001$, with each of the 13 edges shown to occur
+from a half supported in cells 1 to 8 ([ColumnOneBlocks](../../Rule30Open/Columns/ColumnOneBlocks.md)); the two forms of
+a trap are argued on paper, and the width bound rests on the computed reach test. A check that is not in the repository
+runs every right half with support in cells 1 to 10, driven by $0001$ from each of the 4 phases, for 72 steps, and finds
+no violation of the block form, of the graph, of the forcing (B) on repeated blocks, or of the white cell after B3 at
+phase 2; all 13 edges occur.

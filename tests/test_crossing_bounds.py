@@ -59,8 +59,12 @@ def test_lemma_on_random_machines() -> None:
     for _ in range(400):
         last_state = int(rng.integers(1, 3))
         machine = crossing_bounds.random_machine(rng, last_state, 1)
-        runs = [crossing_bounds.run_machine(machine, (1 << (ell - 1)) + low, ell, 300) for low in range(1 << (ell - 1))]
-        if any(run is None for run in runs):
+        runs = []
+        for low in range(1 << (ell - 1)):  # a machine that runs past 300 steps on some input is skipped
+            runs.append(crossing_bounds.run_machine(machine, (1 << (ell - 1)) + low, ell, 300))
+            if runs[-1] is None:
+                break
+        if runs[-1] is None:
             continue
         answers = np.array([run[0] for run in runs], dtype=np.uint8)  # (64,)
         padded = np.zeros(1 << ell, dtype=np.uint8)  # (128,)

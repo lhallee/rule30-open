@@ -39,6 +39,8 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
 
+from computations.rule30 import distinct
+
 # The words of the kit's strip-certificate table (`Rule30StripCertificateTable.certTable`) and of its three single strip
 # certificates (`Rule30StripCertificates.not_eventually_01111111`, `not_eventually_00000011` and
 # `not_eventually_000000000101`), each as its least rotation. tests/test_computations.py reads them from the kit.
@@ -67,38 +69,56 @@ def moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     components."""
     period, n_cells = len(pattern), 1 << width
     windows = np.arange(n_cells, dtype=np.int64)  # (n,)
-    sources, targets = [], []
+    after = {}  # the next window for each value of the column and of the free cell, (n,) each
+    for column in set(pattern):
+        for free in (0, 1):
+            wide = int(column) | windows << 1 | free << (width + 1)  # (n,), the column at bit 0
+            after[column, free] = (((wide << 1) ^ (wide | (wide >> 1))) >> 1) & (n_cells - 1)  # (n,)
+    sources = np.empty(2 * period * n_cells, dtype=np.int64)  # (2 p n,), phase by phase, free cell 0 then 1
+    targets = np.empty(2 * period * n_cells, dtype=np.int64)  # (2 p n,)
     for phase in range(period):
         for free in (0, 1):
-            wide = int(pattern[phase]) | windows << 1 | free << (width + 1)  # (n,), the column at bit 0
-            sources.append(phase * n_cells + windows)  # (n,)
-            targets.append(((phase + 1) % period) * n_cells + ((((wide << 1) ^ (wide | (wide >> 1))) >> 1)
-                                                               & (n_cells - 1)))  # (n,)
-    return np.concatenate(sources), np.concatenate(targets)  # (2 p n,), (2 p n,)
+            part = slice((2 * phase + free) * n_cells, (2 * phase + free + 1) * n_cells)
+            np.add(windows, phase * n_cells, out=sources[part])
+            np.add(after[pattern[phase], free], ((phase + 1) % period) * n_cells, out=targets[part])
+    return sources, targets  # (2 p n,), (2 p n,)
+
+
+@functools.lru_cache(maxsize=6)
+def game_moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """The game's moves (source, target) and the left column at each node, without the components of `game_graph`,
+    for the searches that need only these. The last six games asked for are kept, so the arrays are read-only."""
+    period, n_cells = len(pattern), 1 << width
+    c = np.array([int(bit) for bit in pattern], dtype=np.int64)  # (p,)
+    source, target = moves(pattern, width)  # (2 p n,), (2 p n,)
+    nodes = period * n_cells
+    phase_of, first = np.arange(nodes) // n_cells, np.arange(nodes) % n_cells & 1  # (p n,), (p n,)
+    column = (c[(phase_of + 1) % period] ^ (c[phase_of] | first)).astype(bool)  # (p n,), the left column
+    for array in (source, target, column):
+        array.flags.writeable = False
+    return source, target, column  # (2 p n,), (2 p n,), (p n,)
 
 
 @functools.lru_cache(maxsize=6)
 def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """The game's moves (source, target), each node's strongly connected component, whether a play can stay in each
     component, and the left column at each node. The last six games asked for are kept, so the arrays are read-only."""
-    period, n_cells = len(pattern), 1 << width
-    c = np.array([int(bit) for bit in pattern], dtype=np.int64)  # (p,)
-    source, target = moves(pattern, width)  # (2 p n,), (2 p n,)
-    nodes = period * n_cells
+    source, target, column = game_moves(pattern, width)  # (2 p n,), (2 p n,), (p n,)
+    nodes = column.size
     graph = csr_matrix((np.ones(source.size, dtype=np.int8), (source, target)), shape=(nodes, nodes))
     _, label = connected_components(graph, directed=True, connection="strong")  # (p n,)
     recurrent = np.zeros(label.max() + 1, dtype=bool)  # (components,)
     recurrent[label[source][label[source] == label[target]]] = True  # components a play can stay in
-    phase_of, first = np.arange(nodes) // n_cells, np.arange(nodes) % n_cells & 1  # (p n,), (p n,)
-    column = (c[(phase_of + 1) % period] ^ (c[phase_of] | first)).astype(bool)  # (p n,), the left column
-    for array in (source, target, label, recurrent, column):
+    for array in (label, recurrent):
         array.flags.writeable = False
     return source, target, label, recurrent, column  # (2 p n,), (2 p n,), (p n,), (components,), (p n,)
 
 
+@functools.lru_cache(maxsize=None)
 def bad_pairs(pattern: str, width: int) -> int:
     """The (component, phase) pairs at which a component that can hold a play shows the left column taking both
-    values. Zero means the game excludes the block at this width."""
+    values. Zero means the game excludes the block at this width. Kept for the games asked again, which `least_width`
+    and `first_width` share."""
     _, _, label, recurrent, column = game_graph(pattern, width)
     phase_of = np.arange(label.size) >> width  # (p n,)
     keep = recurrent[label]  # (p n,)
@@ -168,7 +188,7 @@ def component_periods(pattern: str, width: int) -> list[tuple[int, int, bool, bo
             level[node] = level[parent[node]] + 1
         moves = label[src] == component  # (k,)
         cycle = 0
-        for gap in np.unique(np.abs(level[src[moves]] + 1 - level[tgt[moves]])).tolist():
+        for gap in distinct(np.abs(level[src[moves]] + 1 - level[tgt[moves]])).tolist():
             cycle = math.gcd(cycle, int(gap))
 
         def mixed(key: np.ndarray, size: int) -> bool:
@@ -181,9 +201,10 @@ def component_periods(pattern: str, width: int) -> list[tuple[int, int, bool, bo
     return found
 
 
+@functools.lru_cache(maxsize=16)
 def game_ranks(pattern: str, width: int) -> tuple[np.ndarray, int, int]:
     """Each node's rank, the transient ranks as the bits of a number, and the left column at rank r and phase at bit
-    r * period + phase of another.
+    r * period + phase of another. The last 16 games asked for are kept, so the ranks are read-only.
 
     A node's rank is its component's layer in the condensation (the longest path into it) times one more than the
     number of components that can hold a play, plus the component's place among those (0 for the others), so a move
@@ -210,6 +231,7 @@ def game_ranks(pattern: str, width: int) -> tuple[np.ndarray, int, int]:
     if ones[slot[~value]].any():
         raise ValueError(f"{pattern} at width {width}: the left column is not a function of the phase in a component")
     transient = sum(1 << r for r in range(0, int(rank.max()) + 1, stride))
+    rank.flags.writeable = False
     return rank, transient, sum(1 << int(i) for i in np.flatnonzero(ones))  # (p n,), int, int
 
 

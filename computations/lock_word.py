@@ -35,6 +35,7 @@ from computations import locks
 from computations.absorption import ALIGNMENTS, WALL_CELLS, ether, kit_wall
 from computations.coin_lock import UNREACHED, entry_paths, period_rate
 from computations.lock_certificate import successor_table
+from computations.rule30 import distinct
 
 # The least window width at which the kit's family fits, with the alignment (j0, shift) and depth k used there.
 LEAST = {"0001": (16, 6, 0, 3), "0011": (14, 1, 3, 1), "0111": (13, 2, 2, 0)}
@@ -99,7 +100,7 @@ def universal_word(word: str, member: np.ndarray) -> list[int]:
         while not member[(start + len(values)) % period][window]:
             ph = (start + len(values)) % period
             value = int(first[ph][window])
-            groups = [np.unique(successors[(s + len(values)) % period, value][g]) for s, g in enumerate(groups)]
+            groups = [distinct(successors[(s + len(values)) % period, value][g]) for s, g in enumerate(groups)]
             window = int(successors[ph, value][window])
             values.append(value)
 
@@ -126,13 +127,14 @@ def slice_run(word: str, width: int, values: list[int]) -> list[int]:
     return slices
 
 
-def slice_check(word: str, width: int, values: list[int], member: np.ndarray) -> bool:
-    """Whether every window ends in the trap of its final phase, by matching the slices against each trap window."""
+def slice_check(word: str, width: int, values: list[int], member: np.ndarray, slices: list[int] | None = None) -> bool:
+    """Whether every window ends in the trap of its final phase, by matching the slices against each trap window;
+    `slices` is `slice_run` of the word when the caller has it already."""
     # member: (4, 2^W)
     size = 1 << width
     ones = (1 << (4 * size)) - 1
     block = (1 << size) - 1
-    slices = slice_run(word, width, values)
+    slices = slice_run(word, width, values) if slices is None else slices
     inside = 0
     for ph in range(4):
         group = sum(block << (p * size) for p in range(4) if (p + len(values)) % 4 == ph)

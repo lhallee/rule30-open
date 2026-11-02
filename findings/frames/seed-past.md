@@ -37,7 +37,7 @@ $t$ of $\Phi^t(1)$. Define $\rho_k = \Phi^{-k}(1)$, the unique row that becomes 
    step $k$, and not before.
 3. **The periods are unbounded.** The period of $\rho_k$ divides that of $\rho_{k+1}$, since $\Phi$ maps a $p$-periodic
    tail to a $p$-periodic tail. A ring of $p$ cells has $2^p$ states, so no configuration on it dies after more than
-   $2^p$ steps; the period of $\rho_k$ therefore exceeds $\log_2 k$.
+   $2^p$ steps; the period of $\rho_k$ is therefore at least $\log_2 k$.
 
 ## Computation
 
@@ -65,7 +65,13 @@ steps for every $k$ from 66 to 3,000.
 eventual periodicity, for every $k$ (`rho_evPer`, `past_evPer`), and
 [SeedPastPeriods](../../Rule30Open/Frames/SeedPastPeriods.md) the other two facts: for $k \ge 1$ the tail of $\rho_k$ is
 not white (`rho_not_evZero`), a period of $p$ cells forces $k \le 2^p$ (`rho_period_bound`), and so the periods are
-unbounded (`rho_no_short_period`). The table of periods stays a computation.
+unbounded (`rho_no_short_period`). [SeedPastRing](../../Rule30Open/Frames/SeedPastRing.md) states the past in Rule 30
+itself, unique among rows white right of a cell (`seed_past_iff`), and proves that the periodic tail of every $\rho_k$,
+wrapped on its ring, dies in exactly $k$ steps and is all black at step $k - 1$ (`rho_tail_dies`), and
+[SeedPastTable](../../Rule30Open/Frames/SeedPastTable.md) checks the table, the examples and the corollary on rings of
+48 cells in the kernel for every $k \le 3{,}000$ (`rho_min_period`, `rho_preperiods`, `ring48_dies`); for every
+$k \ge 66$ each period of $\rho_k$ is a multiple of 48 (`rho_period_dvd_of_ge`). Lean states $\rho_1$ and $\rho_2$ as
+bit sequences, not as the 2-adic numbers $-1$ and $-1/7$, and the running time of the computation is not a theorem.
 
 ## In the kit
 
