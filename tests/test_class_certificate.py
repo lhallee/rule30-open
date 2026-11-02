@@ -3,11 +3,20 @@ by cell, the components and cyclic periods of `game.component_periods`, and the 
 
 from __future__ import annotations
 
+import dataclasses
+import functools
+
 import numpy as np
 import pytest
 
 from computations import class_certificate as cc
 from computations import game
+
+
+@functools.cache
+def built(block: str, width: int) -> cc.Certificate:
+    """`cc.certificate`, built once for the tests that read it; a test that changes one changes a copy."""
+    return cc.certificate(block, width)
 
 
 def parse(text: str) -> tuple[object, str]:
@@ -59,7 +68,7 @@ def test_step_matches_moves() -> None:
 
 @pytest.mark.parametrize("block,width", [("0000000001", 12), ("01111111", 5), ("00000011", 6)])
 def test_components_and_check(block: str, width: int) -> None:
-    cert = cc.certificate(block, width)
+    cert = built(block, width)
     assert cc.check(cert)
     codes = cert.codes[cert.codes >= 0]  # (m,)
     ranks = codes // cert.base  # (m,)
@@ -73,19 +82,21 @@ def test_components_and_check(block: str, width: int) -> None:
 def test_classes_go_past_the_game() -> None:
     # 0^9 1 at 12 cells: the game fails (one component of cyclic period 20 mixes at a phase), the classes close it.
     assert game.bad_pairs("0000000001", 12) > 0
-    cert = cc.certificate("0000000001", 12)
+    cert = built("0000000001", 12)
     assert cert.base == 20 and cc.check(cert)
 
 
 def test_rejects() -> None:
     with pytest.raises(ValueError):
         cc.certificate("01", 6)
-    cert = cc.certificate("01111111", 5)
+    cert = built("01111111", 5)
+    cert = dataclasses.replace(cert, heights=[height.copy() for height in cert.heights])
     top = int(np.argmax(cert.heights[4]))
     assert cert.heights[4][top] == 11
     cert.heights[4][top] = 1  # a height below that of a move from it
     assert not cc.check(cert)
-    cert = cc.certificate("0000000001", 12)
+    cert = built("0000000001", 12)
+    cert = dataclasses.replace(cert, codes=cert.codes.copy())
     rank, label = cert.codes // cert.base, cert.codes % cert.base  # (P 2^W,), (P 2^W,)
     held = np.array([r >= 0 and not (cert.transient >> int(r)) & 1 for r in rank])  # (P 2^W,)
     node = int(np.flatnonzero(held & (cert.codes >= 0) & (label < cert.base - 1))[0])

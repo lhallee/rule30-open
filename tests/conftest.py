@@ -1,6 +1,6 @@
-"""Settings and fixtures shared by every test: one thread for the linear algebra libraries, and the center column
-stepped once for the tests of its long windows and the diagonals to depth 10,000 run once for the tests that quote
-them.
+"""Settings and fixtures shared by every test: one thread for the linear algebra libraries, the objects of the imports
+frozen out of the garbage collector's passes, and the center column stepped once for the tests of its long windows and
+the diagonals to depth 10,000 run once for the tests that quote them.
 
 The suite runs serially on one core. OpenBLAS starts a thread per core by default, and on a machine whose other cores
 are busy those threads wait on each other: `np.linalg.eigvals` of a 700 by 700 matrix takes about 8 s with four threads
@@ -10,6 +10,7 @@ imports it; if numpy is already loaded, `threadpoolctl` limits the running pools
 
 from __future__ import annotations
 
+import gc
 import os
 import sys
 from typing import TYPE_CHECKING
@@ -28,6 +29,13 @@ if "numpy" in sys.modules:
         pass
     else:
         threadpool_limits(1)
+
+
+def pytest_collection_finish(session: pytest.Session) -> None:
+    """Move the objects that importing the modules and collecting the tests made to the collector's permanent
+    generation, so that its full collections during and after the run, which pytest forces twice at the end, do not
+    traverse them again: about 0.2 s of the run."""
+    gc.freeze()
 
 
 @pytest.fixture(scope="session")

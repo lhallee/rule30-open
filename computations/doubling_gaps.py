@@ -38,11 +38,8 @@ to that next white diagonal. m(p) is the least gap over every anti-periodic Y of
 from __future__ import annotations
 
 import argparse
-import functools
-import shutil
 import subprocess
 import sys
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -52,7 +49,6 @@ from tqdm.auto import tqdm
 from computations.settled_words import pair_next
 
 U64 = np.uint64
-HERE = Path(__file__).resolve().parent
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -148,14 +144,10 @@ def scalar_gap(y: int, P: int, cap: int) -> int:
 # The C program
 
 
-@functools.lru_cache(maxsize=2)
 def _binary(optimize: bool = True) -> Path:
-    """Compile computations/doubling_gaps.c once per process into a temporary directory."""
-    cc = shutil.which("cc") or shutil.which("gcc")
-    assert cc, "a C compiler is needed"
-    out = Path(tempfile.mkdtemp(prefix="doubling_gaps_")) / "doubling_gaps"
-    subprocess.run([cc, "-O2" if optimize else "-O0", "-w", str(HERE / "doubling_gaps.c"), "-o", str(out)], check=True)
-    return out
+    """computations/doubling_gaps.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
+    from computations.seed_onsets import compiled
+    return compiled("doubling_gaps", ("-O2" if optimize else "-O0", "-w"))
 
 
 def census_c(p: int, cap: int, progress: bool = True, optimize: bool = True) -> tuple[np.ndarray, np.ndarray]:

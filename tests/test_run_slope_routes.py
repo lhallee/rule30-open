@@ -13,14 +13,15 @@ from computations.run_slope_routes import (alternating_word, driver_pairs, first
                                            white_followers, window_game_distances)
 
 
-def left_history(driver: list[int], steps: int) -> list[list[int]]:
-    """Rows 0 .. steps - 1 of the left half driven by `driver` (zeros after it); row[k - 1] is cell -k."""
+def left_history(driver: list[int], steps: int) -> list[int]:
+    """Rows 0 .. steps - 1 of the left half driven by `driver` (zeros after it), each as one integer whose bit k - 1 is
+    cell -k, stepped cell by cell at once by the rule on integers."""
     width = steps + 8
-    rows = [[0] * width]
+    rows = [0]
     for t in range(steps - 1):
         c = driver[t] if t < len(driver) else 0
         r = rows[-1]
-        rows.append([(r[k + 1] if k + 1 < width else 0) ^ (r[k] | (r[k - 1] if k else c)) for k in range(width)])
+        rows.append(((r >> 1) ^ (r | (r << 1) | c)) & ((1 << width) - 1))  # cell -k from cells -k - 1, -k, -k + 1
     return rows
 
 
@@ -30,8 +31,7 @@ def test_right_ends_against_every_driver() -> None:
     brute = {}
     for t in range(1, steps + 1):
         for tail in itertools.product([0, 1], repeat=t - 1):
-            row = left_history([1, *tail], t + 1)[t]
-            word = sum(row[k] << k for k in range(width))
+            word = left_history([1, *tail], t + 1)[t] & ((1 << width) - 1)
             brute.setdefault(word, t)
     assert {w: int(f) for w, f in enumerate(first) if f >= 0} == brute
 
@@ -75,7 +75,7 @@ def brute_pairs(j: int, horizon: int) -> tuple[set[tuple[tuple[int, ...], tuple[
     worst = 0
     for tail in itertools.product([0, 1], repeat=j):
         rows = left_history([1, *tail], horizon)
-        diag = [[rows[t][t - i - 1] if t > i else (([1, *tail][t]) if t == i else 0) for t in range(horizon)]
+        diag = [[(rows[t] >> (t - i - 1)) & 1 if t > i else (([1, *tail][t]) if t == i else 0) for t in range(horizon)]
                 for i in (j - 1, j)]
         pairs.add((tuple(diag[0][j:]), tuple(diag[1][j:])))
         p = 1

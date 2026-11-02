@@ -28,13 +28,10 @@ an arbitrary row; it says nothing about the single black cell's column, where a 
 from __future__ import annotations
 
 import argparse
-import functools
 import itertools
 import os
-import shutil
 import subprocess
 import sys
-import tempfile
 from collections.abc import Callable
 from pathlib import Path
 
@@ -46,7 +43,6 @@ from computations import query_adversary as qa
 from computations import query_depth as qd
 from computations.cone_screening import step_slices, variable_slices
 
-HERE = Path(__file__).resolve().parent
 LOW = 9  # cells bit-sliced in the C program
 
 
@@ -103,15 +99,10 @@ def previous_level_split(t: int) -> bool:
     return bool((rest[:half] == rest[half:]).all())  # x_t is the last variable
 
 
-@functools.cache
 def _binary() -> Path:
-    """Compile computations/query_evasive_sums.c once per process into a temporary directory."""
-    cc = shutil.which("cc") or shutil.which("gcc")
-    assert cc, "a C compiler is needed for the sums"
-    out = Path(tempfile.mkdtemp(prefix="query_evasive_")) / "query_evasive_sums"
-    subprocess.run([cc, "-O3", "-march=native", "-fopenmp", "-w", str(HERE / "query_evasive_sums.c"), "-o", str(out)],
-                   check=True)
-    return out
+    """computations/query_evasive_sums.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
+    from computations.seed_onsets import compiled
+    return compiled("query_evasive_sums", ("-O3", "-march=native", "-fopenmp", "-w"))
 
 
 def derivative_sums(t: int, threads: int = 1, split: int = 6) -> int:

@@ -189,10 +189,27 @@ def window_cell(bits: list[np.ndarray], low: int, below: int, k: int) -> np.ndar
     return below if k == low - 1 else 0
 
 
+CLOSED: dict[tuple[Background, int], np.ndarray] = {}  # `closed_strips` by background and width, the last 64 kept
+
+
 def closed_strips(bg: Background, width: int) -> np.ndarray:
     """The greatest set of strips D(c - width + 1 .. c), bit i the cell c - width + 1 + i, with D zero above c, that one
     step maps into the set at the next phase for both values of D(c - width) and that never makes cell c + 1 a defect.
-    Indexed by (phase, (c + offset) mod L, strip): (P, L, 2^width)."""
+    Indexed by (phase, (c + offset) mod L, strip): (P, L, 2^width). The last 64 sets of at most 2^22 entries are kept,
+    read-only, for the calls that ask for them again."""
+    if (bg, width) in CLOSED:
+        return CLOSED[bg, width]
+    alive = compute_closed_strips(bg, width)  # (P, L, 2^w)
+    if alive.size <= 1 << 22:
+        while len(CLOSED) >= 64:
+            del CLOSED[next(iter(CLOSED))]
+        alive.flags.writeable = False
+        CLOSED[bg, width] = alive
+    return alive  # (P, L, 2^w)
+
+
+def compute_closed_strips(bg: Background, width: int) -> np.ndarray:
+    """`closed_strips`, computed."""
     P, L, n = bg.period, bg.length, 1 << width
     m = np.arange(n, dtype=np.int32)  # (2^w,) the strips
     alive = np.ones((P, L, n), dtype=bool)  # (P, L, 2^w)

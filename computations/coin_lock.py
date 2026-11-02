@@ -31,7 +31,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from computations import absorption
-from computations.lock_certificate import entry_time, greatest_invariant_set, jen_seeds, successor_table
+from computations.lock_certificate import entry_time, jen_sets, successor_table
 from computations.right_half import random_starts
 from computations.rule30 import distinct
 
@@ -43,8 +43,7 @@ UNREACHED = np.iinfo(np.int64).max // 4
 def certificate(word: str, width: int) -> np.ndarray:
     """The certificate of the `jen` seed at this width: the union over the white-phase values of column 1 of the
     greatest invariant families, as membership masks; kept for the words and widths asked again, so read-only."""
-    members = [greatest_invariant_set(word, seed, width)[0] for seed in jen_seeds(word)]  # each (period, 2^W)
-    member = np.logical_or.reduce(members)  # (period, 2^W)
+    member = np.logical_or.reduce(jen_sets(word, width))  # (period, 2^W), the union over the seeds of `jen_seeds`
     member.flags.writeable = False
     return member  # (period, 2^W)
 
@@ -162,9 +161,10 @@ def coin_moves(word: str, member: np.ndarray) -> tuple[np.ndarray, np.ndarray, n
     outside = np.flatnonzero(~member.reshape(-1))  # (n,)
     position = np.full(period * size, outside.size, dtype=np.int64)  # (period 2^W,)
     position[outside] = np.arange(outside.size)
-    after = ((np.arange(period) + 1) % period)[:, None, None] * size + successors  # (period, 2, 2^W)
-    phase, window = np.divmod(outside, size)  # (n,) each
-    return position[after[phase, 0, window]], position[after[phase, 1, window]], outside  # (n,) each
+    later = ((np.arange(period) + 1) % period)[:, None] * size  # (period, 1), the next phase's first position
+    first = position[(successors[:, 0] + later).reshape(-1)[outside]]  # (n,), read at position ph * 2^W + s
+    second = position[(successors[:, 1] + later).reshape(-1)[outside]]  # (n,)
+    return first, second, outside  # (n,) each
 
 
 def spread(member: np.ndarray, outside: np.ndarray, values: np.ndarray) -> np.ndarray:

@@ -45,15 +45,17 @@ def first_failures(support: int, phase: int, limit: int = 63) -> np.ndarray:
     there is none before it. Phase 0 checks the odd steps, phase 1 the even ones."""
     assert limit <= 63, "the parity at step t needs bits 0 .. t, and the words hold 64"
     U = np.arange(1 << (support - 1), 1 << support, dtype=np.uint64)  # (n,)
-    V = U & np.uint64((1 << (limit + 1)) - 1)  # (n,), H^t(U) modulo 2^(limit + 1 - t)
     failure = np.full(U.size, limit, dtype=np.int64)  # (n,)
-    alive = np.ones(U.size, dtype=bool)  # (n,)
+    alive = np.arange(U.size)  # (m,), the U with no failure yet; only these are stepped
+    V = U & np.uint64((1 << (limit + 1)) - 1)  # (m,), H^t(U) modulo 2^(limit + 1 - t) for the U alive
     for t in range(limit):
         if (t + phase) % 2 == 1:
-            dead = alive & ((V & ONE) == 0)  # (n,)
-            failure[dead] = t
-            alive &= ~dead
-        V = ((V >> ONE) ^ (V | (V << ONE))) & np.uint64((1 << (limit - t)) - 1)  # (n,)
+            dead = (V & ONE) == 0  # (m,)
+            failure[alive[dead]] = t
+            alive, V = alive[~dead], V[~dead]
+            if alive.size == 0:
+                break
+        V = ((V >> ONE) ^ (V | (V << ONE))) & np.uint64((1 << (limit - t)) - 1)  # (m,)
     return failure  # (n,)
 
 
@@ -63,21 +65,24 @@ def first_failures_0001(support: int, phase: int, check: bool, limit: int = 63) 
     steps before; `limit` when there is none before it."""
     assert limit <= 63, "the parity at step t needs bits 0 .. t, and the words hold 64"
     U = np.arange(1 << (support - 1), 1 << support, dtype=np.uint64)  # (n,)
-    V = U & np.uint64((1 << (limit + 1)) - 1)  # (n,), H^t(U) modulo 2^(limit + 1 - t)
     failure = np.full(U.size, limit, dtype=np.int64)  # (n,)
-    alive = np.ones(U.size, dtype=bool)  # (n,)
-    free = np.zeros(U.size, dtype=bool)  # (n,), whether the last phase-1 step was odd
+    alive = np.arange(U.size)  # (m,), the U with no failure yet; only these are stepped
+    V = U & np.uint64((1 << (limit + 1)) - 1)  # (m,), H^t(U) modulo 2^(limit + 1 - t) for the U alive
+    free = np.zeros(U.size, dtype=bool)  # (m,), whether the last phase-1 step was odd
     for t in range(limit):
-        odd = (V & ONE) == ONE  # (n,)
+        odd = (V & ONE) == ONE  # (m,)
         ph = (t + phase) % 4
         if ph == 1:
-            dead = alive & odd & free if check else np.zeros(U.size, dtype=bool)  # (n,)
+            dead = odd & free if check else np.zeros(alive.size, dtype=bool)  # (m,)
             free = odd
         else:
-            dead = alive & (~odd if ph == 3 else odd)  # (n,)
-        failure[dead] = t
-        alive &= ~dead
-        V = ((V >> ONE) ^ (V | (V << ONE))) & np.uint64((1 << (limit - t)) - 1)  # (n,)
+            dead = ~odd if ph == 3 else odd  # (m,)
+        if dead.any():
+            failure[alive[dead]] = t
+            alive, V, free = alive[~dead], V[~dead], free[~dead]
+            if alive.size == 0:
+                break
+        V = ((V >> ONE) ^ (V | (V << ONE))) & np.uint64((1 << (limit - t)) - 1)  # (m,)
     return failure  # (n,)
 
 

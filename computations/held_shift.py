@@ -249,10 +249,12 @@ def cycle_class(word: int, length: int) -> tuple[int, int, int, int]:
 
 
 def replicate(word: int, length: int, width: int) -> int:
-    """The first `width` bits of the periodic extension of the `length`-bit `word`."""
-    out = 0
-    for position in range(0, width, length):
-        out |= word << position
+    """The first `width` bits of the periodic extension of the `length`-bit `word`: the copies at every multiple of
+    `length` below `width`, doubled in number at each step."""
+    out, filled = word, length  # the copies at 0, length, .., filled - length
+    while filled < width:
+        out |= out << filled
+        filled *= 2
     return out & ((1 << width) - 1)
 
 

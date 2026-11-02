@@ -52,6 +52,23 @@ def step_components(moves: np.ndarray, col: int) -> tuple[np.ndarray, np.ndarray
     return label[:n], after, int(count)
 
 
+def classes(nodes: int, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """A representative of the connected component of each of `nodes` nodes, the edges a[i] - b[i] taken both ways: the
+    least label over the edges, then each label replaced by its own label, until nothing changes. On the small graphs of
+    `linear_step` this takes a third of the time of building a sparse matrix for `connected_components`."""
+    # a, b: (m,)
+    label = np.arange(nodes)  # (nodes,), a node of the same component, never larger than the node
+    while True:
+        low = np.minimum(label[a], label[b])  # (m,)
+        new = label.copy()  # (nodes,)
+        np.minimum.at(new, a, low)
+        np.minimum.at(new, b, low)
+        new = new[new]  # (nodes,)
+        if np.array_equal(new, label):
+            return label  # (nodes,)
+        label = new
+
+
 def canonical(labels: np.ndarray) -> np.ndarray:
     """The labels (shape (n,), -1 for no set) renumbered by first occurrence, so equal families compare equal."""
     out = np.full(labels.shape, -1, dtype=np.int64)  # (n,)
@@ -75,8 +92,7 @@ def linear_step(labels: np.ndarray, moves: np.ndarray, col: int,
     sets = int(labels.max()) + 1
     zero = count + sets  # one node for 'must vanish'
     other = np.where(labels >= 0, count + labels, zero)  # (n,) the set of each window, or the zero node
-    graph = csr_matrix((np.ones(n, dtype=np.int8), (before, other)), shape=(zero + 1, zero + 1))
-    _, cls = connected_components(graph, directed=False)  # (zero + 1,)
+    cls = classes(zero + 1, before, other)  # (zero + 1,)
     dead = cls[zero]
     new = np.full(n, -1, dtype=np.int64)  # (n,)
     reached = after >= 0

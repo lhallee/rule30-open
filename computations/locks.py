@@ -30,6 +30,7 @@ import functools
 import itertools
 import multiprocessing
 import sys
+from collections.abc import Callable
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -46,11 +47,14 @@ def reverse_graph(source: np.ndarray, target: np.ndarray, nodes: int) -> tuple[n
     weights."""
     # source, target: (m,)
     assert nodes < 1 << 31, "node numbers must fit 32 bits"
-    order = np.lexsort((source, target))  # (m,), by target, then source
+    # the moves by target, then source: one sort of target * 2^32 + source, which takes a third of the time of
+    # `np.lexsort` on the two arrays and gives the same order of sources
+    key = np.sort(target.astype(np.uint64) << np.uint64(32) | source.astype(np.uint64))  # (m,)
     pointers = np.zeros(nodes + 2, dtype=np.int32)  # (nodes + 2,)
     np.cumsum(np.bincount(target, minlength=nodes), out=pointers[1:nodes + 1])
     pointers[nodes + 1] = pointers[nodes]
-    return pointers, source[order].astype(np.int32), np.ones(order.size + nodes)  # (nodes + 2,), (m,), (m + nodes,)
+    sources = (key & np.uint64(0xFFFFFFFF)).astype(np.int32)  # (m,)
+    return pointers, sources, np.ones(key.size + nodes)  # (nodes + 2,), (m,), (m + nodes,)
 
 
 def back_closure(seed: np.ndarray, source: np.ndarray, target: np.ndarray,
@@ -162,9 +166,30 @@ def lock_info(block: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     return locked, back_closure(locked, source, target, reverse)  # (p n,), (p n,)
 
 
+KEPT: dict[tuple[str, str, int], np.ndarray] = {}  # `locked_nodes` and `mixed_nodes` by name, block and width
+KEPT_BYTES = 1 << 26  # the most that `KEPT` holds, 64 MB
+
+
+def kept(name: str, block: str, width: int, compute: Callable[[str, int], np.ndarray]) -> np.ndarray:
+    """`compute(block, width)`, kept read-only for the 256 games asked last while they take at most `KEPT_BYTES`, so
+    that the tests and searches that ask for one game again share one search."""
+    key = (name, block, width)
+    if key in KEPT:
+        KEPT[key] = KEPT.pop(key)  # the latest asked last
+        return KEPT[key]
+    out = compute(block, width)  # (p n,)
+    out.flags.writeable = False
+    while KEPT and (len(KEPT) >= 256 or sum(nodes.nbytes for nodes in KEPT.values()) + out.nbytes > KEPT_BYTES):
+        del KEPT[next(iter(KEPT))]
+    if out.nbytes <= KEPT_BYTES:
+        KEPT[key] = out
+    return out  # (p n,)
+
+
 def locked_nodes(block: str, width: int) -> np.ndarray:
-    """The locked nodes of `lock_info` alone, without the search for the nodes that reach them."""
-    return locked_search(block, width)[0]  # (p n,)
+    """The locked nodes of `lock_info` alone, without the search for the nodes that reach them; kept (`kept`), so
+    read-only."""
+    return kept("locked", block, width, lambda b, w: locked_search(b, w)[0])  # (p n,)
 
 
 def locked_search(block: str, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray,
@@ -213,7 +238,12 @@ def mixed_nodes(block: str, width: int) -> np.ndarray:
     """The nodes that can reach both values of the left column at one phase, the complement of `lock_info`'s locked
     nodes, found backward from each white phase's nodes by `back_search`: one byte per node and no list of moves, for
     games of 20 cells and more. It stops once every node is mixed, which for a block without a locked node is often
-    after its first white phase."""
+    after its first white phase. Kept (`kept`), so read-only."""
+    return kept("mixed", block, width, search_mixed)  # (p n,)
+
+
+def search_mixed(block: str, width: int) -> np.ndarray:
+    """`mixed_nodes`, searched."""
     period, size = len(block), 1 << width
     c = np.array([int(bit) for bit in block], dtype=np.uint8)  # (p,)
     first = (np.arange(size) & 1).astype(np.uint8)  # (n,), cell 1 of each window

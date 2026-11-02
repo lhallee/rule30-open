@@ -210,14 +210,21 @@ def same_skeleton(onsets: np.ndarray, J: int, H: int, P: int = 8) -> bool:
 
 @functools.cache
 def _binary(name: str) -> Path:
-    """Compile computations/<name>.c, or reuse the binary an earlier process compiled from the same source with the
-    same compiler and flags on the same machine: it is kept in a directory of the temporary folder that only this
-    user can write, under a hash of all four."""
+    """Compile computations/<name>.c with OpenMP and -O3 for this machine (-O1 when the variable SEED_ONSETS_FAST is
+    not 1), or reuse the binary of an earlier process (`compiled`)."""
+    flags = ("-O3", "-march=native") if os.environ.get("SEED_ONSETS_FAST", "1") == "1" else ("-O1",)
+    return compiled(name, (*flags, "-fopenmp", "-w"))
+
+
+@functools.cache
+def compiled(name: str, flags: tuple[str, ...]) -> Path:
+    """Compile computations/<name>.c with `flags`, or reuse the binary an earlier process compiled from the same source
+    with the same compiler and flags on the same machine: it is kept in a directory of the temporary folder that only
+    this user can write, under a hash of all four. The C programs of the other modules are compiled here too."""
     cc = shutil.which("cc") or shutil.which("gcc")
     assert cc, "a C compiler is needed for the searches"
     source = HERE / f"{name}.c"
-    flags = ["-O3", "-march=native"] if os.environ.get("SEED_ONSETS_FAST", "1") == "1" else ["-O1"]
-    command = [cc, *flags, "-fopenmp", "-w", str(source)]
+    command = [cc, *flags, str(source)]
     key = hashlib.sha256(source.read_bytes() + repr((command, platform.node(), platform.machine())).encode())
     folder = Path(tempfile.gettempdir()) / f"rule30-open-{os.getuid()}"
     folder.mkdir(mode=0o700, exist_ok=True)

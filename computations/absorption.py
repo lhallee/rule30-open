@@ -52,6 +52,7 @@ ALIGNMENTS = {"0001": [(5, 0), (6, 0)], "0011": [(0, 0), (1, 3), (4, 0)], "0111"
 WORDS = ("0001", "0011", "0111")
 WALL_CELLS = 13
 ONE = np.uint64(1)
+LAST = np.uint64(63)  # the shift that carries a bit from one 64-bit word to the next
 
 
 def ether(j: int, phase: int) -> int:
@@ -89,8 +90,10 @@ def greatest_wall() -> np.ndarray:
     return member  # (4, 2^13)
 
 
+@functools.lru_cache(maxsize=None)
 def kit_wall() -> np.ndarray:
-    """The unique terminal strongly connected component of the greatest wall: the kit's 109 wall states."""
+    """The unique terminal strongly connected component of the greatest wall: the kit's 109 wall states. Built once and
+    kept, read-only, for the many callers that ask for it."""
     successors, _ = wall_graph()  # (4, 2, 2^13)
     member = greatest_wall().reshape(-1)  # (4 2^13,)
     size = 1 << WALL_CELLS
@@ -105,7 +108,9 @@ def kit_wall() -> np.ndarray:
     exits[label[source][member[source] & leaving]] = True
     sinks = [c for c in np.unique(label[member]).tolist() if not exits[c]]
     assert len(sinks) == 1, f"the greatest wall has {len(sinks)} terminal components"
-    return (label == sinks[0]).reshape(4, size)  # (4, 2^13)
+    wall = (label == sinks[0]).reshape(4, size)  # (4, 2^13)
+    wall.flags.writeable = False
+    return wall  # (4, 2^13)
 
 
 @functools.lru_cache(maxsize=None)
@@ -188,11 +193,14 @@ def step_rows(rows: np.ndarray, center: int) -> np.ndarray:
     column 1."""
     # rows: (n, words)
     left = rows << ONE  # (n, words)
-    left[:, 1:] |= rows[:, :-1] >> np.uint64(63)
-    left[:, 0] |= np.uint64(center)
     right = rows >> ONE  # (n, words)
-    right[:, :-1] |= rows[:, 1:] << np.uint64(63)
-    return left ^ (rows | right)  # (n, words)
+    if rows.shape[1] > 1:  # the carries between words
+        left[:, 1:] |= rows[:, :-1] >> LAST
+        right[:, :-1] |= rows[:, 1:] << LAST
+    left[:, 0] |= np.uint64(center)
+    right |= rows
+    left ^= right
+    return left  # (n, words)
 
 
 def absorb(word: str, rows: np.ndarray, phase: int, steps: int, wall: np.ndarray, reach: int) -> np.ndarray:
@@ -204,8 +212,9 @@ def absorb(word: str, rows: np.ndarray, phase: int, steps: int, wall: np.ndarray
     rows = rows.copy()  # (n, words)
     for t in range(steps):
         inside = family_depth(word, rows[:, 0], (t + phase) % 4, wall) >= 0  # (n,)
-        times[index[inside]] = t
-        rows, index = rows[~inside], index[~inside]
+        if inside.any():  # the halves still outside, copied only when one entered
+            times[index[inside]] = t
+            rows, index = rows[~inside], index[~inside]
         if index.size == 0:
             break
         active = min(rows.shape[1], (reach + t + 2) // 64 + 1)

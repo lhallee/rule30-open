@@ -22,6 +22,7 @@ the drive's phase modulo 3. The trap is closed (`t001_check`), so the half stays
 from __future__ import annotations
 
 import argparse
+import functools
 import re
 import sys
 import time
@@ -95,8 +96,10 @@ def settled_from(word: str, half: int, phase: int, steps: int, period: int) -> i
     return int(times[min(first, len(times) - 1)])
 
 
+@functools.lru_cache(maxsize=None)
 def trap_keys() -> np.ndarray:
-    """The states of the kit's trap t001 as sorted keys strip * 4 + (label mod 3), read from the kit's source."""
+    """The states of the kit's trap t001 as sorted keys strip * 4 + (label mod 3), read from the kit's source once and
+    kept, read-only."""
     packed = dict(re.findall(r"def t001_(\w+) : Nat := (\d+)", TRAP.read_text(encoding="utf-8")))
     digits = sys.get_int_max_str_digits()
     sys.set_int_max_str_digits(0)  # the packed tables have thousands of digits
@@ -106,7 +109,9 @@ def trap_keys() -> np.ndarray:
         sys.set_int_max_str_digits(digits)
     keys = {((states >> (TRAP_WIDTH * i)) % (1 << TRAP_WIDTH)) * 4 + ((labels >> (label_bits * i)) % (1 << label_bits)) % 3
             for i in range(count)}
-    return np.array(sorted(keys), dtype=np.uint64)  # (n,)
+    out = np.array(sorted(keys), dtype=np.uint64)  # (n,)
+    out.flags.writeable = False
+    return out  # (n,)
 
 
 def in_sorted(values: np.ndarray, keys: np.ndarray) -> np.ndarray:

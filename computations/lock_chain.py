@@ -266,18 +266,20 @@ def trap_reach(*traps: dict, width: int | None = None) -> float:
 
 
 REACHED: dict[tuple[str, int, bytes], np.ndarray] = {}  # `reach_nodes` by block, width and digest of the seed
+REACHED_BYTES = 1 << 27  # the most that `REACHED` holds, 128 MB
 
 
 def reach_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
     """The nodes of the game of `width` cells that can reach the traps' nodes (`trap_nodes`), found backward from them
-    (`locks.back_search`). The result is kept, read-only, for the eight seeds asked last, so that calls on the same
-    traps and width share one search."""
+    (`locks.back_search`). The result is kept, read-only, for the 256 seeds asked last while they take at most
+    `REACHED_BYTES`, so that calls on the same traps and width share one search."""
     word = traps[0]["word"]
     assert all(t["word"] == word for t in traps), "one block"
     seed = trap_nodes(traps, width)  # (p n,)
     key = (word, width, hashlib.sha1(np.packbits(seed).tobytes()).digest())
     if key not in REACHED:
-        while len(REACHED) >= 8:
+        while REACHED and (len(REACHED) >= 256
+                           or sum(kept.nbytes for kept in REACHED.values()) + seed.nbytes > REACHED_BYTES):
             del REACHED[next(iter(REACHED))]
         REACHED[key] = locks.back_search(word, width, seed)  # (p n,)
         REACHED[key].flags.writeable = False
@@ -311,8 +313,9 @@ def trap_nodes(traps: tuple[dict, ...], width: int) -> np.ndarray:
         mine = np.zeros((period, 1 << cut), dtype=bool)  # (p, 2^cut), a label and the first `cut` cells
         for label, window in t["states"]:
             mine[label % period, window & ((1 << cut) - 1)] = True
-        inside |= np.tile(mine, (1, 1 << (width - cut))).reshape(-1)  # (p n,), any cells after the first `cut`
-    return inside
+        # any cells after the first `cut`: the window is (later cells) * 2^cut + (first cells)
+        inside.reshape(period, 1 << (width - cut), 1 << cut)[...] |= mine[:, None, :]  # (p, 2^(width - cut), 2^cut)
+    return inside  # (p n,)
 
 
 def module_entries() -> list[tuple[str, str, functools.partial]]:
@@ -2967,15 +2970,17 @@ def escapes(word: str, modulus: int, cells: int, phase: int, window: int, walks:
     at once, where `closure` would have to grow to its cap."""
     rng = np.random.default_rng(seed)
     period, mask = len(word), (1 << cells) - 1
+    column = [int(word[ph % period]) for ph in range(modulus)]  # the block's cell at each phase
+    after = [(ph + 1) % modulus for ph in range(modulus)]  # the next phase
     value: dict[int, int] = {}
     for _ in range(walks):
         ph, w = phase % modulus, window
         frees = rng.integers(0, 2, 4 * cells)  # (4 * cells,)
         for free in frees.tolist():
-            if word[ph % period] == "0" and value.setdefault(ph, w & 1) != w & 1:
+            if not column[ph] and value.setdefault(ph, w & 1) != w & 1:
                 return True
-            left, core = (w << 1) | int(word[ph % period]), w | (w >> 1)
-            ph, w = (ph + 1) % modulus, (left ^ (core | (free << (cells - 1)))) & mask
+            left, core = (w << 1) | column[ph], w | (w >> 1)
+            ph, w = after[ph], (left ^ (core | (free << (cells - 1)))) & mask
     return False
 
 
@@ -3179,7 +3184,14 @@ def wall_as_chain() -> list[bool]:
 
 def t001_states() -> list[tuple[int, int]]:
     """The kit's trap `t001` for 001 (`Rule30EtherThreeTrap`), read from its source: each state's strip of 47 columns,
-    column x at bit x - 1, and its label modulo 21."""
+    column x at bit x - 1, and its label modulo 21. The source is read once (`read_t001`); each call gets its own
+    list."""
+    return list(read_t001())
+
+
+@functools.lru_cache(maxsize=None)
+def read_t001() -> tuple[tuple[int, int], ...]:
+    """The states of `t001_states`, read from the kit's source."""
     import re
     from computations import period_three
     packed = dict(re.findall(r"def t001_(\w+) : Nat := (\d+)", period_three.TRAP.read_text(encoding="utf-8")))
@@ -3190,8 +3202,8 @@ def t001_states() -> list[tuple[int, int]]:
     finally:
         sys.set_int_max_str_digits(digits)
     width = period_three.TRAP_WIDTH
-    return [((strips >> (width * i)) % (1 << width), (labels >> (label_bits * i)) % (1 << label_bits))
-            for i in range(count)]
+    return tuple(((strips >> (width * i)) % (1 << width), (labels >> (label_bits * i)) % (1 << label_bits))
+                 for i in range(count))
 
 
 def t001_reach(width: int) -> float:

@@ -88,11 +88,11 @@ def canon(cells: int, p: int, q: int) -> Rat:
 def rat_cells(x: Rat, n: int) -> int:
     """The cells 0 .. n - 1 of the rational x."""
     p, q, cells = x
-    out = cells & mask(p)
-    word = cells >> p
-    for pos in range(p, n, q):
-        out |= word << pos
-    return out & mask(n)
+    word, filled = cells >> p, q  # the copies of the periodic part at 0, q, .., filled - q, doubled in number
+    while filled < n - p:
+        word |= word << filled
+        filled *= 2
+    return ((cells & mask(p)) | (word << p)) & mask(n)
 
 
 def rat_step(x: Rat) -> Rat:
@@ -101,6 +101,9 @@ def rat_step(x: Rat) -> Rat:
     p, q, _ = x
     u = rat_cells(x, p + q + 2)
     return canon((u >> 1) ^ (u | (u << 1)), p + 1, q)
+
+
+DIGITS = bytes.maketrans(b"\x00\x01", b"01")  # the cells 0 and 1 as the characters of a binary number
 
 
 def rat_preimage(x: Rat, c: int) -> Rat:
@@ -115,8 +118,9 @@ def rat_preimage(x: Rat, c: int) -> Rat:
     for j in range(n):
         u.append(((v >> j) & 1) ^ (u[j] | (u[j - 1] if j > 0 else 0)))
     lo, hi = p + 4 * q, p + 12 * q
-    d = next(d for d in range(1, 4 * q + 1) if all(u[j] == u[j + d] for j in range(lo, hi - d)))
-    return canon(sum(b << j for j, b in enumerate(u[:lo + d])), lo, d)
+    cells = bytes(u)  # cells[j] = U(j), compared as strings
+    d = next(d for d in range(1, 4 * q + 1) if cells[lo:hi - d] == cells[lo + d:hi])
+    return canon(int(cells[lo + d - 1::-1].translate(DIGITS), 2), lo, d)
 
 
 def k_preimages(x: Rat) -> tuple[Rat, Rat]:

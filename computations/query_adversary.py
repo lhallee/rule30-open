@@ -30,10 +30,8 @@ import argparse
 import functools
 import itertools
 import os
-import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -42,19 +40,13 @@ from tqdm.auto import tqdm
 from computations import query_depth as qd
 from computations.cone_screening import cone_table
 
-HERE = Path(__file__).resolve().parent
 LOW = 9  # cells bit-sliced in the C program
 
 
-@functools.cache
 def _binary() -> Path:
-    """Compile computations/query_adversary_sums.c once per process into a temporary directory."""
-    cc = shutil.which("cc") or shutil.which("gcc")
-    assert cc, "a C compiler is needed for the sums"
-    out = Path(tempfile.mkdtemp(prefix="query_adversary_")) / "query_adversary_sums"
-    subprocess.run([cc, "-O3", "-march=native", "-fopenmp", "-w", str(HERE / "query_adversary_sums.c"), "-o",
-                    str(out)], check=True)
-    return out
+    """computations/query_adversary_sums.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
+    from computations.seed_onsets import compiled
+    return compiled("query_adversary_sums", ("-O3", "-march=native", "-fopenmp", "-w"))
 
 
 def kernel_sums(t: int, fixed: dict[int, int], threads: int = 1, split: int = 8,

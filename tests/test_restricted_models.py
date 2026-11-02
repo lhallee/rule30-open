@@ -62,29 +62,41 @@ def _min_by_choices(n: int) -> int:
     """Least closure of (n, 0) over every choice of one black parent where both or-parents are black: a minimal
     certificate is such a closure, so this is the minimum, found without integer programming."""
     x = spacetime_cone(30, n)  # (n + 1, 2n + 1)
-    value = lambda s, j: int(x[s, j + n]) if abs(j) <= s else 0
+    black = {(s, j - n) for s, j in np.argwhere(x).tolist() if abs(j - n) <= s}  # the cone's black cells
+    value = lambda s, j: int((s, j) in black)
     choice_cells = [
         (s, j) for (s, j) in certificate_cells(n) if s >= 2 and value(s - 1, j) == 1 and value(s - 1, j + 1) == 1
     ]
+    # the parents each cell of the cone puts in the closure, the cells at step 0 and outside the cone left out: the
+    # xor-parent, then the black or-parent, or both or-parents when neither is black; at a choice cell the or-parent
+    # is the choice's, read from `chosen` by the choice's index
+    inside = lambda s, j: s > 0 and abs(j) <= s
+    index = {cell: i for i, cell in enumerate(choice_cells)}
+    parents, chosen = {}, {}
+    for s in range(1, n + 1):
+        for j in range(-s, s + 1):
+            if (s, j) in index:
+                below = [(s - 1, j - 1)]
+                chosen[s, j] = [cell if inside(*cell) else None for cell in ((s - 1, j), (s - 1, j + 1))]
+            elif value(s - 1, j) == 1:
+                below = [(s - 1, j - 1), (s - 1, j)]
+            elif value(s - 1, j + 1) == 1:
+                below = [(s - 1, j - 1), (s - 1, j + 1)]
+            else:
+                below = [(s - 1, j - 1), (s - 1, j), (s - 1, j + 1)]
+            parents[s, j] = [cell for cell in below if inside(*cell)]
     best = None
     for bits in itertools.product((0, 1), repeat=len(choice_cells)):
-        pick = dict(zip(choice_cells, bits))
         seen: set[tuple[int, int]] = set()
         stack = [(n, 0)]
         while stack:
-            s, j = stack.pop()
-            if (s, j) in seen or s == 0 or abs(j) > s:
+            cell = stack.pop()
+            if cell in seen:
                 continue
-            seen.add((s, j))
-            stack.append((s - 1, j - 1))
-            if (s, j) in pick:
-                stack.append((s - 1, j + pick[(s, j)]))
-            elif value(s - 1, j) == 1:
-                stack.append((s - 1, j))
-            elif value(s - 1, j + 1) == 1:
-                stack.append((s - 1, j + 1))
-            else:
-                stack.extend([(s - 1, j), (s - 1, j + 1)])
+            seen.add(cell)
+            stack.extend(parents[cell])
+            if cell in chosen and (pick := chosen[cell][bits[index[cell]]]) is not None:
+                stack.append(pick)
         best = len(seen) if best is None else min(best, len(seen))
     return best
 

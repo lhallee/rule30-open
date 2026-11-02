@@ -69,14 +69,19 @@ def moves(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray]:
     components."""
     period, n_cells = len(pattern), 1 << width
     windows = np.arange(n_cells, dtype=np.int64)  # (n,)
-    sources, targets = [], []
+    after = {}  # the next window for each value of the column and of the free cell, (n,) each
+    for column in set(pattern):
+        for free in (0, 1):
+            wide = int(column) | windows << 1 | free << (width + 1)  # (n,), the column at bit 0
+            after[column, free] = (((wide << 1) ^ (wide | (wide >> 1))) >> 1) & (n_cells - 1)  # (n,)
+    sources = np.empty(2 * period * n_cells, dtype=np.int64)  # (2 p n,), phase by phase, free cell 0 then 1
+    targets = np.empty(2 * period * n_cells, dtype=np.int64)  # (2 p n,)
     for phase in range(period):
         for free in (0, 1):
-            wide = int(pattern[phase]) | windows << 1 | free << (width + 1)  # (n,), the column at bit 0
-            sources.append(phase * n_cells + windows)  # (n,)
-            targets.append(((phase + 1) % period) * n_cells + ((((wide << 1) ^ (wide | (wide >> 1))) >> 1)
-                                                               & (n_cells - 1)))  # (n,)
-    return np.concatenate(sources), np.concatenate(targets)  # (2 p n,), (2 p n,)
+            part = slice((2 * phase + free) * n_cells, (2 * phase + free + 1) * n_cells)
+            np.add(windows, phase * n_cells, out=sources[part])
+            np.add(after[pattern[phase], free], ((phase + 1) % period) * n_cells, out=targets[part])
+    return sources, targets  # (2 p n,), (2 p n,)
 
 
 @functools.lru_cache(maxsize=6)
@@ -109,9 +114,11 @@ def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.nda
     return source, target, label, recurrent, column  # (2 p n,), (2 p n,), (p n,), (components,), (p n,)
 
 
+@functools.lru_cache(maxsize=None)
 def bad_pairs(pattern: str, width: int) -> int:
     """The (component, phase) pairs at which a component that can hold a play shows the left column taking both
-    values. Zero means the game excludes the block at this width."""
+    values. Zero means the game excludes the block at this width. Kept for the games asked again, which `least_width`
+    and `first_width` share."""
     _, _, label, recurrent, column = game_graph(pattern, width)
     phase_of = np.arange(label.size) >> width  # (p n,)
     keep = recurrent[label]  # (p n,)

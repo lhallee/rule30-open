@@ -91,10 +91,13 @@ def brute_quarter(word: str) -> bool:
         for r in range(P):  # theorem B: r < P black cells from t1, then a white cell
             if all(c(t1 + s) for s in range(r)) and not c(t1 + r) and 9 * ((P - r + 3) // 4) <= r:
                 return True
-        for s, r in itertools.product(range(9, P), range(P)):  # theorem D
-            if (s + r < P and all(c(t1 + i) for i in range(s)) and not any(c(t1 + s + i) for i in range(r))
-                    and c(t1 + s + r) and 1 + 9 * ((P - s - r + 1) // 4) <= r):
-                return True
+        for s in range(9, P):  # theorem D: s black cells from t1, then r white cells, then a black cell
+            if not all(c(t1 + i) for i in range(s)):
+                continue  # whatever r is
+            for r in range(P):
+                if (s + r < P and not any(c(t1 + s + i) for i in range(r)) and c(t1 + s + r)
+                        and 1 + 9 * ((P - s - r + 1) // 4) <= r):
+                    return True
     return False
 
 

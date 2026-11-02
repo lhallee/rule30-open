@@ -264,13 +264,21 @@ def test_small_right() -> None:
     for word, phase, entries in lists:
         phase, entries = int(phase), [(int(t), int(k)) for t, k in re.findall(r"\((\d+), (\d+)\)", entries)]
         assert len(entries) == 64
+        # the 64 halves stepped together as rows of cells, each kept at its listed step; n columns hold every cell a
+        # half of six cells can reach by then, so the white cell past column n changes nothing
+        last = max(t1 for t1, _ in entries)
+        rows = np.zeros((64, last + max(k for _, k in entries) + 20), dtype=bool)  # (64, n), columns 1 .. n
+        rows[:, :6] = (np.arange(64)[:, None] >> np.arange(6)[None, :]) & 1
+        kept = {}
+        for t in range(last + 1):
+            for half, (t1, _) in enumerate(entries):
+                if t1 == t:
+                    kept[half] = rows[half].copy()  # (n,)
+            left = np.concatenate([np.full((64, 1), word[(t + phase) % 4] == "1"), rows[:, :-1]], axis=1)  # (64, n)
+            right = np.concatenate([rows[:, 1:], np.zeros((64, 1), dtype=bool)], axis=1)  # (64, n)
+            rows = left ^ (rows | right)
         for half, (t1, k) in enumerate(entries):
-            row = np.zeros(t1 + k + 20, dtype=bool)  # (n,), columns 1 .. n, white past the light cone
-            row[:6] = [(half >> i) & 1 for i in range(6)]
-            for t in range(t1):
-                left = np.concatenate([[word[(t + phase) % 4] == "1"], row[:-1]])  # (n,)
-                right = np.concatenate([row[1:], [False]])  # (n,)
-                row = left ^ (row | right)
+            row = kept[half]  # (n,)
             strip = tuple(bool(cell) for cell in row[k:k + 13])
             assert any((j0 + k) % 7 == 2 and (psi := (t1 + s + phase) % 4, strip) in wall
                        and all(row[p - 1] == (ETHER[(j0 + p) % 7][psi] == "1") for p in range(1, k + 1))

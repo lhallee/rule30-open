@@ -43,8 +43,6 @@ cost(s) - gamma <= E(s) - E(s') on every edge.
 from __future__ import annotations
 
 import argparse
-import functools
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -55,7 +53,6 @@ from pathlib import Path
 import numpy as np
 from tqdm.auto import tqdm
 
-HERE = Path(__file__).resolve().parent
 GAMMA = Fraction(5, 2)
 
 
@@ -264,15 +261,11 @@ def excess_graph(g: WalkGraph, gamma: Fraction, rounds: int = 100000) -> np.ndar
 # The C program
 
 
-@functools.lru_cache(maxsize=2)
 def _binary(optimize: bool) -> Path:
-    """Compile computations/walk_eigen.c once per process into a temporary directory (without optimization for the
-    small periods, where compiling takes longer than running)."""
-    cc = shutil.which("cc") or shutil.which("gcc")
-    assert cc, "a C compiler is needed"
-    out = Path(tempfile.mkdtemp(prefix="walk_eigen_")) / "walk_eigen"
-    subprocess.run([cc, "-O2" if optimize else "-O0", "-w", str(HERE / "walk_eigen.c"), "-o", str(out)], check=True)
-    return out
+    """computations/walk_eigen.c, compiled once and kept for later processes (`seed_onsets.compiled`; without
+    optimization for the small periods, where compiling takes longer than running)."""
+    from computations.seed_onsets import compiled
+    return compiled("walk_eigen", ("-O2" if optimize else "-O0", "-w"))
 
 
 @dataclass(frozen=True, slots=True)

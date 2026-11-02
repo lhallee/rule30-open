@@ -149,10 +149,13 @@ def _rotation_classes(P: np.ndarray, Q: np.ndarray, period: np.ndarray) -> int:
     # P, Q: (n, h); period: (n,)
     h = P.shape[1]
     classes: set[tuple[int, bytes]] = set()
+    size = P.itemsize
     for i in np.nonzero(period > 0)[0].tolist():
         p = int(period[i])
-        word = np.stack([P[i, h - p:], Q[i, h - p:]])  # (2, p)
-        classes.add((p, min(np.roll(word, k, axis=1).tobytes() for k in range(p))))
+        first, second = P[i, h - p:].tobytes(), Q[i, h - p:].tobytes()  # p items each
+        # the bytes of the (2, p) array of the two rows turned k places (`np.roll` along the time axis), every k
+        classes.add((p, min(first[len(first) - k * size:] + first[:len(first) - k * size]
+                            + second[len(second) - k * size:] + second[:len(second) - k * size] for k in range(p))))
     return len(classes)
 
 
