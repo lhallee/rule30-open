@@ -150,7 +150,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([reach of the kit's conjectures](findings/columns/kit-absorption-reach.md)): the test that refutes entry into seven
   traps of periods 13 to 15 ([MissedTraps](Rule30Open/Columns/MissedTraps.md)) finds nothing against either at those
   widths. A set of 52 cells misses `t001`: the second trap for $001$, so the kit's `AbsorptionT t001` is false
-  ([Traps001](Rule30Open/Columns/Traps001.md)). Under $0001$ every right half reads column 1 as $0^a 1^{4-a}$ on
+  ([Traps001](Rule30Open/Columns/Traps001.md)). In Lean, every right half, finite or infinite, whose first $K$ cells
+  lie in the forced basin of the family enters it whatever lies beyond; that is a fixed share of the halves of every
+  length, 2.5% to 33.6% of the windows by word and phase at $K$ = 14, 16 and 18, and by computation 21% to 56% at 24
+  cells ([ForcedBasin](Rule30Open/Columns/ForcedBasin.md), [ForcedBasin18](Rule30Open/Columns/ForcedBasin18.md)); halves
+  slow to enter the family are as slow to reach the basin. Under $0001$ every right half reads column 1 as $0^a 1^{4-a}$ on
   each block of four steps, along a graph of 13 transitions, and a repeated value 2 or 3 forces the aligned ether up to
   its first $B_3$ column ([column-one blocks](findings/columns/column-one-blocks.md)). For a uniformly random infinite
   half the law at each time is exact, uniform on a set of measure $2^{-t}$; almost every infinite half enters exactly
@@ -307,8 +311,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   slopes](negative-results/diagonals/finite-state-slopes.md)). Every configuration white left of a black cell settles to
   the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
   ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
-  followed by a doubling period, which the computation confirms below depth 53,207; so over all drivers the slope
-  question is the single cell's question of when its left diagonals settle, and the forced-word, diagonal and
+  followed by a doubling period, which the computation confirms below depth 53,207. Behind a white diagonal with no
+  doubling, flipping one cell realizes the complemented class, so from depth 53,208 the settled pairs form a tree of
+  classes, 8 branches to depth 250,000, each walking 1.99 to 2.02 cells per depth ([SkeletonTree](Rule30Open/Diagonals/SkeletonTree.md),
+  [the skeleton tree](findings/diagonals/skeleton-tree.md)); so over all drivers the slope question is the single cell's
+  question of when its left diagonals settle, taken over the branches of that tree, and the forced-word, diagonal and
   window-rank routes stop there ([driven run slopes](negative-results/diagonals/driven-run-slopes.md)).
   In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
@@ -432,7 +439,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   of a diagonal that ends in a copy of $c_{t-1}$, and the right corner repeats once as an AND after $x_{t-3}$ is black, in
   Lean, but the adversaries for trees that read $x_{-t+1}$ last and earlier do not combine ($t \le 9$), gates stop after
   one level ($t \le 12$), and every linear measure is a multiple of $\mu$ ([SecondCells](Rule30Open/Complexity/SecondCells.md),
-  [evasiveness routes](negative-results/complexity/query-evasive-routes.md)). As a function of the digits of $n$, $c$
+  [evasiveness routes](negative-results/complexity/query-evasive-routes.md)). The fewest cells of a partial row that fix
+  the center always include $x_{-t}$, and $t - 1$ suffice for every $t \ge 9$ (the alternating stripe on $-t..-2$ with
+  $x_{-1}$ free), in Lean; $t - 1$ is the least for $9 \le t \le 15$ by an exhaustive search, while the routing lemma
+  that would give it for every $t$ fails at $t = 12$ ([MinCertificate](Rule30Open/Complexity/MinCertificate.md),
+  [routing lemma](negative-results/complexity/min-certificate-routing.md)). As a function of the digits of $n$, $c$
   has the algebraic normal form, the parity correlations and the mod-3 correlations of a random function for digit
   lengths up to 20 ([index spectrum](negative-results/complexity/index-function-spectrum.md)), and one step on a ring of
   $W$ cells loses fewer than $0.85^W$ bits, less than Rule 90's 1 or 2, so erased information gives no lower bound
@@ -531,7 +542,11 @@ In order of the assessment above.
      an exclusion would need a forced list of entropy 0 read at every white step.
    - *Period two, the right half.* Every finite right half entering the gap trap, the kit's ether family or the lock of
      period seven ([the census](findings/period-two/gate-census.md)) would leave the left statement `Q01Gap` alone; the
-     census reaches 20 cells, and wider locks, or a test of reach for the three sets together, are next.
+     census reaches 20 cells, every state of the double-step game of up to 26 cells can reach the three sets, and every
+     play enters them from 61% of the states of 22 cells ([the three-set game](findings/period-two/three-set-game.md)),
+     but no forced basin at a fixed width covers the deep members of the family, whose windows stay the aligned ether
+     ([the residue](negative-results/period-two/game-residue.md)); an argument that uses the finiteness of the half, or
+     wider locks, is next.
    - *Period two.* (R) on ether tails is what the computations leave; it needs every defect on the ether to have a
      bounded top ([the shift model](findings/period-two/shift-model.md), items 5 and 8). Windows of 5, 8, 10 and 12 cells at the top
      cannot certify that, with or without $K$ ([ether fronts](negative-results/period-two/ether-front-windows.md),

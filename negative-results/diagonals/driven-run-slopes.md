@@ -79,7 +79,7 @@ depth of the window at time $t$, which makes the game infinite: that is route 2.
   single cell's read with a time shift, for $j \le 53{,}207$ (Lean step and base, a computed check at the four white
   diagonals 2, 7, 28, 399). So there $A_j$ and the period $P_j$ are the single cell's, and only $T_j$ depends on the
   driver. At the white diagonals 53,207 and 58,286 the period does not double and the step leaves a second,
-  complemented class that nothing here excludes.
+  complemented class, which one flipped cell realizes ([the skeleton tree](../../findings/diagonals/skeleton-tree.md)).
 - The reset bound: by `shift_of_black` (and `D_periodic_of_black` of [LeftMemory](../../Rule30Open/Diagonals/LeftMemory.md)),
   $T_{j+1} \le \max(T_j, j + 1) + g_j + 1$, where $g_j$ is the longest cyclic white run of the periodic part of
   $D_j$ ($g_j = -1$ for a white diagonal). With $T_1 = 2$ this gives a bound $B_j$ for every driver,

@@ -138,6 +138,8 @@ public import Rule30Open.Columns.ColumnTransfer
 public import Rule30Open.Columns.WideWalls
 public import Rule30Open.Columns.SixRefuted
 public import Rule30Open.Columns.TailFamilies14
+public import Rule30Open.Columns.ForcedBasin
+public import Rule30Open.Columns.ForcedBasin18
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
@@ -159,6 +161,7 @@ public import Rule30Open.Diagonals.PrefixWalk
 public import Rule30Open.Diagonals.DrivenSkeleton
 public import Rule30Open.Diagonals.RunTransfer
 public import Rule30Open.Diagonals.DoublingGaps
+public import Rule30Open.Diagonals.SkeletonTree
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Analogs.Rule210
@@ -171,6 +174,7 @@ public import Rule30Open.Complexity.RightCorner
 public import Rule30Open.Complexity.CornerOr
 public import Rule30Open.Complexity.SecondCells
 public import Rule30Open.Complexity.LeftCut
+public import Rule30Open.Complexity.MinCertificate
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

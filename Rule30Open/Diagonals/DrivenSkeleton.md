@@ -66,9 +66,10 @@ diagonals below depth 59,000 are 2, 7, 28, 399, 53,207 and 58,286 (`followers`, 
 last 128 of 110,000 steps, as in [the records](../../findings/diagonals/left-records.md)), and at 53,207 and 58,286 the
 diagonal before the white one has even weight per period (6 and 10 of 16), so the diagonal after it does not flip,
 and that diagonal's complement is not one of its rotations. So at depth 53,208 the step leaves two candidate classes,
-the single cell's pair and the pair with $D_{53208}$ complemented. Whether some configuration settles to the second is not decided here.
-So the time-shift statement holds for the pairs $(D_{j-1}, D_j)$ with $j \le 53{,}207$, on the evidence of that
-computation, and is open beyond.
+the single cell's pair and the pair with $D_{53208}$ complemented. Some configuration settles to the second: [SkeletonTree](SkeletonTree.md) realizes it by flipping one cell of the
+single cell's row at time 107,310 (`branch_realized`, `branch_not_shift`). So the time-shift statement holds for the
+pairs $(D_{j-1}, D_j)$ with $j \le 53{,}207$, on the evidence of that computation, and fails at depth 53,208 for some
+configurations.
 
 For the left half driven by an arbitrary center column $c(0) = 1, c(1), \ldots$ (a relaxation: not every such
 column is realized by a configuration), diagonal 0 is black from time 0 and diagonal 1 from time 2, so the pair
