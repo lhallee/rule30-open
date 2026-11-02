@@ -159,7 +159,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   its first $B_3$ column ([column-one blocks](findings/columns/column-one-blocks.md)). For a uniformly random infinite
   half the law at each time is exact, uniform on a set of measure $2^{-t}$; almost every infinite half enters exactly
   when entry has a uniform positive chance after every prefix, which is open, and for $0001$ a half stays out for $T$
-  steps with chance at least $2^{-(T + 20)}$ ([random halves](findings/columns/random-halves.md)). Open: attraction for
+  steps with chance at least $2^{-(T + 20)}$ ([random halves](findings/columns/random-halves.md)). The exact channel
+  from a free column into column 1 keeps positive entropy at every width up to 30, 0.298, 0.296 and 0.242 bit per
+  period for the three words, and the class test fails at every width; its growth levels off for $0011$ and $0111$ and
+  is still falling for $0001$ ([the channel ladder](negative-results/columns/channel-ladder.md)), so no window of up to
+  30 cells bypasses `Absorption` through the class test. Open: attraction for
   halves with at least three black cells among the
   first $G$ columns, one of them among columns 1 to 30, one among columns 7 to $B$, one among columns 11 to $G'$ and one
   among columns 15 to 750, 1,446 and 560, beyond the census's 20 cells. *Assessment:* the most direct route to a full
@@ -171,6 +175,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   Lean checks, for each word, every half that lies within depth 88 at the time it starts to keep the pattern
   ([LeftHalf0001](Rule30Open/Columns/LeftHalf0001.md) with the kit's lane checker,
   [LeftHalfDriven](Rule30Open/Columns/LeftHalfDriven.md) with the checker extended to a boundary that is not white).
+  With its free reading constrained by the right channel at 24 cells (0.354 of the bit per period `C3` leaves free), no
+  left half of up to 180 cells meets the constrained statement for $0001$, in any phase; margins still grow at the coin
+  rate ([the channel-constrained C3](negative-results/columns/channel-left-c3.md)).
   *Assessment:* the latest failure outlasts the half's length by about a third of it, and the work of a check doubles
   with every four cells, so checks settle bounded cases only; a proof needs an argument that uses the finiteness of the
   half.
@@ -242,7 +249,15 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   also equivalent to some horizon working at every depth, all in Lean ([WedgeLadder](Rule30Open/PeriodTwo/WedgeLadder.md),
   [WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)). So BWH implies `Q01`, and `Q01` implies the kit's SEP; read
   through the chart, BWH at depth $n$ is `Q01` for starts of width about $2n$ with a time horizon about twice the width,
-  as simulation confirms for $n \le 12$. SmallRW is proved here ([WedgeSmall](Rule30Open/PeriodTwo/WedgeSmall.md)). Past a free prefix of $n$
+  as simulation confirms for $n \le 12$. SmallRW is proved here ([WedgeSmall](Rule30Open/PeriodTwo/WedgeSmall.md)).
+  Period two for the single cell also follows from one statement about finite left halves, with no entry hypothesis on
+  the right half: `Q01Right(W)`, that no finite constrained start has the complement of its free bits equal, from some
+  step on, to column 1 along a path in the limit set $E_W$ of the double-step windows of $W$ columns, for any one
+  $W \ge 1$. This is in Lean, with $E_{14}$ explicit: 2,436 windows, which every right half enters by white step 20
+  ([ChannelLanguage](Rule30Open/PeriodTwo/ChannelLanguage.md)). The channel's entropy falls from 0.356 bits per white
+  step at 8 columns to 0.122 at 28, against 1 for `Q01`, but components that a path can stay in forever, outside the gap
+  trap and not locked, persist through 28 columns, so the channel does not yet reduce period two to `Q01Gap` and
+  periodic columns ([the right channel language](findings/period-two/right-channel-language.md)). Past a free prefix of $n$
   symbols each binary symbol is forced, so BWH and RW are statements about $2^n$ forced runs; no witness of BWH exists
   for $7 \le n \le 31$ and none of RW for $n \le 26$, by search ([forced runs](findings/period-two/wedge-forced-runs.md)).
   A run dies exactly when the constant is off an edge of a square that the step's symmetries preserve, and the four
@@ -352,7 +367,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   settled side ([linear-settling leads](negative-results/diagonals/linear-settling-leads.md)); a density budget on reset
   gaps, the decay of damage from one flipped cell and a doubling law for the onsets each reduce to the onsets again, and
   the onsets spread like a walk (variance about 2.2 per depth, a heuristic reading)
-  ([onset heuristics](negative-results/diagonals/onset-heuristics.md)). Over every row white left
+  ([onset heuristics](negative-results/diagonals/onset-heuristics.md)). The onsets are the left edge of the seed against
+  its own translate by the period: the edge moves by a three-case law and passes diagonal $j$ exactly when every
+  diagonal up to $j$ repeats, so a depth gain of $2/3$ per step gives slope $3/13$, in Lean
+  ([OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)). To depth 200,000 the edge gains 0.752 per step and moves like the
+  damage edge of one flipped cell in random rows (0.756); in a game where the settled cells are fair coins, no transient
+  that keeps 4 or more cells right of the edge holds the gain at $2/3$, which is a model and not a bound, because the
+  settled side is a fixed word ([onset edge](findings/diagonals/onset-edge.md)). Over every row white left
   of a black cell, a later row of which is again such a row, diagonal $j$ settles by $\lceil 3j/2 \rceil + 5$ for
   $j \le 76$, exactly, with 5 attained at $j = 48$; this seed-uniform bound is conjectured for every $j$ ([seed-uniform
   onsets](findings/diagonals/seed-uniform-onsets.md)), and a sound window abstraction proves it by computation for
@@ -434,7 +455,15 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   right-edge cycle length $L_n$ grows faster than linearly, while Rule 90's is 2-automatic, in Lean
   ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 25 of the levels $n \le 61$ and reaches $2^{25}$
   ([right-edge cycles](findings/complexity/right-edge-cycles.md)); the transducers of the powers of the right-edge step
-  grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)). *Assessment:* a
+  grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)).
+  In parity models the center is separated from the linear rules for every $t$, in Lean: a function of odd weight has
+  Walsh coefficients 2 mod 4 and an XOR lift that is its own inverse over GF(2), so with the kit's top monomial $c_t$ has
+  at least $2^{2t-1}$ nonzero Walsh coefficients and its XOR lift has GF(2) rank $2^{2t-1}$, where Rules 90 and 150 have
+  one; the bounds are linear in the cone, and Rule 120 behaves the same, so nothing follows for the single seed
+  ([ParityLift](Rule30Open/Complexity/ParityLift.md)). Across a left cut the GF(2) rank of the cone after $a$ cells is
+  $2 + \lfloor 2^a/3 \rfloor$ for every $a \le t - 3$ and $t \le 14$, as for Rule 45; windows of fixed width have rank 1
+  at $t = 2^j$ (Lean), so an all-$t$ bound needs cells at distance $\log_2 t$ from the cut ([the left-cut
+  rank](findings/complexity/left-cut-rank.md), [LeftCutRank](Rule30Open/Complexity/LeftCutRank.md)). *Assessment:* a
   lower bound in a restricted model is within reach only for finite ranges; an asymptotic one, even "the column is not
   automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides. Crossing
   sequences, the kit's method for one tape, give at most time of order $(\log n)^2$ for any function, and for $c$ only

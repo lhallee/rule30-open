@@ -175,7 +175,9 @@ after about $2.5 d$ steps), not how much it can bias it; the rates here measure 
 - The kit, at the pinned commit and on its main branch, has no relaxation of the right half by columns: its
   equivalent form `CoupledHalves` couples the two driven halves exactly, its counts (`Rule30CenterRuns`: at least
   $\log_2 T$ black and $\log_4 T$ white cells before $T$) are of order $\log T$, and the run bounds of
-  `Rule30SettledBarrierEffective` on the main branch give no density either.
+  `Rule30SettledBarrierEffective` on the main branch give no density either. The same truncation, columns $1 .. W$
+  exact with column $W + 1$ free, appears in this repository for an alternating center in
+  [the right channel language](../period-two/right-channel-language.md), for Problem 1.
 
 ## Reproduce
 

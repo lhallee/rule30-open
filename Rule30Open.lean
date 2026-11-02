@@ -157,9 +157,11 @@ public import Rule30Open.PeriodTwo.EtherKTree32
 public import Rule30Open.PeriodTwo.WedgeSmall
 public import Rule30Open.PeriodTwo.WedgeLadder
 public import Rule30Open.PeriodTwo.WedgeLadderQ01
+public import Rule30Open.PeriodTwo.ChannelLanguage
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Diagonals.SettledSlope
+public import Rule30Open.Diagonals.OnsetEdge
 public import Rule30Open.Diagonals.FrontWalker
 public import Rule30Open.Diagonals.PrefixWalk
 public import Rule30Open.Diagonals.DrivenSkeleton
@@ -180,6 +182,8 @@ public import Rule30Open.Complexity.SecondCells
 public import Rule30Open.Complexity.LeftCut
 public import Rule30Open.Complexity.MinCertificate
 public import Rule30Open.Complexity.TwoIndex
+public import Rule30Open.Complexity.LeftCutRank
+public import Rule30Open.Complexity.ParityLift
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/
