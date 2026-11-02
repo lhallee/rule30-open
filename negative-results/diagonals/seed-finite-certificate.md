@@ -103,6 +103,9 @@ the stops recorded in [seed-uniform induction](seed-uniform-induction.md) (route
 $N_{n,k}$ for $k \le 16$) and [linear settling leads](linear-settling-leads.md); for black runs of the driven left half
 the analogous barrier is [finite-state slopes](finite-state-slopes.md).
 
+A potential allowed to grow with the white runs is tried in [the white-run potential](white-run-potential.md), which
+stops too.
+
 ## Reproduce
 
 ```bash

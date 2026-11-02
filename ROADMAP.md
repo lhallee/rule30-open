@@ -326,7 +326,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   $j \le 1{,}252$ and proves $T_j \le \lceil 8j/5 \rceil$ for every seed and $j \le 87{,}866$ ([seed window
   bounds](findings/diagonals/seed-window-bounds.md)); no finite certificate gives it for every $j$, since a bounded
   potential would bound the one-step jump, which is one plus the longest white run of a settled diagonal and reaches 24
-  by depth 200,000 ([finite certificates](negative-results/diagonals/seed-finite-certificate.md)), and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
+  by depth 200,000 ([finite certificates](negative-results/diagonals/seed-finite-certificate.md)). A potential that grows
+  with the white runs does not help: the window bounds grow linearly faster than $3j/2$ while the largest white run
+  stays at 15, a certificate that knows only the white runs needs slope $7/3$, and the step carries a white run to the
+  diagonals before it without shortening it ([RunTransfer](Rule30Open/Diagonals/RunTransfer.md)), so it bounds the runs
+  only by the period ([white-run potential](negative-results/diagonals/white-run-potential.md)). To depth 200,000 the
+  settled words look like fair words of their period and the largest white run stays below $\log_2 j + 6$ ([settled
+  words](findings/diagonals/settled-words.md)), so a logarithmic bound on it is a conjecture; and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
   rule that makes the search exact, but induction through later rows, subadditivity over seeds and a fixed delay behind
   the single cell all stop, the first at slope 2 ([seed-uniform induction](negative-results/diagonals/seed-uniform-induction.md)).
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth

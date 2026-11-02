@@ -29,7 +29,7 @@ on small cases; the large runs belong to the reproduce commands of the entries.
   fixtures in `conftest.py` serve several files: `center_rows`, the first 65,536 digits of the center column and the
   rows at 16,384, 32,768 and 49,152 steps, stepped one row at a time (for `test_long_window`, `test_wide_window` and
   the long window of `test_lean_statements.py`), and `deep_diagonals`, the stream of `settled_slope` to depth 10,000
-  over 15,600 steps (for `test_settled_slope.py`, `test_front_walker.py` and `test_onset_heuristics.py`). No test calls `lock_chain.block_traps` (about 570 s
+  over 15,600 steps (for `test_settled_slope.py`, `test_front_walker.py`, `test_onset_heuristics.py` and `test_settled_words.py`). No test calls `lock_chain.block_traps` (about 570 s
   for its 1,648 traps) or builds every trap.
 - **Reverse search and vectorized stepping.** `locks.back_closure` runs a breadth-first search on the reversed graph
   (`locks.reverse_graph`), `locks.back_search` sorts a small frontier instead of scanning the game, and
@@ -96,7 +96,7 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q --durations=40 -p no:cacheprovider` collects 525 tests: 524 pass and 1 is skipped
+`python -m pytest -q --durations=40 -p no:cacheprovider` collects 533 tests: 532 pass and 1 is skipped
 (`test_late_onset.py` needs `pysat`, which this environment lacks). Serially on one core of a machine with four, with no
 other job running, the suite takes 44 to 49 s of wall time; the per-test durations (setup and call) sum to 42 to 46 s,
 and collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for `test_persistence.py`

@@ -155,6 +155,7 @@ public import Rule30Open.Diagonals.SettledSlope
 public import Rule30Open.Diagonals.FrontWalker
 public import Rule30Open.Diagonals.PrefixWalk
 public import Rule30Open.Diagonals.DrivenSkeleton
+public import Rule30Open.Diagonals.RunTransfer
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Analogs.Rule210

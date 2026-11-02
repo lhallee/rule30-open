@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-166 Lean modules with 732 headline theorems, 54 findings (proved on paper,
-computed or conjectured) and 62 negative results. Prize problem 1 asks whether the center column
+167 Lean modules with 740 headline theorems, 55 findings (proved on paper,
+computed or conjectured) and 63 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -14,7 +14,7 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 133 | 26 | 15 |
 | [Period two](#period-two) | 12 | 12 | 9 |
-| [Diagonals](#diagonals) | 6 | 5 | 7 |
+| [Diagonals](#diagonals) | 7 | 6 | 8 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
@@ -370,6 +370,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [A walk that steps down on black cells and down-left on white ones bounds when the left diagonals settle; it advances 2.01 times per depth to depth 200,000, and a walk of slope 2 + o(1) would give black center runs of slope 1/3](Rule30Open/Diagonals/FrontWalker.md) | [`Diagonals.FrontWalker`](Rule30Open/Diagonals/FrontWalker.lean) | `pair_repeats_of_walk`, `black_run_le_of_walk`, `black_run_le_of_steep_walk` | 2 | extends a kit result |
 | [Left diagonals remember only behind a white diagonal](Rule30Open/Diagonals/LeftMemory.md) | [`Diagonals.LeftMemory`](Rule30Open/Diagonals/LeftMemory.lean) | `D_reset`, `D_periodic_of_black`, `D_period_dichotomy`, `D_period_doubles`, `D_two_white`, `D_three_flips` | 1 | extends a kit result |
 | [Behind a walk through its black cells, a left diagonal of any row white left of a cell forgets the cells past a prefix; this bounds the onsets of every extension of the prefix at once](Rule30Open/Diagonals/PrefixWalk.md) | [`Diagonals.PrefixWalk`](Rule30Open/Diagonals/PrefixWalk.lean) | `agree_of_walk`, `Ld_agree_of_prefix`, `Ld_agree_of_walk`, `Ld_repeats_of_walk` | 2 | extends a kit result |
+| [A white run of a left diagonal is a run on which the two diagonals before it agree, and a black run is a white run two diagonals before; so the reset cost of a diagonal is at most two more than the longest agreement run of the pair before it](Rule30Open/Diagonals/RunTransfer.md) | [`Diagonals.RunTransfer`](Rule30Open/Diagonals/RunTransfer.lean) | `agree_of_white_run`, `white_run_of_agree`, `white_of_black_run`, `black_run_of_white`, `blackWithin_of_disagreeWithin`, `whiteWithin_of_blackWithin`, `D_blackWithin_of_disagreeWithin`, `D_whiteWithin_of_blackWithin` | 2 | extends a kit result |
 | [If the left diagonals repeat with period 16 from time 3j/2 to depth J, black center runs have 13L at most 3a + 2400 and white blocks reach left at most (a + 100)/3](Rule30Open/Diagonals/SettledRuns.md) | [`Diagonals.SettledRuns`](Rule30Open/Diagonals/SettledRuns.lean) | `no_alt_pair`, `settled_alt_pair`, `no_white_pair`, `erode_alt`, `black_run_le_of_settled`, `white_block_le_of_settled` | 2 | not in the kit |
 | [If the left diagonals repeat from time 3j/2 with any periods and no settled pair alternates in antiphase more than A times, black center runs have 13L at most 3a + 130A + 260; the reset bound reduces the settling to the white runs of the settled diagonals](Rule30Open/Diagonals/SettledSlope.md) | [`Diagonals.SettledSlope`](Rule30Open/Diagonals/SettledSlope.lean) | `altBound_of_repeats`, `altBound_of_period_le`, `black_run_window`, `black_run_le_of_settling`, `black_run_le_of_fast_settling`, `pair_repeats_of_white_runs`, `black_run_le_of_white_runs` | 2 | not in the kit |
 
@@ -382,6 +383,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Over every row white left of a black cell, the left diagonal j settles by time ceil(3j/2) + 5 for j up to 76, exactly; from depth 9 to 76 the worst row is the single cell delayed by 6 to 8 steps, and the bound is conjectured for every j](findings/diagonals/seed-uniform-onsets.md) | conjecture | 2 | wanted |
 | [A sound abstraction of the seed rows by a window of times before the onset front gives T_j at most ceil(3j/2) + 5 for every seed and every j up to 1,252, at most ceil(8j/5) up to 87,866, and the exact latest onset to depth 88; the bound's slope falls from 2.03 to about 1.52 as the window grows from 0 to 8 times](findings/diagonals/seed-window-bounds.md) | computed | 2 | wanted |
 | [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md) | conjecture | 2 | partial |
+| [To depth 200,000 the settled words of the left diagonals look like fair words of their period; every word of period 16 occurs up to rotation, the longest white runs follow the longest-run law of fair words, and the largest white run W_j stays below log2 j + 6](findings/diagonals/settled-words.md) | computed | 2 | not applicable |
 
 **Negative results**
 
@@ -394,6 +396,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Three heuristics for the onsets of the single cell's left diagonals fail on the data; the transient has the density of fair coins, so a budget on reset gaps gives the walk's slope 2, a flipped cell's damage ends by the later onset or becomes a permanent time shift, and a doubling law passes its base test while the onsets spread like a walk](negative-results/diagonals/onset-heuristics.md) | refuted | 2 |
 | [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
+| [A potential that grows with the white runs does not turn the window bounds into a slope below 2 for every depth, and the step bounds the white runs only by the period; the window bounds grow linearly faster than 3j/2 while W_j is constant, a certificate that knows only the white runs needs slope 7/3, and words with one black cell per period occur at periods 4, 8 and 16](negative-results/diagonals/white-run-potential.md) | dead end | 2 |
 
 ## Frames and the seed's past
 
