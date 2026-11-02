@@ -6,6 +6,7 @@ and tqdm, and run on a laptop.
 
 | Module | Reproduces | Command | Time |
 |---|---|---|---|
+| [background_prefix.py](background_prefix.py) | [BackgroundPrefix](../Rule30Open/Columns/BackgroundPrefix.md), [BackgroundSiblings](../Rule30Open/Columns/BackgroundSiblings.md) and [background truncations](../negative-results/columns/background-truncations.md) | see the reproduce section of [BackgroundPrefix](../Rule30Open/Columns/BackgroundPrefix.md) | `--walls` and `--siblings` seconds; the truncation runs about 75 min |
 | [doubling_gaps.py](doubling_gaps.py) | [Doubling gaps](../findings/diagonals/doubling-gaps.md) and [DoublingGaps](../Rule30Open/Diagonals/DoublingGaps.md), with the C program [doubling_gaps.c](doubling_gaps.c) | `python -m computations.doubling_gaps --census 1-16 --cap 10000000`; `--families 40 --cap 10000000`; `--single-cell --cap 100000`; `--predict --cap 274877906944`; `--sources 5-49` | 5 min; 3 min; 10 s; 1 min; 3 min, 3.6 GB |
 | [forced_basin.py](forced_basin.py) | [ForcedBasin](../Rule30Open/Columns/ForcedBasin.md) and [ForcedBasin18](../Rule30Open/Columns/ForcedBasin18.md) | `python -m computations.forced_basin compare --widths 13,14,15,16,17,18,19,20` | under a minute |
 | [left_cut.py](left_cut.py) | [The left cut](../negative-results/complexity/left-cut.md) and [LeftCut](../Rule30Open/Complexity/LeftCut.md): left-cut counts, stripe screening and the certificates | `python -m computations.left_cut --t 17 --k 15 --black 2`; `--t 20 --k 18 --family-count 2`; `--t 22 --stripes`; `--t 17 --lean` | 200 s; 5 min; 1 min; 15 s |

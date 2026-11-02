@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-175 Lean modules with 787 headline theorems, 61 findings (proved on paper,
-computed or conjectured) and 68 negative results. Prize problem 1 asks whether the center column
+177 Lean modules with 799 headline theorems, 61 findings (proved on paper,
+computed or conjectured) and 69 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 136 | 27 | 15 |
+| [Columns](#columns) | 138 | 27 | 16 |
 | [Period two](#period-two) | 13 | 14 | 11 |
 | [Diagonals](#diagonals) | 9 | 9 | 9 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
@@ -129,6 +129,8 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [No two adjacent columns are eventually periodic](Rule30Open/Columns/AdjacentColumns.md) | [`Columns.AdjacentColumns`](Rule30Open/Columns/AdjacentColumns.lean) | `adjacent_columns`, `no_constant_column`, `center_not_eventually_constant` | 1 | independent proof of a kit result |
 | [Entry into 48 traps that pass the tests of reach is false, refuted by a wider trap of the same block](Rule30Open/Columns/ApartTraps.md) | [`Columns.ApartTraps`](Rule30Open/Columns/ApartTraps.lean) | `natw00001111111_not_absorption_apart`, `pair_00001111111_excludes`, `fw1_106_not_absorption_apart`, `nat0000110111001_not_absorption_apart` | 1 | not in the kit |
 | [The right half beside a 0001 column of the 80-cell background is in the ether-and-wall family at no time](Rule30Open/Columns/BackgroundHalves.md) | [`Columns.BackgroundHalves`](Rule30Open/Columns/BackgroundHalves.lean) | `background_half_not_inFamily`, `background_half_not_absorbed`, `background_half_8`, `drv_eq`, `prefix_short` | 1 | not in the kit |
+| [Every right half that begins with the background is in 162 carried traps of periods 10, 12 and 14 from step 0](Rule30Open/Columns/BackgroundPrefix.md) | [`Columns.BackgroundPrefix`](Rule30Open/Columns/BackgroundPrefix.lean) | `ten_background_prefix`, `twelve_background_prefix`, `fourteen_background_prefix`, `prefixRightW_of_bg`, `tenRing_ok`, `twelveRing_ok`, `fourteenRing_ok` | 1 | not in the kit |
+| [Entry into 41 more carried traps is false, refuted by the same wall carried farther into its background](Rule30Open/Columns/BackgroundSiblings.md) | [`Columns.BackgroundSiblings`](Rule30Open/Columns/BackgroundSiblings.lean) | `nine8_not_absorption_sibling`, `el1_9_not_absorption_sibling`, `tw0_29_not_absorption_sibling`, `th0_11_not_absorption_sibling`, `fo0_13_not_absorption_sibling` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 99 more blocks of period 17](Rule30Open/Columns/BitBlocks17.md) | [`Columns.BitBlocks17`](Rule30Open/Columns/BitBlocks17.lean) | `center_not_blocks17`, `not_eventually_blocks17`, `center_not_wallBlocks17` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 122 more blocks of period 18](Rule30Open/Columns/BitBlocks18.md) | [`Columns.BitBlocks18`](Rule30Open/Columns/BitBlocks18.lean) | `center_not_blocks18`, `not_eventually_blocks18`, `center_not_wallBlocks18` | 1 | not in the kit |
 | [The game decided in the kernel and the window-set check exclude 133 more blocks of period 19](Rule30Open/Columns/BitBlocks19.md) | [`Columns.BitBlocks19`](Rule30Open/Columns/BitBlocks19.lean) | `center_not_blocks19`, `not_eventually_blocks19`, `center_not_wallBlocks19` | 1 | not in the kit |
@@ -299,6 +301,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 
 | Result | Kind | Problems |
 |---|---|---|
+| [Truncated backgrounds add no class of halves that enter the carried traps; they are inside at once or refute them](negative-results/columns/background-truncations.md) | refuted | 1 |
 | [The Conley index of the windows beside a repeating column excludes no block, and over GF(2) it vanishes for a block that a background repeats](negative-results/columns/conley-index.md) | refuted | 1 |
 | [Constraining the free bits of column -1 by the right half lowers the entropy of the left-half statements for 001 and 011, and no finite left game closes](negative-results/columns/constrained-left-halves.md) | dead end | 1 |
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |

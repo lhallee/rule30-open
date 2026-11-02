@@ -501,7 +501,13 @@ In order of the assessment above.
    - *Classes of halves.* For the walls with Lean classes of entering halves ([TenGap](Rule30Open/Columns/TenGap.md),
      [WallGaps](Rule30Open/Columns/WallGaps.md), [NineWhite](Rule30Open/Columns/NineWhite.md)), wider classes, such as
      every half of twelve cells as [FourteenCells](Rule30Open/Columns/FourteenCells.md) does for period four, and a word
-     of the column beyond that brings every window in, as [LockWord](Rule30Open/Columns/LockWord.md) does.
+     of the column beyond that brings every window in, as [LockWord](Rule30Open/Columns/LockWord.md) does. Truncated
+     backgrounds are not such a class. Beside the aligned columns of the walls $0000010001$, $000110110011$ and
+     $00011100101011$ the background's own half is a state of the carried trap at every label, so every half that
+     begins with it is excluded at step 0 ([BackgroundPrefix](Rule30Open/Columns/BackgroundPrefix.md)). For the walls
+     whose chains reach their background after a transient, the wall carried farther along the background is a trap
+     apart from the module's, which refutes 107 traps in Lean, 41 of them refuted nowhere else
+     ([BackgroundSiblings](Rule30Open/Columns/BackgroundSiblings.md), [what failed](negative-results/columns/background-truncations.md)).
    - *Steering.* Steering at wider windows and longer periods ([steerable locks](findings/columns/steerable-locks.md)),
      the one tool here that reaches blocks without long runs, though only to a condition on a farther column.
    - *Periods 5, 6 and 7.* Traps that the coin of `coin_entry` enters readily ([trap

@@ -140,6 +140,8 @@ public import Rule30Open.Columns.SixRefuted
 public import Rule30Open.Columns.TailFamilies14
 public import Rule30Open.Columns.ForcedBasin
 public import Rule30Open.Columns.ForcedBasin18
+public import Rule30Open.Columns.BackgroundPrefix
+public import Rule30Open.Columns.BackgroundSiblings
 public import Rule30Open.PeriodTwo.HeldColumn
 public import Rule30Open.PeriodTwo.Domains
 public import Rule30Open.PeriodTwo.WhiteRightHalf
