@@ -101,7 +101,7 @@ $n$, a different model ([kit pull requests](../../literature/kit-pull-requests.m
 **Open.** $D(c_t) = 2t + 1$ for every $t$. The GF(2) degree cannot show it. The only monomial of degree $2t - 1$
 is $M$, so after an adversary fixes a cell other than $x_{-t+1}$ the remaining function has GF(2) degree below its
 number of cells, and a certificate must use the real coefficients. Those change sign without a pattern and vanish at
-$t = 14$. [CornerOr](CornerOr.md) extends the computation to $t \le 21$ and reduces the open case to one
+$t = 14$. [CornerOr](CornerOr.md) extends the computation to $t \le 22$ and reduces the open case to one
 function $G_t$ of $2t - 1$ cells needing all its cells.
 
 ## Reproduce

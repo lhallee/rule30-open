@@ -206,7 +206,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   points), and they are the points with $p \le 56$ of a finite backward tree of 303 points; conjecture (E), that these are
   all of them, gives (R) on the ether, and a counterexample keeps a defect of more than 57 cells ([the points of $K$ with an
   ether tail](findings/period-two/k-ether-points.md)), but neither the top of the defect nor its length decreases along $K$
-  ([no monotone defect on K](negative-results/period-two/k-ether-monotone.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
+  ([no monotone defect on K](negative-results/period-two/k-ether-monotone.md)); $K$ itself is a Cantor set of dimension
+  1/2 whose points with a stripe tail are dense, so a census of heads decides nothing until a tail is fixed, and every point
+  of $K$ with a tail period of at most 28 and $p + q \le 64$ has a stripe tail or lies in a finite backward closure of the 14
+  ether points, so (E) for every tail period is (E) together with the absence of points of $K$ on other backgrounds ([the
+  structure of K](findings/period-two/k-structure.md)); a descent of the top at a lag of about twice the top holds for
+  heads of 25 to 40 cells, but each head length is its own census ([the descent at a lag](negative-results/period-two/k-descent-lag.md)); in general the bound is open, and the window automaton at the top of the defect does not do at 5, 8, 10 or 12 cells, where it has a cycle
   of positive gain, and real defects follow such cycles: one orbit returns to its own window of 24 cells 14 cells higher, so
   no potential on top windows of up to 28 cells holds even along single orbits ([the ether
   census](findings/period-two/ether-defect-census.md), item 3); no strip of 12 cells or fewer below the top is closed, and the condition of $K$ at
@@ -317,7 +322,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([onset heuristics](negative-results/diagonals/onset-heuristics.md)). Over every row white left
   of a black cell, a later row of which is again such a row, diagonal $j$ settles by $\lceil 3j/2 \rceil + 5$ for
   $j \le 76$, exactly, with 5 attained at $j = 48$; this seed-uniform bound is conjectured for every $j$ ([seed-uniform
-  onsets](findings/diagonals/seed-uniform-onsets.md)), and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
+  onsets](findings/diagonals/seed-uniform-onsets.md)), and a sound window abstraction proves it by computation for
+  $j \le 1{,}252$ and proves $T_j \le \lceil 8j/5 \rceil$ for every seed and $j \le 87{,}866$ ([seed window
+  bounds](findings/diagonals/seed-window-bounds.md)); no finite certificate gives it for every $j$, since a bounded
+  potential would bound the one-step jump, which is one plus the longest white run of a settled diagonal and reaches 24
+  by depth 200,000 ([finite certificates](negative-results/diagonals/seed-finite-certificate.md)), and [PrefixWalk](Rule30Open/Diagonals/PrefixWalk.md) proves the
   rule that makes the search exact, but induction through later rows, subadditivity over seeds and a fixed delay behind
   the single cell all stop, the first at slope 2 ([seed-uniform induction](negative-results/diagonals/seed-uniform-induction.md)).
   A strip of fixed depth gains nothing on the slope $3/5$ ([fixed-depth
@@ -384,7 +393,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
   they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
-  on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 21$ by computation, where Rule 90 needs only
+  on paper to the kit's degree theorem) and all $2t + 1$ for $t \le 22$ by computation, where Rule 90 needs only
   $2^{\mathrm{popcount}(t)}$; this bound is linear and says nothing about the single seed
   ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)); certificates, sensitivity and fixed answers cannot pass $2t$,
   since no row is sensitive to all three rightmost cells of the cone, in Lean ([RightCorner](Rule30Open/Complexity/RightCorner.md),
@@ -392,7 +401,15 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   only through their OR, in Lean, so an adversary must answer the first of them white, and $2t + 1$ for every $t$ is
   equivalent to one function $G_t$ of $2t - 1$ cells needing all its cells; self-similar restrictions, restricted top
   coefficients and congruences stop ([CornerOr](Rule30Open/Complexity/CornerOr.md), [adversary
-  routes](negative-results/complexity/query-adversary-routes.md)).
+  routes](negative-results/complexity/query-adversary-routes.md)); the derivative along $x_{-t+1}$ is $t$ plus the parity
+  of a diagonal that ends in a copy of $c_{t-1}$, and the right corner repeats once as an AND after $x_{t-3}$ is black, in
+  Lean, but the adversaries for trees that read $x_{-t+1}$ last and earlier do not combine ($t \le 9$), gates stop after
+  one level ($t \le 12$), and every linear measure is a multiple of $\mu$ ([SecondCells](Rule30Open/Complexity/SecondCells.md),
+  [evasiveness routes](negative-results/complexity/query-evasive-routes.md)). As a function of the digits of $n$, $c$
+  has the algebraic normal form, the parity correlations and the mod-3 correlations of a random function for digit
+  lengths up to 20 ([index spectrum](negative-results/complexity/index-function-spectrum.md)), and one step on a ring of
+  $W$ cells loses fewer than $0.85^W$ bits, less than Rule 90's 1 or 2, so erased information gives no lower bound
+  ([ring images](findings/structure/ring-images.md), [ring loss](negative-results/complexity/ring-information-loss.md)).
 
 ## Next steps
 

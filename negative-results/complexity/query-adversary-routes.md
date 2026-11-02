@@ -14,7 +14,7 @@ $x_{-t}, \dots, x_t$ of an arbitrary row, $D(f)$ for the least depth of a decisi
 $\mu(f) = \sum_x (-1)^{|x|} f(x)$ for the top coefficient of the real polynomial of $f$, up to sign.
 [QueryDepth](../../Rule30Open/Complexity/QueryDepth.md) proves $D(c_t) \ge 2t$; [CornerOr](../../Rule30Open/Complexity/CornerOr.md)
 proves that $D(c_t) = 2t + 1$ if and only if $G_t$, the center with $x_{-t}$ and $x_{t-1}$ white, needs all its
-$2t - 1$ cells, and computation gives $D(c_t) = 2t + 1$ for $t \le 21$. Can one of three routes prove it for every
+$2t - 1$ cells, and computation gives $D(c_t) = 2t + 1$ for $t \le 22$. Can one of three routes prove it for every
 $t$: (i) an induction through one step of the rule, carried by a restriction of $c_{t+1}$ that is a copy of $c_t$;
 (ii) a fixed pattern of restrictions whose top coefficients are nonzero for every $t$; (iii) a congruence for $\mu$?
 
@@ -101,6 +101,8 @@ last. Every tool tried for that case reads a real coefficient, of $c_t$ or of it
 range those coefficients follow no pattern: they change sign, $\mu(c_t)$ vanishes at $t = 14$, and their residues mod 4
 are counts of covering pairs in the normal form. As a heuristic, a proof for every $t$ would need an adversary whose
 answers follow the dynamics of the rule over many steps rather than a coefficient.
+[Evasiveness routes](query-evasive-routes.md) follows the case of $x_{-t+1}$ last through the derivative along that
+cell, and the right corner one step further in, and records where those routes stop.
 
 ## Reproduce
 

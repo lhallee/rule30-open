@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-165 Lean modules with 727 headline theorems, 51 findings (proved on paper,
-computed or conjectured) and 57 negative results. Prize problem 1 asks whether the center column
+166 Lean modules with 732 headline theorems, 54 findings (proved on paper,
+computed or conjectured) and 62 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -13,16 +13,16 @@ takes effort of order `n`.
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 133 | 26 | 15 |
-| [Period two](#period-two) | 12 | 11 | 8 |
-| [Diagonals](#diagonals) | 6 | 4 | 6 |
+| [Period two](#period-two) | 12 | 12 | 9 |
+| [Diagonals](#diagonals) | 6 | 5 | 7 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
-| [Hidden structure](#hidden-structure) | 0 | 2 | 7 |
+| [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 5 | 3 | 9 |
+| [Complexity](#complexity) | 6 | 3 | 12 |
 
 ## Open work
 
@@ -42,9 +42,11 @@ approach stopped.
 - [Windows of 14 cells followed through the column's whole history exclude every tail of up to six cells but 10101 after 22 white cells, and 1,672 blocks of period at most 22](findings/columns/limit-windows.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
+- [A sound abstraction of the seed rows by a window of times before the onset front gives T_j at most ceil(3j/2) + 5 for every seed and every j up to 1,252, at most ceil(8j/5) up to 87,866, and the exact latest onset to depth 88; the bound's slope falls from 2.03 to about 1.52 as the window grows from 0 to 8 times](findings/diagonals/seed-window-bounds.md): problem 2
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
+- [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md): problem 3
 
 **Findings proved in Lean in part**
 
@@ -76,6 +78,7 @@ approach stopped.
 - [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even along one real orbit](findings/period-two/ether-defect-census.md): problem 1
 - [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md): problem 1
 - [The points of K with an ether tail from cell 56 on are 203, all on four periodic orbits, and they are the points of a finite backward tree of 303](findings/period-two/k-ether-points.md): problem 1
+- [K is a Cantor set of dimension 1/2 in which the stripe-tailed points are dense, and its other rational points with a tail period up to 28 and p + q at most 64 lie in finite backward closures of the 14 ether points](findings/period-two/k-structure.md): problem 1
 - [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md): problem 1
 - [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md): problem 1
 - [Beyond the stripes and the ether, every periodic tail of up to 12 cells falls onto a background where the tops of most defects run away, and no head of up to 16 cells on one of them is in K](findings/period-two/tail-census.md): problem 1
@@ -333,6 +336,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even along one real orbit](findings/period-two/ether-defect-census.md) | computed | 1 | partial |
 | [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md) | computed | 1 | partial |
 | [The points of K with an ether tail from cell 56 on are 203, all on four periodic orbits, and they are the points of a finite backward tree of 303](findings/period-two/k-ether-points.md) | computed | 1 | partial |
+| [K is a Cantor set of dimension 1/2 in which the stripe-tailed points are dense, and its other rational points with a tail period up to 28 and p + q at most 64 lie in finite backward closures of the 14 ether points](findings/period-two/k-structure.md) | computed | 1 | partial |
 | [Every integer below 2^52 fails the period-two condition, near step 2M](findings/period-two/left-half-alone.md) | computed | 1 | partial |
 | [Beside an alternating center the right half nearly locks, and slips](findings/period-two/right-channel.md) | computed | 1 | not applicable |
 | [The period-two condition is a full 2-shift whose periodic points are domains, and its rational points are preperiodic as far as tried](findings/period-two/shift-model.md) | computed | 1 | partial |
@@ -350,6 +354,7 @@ The first open period of Prize Problem 1, reduced to a question about one intege
 | [The left half is not a patchwork of ether domains](negative-results/period-two/ether-patchwork.md) | refuted | 1 |
 | [The first twelve forced bits of the period-two condition are dense polynomials of full degree](negative-results/period-two/forced-bits-dense.md) | dead end | 1 |
 | [A bounded defect top does not give (R) for the periodic tails of up to 12 cells beyond the stripes and the ether, since the tops run away, provably on 10 of the 12 backgrounds](negative-results/period-two/front-backgrounds.md) | refuted | 1 |
+| [A descent of the defect's top that uses K at a lag of about twice the top holds head length by head length to 40 cells, but each length is its own census](negative-results/period-two/k-descent-lag.md) | dead end | 1 |
 | [The defect of a point of K with an ether tail is not monotone, and proving that K has no long ether head is a question of the period-two kind](negative-results/period-two/k-ether-monotone.md) | dead end | 1 |
 | [No finite certificate settles period two](negative-results/period-two/no-finite-certificate.md) | dead end | 1 |
 
@@ -375,6 +380,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md) | conjecture | 2 | wanted |
 | [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md) | computed | 1 | partial |
 | [Over every row white left of a black cell, the left diagonal j settles by time ceil(3j/2) + 5 for j up to 76, exactly; from depth 9 to 76 the worst row is the single cell delayed by 6 to 8 steps, and the bound is conjectured for every j](findings/diagonals/seed-uniform-onsets.md) | conjecture | 2 | wanted |
+| [A sound abstraction of the seed rows by a window of times before the onset front gives T_j at most ceil(3j/2) + 5 for every seed and every j up to 1,252, at most ceil(8j/5) up to 87,866, and the exact latest onset to depth 88; the bound's slope falls from 2.03 to about 1.52 as the window grows from 0 to 8 times](findings/diagonals/seed-window-bounds.md) | computed | 2 | wanted |
 | [A linear settling time of the left diagonals with periods o(j) would cut the slope of center-column runs to 3/13 (black) and 1/3 (white) at settling time 3j/2; depths 8 to 7,999 repeat with period 16 from time 3j/2 to time 12,583](findings/diagonals/settled-runs.md) | conjecture | 2 | partial |
 
 **Negative results**
@@ -386,6 +392,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Direct comparison with a true strip of the pattern near the left edge of any fixed depth leaves the slope of black center runs at 3/5](negative-results/diagonals/fixed-depth-strips.md) | barrier | 2 |
 | [Three leads to linear settling of the single cell's left diagonals stop, to depth 200,000, at the transient or at a law of large numbers for the settled left side; the onset phases are uniform, the front shows nothing at the white diagonals, and no settled pair repeats up to a time shift](negative-results/diagonals/linear-settling-leads.md) | dead end | 2 |
 | [Three heuristics for the onsets of the single cell's left diagonals fail on the data; the transient has the density of fair coins, so a budget on reset gaps gives the walk's slope 2, a flipped cell's damage ends by the later onset or becomes a permanent time shift, and a doubling law passes its base test while the onsets spread like a walk](negative-results/diagonals/onset-heuristics.md) | refuted | 2 |
+| [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
 
 ## Frames and the seed's past
@@ -458,6 +465,7 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 |---|---|---|---|
 | [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md) | proved on paper | 3 | proved in the kit |
 | [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md) | proved on paper | 1, 2, 3 | proved in the kit |
+| [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md) | proved on paper | 3 | wanted |
 
 **Negative results**
 
@@ -524,6 +532,7 @@ Prize Problem 3, and what an answer either way would imply.
 | [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
 | [A decision tree for the center cell from an arbitrary row spends exactly one query on the leftmost cell, so with the kit's degree bound it reads at least 2t cells; computation gives all 2t + 1 for t ≤ 17](Rule30Open/Complexity/QueryDepth.md) | [`Complexity.QueryDepth`](Rule30Open/Complexity/QueryDepth.lean) | `depth_restrict_succ_le`, `eval_restrict`, `tree_drop_of_flip`, `center_tree_drop`, `center_tree_lift` | 3 | extends a kit result |
 | [The center never depends on all three rightmost cone cells at one row, so its certificate complexity is at most 2t](Rule30Open/Complexity/RightCorner.md) | [`Complexity.RightCorner`](Rule30Open/Complexity/RightCorner.lean) | `right_corner`, `right_corner_certificate`, `corner_white`, `strip_one`, `strip_two`, `strip_three` | 3 | not in the kit |
+| [The derivative of the center along the second cell of its cone is the parity of a diagonal, and the right corner repeats one step in as an AND](Rule30Open/Complexity/SecondCells.md) | [`Complexity.SecondCells`](Rule30Open/Complexity/SecondCells.lean) | `center_flip_second`, `second_derivative_flip`, `center_step_corner`, `center_second_shield`, `center_second_and` | 3 | extends a kit result |
 
 **Findings**
 
@@ -539,10 +548,13 @@ Prize Problem 3, and what an answer either way would imply.
 |---|---|---|
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
 | [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
+| [As a function of the digits of n, the center cell has the algebraic normal form and the Fourier and mod-3 spectra of a random function](negative-results/complexity/index-function-spectrum.md) | no signal | 3 |
 | [The linear complexity is n/2, the most a sequence can have](negative-results/complexity/linear-complexity.md) | no signal | 1, 3 |
 | [Crossing sequences prove at most time (log n)² for the center column, and need a spectral hypothesis that implies Problem 1](negative-results/complexity/one-tape-crossing.md) | barrier | 3, 1 |
 | [Probabilistic checking verifies the center cell cheaply, as it does every computation, and does not compute it](negative-results/complexity/probabilistic-checking.md) | barrier | 3, 1, 2 |
 | [Problem 3 asks for a lower bound beyond current complexity theory](negative-results/complexity/problem-three-barrier.md) | barrier | 3, 1 |
 | [Self-similar restrictions, restricted top coefficients and congruences do not prove that the center needs its whole cone for every t](negative-results/complexity/query-adversary-routes.md) | dead end | 3 |
 | [Sensitivity, certificates, fixed answers and one-step lifting do not show that the center needs its whole cone](negative-results/complexity/query-depth-routes.md) | barrier | 3 |
+| [The derivative along the second cell, gates after restrictions and measures other than adaptive certificates do not prove that the center needs its whole cone for every t](negative-results/complexity/query-evasive-routes.md) | dead end | 3 |
 | [Restricted models give the center cell no new lower bound for every n; past reading the digits they imply Problem 1, and spacetime bounds hold for Rule 90](negative-results/complexity/restricted-models.md) | barrier | 3, 1 |
+| [One step of Rule 30 on a ring loses almost no information, less than Rule 90 does, so erased information gives no lower bound](negative-results/complexity/ring-information-loss.md) | refuted | 3 |

@@ -41,12 +41,12 @@ row of the prize, where a tree reads nothing.
    the $2t - 1$ cells $x_{-t+1}, \dots, x_{t-2}, x_t$. Then $D(c_t) = 2t + 1$ if and only if every tree for $G_t$ reads
    all its $2t - 1$ cells on some row. The GF(2) degree of $G_t$ is $2t - 2$, and $x_{-t+2} \cdots x_{t-2} x_t$,
    the product of every cell but $x_{-t+1}$, is a monomial of $G_t$ of that degree. Also $\mu(G_t) = \pm\mu(c_t)/2$.
-5. **Computed** (`computations/query_adversary.py`). $\mu(c_t) \ne 0$ for $18 \le t \le 21$, so with QueryDepth
-   $D(c_t) = 2t + 1$ for every $t \le 21$:
+5. **Computed** (`computations/query_adversary.py`). $\mu(c_t) \ne 0$ for $18 \le t \le 22$, so with QueryDepth
+   $D(c_t) = 2t + 1$ for every $t \le 22$:
 
-| $t$ | 18 | 19 | 20 | 21 |
-|---|---|---|---|---|
-| $\mu(c_t)$ | −756 | 336 | −232 | −3104 |
+| $t$ | 18 | 19 | 20 | 21 | 22 |
+|---|---|---|---|---|---|
+| $\mu(c_t)$ | −756 | 336 | −232 | −3104 | −944 |
 
 ## Proof
 
@@ -120,7 +120,7 @@ fill the 512 lanes of a vector, the others are walked in Gray code order with th
 a flip of the cell $x_{-t+m}$ recomputes only the $m + 1$ cells of each row of the cone that it reaches. The test
 checks it against `query_depth.subcube_sums` with and without fixed cells, and the values for $t \le 17$ are those of
 QueryDepth. $t = 20$ takes about three minutes on three threads and $t = 21$ about fifteen; each step of $t$
-multiplies the time by about four.
+multiplies the time by about four. $t = 22$ took 63 minutes on two threads of a machine running other work.
 
 ## What it means
 
@@ -131,8 +131,10 @@ that answers each cell so that the GF(2) coefficient of the product of the free 
 answers $u$ white, forces every cell as soon as the tree reads $u$ before the last query (the function left then has
 full GF(2) degree). Against a tree that reads $u$ last it guarantees nothing: its answers then keep only the value 1 of
 the function left at $u = 0$, and that function may take the value 1 at $u = 1$ too. The real top coefficient covers
-that case at every $t \le 21$ except $t = 14$, where QueryDepth's certificate of level 2 does.
+that case at every $t \le 22$ except $t = 14$, where QueryDepth's certificate of level 2 does.
 [Adversary routes](../../negative-results/complexity/query-adversary-routes.md) records where the other routes stop.
+[SecondCells](SecondCells.md) identifies the derivative along $u$, which decides that case, and the right corner one
+step further in.
 
 The kit's `deriv_evol_right` says that the derivative along $x_t$ is 1 exactly when the diagonal left of the right edge
 is white, which contains the second shield. The first shield, and the OR form with its consequences for the query
@@ -145,4 +147,8 @@ python -m computations.query_adversary --max-t 21 --threads 3
 ```
 
 The corner sums and the certificates take about five minutes on three threads for $t \le 20$, and $t = 21$ adds about
-twenty.
+twenty. The sum at $t = 22$ alone:
+
+```bash
+python -c "from computations.query_adversary import kernel_sums; print(2 * kernel_sums(22, {}, threads=3)[0])"
+```

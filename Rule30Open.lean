@@ -165,6 +165,7 @@ public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth
 public import Rule30Open.Complexity.RightCorner
 public import Rule30Open.Complexity.CornerOr
+public import Rule30Open.Complexity.SecondCells
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

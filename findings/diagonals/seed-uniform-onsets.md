@@ -75,7 +75,10 @@ The exact maxima:
   is 5 on depths 20 to 68, 3 on 69 to 138, $-21$ on 139 to 299, $-47$ on 300 to 599 and $-117$ on 600 to 1,000.
 
 **Conjecture (seed-uniform settling).** For every seed and every $j$, $T_j \le \lceil 3j/2 \rceil + 5$. It holds for
-$j \le 76$ by the searches below and holds on the sampled seeds to depth 1,000. For the single cell it is the settling
+$j \le 76$ by the searches below, for $j \le 1{,}252$ by the window abstraction of [seed window
+bounds](seed-window-bounds.md), which also gives $M_j$ exactly at $j = 77$ to 88 and at more depths to 117, and holds on
+the sampled seeds to depth 1,000; no finite certificate proves it for every $j$ ([finite
+certificates](../../negative-results/diagonals/seed-finite-certificate.md)). For the single cell it is the settling
 hypothesis of SettledSlope with $\delta = 5$, which also needs the alternations bounded. The conjecture asks more than
 the single cell needs, but it is the form an induction over depths would carry: the row at any time is again a seed. The
 routes tried for such an induction, and where each stops, are in
