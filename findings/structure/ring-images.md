@@ -3,7 +3,7 @@ title: On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, 
 category: structure
 problems: [3]
 status: paper
-formalization: wanted
+formalization: partial
 evidence: [computations/ring_images.py, tests/test_ring_images.py]
 ---
 
@@ -49,7 +49,9 @@ $N_2$ and $x^{18} (x^3 - 1)^2$ for $N_3$, so $\operatorname{tr} N_2^W = p_W + 1$
 $(100)^{W/3}$, all mapped to the black row, as on the line (the kit's `exists_card_eq_three`).
 
 The formula agrees with the enumeration of all $2^W$ rows for $3 \le W \le 24$, and so do the maximal numbers of
-preimages. The proof is on paper; the kit's `card_le_three` is in Lean, and the count is not.
+preimages. [RingImages](../../Rule30Open/Complexity/RingImages.md) proves the count in Lean for every $W \ge 1$
+(`ring_missed_rows`), with at most three preimages and one row with three exactly when $3 \mid W$; the asymptotics
+and the comparison with Rules 90 and 150 are on paper.
 
 **What it means.** The step of Rule 30 on a ring is almost a bijection, the finite form of the kit's
 `Mixing.ae_existsUnique_preimage` (almost every configuration of the line has exactly one preimage). The pairs of

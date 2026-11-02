@@ -133,6 +133,7 @@ public import Rule30Open.Columns.ClassBlocks18SplitJ3
 public import Rule30Open.Columns.ClassBlocks18Split
 public import Rule30Open.Columns.ApartTraps
 public import Rule30Open.Columns.BackgroundHalves
+public import Rule30Open.Columns.ColumnOneBlocks
 public import Rule30Open.Columns.ClosingObservable
 public import Rule30Open.Columns.ColumnTransfer
 public import Rule30Open.Columns.WideWalls
@@ -170,6 +171,8 @@ public import Rule30Open.Diagonals.DoublingGaps
 public import Rule30Open.Diagonals.SkeletonTree
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
+public import Rule30Open.Frames.SeedPastRing
+public import Rule30Open.Frames.SeedPastTable
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.RandomRows.LeftWindow
@@ -181,6 +184,9 @@ public import Rule30Open.Complexity.CornerOr
 public import Rule30Open.Complexity.SecondCells
 public import Rule30Open.Complexity.LeftCut
 public import Rule30Open.Complexity.MinCertificate
+public import Rule30Open.Complexity.StripeGrowth
+public import Rule30Open.Complexity.CertificateLower
+public import Rule30Open.Complexity.RingImages
 public import Rule30Open.Complexity.TwoIndex
 public import Rule30Open.Complexity.LeftCutRank
 public import Rule30Open.Complexity.ParityLift

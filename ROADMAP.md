@@ -156,7 +156,8 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   cells ([ForcedBasin](Rule30Open/Columns/ForcedBasin.md), [ForcedBasin18](Rule30Open/Columns/ForcedBasin18.md)); halves
   slow to enter the family are as slow to reach the basin. Under $0001$ every right half reads column 1 as $0^a 1^{4-a}$ on
   each block of four steps, along a graph of 13 transitions, and a repeated value 2 or 3 forces the aligned ether up to
-  its first $B_3$ column ([column-one blocks](findings/columns/column-one-blocks.md)). For a uniformly random infinite
+  its first $B_3$ column ([column-one blocks](findings/columns/column-one-blocks.md)); the block graph is in Lean for
+  every driven half, with each of its 13 edges realized ([ColumnOneBlocks](Rule30Open/Columns/ColumnOneBlocks.md)). For a uniformly random infinite
   half the law at each time is exact, uniform on a set of measure $2^{-t}$; almost every infinite half enters exactly
   when entry has a uniform positive chance after every prefix, which is open, and for $0001$ a half stays out for $T$
   steps with chance at least $2^{-(T + 20)}$ ([random halves](findings/columns/random-halves.md)). The exact channel
@@ -491,13 +492,22 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   one level ($t \le 12$), and every linear measure is a multiple of $\mu$ ([SecondCells](Rule30Open/Complexity/SecondCells.md),
   [evasiveness routes](negative-results/complexity/query-evasive-routes.md)). The fewest cells of a partial row that fix
   the center always include $x_{-t}$, and $t - 1$ suffice for every $t \ge 9$ (the alternating stripe on $-t..-2$ with
-  $x_{-1}$ free), in Lean; $t - 1$ is the least for $9 \le t \le 15$ by an exhaustive search, while the routing lemma
-  that would give it for every $t$ fails at $t = 12$ ([MinCertificate](Rule30Open/Complexity/MinCertificate.md),
-  [routing lemma](negative-results/complexity/min-certificate-routing.md)). As a function of the digits of $n$, $c$
+  $x_{-1}$ free), in Lean; $t - 1$ is the least for $9 \le t \le 15$ by an exhaustive search
+  ([MinCertificate](Rule30Open/Complexity/MinCertificate.md), [routing lemma](negative-results/complexity/min-certificate-routing.md)),
+  but not beyond: the stripe absorbs two cells beside its black end every nine steps, so
+  $m(t) \le t - 2\lfloor t/9 \rfloor + 2$ for every $t \ge 9$ and $m(t) \le t - 2$ for $t \ge 18$, in Lean, and
+  $m(16) = 13$ by computation ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)). Every constant subcube meets each
+  comb of cells $-t+1, -t+3, \dots, -t+2j+1, -t+2j+2$ for which $\binom{t}{j+1}$ is odd, in Lean
+  ([CertificateLower](Rule30Open/Complexity/CertificateLower.md)); an all-$t$ lower bound stops at two cells from the
+  algebra and at an unproved window lemma that would give about $t/6$
+  ([certificate lower bounds](negative-results/complexity/certificate-lower-routes.md)). As a function of the digits of $n$, $c$
   has the algebraic normal form, the parity correlations and the mod-3 correlations of a random function for digit
   lengths up to 20 ([index spectrum](negative-results/complexity/index-function-spectrum.md)), and one step on a ring of
   $W$ cells loses fewer than $0.85^W$ bits, less than Rule 90's 1 or 2, so erased information gives no lower bound
-  ([ring images](findings/structure/ring-images.md), [ring loss](negative-results/complexity/ring-information-loss.md)).
+  ([ring images](findings/structure/ring-images.md), [ring loss](negative-results/complexity/ring-information-loss.md));
+  the count of rows one step misses, $(p_W + 1)/2 - [3 \mid W]$, is in Lean for every $W$, through the traces of
+  transfer matrices of pairs and triples of preimages, and gives the kit's Garden-of-Eden count `numWithPreds 0` a closed
+  form ([RingImages](Rule30Open/Complexity/RingImages.md)).
 
 ## Next steps
 
@@ -577,8 +587,10 @@ In order of the assessment above.
    apart from each other, the hypothesis has to be entry into one of all of them.
 3. **Findings that want a Lean proof.** The census beyond what SparseRight covers, the entry statements of the
    period-four certificate, the periodic backgrounds and the period-two computations ([open
-   work](CATALOG.md#open-work)); the general facts of the seed's past are now in Lean
-   ([SeedPast](Rule30Open/Frames/SeedPast.md), [SeedPastPeriods](Rule30Open/Frames/SeedPastPeriods.md)). The 2-adic
+   work](CATALOG.md#open-work)); the seed's past is in Lean: its uniqueness in Rule 30, the ring death in exactly $k$
+   steps and the table of periods and preperiods to $k = 3{,}000$ ([SeedPast](Rule30Open/Frames/SeedPast.md),
+   [SeedPastPeriods](Rule30Open/Frames/SeedPastPeriods.md), [SeedPastRing](Rule30Open/Frames/SeedPastRing.md),
+   [SeedPastTable](Rule30Open/Frames/SeedPastTable.md)). The 2-adic
    trace, the center degree and the Duhamel form are proved in the kit's equivalent forms, which a search should include
    before any formalization (`.lake/packages/rule30prize/equivalents/Rule30Equivalents/`).
 4. **Track the kit and the literature.** Re-pin the kit when it gains modules, after the build, the audit and the tests

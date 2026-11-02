@@ -95,8 +95,11 @@ cell, where every cell is known. It is also not the least *forward certificate* 
 [restricted models](../../negative-results/complexity/restricted-models.md), which is a set of spacetime cells of the
 single-seed diagram from which the rule derives $c(n)$; here the cells are those of one arbitrary row.
 
-**Open.** $m(t) = t - 1$ for every $t \ge 9$. The routing lemma, which would give it, fails at $t = 12$
-([routing lemma](../../negative-results/complexity/min-certificate-routing.md)).
+**Beyond 15.** $m(t) = t - 1$ does not hold for every $t \ge 9$: $m(16) = 13$ by computation, and
+$m(t) \le t - 2\lfloor t/9 \rfloor + 2$ for every $t \ge 9$, so $m(t) \le t - 2$ for $t \ge 18$, in Lean, because the
+stripe absorbs two cells beside its black end every nine steps ([StripeGrowth](StripeGrowth.md)). The routing lemma
+fails at $t = 12$ ([routing lemma](../../negative-results/complexity/min-certificate-routing.md)), and an all-$t$ lower
+bound is open ([certificate lower bounds](../../negative-results/complexity/certificate-lower-routes.md)).
 
 The kit has no statement about prime implicants, subcubes or the least certificate of a function of the cone (its
 core Lean, its equivalent forms, including `QueryComplexity` and `AlgebraicDegree`, and its main branch were

@@ -121,6 +121,8 @@ and tqdm, and run on a laptop.
 | [edge_game.py](edge_game.py) | The edge game of [the onset edge](../findings/diagonals/onset-edge.md) | `python -m computations.edge_game --kmax 8` | 15 s |
 | [left_cut_rank.py](left_cut_rank.py) | [The left-cut rank](../findings/complexity/left-cut-rank.md) and [LeftCutRank](../Rule30Open/Complexity/LeftCutRank.md) | see the reproduce section of [the left-cut rank](../findings/complexity/left-cut-rank.md) | minutes |
 | [parity_lift.py](parity_lift.py) | [ParityLift](../Rule30Open/Complexity/ParityLift.md) | `python -m computations.parity_lift --max-t 10 --rank-t 6` | 20 s, 0.6 GB |
+| [certificate_lower.py](certificate_lower.py) | [StripeGrowth](../Rule30Open/Complexity/StripeGrowth.md), [CertificateLower](../Rule30Open/Complexity/CertificateLower.md) and [certificate lower bounds](../negative-results/complexity/certificate-lower-routes.md) | see the reproduce section of [StripeGrowth](../Rule30Open/Complexity/StripeGrowth.md) | about 55 min, 3.6 GB |
+| [seed_past_lean.py](seed_past_lean.py) | [The seed's past](../findings/frames/seed-past.md): certificates for [SeedPastTable](../Rule30Open/Frames/SeedPastTable.md) | `python -m computations.seed_past_lean` | 1 s |
 
 Several entries quote numbers whose code is not in this repository: the pruned search over seed extensions, the
 period-two searches past support 24, the learned models, the automaton bounds, the coarse-graining closures and the

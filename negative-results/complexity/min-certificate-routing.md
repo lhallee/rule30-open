@@ -22,7 +22,7 @@ number of fixed cells right of $u$ over subcubes with $u$ free, every cell left 
 The lemma is $R(t, k) \ge t - k - 1$ for every $k$; it gives $m(t) \ge k + (t - k - 1) = t - 1$.
 
 **Outcome.** The lemma holds for $t \le 11$ and fails at $t = 12$, $k = 1$, and at $t = 13$ and $14$, $k = 2$. The
-conjecture $m(t) = t - 1$ survives, since $m(12) = 11$, $m(13) = 12$ and $m(14) = 13$: the subcubes that break the lemma make the derivative
+values $m(12) = 11$, $m(13) = 12$ and $m(14) = 13$ still equal $t - 1$: the subcubes that break the lemma make the derivative
 vanish without making $c_t$ constant. The one-step reduction behind the lemma keeps $k$ and lowers $t$, but it maps a
 subcube to a set that is not a subcube, and the class of sets it does preserve is far too weak.
 
@@ -95,8 +95,9 @@ $x_{j-1} \oplus (x_j \lor x_{j+1})$ of the constraints, and after $s$ steps that
 
 ## 3. What remains
 
-The conjecture $m(t) = t - 1$ for every $t \ge 9$ is open; MinCertificate has the upper bound for every $t$ and the
-lower bound for $t \le 15$. The least subcubes are not only stripes from $t = 12$ on (16 at $t = 12$, 14 at $t = 13$,
+The value $m(t) = t - 1$ holds for $9 \le t \le 15$ and fails from $t = 16$ on: $m(16) = 13$ by computation, and
+$m(t) \le t - 2$ for every $t \ge 18$ in Lean ([StripeGrowth](../../Rule30Open/Complexity/StripeGrowth.md)). What is
+open is an all-$t$ lower bound ([certificate lower bounds](certificate-lower-routes.md)). The least subcubes are not only stripes from $t = 12$ on (16 at $t = 12$, 14 at $t = 13$,
 46 at $t = 14$, 72 at $t = 15$), so a proof must handle partial rows with free cells inside the fixed stretch. A lower bound that
 replaces the routing lemma must use more than the leftmost free cell: at $(12, 1)$ the derivative along $u$ vanishes,
 and what keeps $c_{12}$ from being constant is a free cell further right.

@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-184 Lean modules with 853 headline theorems, 67 findings (proved on paper,
-computed or conjectured) and 74 negative results. Prize problem 1 asks whether the center column
+190 Lean modules with 904 headline theorems, 67 findings (proved on paper,
+computed or conjectured) and 75 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,17 +12,17 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 138 | 27 | 18 |
+| [Columns](#columns) | 139 | 27 | 18 |
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 12 | 10 |
-| [Frames and the seed's past](#frames-and-the-seeds-past) | 2 | 3 | 1 |
+| [Frames and the seed's past](#frames-and-the-seeds-past) | 4 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 11 | 5 | 15 |
+| [Complexity](#complexity) | 14 | 5 | 16 |
 
 ## Open work
 
@@ -41,7 +41,6 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
-- [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
 - [Windows of 20 cells exclude 0^q 10101 for every q of at least 26 and give every tail of up to eight cells but 1100001 a least white run; 1100001 has one, 37, at 22 cells](findings/columns/tail-families.md): problem 1
@@ -50,7 +49,6 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
-- [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md): problem 3
 
 **Findings proved in Lean in part**
 
@@ -59,6 +57,7 @@ approach stopped.
 - [The game with cyclic classes closes ten blocks of period 13 to 16, eight of period 17 and fifteen of period 18 that nothing else excludes](findings/columns/class-blocks.md): problem 1
 - [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md): problem 1
 - [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md): problem 1
+- [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md): problem 1
 - [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md): problem 1
 - [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md): problem 1
 - [The finite game excludes 508 of the 79,971 blocks of period 19 and 20](findings/columns/game-blocks-20.md): problem 1
@@ -95,6 +94,7 @@ approach stopped.
 - [The kit's wedge hypotheses BWH and RW are statements about 2^n forced runs; no witness of BWH for 7 <= n <= 31 or of RW for n <= 26](findings/period-two/wedge-forced-runs.md): problem 1
 - [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
 - [No other right extension up to 40 cells keeps the center column](findings/seeds/no-other-extensions.md): problems 1, 2, 3
+- [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md): problem 3
 
 ## Foundations
 
@@ -205,6 +205,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game with cyclic classes, checked width by width, excludes 000000001011 in Lean](Rule30Open/Columns/ClassGame.md) | [`Columns.ClassGame`](Rule30Open/Columns/ClassGame.lean) | `class_column`, `center_not_class`, `class_not_eventuallyWord`, `column_not_000000001011`, `center_not_000000001011`, `not_eventually_000000001011` | 1 | not in the kit |
 | [A certificate of the game with cyclic classes can be checked over several modules](Rule30Open/Columns/ClassSplit.md) | [`Columns.ClassSplit`](Rule30Open/Columns/ClassSplit.lean) | `ClassCert.tri_append`, `ClassCert.levelOk_append` | 1 | not in the kit |
 | [A periodic column and any observable that closes the strip to its right](Rule30Open/Columns/ClosingObservable.md) | [`Columns.ClosingObservable`](Rule30Open/Columns/ClosingObservable.lean) | `closing_observable`, `affine_observable`, `center_xor`, `center_masked_two`, `center_parity` | 1 | extends a kit result |
+| [Beside 0001, column 1 moves in blocks of four along a graph of exactly 13 edges, and a repeated block forces the ether](Rule30Open/Columns/ColumnOneBlocks.md) | [`Columns.ColumnOneBlocks`](Rule30Open/Columns/ColumnOneBlocks.lean) | `column_one_blocks`, `column_one_white_period_four`, `column_one_period_four`, `column_one_period_four_ether`, `drv_column_one_blocks`, `drv_column_one_white_period_four`, `cob_edges_realized`, `cob_loops`, `cob_two_cycles` | 1 | not in the kit |
 | [Counts of black cells move left by at most a factor of three](Rule30Open/Columns/ColumnTransfer.md) | [`Columns.ColumnTransfer`](Rule30Open/Columns/ColumnTransfer.lean) | `transfer`, `transfer_white`, `iterate`, `transfer_right`, `transfer_right_white`, `iterate_right`, `center_lower` | 2 | not in the kit |
 | [For 001 the left half only has to fail for free bits whose runs of 0s have length at least 2 and runs of 1s at least 3](Rule30Open/Columns/ConstrainedLeft001.md) | [`Columns.ConstrainedLeft001`](Rule30Open/Columns/ConstrainedLeft001.lean) | `not_eventually_001_of_C3r`, `center_not_eventually_001_of_C3r`, `c3r_of_c3s` | 1 | extends a kit result |
 | [Traps for 57 of the 186 blocks of period 11, from walls of period eleven carried leftward](Rule30Open/Columns/ElevenTraps.md) | [`Columns.ElevenTraps`](Rule30Open/Columns/ElevenTraps.lean) | `elevenTraps_check`, `elevenTraps_blocks`, `eleven_absorption_excludes` | 1 | not in the kit |
@@ -280,7 +281,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [The game with cyclic classes closes ten blocks of period 13 to 16, eight of period 17 and fifteen of period 18 that nothing else excludes](findings/columns/class-blocks.md) | computed | 1 | partial |
 | [The game with cyclic classes at 16 cells excludes 000000001011, a block of period 12 nothing else excludes](findings/columns/class-game.md) | computed | 1 | partial |
 | [Every window can reach the period-four certificate, so a fair coin beyond it locks the right half](findings/columns/coin-lock.md) | computed | 1 | partial |
-| [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | wanted |
+| [Beside 0001, column 1 moves in blocks of four along a graph of 13 edges, and a repeated block forces the ether](findings/columns/column-one-blocks.md) | proved on paper | 1 | partial |
 | [Up to period 15, what the exclusions and reductions in Lean reach, period by period](findings/columns/coverage.md) | computed | 1 | not applicable |
 | [Against a right half of at most 11 to 14 cells, no left half of fewer than 1,000 cells keeps the center on a block of period 2, 3, 5, 6, 7 or 9](findings/columns/finite-onset-census.md) | computed | 1 | partial |
 | [The finite game excludes 261 of the 22,242 blocks of period 17 and 18](findings/columns/game-blocks-18.md) | computed | 1 | partial |
@@ -449,6 +450,8 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 |---|---|---|---|---|
 | [Every row of the single cell's past is eventually periodic to the left](Rule30Open/Frames/SeedPast.md) | [`Frames.SeedPast`](Rule30Open/Frames/SeedPast.lean) | `phiF_phiInv`, `phiInv_phiF`, `past_unique`, `phiInv_evPer`, `rho_evPer`, `frame_step`, `past_evPer` | 1 | extends a kit result |
 | [The periods of the single cell's past grow without bound](Rule30Open/Frames/SeedPastPeriods.md) | [`Frames.SeedPastPeriods`](Rule30Open/Frames/SeedPastPeriods.lean) | `phiF_topAt`, `rho_not_evZero`, `rho_iter`, `agree_of_period`, `pigeonhole`, `rho_period_bound`, `rho_no_short_period` | 1 | extends a kit result |
+| [The single cell has exactly one past in Rule 30, and its tails die on their rings in exactly k steps](Rule30Open/Frames/SeedPastRing.md) | [`Frames.SeedPastRing`](Rule30Open/Frames/SeedPastRing.lean) | `seedRow_evolve`, `seed_past_iff`, `evolve_periodic`, `evolve_agree`, `tailRing_left`, `tailRing_periodic`, `rho_one`, `rho_tail_dies`, `seed_past_rings` | 1 | extends a kit result |
+| [The periods and preperiods of the single cell's past, to depth 3,000, checked in the kernel](Rule30Open/Frames/SeedPastTable.md) | [`Frames.SeedPastTable`](Rule30Open/Frames/SeedPastTable.lean) | `phiIter_period`, `phiIter_eq_rho`, `tailPeriod_gcd`, `minTailPeriod_dvd`, `rho_min_period_dvd`, `seedCerts_ok`, `seedCerts_rho`, `rho_min_period`, `rho_period_dvd_of_ge`, `rho_preperiod_small`, `rho_preperiods`, `rho_two`, `rho_ten`, `rho_twentyEight`, `ring48_dies` | 1 | not in the kit |
 
 **Findings**
 
@@ -509,7 +512,7 @@ Exact searches for invariants, coarse-grainings, automata and algebraic relation
 |---|---|---|---|
 | [The center cell has degree exactly 2t - 1 over GF(2)](findings/structure/center-degree.md) | proved on paper | 3 | proved in the kit |
 | [The center column as a sum over adjacent black pairs](findings/structure/duhamel.md) | proved on paper | 1, 2, 3 | proved in the kit |
-| [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md) | proved on paper | 3 | wanted |
+| [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md) | proved on paper | 3 | partial |
 
 **Negative results**
 
@@ -571,6 +574,7 @@ Prize Problem 3, and what an answer either way would imply.
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [The mixed derivative of the center over the comb -t+1, -t+3, ..., -t+2j+1, -t+2j+2 is C(t, j+1) mod 2 on every row, so every constant subcube meets each comb with an odd binomial](Rule30Open/Complexity/CertificateLower.md) | [`Complexity.CertificateLower`](Rule30Open/Complexity/CertificateLower.lean) | `combPar_zero`, `combPar_step`, `combPar_front`, `constOn_hits_comb`, `constOn_odd`, `constOn_two_mod_four` | 3 | not in the kit |
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [The center sees the two rightmost cells of its cone only through their OR, so an adversary must answer the first of them white, and depth 2t + 1 reduces to a function of 2t - 1 cells](Rule30Open/Complexity/CornerOr.md) | [`Complexity.CornerOr`](Rule30Open/Complexity/CornerOr.lean) | `center_corner_or`, `center_flip_beside_black`, `center_flip_corner_of_black`, `corner_tree_lift` | 3 | extends a kit result |
 | [Read from the left, the cells -t to -3 of the cone are pairwise distinguishable for 3 ≤ t ≤ 17, so left-to-right ordered decision diagrams of the center have width 2^(t-2) there, and not at t = 18](Rule30Open/Complexity/LeftCut.md) | [`Complexity.LeftCut`](Rule30Open/Complexity/LeftCut.lean) | `left_cut`, `left_cut_at`, `left_cut_factor`, `left_cut_width`, `left_cut_fails_18`, `stripe_three_18`, `stripe_four_18`, `left_cut_of_check`, `separates_of_refineMasks`, `testBit_sliceCenter` | 3 | not in the kit |
@@ -580,7 +584,9 @@ Prize Problem 3, and what an answer either way would imply.
 | [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
 | [A decision tree for the center cell from an arbitrary row spends exactly one query on the leftmost cell, so with the kit's degree bound it reads at least 2t cells; computation gives all 2t + 1 for t ≤ 17](Rule30Open/Complexity/QueryDepth.md) | [`Complexity.QueryDepth`](Rule30Open/Complexity/QueryDepth.lean) | `depth_restrict_succ_le`, `eval_restrict`, `tree_drop_of_flip`, `center_tree_drop`, `center_tree_lift` | 3 | extends a kit result |
 | [The center never depends on all three rightmost cone cells at one row, so its certificate complexity is at most 2t](Rule30Open/Complexity/RightCorner.md) | [`Complexity.RightCorner`](Rule30Open/Complexity/RightCorner.lean) | `right_corner`, `right_corner_certificate`, `corner_white`, `strip_one`, `strip_two`, `strip_three` | 3 | not in the kit |
+| [On a ring of W cells one step of Rule 30 misses exactly (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2](Rule30Open/Complexity/RingImages.md) | [`Complexity.RingImages`](Rule30Open/Complexity/RingImages.lean) | `ring_missed_rows`, `ring_missed_rows_div`, `ring_image_card`, `ring_preimages_le_three`, `ring_three_preimages`, `numWithPreds_zero_closed`, `numWithPreds_two_closed` | 3 | extends a kit result |
 | [The derivative of the center along the second cell of its cone is the parity of a diagonal, and the right corner repeats one step in as an AND](Rule30Open/Complexity/SecondCells.md) | [`Complexity.SecondCells`](Rule30Open/Complexity/SecondCells.lean) | `center_flip_second`, `second_derivative_flip`, `center_step_corner`, `center_second_shield`, `center_second_and` | 3 | extends a kit result |
+| [The stripe grows by two cells every nine steps, so t - 2k fixed cells make the center constant for t ≥ 9(k + 1), and the least certificate is below t - 1 for every t ≥ 18, and at t = 16, 17 by computation](Rule30Open/Complexity/StripeGrowth.md) | [`Complexity.StripeGrowth`](Rule30Open/Complexity/StripeGrowth.lean) | `stripe_grow`, `stripe_far`, `far_stripe_center`, `farStripe_constOn`, `farStripeRow_isSome` | 3 | extends a kit result |
 | [A 2-automatic array of two indices with eventually periodic rows has row periods O(j), so Rule 30's diagram of right diagonals is not 2-automatic if the right-edge cycles grow faster than linearly; Rule 90's is 2-automatic](Rule30Open/Complexity/TwoIndex.md) | [`Complexity.TwoIndex`](Rule30Open/Complexity/TwoIndex.lean) | `twoIndex_row_period_le`, `twoIndex_row_period_le_of_periodic`, `twoIndex_diag_automatic`, `rule30_twoIndex_not_recognizable`, `rule30_twoIndex_not_recognizable_of_leastExp`, `rule30_twoIndex_not_recognizable_of_white_runs`, `rule30_twoIndex_center_automatic`, `rule90_twoIndex_recognizable`, `rule90_spacetime_recognizable` | 3 | not in the kit |
 
 **Findings**
@@ -599,6 +605,7 @@ Prize Problem 3, and what an answer either way would imply.
 |---|---|---|
 | [The powers Φ^(2^k) of the right-edge step have minimal transducers of 3, 7, 35, 517 and 57,741 states, growing at every squaring for k ≤ 4, and Rules 90 and 150, whose cycles grow linearly, have larger ones](negative-results/complexity/automaton-group-sections.md) | dead end | 3 |
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
+| [An all-t lower bound on the least certificate of the center stops at two cells from the algebra and at an unproved window lemma that would give t/6](negative-results/complexity/certificate-lower-routes.md) | dead end | 3 |
 | [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
 | [As a function of the digits of n, the center cell has the algebraic normal form and the Fourier and mod-3 spectra of a random function](negative-results/complexity/index-function-spectrum.md) | no signal | 3 |
 | [The leftmost t - 2 cells of the cone are pairwise distinguishable for 3 ≤ t ≤ 17 and not for 18 ≤ t ≤ 22, where alternating stripes ending at -3 and -4 fix the center](negative-results/complexity/left-cut.md) | refuted | 3 |
