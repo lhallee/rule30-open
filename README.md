@@ -25,17 +25,80 @@ extension of one.
 
 ## Where things stand
 
-| Problem | Proved in Lean here | Computed here | Open leads |
-|---|---|---|---|
-| 1 | No column of a row with a leftmost black cell is eventually constant, nor eventually periodic with all runs of 1s at least nine long, nor with a period $P$ holding a run of $r \ge 9$ 1s with $P - r \le 4 \lfloor r/9 \rfloor$, nor with a period holding nine or more 1s, then $b$ 0s, then at most $4 \lfloor (b - 1)/9 \rfloor + 2$ more steps, nor with a period whose runs of nine or more 1s are separated by segments that a check on the possible three-cell windows beside the column accepts, every such block of period at most 16 the finite game excludes among them, and the families $1^a 0^b 1 0$, $1^a 0 1 1 0^c$, $1^a 0^{2k+3} 1 0 0$ and $1^a 0^{2k+2} 1 0 1 0$ for every $a \ge 9$; two blocks of period 8 excluded by a finite game, 136 more of period 8 to 16, 155 of period 17 and 18, 327 of period 19 and 20 and 303 of period 21 that the kit does not exclude; period 2, and the period-four word $0001$, reduced to questions about one integer map; no finite row whose right half has at most fourteen cells, or is white on cells 7 to 535 or on cells 11 to 654, or has at most two black cells among cells 1 to 1,359, or is the aligned ether cut anywhere and followed by at most six cells, has a center repeating a word of period four, nor one whose right half is white on its first 1,317 cells a center repeating $001$, nor one whose right half is white on cells 9 to 3,058, 1,610 or 2,357 a center repeating $0000010001$, $00000011011$ or $001011100111$; no center repeats $0001$, $0011$ or $0111$ while column 17, 15 or 14 later reads one fixed sequence of 1,193, 955 or 381 values, nor one of 49 other blocks of period at most 12, 16 of them without a run of more than four, while column 14 later reads one fixed sequence for the block, and for 22 of them a column near the center is black at least once in every 27 to 302 steps; no left half within depth 88 keeps the kit's left-half pattern for any period-four word from any time; an eventual period $P$ of the center column after a transient $T$ needs $T + P \ge 262{,}125$; every eventual period of every length comes down to one statement about the left half; 16 of the 56 blocks of period 9, 23 of the 99 of period 10, 53 of the 186 of period 11, 96 of the 335 of period 12, 176 of the 630 of period 13, 334 of the 1,161 of period 14 and 612 of the 2,182 of period 15, and one block each of period 3, 5 and 7, come down to entry into some trap of the block, with a trap that every window of 20 and 22 cells can reach, as $001$ does and the period-four words into the kit's family, while entry into 360 other traps alone is false, 184 of them in Lean, and so is the kit's own statement of entry into its trap for $001$, and for two of them every right half white on its first 91,129 to 201,172 cells enters, from most phases; against a white right half, no left half within depth 32,754 keeps the center alternating | The game excludes 197 of 8,800 blocks up to period 16, 136 of them beyond the kit, 261 of the 22,242 of period 17 and 18, 508 of the 79,971 of period 19 and 20, and 434 of the 99,858 of period 21; sampled right halves driven by blocks of period 9 to 12 settle into their traps, and every right half of up to four cells into 30 of the 35 that no wall carries; the integer map fails below $2^{52}$; no row with its leftmost 1 within 120 cells has an alternating center; every right half of up to 20 cells enters the kit's ether-and-wall family under each period-four word, and no left half of up to 80 cells meets the kit's left-half statement for one, nor one of 37 to 100 cells the left-half statement of any block of period 3, 5, 6, 7 or 9; against a white right half no left half of fewer than a million cells keeps the center alternating | [Period-four locking](findings/columns/period-four-locking.md), with [a width-16 certificate](findings/columns/period-four-certificate.md), [the absorption census](findings/columns/absorption-census.md) and [a fair coin beyond it](findings/columns/coin-lock.md) that leave only attraction open; [the kit's left-half statements](findings/columns/left-half-c3.md), [every block's](findings/columns/left-half-every-block.md); [the white right half](findings/period-two/white-right-half.md); [the integer map](Rule30Open/PeriodTwo/HeldColumn.md); [lock chains](findings/columns/lock-chains.md), which read every lock found, the kit's wall and its trap for $001$ as one lock carried leftward |
-| 2 | No bound on the density yet; conditional run slopes: if the left diagonals settle linearly with bounded antiphase, black center runs have slope 3/13, and the onsets are the left edge of the seed against its own translate, so a depth gain of 2/3 per step gives that slope ([SettledSlope](Rule30Open/Diagonals/SettledSlope.md), [OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)) | Density 0.500169 over $2^{22}$ cells; no additive conservation law | None found; [random rows do not reach the single cell](negative-results/random-rows/almost-every-row.md) |
-| 3 | An upper bound: a one-tape machine computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps ([QuadraticTime](Rule30Open/Complexity/QuadraticTime.md)); for a row given as input, linear lower bounds that separate Rule 30 from the linear rules: decision trees read at least $2t$ cells ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)), $c_t$ has at least $2^{2t-1}$ nonzero Walsh coefficients ([ParityLift](Rule30Open/Complexity/ParityLift.md)), and the least certificate is between 2 and $t - 2\lfloor t/9 \rfloor + 2$ cells ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)) | No automaton under 131,070 states; linear complexity $n/2$; no learned shortcut | [Why it is hard](negative-results/complexity/problem-three-barrier.md); [as a space lower bound](findings/complexity/space-ladder.md), between the order $\sqrt{n}$ that Paterson's theorem needs and the $\sqrt{n} \log n$ that tree evaluation uses; and why [hypotheses about satisfiability](negative-results/complexity/hardness-hypotheses.md) do not change it |
+All three problems are open. Each route toward them ends at a statement that the chaotic part of a Rule 30 row behaves
+fairly, and no method here proves such a statement. [ROADMAP.md](ROADMAP.md) gives every route, its status and its
+next step; the summary below names the main results and links the entry for each.
+
+### Problem 1: is the center column eventually periodic?
+
+Proved in Lean:
+
+- **Long runs of 1s.** No column of a row with a leftmost black cell is eventually constant, or eventually periodic
+  with every run of 1s at least nine long. Several wider families of blocks with runs of nine or more 1s are excluded
+  as well ([ROADMAP](ROADMAP.md#problem-1-is-the-center-column-eventually-periodic)).
+- **Blocks one at a time.** A finite game excludes 1,400 blocks of period at most 21, hundreds of them beyond the kit
+  ([game blocks](findings/columns/game-blocks.md)). An eventual period $P$ after a transient $T$ needs
+  $T + P \ge 262{,}125$.
+- **Period two.** The kit's hypothesis BWH implies its hypothesis `Q01`
+  ([WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)), and one statement about finite left halves,
+  `Q01Right(W)`, excludes period two whatever the right half does
+  ([ChannelLanguage](Rule30Open/PeriodTwo/ChannelLanguage.md)). Period two also reduces to one integer map
+  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)).
+- **Period four.** No finite row whose right half has at most 14 cells has a center repeating a word of period four,
+  and no left half within depth 88 keeps the kit's left-half pattern for one.
+- **Every period** comes down to one statement about the left half for each block
+  ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). Many blocks of period 9 to 15 come down to entry into a trap, while
+  entry into 360 other traps alone is false, and so is the kit's own statement of entry into its trap for $001$.
+
+Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
+([the shift model](findings/period-two/shift-model.md)); every right half of up to 20 cells enters the kit's family
+under each period-four word ([the absorption census](findings/columns/absorption-census.md)); no left half of up to 80
+cells meets the kit's left-half statement for one ([the left-half statements](findings/columns/left-half-c3.md)).
+
+Where it stops: `Q01` and `Q01Right`, entry into the traps, and attraction into the period-four family are each open,
+and in every computation the cells they depend on behave like fair coins.
+
+### Problem 2: does each color occur equally often?
+
+Proved in Lean: no bound on the density. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
+and their settled pairs alternate in antiphase a bounded number of times, black runs of the center column have slope
+at most 3/13 ([SettledSlope](Rule30Open/Diagonals/SettledSlope.md)), and the point where they start to repeat moves
+by a three-case law, so a gain of 2/3 diagonal per step gives that slope
+([OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)).
+
+Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
+every center column the left half allows, black cells grow at a rate near 3/4
+([driver density](findings/diagonals/driver-density.md)).
+
+Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random
+rows satisfy the problem but do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
+
+### Problem 3: does the $n$th cell need about $n$ steps?
+
+Proved in Lean:
+
+- **An upper bound.** A one-tape machine computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps
+  ([QuadraticTime](Rule30Open/Complexity/QuadraticTime.md)).
+- **Lower bounds for a row given as input.** Each is linear in the cone and separates Rule 30 from the linear rules
+  such as Rule 90: a decision tree reads at least $2t$ cells ([QueryDepth](Rule30Open/Complexity/QueryDepth.md)); the
+  center after $t$ steps has at least $2^{2t-1}$ nonzero Walsh coefficients
+  ([ParityLift](Rule30Open/Complexity/ParityLift.md)); the fewest cells that fix it are at most
+  $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
+- **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
+  cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+
+Computed: no automaton under 131,070 states computes the column; linear complexity $n/2$; no learned shortcut.
+
+Where it stops: a lower bound for the single starting cell amounts to an exponential lower bound for one explicit
+function ([why it is hard](negative-results/complexity/problem-three-barrier.md)); as a space lower bound it sits
+between the order $\sqrt{n}$ that Paterson's theorem needs and the $\sqrt{n} \log n$ that tree evaluation uses
+([the space ladder](findings/complexity/space-ladder.md)).
 
 ## Where to start
 
 [ROADMAP.md](ROADMAP.md) groups every result by route, says which routes are closed and which are open, and lists
 the next steps. [CATALOG.md](CATALOG.md#open-work) lists the open work: conjectures to settle, and findings proved on
-paper or by computation that still want a Lean proof. For Problem 1, start from the open leads in the table above. Before starting
+paper or by computation that still want a Lean proof. Before starting
 in a category, read its negative results; each says where an approach stopped and why. [The literature](literature/README.md)
 collects what is published around the problems, from Jen's theorem to the claims made since 2019.
 
@@ -69,7 +132,7 @@ python scripts/catalog.py check
 axioms of every headline theorem and fails on anything beyond `propext`, `Classical.choice` and `Quot.sound`. The
 source contains no `sorry`, `native_decide` or new axiom, which `catalog.py check` enforces. The tests run on your
 machine, on a CPU, not in continuous integration, which runs the build, the audit and the catalog check on every push;
-the limit for the whole suite is a minute, which it does not meet yet ([tests/README.md](tests/README.md)).
+the whole suite runs in under a minute ([tests/README.md](tests/README.md)).
 
 ## Contributing
 
