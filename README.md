@@ -63,14 +63,15 @@ and in every computation the cells they depend on behave like fair coins.
 Proved in Lean: no bound on the density. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
 and their settled pairs alternate in antiphase a bounded number of times, black runs of the center column have slope
 at most 3/13 ([SettledSlope](Rule30Open/Diagonals/SettledSlope.md)), and the point where they start to repeat moves
-by a three-case law, so a gain of 2/3 diagonal per step gives that slope ([OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)).
+by a three-case law, so a gain of 2/3 diagonal per step gives that slope
+([OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)).
 
 Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
 every center column the left half allows, black cells grow at a rate near 3/4
 ([driver density](findings/diagonals/driver-density.md)).
 
-Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random rows satisfy the problem but
-do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
+Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random
+rows satisfy the problem but do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
 
 ### Problem 3: does the $n$th cell need about $n$ steps?
 
