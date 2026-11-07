@@ -26,8 +26,8 @@ stripe relation can give.
 - `rep_of_S01`: the representative `rep B` of [StripeClasses](StripeClasses.md) (one move to a row with cell $B$
   black, or the row itself) is constant on `S01` pairs, for every $B \ge 1$ and all rows.
 - `joined_iff`: two rows of the box are joined iff they have the same representative.
-- `s01_class_count`: every row of the box is joined to one of the $2^{A+B} + 3 \cdot 2^{A-1}$ rows `boxRep A B i`, and
-  no two of these are joined.
+- `s01_class_count`: the $2^{A+B} + 3 \cdot 2^{A-1}$ rows `boxRep A B i` are rows of the box, every row of the box is
+  joined to one of them, and no two of them are joined.
 
 Per left part: the $2^B$ rows with a given left part form $2^{B-1} + 1$ classes, or $2^{B-1}$ when the left part ends
 in $0\,1$ (cell $-1$ white, cell $0$ black); classes never mix left parts.

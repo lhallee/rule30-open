@@ -862,14 +862,15 @@ theorem boxRep_inj (A B i j : Nat) (hB : 1 ≤ B) (h : boxRep A B i = boxRep A B
 end StripeClasses
 
 /-- **The stripe-class count identity.** For `A, B >= 1`, the classes of `S01` on the rows supported in `[-A, B]`
-are exactly the classes of the `2^(A+B) + 3 * 2^(A-1)` rows `boxRep A B i`: every row of the box is joined to one of
-them, and no two of them are joined. -/
+are exactly the classes of the `2^(A+B) + 3 * 2^(A-1)` rows `boxRep A B i`: each of them is a row of the box, every
+row of the box is joined to one of them, and no two of them are joined. -/
 theorem StripeClasses.s01_class_count (A B : Nat) (hA : 1 ≤ A) (hB : 1 ≤ B) :
+    (∀ i, i < 2 ^ (A + B) + 3 * 2 ^ (A - 1) → boxRep A B i < 2 ^ (A + B + 1)) ∧
     (∀ x, x < 2 ^ (A + B + 1) →
       ∃ i, i < 2 ^ (A + B) + 3 * 2 ^ (A - 1) ∧ Joined (BoxS01 A B) x (boxRep A B i)) ∧
     (∀ i j, i < 2 ^ (A + B) + 3 * 2 ^ (A - 1) → j < 2 ^ (A + B) + 3 * 2 ^ (A - 1) →
       Joined (BoxS01 A B) (boxRep A B i) (boxRep A B j) → i = j) := by
-  constructor
+  refine ⟨fun i hi => (boxRep_fixed A B i hA hB hi).1, ?_, ?_⟩
   · intro x hx
     have hrx := rep_lt A B x hx
     have hc : rep B x % 2 = 1 ∨ (rep B x % 2 ^ B = 0 ∧ (rep B x / 2 ^ B) % 4 ≠ 1) := by

@@ -30,7 +30,8 @@ $1, \dots, B$. The left part *ends in $0\,1$* when cell $-1$ is white and cell $
   whose right half is empty and whose left part does not end in $0\,1$.
 - `right_half_columns`, `box_columns`: the same in the kit's frame.
 - `center_eq_right_extension`: the official form. The prize's column is the center column of the single black cell
-  followed by a right half inside $[1, B]$ whose cell $B$ is black.
+  followed by a right half inside $[1, B]$ whose cell $B$ is black; [SeedExtensions](../Seeds/SeedExtensions.md) names
+  these rows, $(10)^k1$ and $(10)^k11$.
 
 ## Argument
 
