@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-191 Lean modules with 911 headline theorems, 67 findings (proved on paper,
+193 Lean modules with 920 headline theorems, 67 findings (proved on paper,
 computed or conjectured) and 75 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -15,7 +15,7 @@ takes effort of order `n`.
 | [Columns](#columns) | 139 | 27 | 18 |
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 12 | 10 |
-| [Frames and the seed's past](#frames-and-the-seeds-past) | 4 | 3 | 1 |
+| [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 3 | 1 |
 | [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
@@ -452,6 +452,8 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 | [The periods of the single cell's past grow without bound](Rule30Open/Frames/SeedPastPeriods.md) | [`Frames.SeedPastPeriods`](Rule30Open/Frames/SeedPastPeriods.lean) | `phiF_topAt`, `rho_not_evZero`, `rho_iter`, `agree_of_period`, `pigeonhole`, `rho_period_bound`, `rho_no_short_period` | 1 | extends a kit result |
 | [The single cell has exactly one past in Rule 30, and its tails die on their rings in exactly k steps](Rule30Open/Frames/SeedPastRing.md) | [`Frames.SeedPastRing`](Rule30Open/Frames/SeedPastRing.lean) | `seedRow_evolve`, `seed_past_iff`, `evolve_periodic`, `evolve_agree`, `tailRing_left`, `tailRing_periodic`, `rho_one`, `rho_tail_dies`, `seed_past_rings` | 1 | extends a kit result |
 | [The periods and preperiods of the single cell's past, to depth 3,000, checked in the kernel](Rule30Open/Frames/SeedPastTable.md) | [`Frames.SeedPastTable`](Rule30Open/Frames/SeedPastTable.lean) | `phiIter_period`, `phiIter_eq_rho`, `tailPeriod_gcd`, `minTailPeriod_dvd`, `rho_min_period_dvd`, `seedCerts_ok`, `seedCerts_rho`, `rho_min_period`, `rho_period_dvd_of_ge`, `rho_preperiod_small`, `rho_preperiods`, `rho_two`, `rho_ten`, `rho_twentyEight`, `ring48_dies` | 1 | not in the kit |
+| [The stripe relation at time 0 or 1 has exactly 2^(A+B) + 3 * 2^(A-1) classes on the box [-A, B]](Rule30Open/Frames/StripeClassCount.md) | [`Frames.StripeClassCount`](Rule30Open/Frames/StripeClassCount.lean) | `StripeClasses.s01_class_count`, `StripeClasses.joined_iff`, `StripeClasses.rep_of_S01`, `StripeClasses.tail_of_Phi_stripe` | 1 | extends a kit result |
+| [A right half of B cells gives at most 2^(B-1) + 1 center columns to each left part](Rule30Open/Frames/StripeClasses.md) | [`Frames.StripeClasses`](Rule30Open/Frames/StripeClasses.lean) | `StripeClasses.right_half_center_columns`, `StripeClasses.box_center_columns`, `StripeClasses.right_half_columns`, `StripeClasses.box_columns`, `StripeClasses.center_eq_right_extension` | 1 | extends a kit result |
 
 **Findings**
 

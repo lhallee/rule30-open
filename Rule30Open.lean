@@ -173,6 +173,8 @@ public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Frames.SeedPastRing
 public import Rule30Open.Frames.SeedPastTable
+public import Rule30Open.Frames.StripeClasses
+public import Rule30Open.Frames.StripeClassCount
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.Analogs.SymmetricAxes

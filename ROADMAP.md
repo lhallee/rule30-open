@@ -28,6 +28,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
+| 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 18 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 360 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game, from where sampled halves settle or from another trap of the block, and so does the kit's own reduction of $001$ to its trap `t001` |
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
@@ -300,6 +301,19 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
+- **Equal center columns and the left edge.** *Open.* The kit proves that its open statement `EdgeObservable`, that
+  two finite rows with the same center column have the same leftmost black cell, implies Problem 1: rows $T$ and
+  $T + P$ of an eventually periodic orbit share a center column and not a left edge. The kit's stripe relation, at
+  time 0 or after one step with cell 0 shared, joins rows with equal center columns, and on the rows supported in
+  $[-A, B]$ it has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes, each inside one left part, with an explicit
+  representative; so those rows have at most that many center columns, and the $B$ cells right of the center add at
+  most $2^{B-1} + 1$ center columns to each left part, in Lean ([StripeClasses](Rule30Open/Frames/StripeClasses.md),
+  [StripeClassCount](Rule30Open/Frames/StripeClassCount.md)). On every box of up to 18 cells the count of distinct
+  center columns reaches that bound, so there equal center columns are exactly the stripe classes (computed).
+  Completeness, that rows in different classes always have different center columns, is open; on the boxes $[-A, A]$
+  for every $A$ it would give `EdgeObservable` for the orbit's rows, hence Problem 1. *Assessment:* a counting
+  statement with an exact target on every box, but a statement about all rows of a box at once, the single cell's
+  among them.
 - **Random rows and probabilistic arguments.** *Closed.* The problems hold for random rows, provably, and no amount of
   randomness reaches the single cell ([random rows](negative-results/random-rows/almost-every-row.md)).
 - **Counterexamples.** *No signal for the problem; found for hypotheses.* No row of up to 24 cells has a column that

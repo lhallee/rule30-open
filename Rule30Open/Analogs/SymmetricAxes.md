@@ -68,9 +68,9 @@ Rule 150 for $b = 1$. Let $y$ be a row that is 0 outside $[-N, N]$ and $p$ a cel
    single cell (the kit's `run210_eq`).
 
 The explicit columns of step 6, which follow from its recursion by induction: under Rule 90, $u(t) = 1$ exactly when
-$t + 1$ is a power of 2 (Lucas' theorem gives $u(t) = \binom{t}{(t-1)/2} \bmod 2$); under Rule 150, $u(t)$ is the
-parity of the number of trailing 1s of $t$ in binary, $v_2(t + 1) \bmod 2$, a form of the period-doubling sequence.
-The proof does not need these forms.
+$t + 1$ is a power of 2 ($u(t) = 0$ at even $t$, and at odd $t$ Lucas' theorem gives
+$u(t) = \binom{t}{(t-1)/2} \bmod 2$); under Rule 150, $u(t)$ is the parity of the number of trailing 1s of $t$ in
+binary, $v_2(t + 1) \bmod 2$, a form of the period-doubling sequence. The proof does not need these forms.
 
 The counts agree with the controls of [the search for columns that repeat from time
 0](../../negative-results/columns/periodic-from-start.md). Rows of at most 12 cells symmetric about a cell number
