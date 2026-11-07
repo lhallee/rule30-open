@@ -49,6 +49,15 @@ Proved in Lean:
 - **Every period** comes down to one statement about the left half for each block
   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). Many blocks of period 9 to 15 come down to entry into a trap, while
   entry into 360 other traps alone is false, and so is the kit's own statement of entry into its trap for $001$.
+- **Equal center columns.** On the rows supported in $[-A, B]$ the kit's stripe relation, which joins rows with equal
+  center columns, has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes, none mixing left parts, so those rows have at most
+  that many center columns ([StripeClassCount](Rule30Open/Frames/StripeClassCount.md),
+  [StripeClasses](Rule30Open/Frames/StripeClasses.md)). If every box $[-A, A]$ reached that count, rows with equal
+  center columns would have equal left edges, the kit's `EdgeObservable`, which implies Problem 1; every box of up to
+  18 cells reaches it.
+- **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
+  when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
+  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)).
 
 Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
 ([the shift model](findings/period-two/shift-model.md)); every right half of up to 20 cells enters the kit's family
@@ -68,7 +77,10 @@ by a three-case law, so a gain of 2/3 diagonal per step gives that slope
 
 Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
 every center column the left half allows, black cells grow at a rate near 3/4
-([driver density](findings/diagonals/driver-density.md)).
+([driver density](findings/diagonals/driver-density.md)). From a uniformly random left half, almost surely every center column
+the half allows, whatever the right half, has black cells of upper density at most 0.7729, the root of $h(d) = d$
+(proved on paper, [the first moment](findings/diagonals/driver-first-moment.md)); the white start is one half of
+measure zero.
 
 Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random
 rows satisfy the problem but do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
