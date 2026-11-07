@@ -5,7 +5,7 @@ problems: [1]
 status: proved
 lean: Rule30Open.Analogs.SymmetricAxes
 headline: [iter90_column_periodic_iff, iter150_column_periodic_iff, linear_column_periodic_iff, at_most_one_periodic_column, run90_column_periodic_iff, run150_column_periodic_iff, run210_column_periodic_iff]
-kit: new
+kit: refines
 kit_modules: [Rule30Realization, Rule30Jen, Rule30DividedDifference]
 ---
 
@@ -72,10 +72,12 @@ $t + 1$ is a power of 2 (Lucas' theorem gives $u(t) = \binom{t}{(t-1)/2} \bmod 2
 parity of the number of trailing 1s of $t$ in binary, $v_2(t + 1) \bmod 2$, a form of the period-doubling sequence.
 The proof does not need these forms.
 
-The theorem predicts the controls of [the search for columns that repeat from time 0](../../negative-results/columns/periodic-from-start.md)
-exactly. Rows of at most 12 cells symmetric about a cell number $\sum_{h=0}^{5} (12 - 2h)\, 2^h = 240$, each with one
-axis, and Rule 150 keeps 240 rows. Under Rule 90 the axis column is $y(p), 0, 0, \dots$, which repeats from time 0 only
-when $y(p) = 0$, and those rows number $\sum_{h=1}^{5} (12 - 2h)\, 2^{h-1} = 114$, the rows Rule 90 keeps.
+The counts agree with the controls of [the search for columns that repeat from time
+0](../../negative-results/columns/periodic-from-start.md). Rows of at most 12 cells symmetric about a cell number
+$\sum_{h=0}^{5} (12 - 2h)\, 2^h = 240$, each with one axis, and Rule 150 keeps 240 rows. Under Rule 90 the axis
+column is $y(p), 0, 0, \dots$, which repeats from time 0 only when $y(p) = 0$, and those rows number
+$\sum_{h=1}^{5} (12 - 2h)\, 2^{h-1} = 114$, the rows Rule 90 keeps. The theorem accounts for every column that is
+eventually periodic; that no other column passed the search's finite test is an observation of that search.
 
 ## In Lean
 
@@ -86,9 +88,17 @@ when $y(p) = 0$, and those rows number $\sum_{h=1}^{5} (12 - 2h)\, 2^{h-1} = 114
 `halving_not_periodic` is the descent on the period, stated for any pair of sequences $u, c$ with the properties of
 step 6. A finite row is one that is 0 outside $[-N, N]$, `∀ x, N < x.natAbs → y x = false`.
 
-## Relation to the kit
+## Relation to the kit and the literature
 
-Not in the kit. The kit's
+The characterization, the "only if" direction through the symmetry of the row, and its proof by descent are not in the
+kit. Two of its consequences also follow from Jen's argument, which needs only a rule that is permutive in its left
+cell and a left edge that moves one cell per step, both true for Rules 90 and 150 from every nonzero finite row: at
+most one column is eventually periodic (`at_most_one_periodic_column`; for Rule 30 the kit's
+`Rule30Jen.between_periodic` and `Rule30FiniteConfigs.jen`, and Kopra (2023), Theorem 3.5, for a class that contains
+Rule 90, in [the literature](../../literature/columns.md#traces)), and, with the kit's `barrier` and
+`run_not_adjacent`, the single-cell corollaries. A Lean library of Palamarchuk (2026) claims the Rule 90 case at cell 1
+([the literature](../../literature/columns.md)). Jen (1988) studies the temporal sequences of linear rules over finite
+fields; its text was not read here, so novelty is claimed against the kit and this repository only. The kit's
 [`Rule30Realization`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30Realization.lean)
 proves that the single cell's center column is eventually constant under Rules 90, 150 and 210 (`center90`,
 `center150`, `center210`, `barrier`), and that Jen's adjacent-column theorem holds for them (`run_not_adjacent`);
@@ -98,7 +108,7 @@ only eventually periodic column. `EventuallyPeriodic` and `common_period` come f
 The "if" direction appears in the kit for one case: in
 [`Rule30DividedDifference`](https://github.com/WolframInstitute/Rule30PrizeKit/blob/932cf8dde039b89b1dcbe9636867bb1b2057fef0/lean/Ruliology/CellularAutomata/Rule30DividedDifference.lean),
 `add_reflect` and `add_center` show that under Rule 150 a row symmetric about cell 1 with cell 1 white keeps column 1
-white. The "only if" direction, the characterization and its consequences are not in the kit; its equivalent forms
+white. The "only if" direction and the characterization are not in the kit; its equivalent forms
 (`CenterFormulas`) write Rule 30 as Rule 150 plus $x_p x_{p+1}$ with Rule 150's Green's function and say nothing about
 which columns of Rule 150 are periodic.
 
