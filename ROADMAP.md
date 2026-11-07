@@ -351,7 +351,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   among $c(0..T)$ is 141 at $T = 190$ exactly and at least 2,254 at $T = 3{,}000$ (a beam that is exact to 190), a rate
   near 3/4, and chaining dense periodic words does not raise it, since a long stretch is mostly followed by a gap of
   comparable length; so the conjecture that the black count is at most $\rho T + C$ with $\rho < 1$ would give the single
-  cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). A potential over
+  cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). From a
+  uniformly random left half, almost surely every driver it admits, so the center column beside every right half at
+  once, has black cells of upper density at most $0.7729$, the root of $h(d) = d$; this first-moment bound is just above
+  the measured $3/4$, and the conjecture is equivalent to an upper large-deviation bound for the center column with
+  column 1 replaced by fair coins, one that may lose an exponential factor against the first moment; from the white
+  half the admissible words with $b$ black cells number at most 1.35 times their mean over random halves for $n$ from
+  20 to 150 ([the first moment](findings/diagonals/driver-first-moment.md)). A potential over
   27 row features certifies only 12/13 ([driver-density potentials](negative-results/diagonals/driver-density-potential.md)).
   With right cells $1 .. k$ exact and cell $k + 1$ free, the most white cells among $c(0..150)$ is 117 at $k = 1$, where
   the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
