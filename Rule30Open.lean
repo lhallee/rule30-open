@@ -175,6 +175,7 @@ public import Rule30Open.Frames.SeedPastRing
 public import Rule30Open.Frames.SeedPastTable
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
+public import Rule30Open.Analogs.SymmetricAxes
 public import Rule30Open.RandomRows.LeftWindow
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening

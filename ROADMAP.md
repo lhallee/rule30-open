@@ -19,7 +19,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 
 | Problem | Route | Status | Where it stands |
 |---|---|---|---|
-| 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
+| 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses, and under 90 and 150 the eventually periodic columns of a finite row are exactly its mirror axes (Lean) |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 1,400 blocks of period at most 21, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
 | 1 | Single blocks through traps | open | 16 of the 56 blocks of period 9, 23 of the 99 of period 10, 53 of the 186 of period 11, 96 of the 335 of period 12, 176 of the 630 of period 13, 334 of the 1,161 of period 14 and 612 of the 2,182 of period 15 come down to entry into some trap of the block, with a trap that every window of 20 cells can reach, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14 and six of period 15, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 15, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 5 and 7 has a trap that passes the tests but that small halves almost never enter, and the four traps of the one block of period 6, which share their first 22 cells, fail the test in the game of 22 cells, and none of its windows of up to 22 cells is locked; entry into 360 other traps alone, most of them carried along a background's columns, is false, 184 of them in Lean, among them 48 natural traps that pass the test of reach but that a wider trap of their block is apart from, and the only trap of period 5, and 90 blocks need entry into one of several traps |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
@@ -48,7 +48,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   sequence that, with the cells between, closes the strip to its right are never both eventually periodic: the center
   column and column 1 xor column 2, or the parity of columns 1 to $k$ for any $k$, in Lean
   ([ClosingObservable](Rule30Open/Columns/ClosingObservable.md)). The kit proves that Rules 90, 150 and 210 share every
-  fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
+  fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone. For Rules 90
+  and 150 the cause is exactly the seed's symmetry: a column of a finite row is eventually periodic if and only if the
+  row is mirror-symmetric about it, so from the single cell the center is the only eventually periodic column of Rules
+  90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
+  two steps being one step on each sublattice, neither of which Rule 30 has.
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period. [The coverage](findings/columns/coverage.md) counts, period by
   period up to 15, the blocks excluded, reduced to entry into a trap that passes the two tests entry needs, reduced by

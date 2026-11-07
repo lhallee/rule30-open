@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-190 Lean modules with 904 headline theorems, 67 findings (proved on paper,
+191 Lean modules with 911 headline theorems, 67 findings (proved on paper,
 computed or conjectured) and 75 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -16,7 +16,7 @@ takes effort of order `n`.
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 12 | 10 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 4 | 3 | 1 |
-| [Sibling rules](#sibling-rules) | 2 | 0 | 1 |
+| [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
 | [Random rows](#random-rows) | 1 | 0 | 1 |
@@ -469,7 +469,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 
 ## Sibling rules
 
-Results for Rules 210 and 150 that show which features of Rule 30 a proof has to use.
+Results for Rules 90, 150 and 210 that show which features of Rule 30 a proof has to use.
 
 **Proved in Lean**
 
@@ -477,6 +477,7 @@ Results for Rules 210 and 150 that show which features of Rule 30 a proof has to
 |---|---|---|---|---|
 | [The linear analog of period two is true](Rule30Open/Analogs/Rule150Descent.md) | [`Analogs.Rule150Descent`](Rule30Open/Analogs/Rule150Descent.lean) | `held150_even_steps`, `held150_odd_steps`, `descent150` | 1 | not in the kit |
 | [Rule 210 keeps the period-two condition](Rule30Open/Analogs/Rule210.md) | [`Analogs.Rule210`](Rule30Open/Analogs/Rule210.lean) | `rule210_finite_half`, `orbit210_checkerboard` | 1 | not in the kit |
+| [Under Rules 90 and 150 a column is eventually periodic exactly at a mirror axis](Rule30Open/Analogs/SymmetricAxes.md) | [`Analogs.SymmetricAxes`](Rule30Open/Analogs/SymmetricAxes.lean) | `iter90_column_periodic_iff`, `iter150_column_periodic_iff`, `linear_column_periodic_iff`, `at_most_one_periodic_column`, `run90_column_periodic_iff`, `run150_column_periodic_iff`, `run210_column_periodic_iff` | 1 | not in the kit |
 
 **Negative results**
 

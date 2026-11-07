@@ -34,7 +34,7 @@
 - id: analogs
   title: Sibling rules
   lean: Analogs
-  summary: Results for Rules 210 and 150 that show which features of Rule 30 a proof has to use.
+  summary: Results for Rules 90, 150 and 210 that show which features of Rule 30 a proof has to use.
 
 - id: dynamics
   title: Dynamics of the two halves
