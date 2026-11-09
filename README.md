@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 193 Lean modules with 920
-headline theorems, 68 findings and 75 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 194 Lean modules with 925
+headline theorems, 69 findings and 78 negative results.
 
 ## The problems
 
@@ -54,7 +54,7 @@ Proved in Lean:
   that many center columns ([StripeClassCount](Rule30Open/Frames/StripeClassCount.md),
   [StripeClasses](Rule30Open/Frames/StripeClasses.md)). If every box $[-A, A]$ reached that count, rows with equal
   center columns would have equal left edges, the kit's `EdgeObservable`, which implies Problem 1; every box of up to
-  18 cells reaches it.
+  21 cells reaches it ([center classes](findings/frames/center-classes.md)).
 - **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
   when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
   ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)).
@@ -82,8 +82,12 @@ the half allows, whatever the right half, has black cells of upper density at mo
 (proved on paper, [the first moment](findings/diagonals/driver-first-moment.md)); the white start is one half of
 measure zero.
 
-Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random
-rows satisfy the problem but do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
+Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open, and
+every bound on the black rate contains a positive density for one explicit orbit, Rule 30 beside a cell held black
+([the relaxed game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
+reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)), and invariant measures of
+positive entropy need not be uniform: rows moving right at the speed of light form a set of positive entropy, in Lean
+([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
 
 ### Problem 3: does the $n$th cell need about $n$ steps?
 

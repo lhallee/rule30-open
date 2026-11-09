@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 194 Lean modules with 925 headline theorems, 69 findings (proved on paper,
-computed or conjectured) and 77 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 78 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -14,7 +14,7 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 139 | 27 | 18 |
 | [Period two](#period-two) | 16 | 15 | 12 |
-| [Diagonals](#diagonals) | 10 | 13 | 10 |
+| [Diagonals](#diagonals) | 10 | 13 | 11 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 1 |
 | [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
@@ -439,6 +439,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [Three leads to linear settling of the single cell's left diagonals stop, to depth 200,000, at the transient or at a law of large numbers for the settled left side; the onset phases are uniform, the front shows nothing at the white diagonals, and no settled pair repeats up to a time shift](negative-results/diagonals/linear-settling-leads.md) | dead end | 2 |
 | [No potential that reads the white run ahead of the front walk and a window of at most three cells of the pair that holds the phase or ends just before it certifies the walk's slope 5/2 at every period; at every period from 5 to 10, states with equal features are joined by edges or cycles of mean above 5/2, and the slope such a potential can certify grows with the period](negative-results/diagonals/local-walk-potential.md) | barrier | 2 |
 | [Three heuristics for the onsets of the single cell's left diagonals fail on the data; the transient has the density of fair coins, so a budget on reset gaps gives the walk's slope 2, a flipped cell's damage ends by the later onset or becomes a permanent time shift, and a doubling law passes its base test while the onsets spread like a walk](negative-results/diagonals/onset-heuristics.md) | refuted | 2 |
+| [The relaxed driver game G has value about 0.63 T to T = 180, its lemmas reduce a black density below 1 to a charging property, and every such bound contains a positive density for one explicit orbit, Rule 30 beside a cell held black](negative-results/diagonals/relaxed-density-game.md) | dead end | 2 |
 | [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
 | [A potential that grows with the white runs does not turn the window bounds into a slope below 2 for every depth, and the step bounds the white runs only by the period; the window bounds grow linearly faster than 3j/2 while W_j is constant, a certificate that knows only the white runs needs slope 7/3, and words with one black cell per period occur at periods 4, 8 and 16](negative-results/diagonals/white-run-potential.md) | dead end | 2 |

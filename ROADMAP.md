@@ -28,7 +28,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
-| 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 18 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
+| 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 21 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 360 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game, from where sampled halves settle or from another trap of the block, and so does the kit's own reduction of $001$ to its trap `t001` |
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
@@ -53,7 +53,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   and 150 the cause is exactly the seed's symmetry: a column of a finite row is eventually periodic if and only if the
   row is mirror-symmetric about it, so from the single cell the center is the only eventually periodic column of Rules
   90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
-  two steps being one step on each sublattice, neither of which Rule 30 has.
+  two steps being one step on each sublattice, neither of which Rule 30 has. A proof through the center cannot treat the
+  two halves as black boxes either: either half can be replaced by a causal adversary that makes the center eventually
+  periodic, the single cell's own left half admits the white tail $1, 1, 0, 0, \dots$, and beyond period one the route
+  returns to the open left-half checks and right-half channel statements
+  ([compositional halves](negative-results/dynamics/compositional-halves.md)).
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period. [The coverage](findings/columns/coverage.md) counts, period by
   period up to 15, the blocks excluded, reduced to entry into a trap that passes the two tests entry needs, reduced by
@@ -308,8 +312,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   $[-A, B]$ it has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes, each inside one left part, with an explicit
   representative; so those rows have at most that many center columns, and the $B$ cells right of the center add at
   most $2^{B-1} + 1$ center columns to each left part, in Lean ([StripeClasses](Rule30Open/Frames/StripeClasses.md),
-  [StripeClassCount](Rule30Open/Frames/StripeClassCount.md)). On every box of up to 18 cells the count of distinct
-  center columns reaches that bound, so there equal center columns are exactly the stripe classes (computed).
+  [StripeClassCount](Rule30Open/Frames/StripeClassCount.md)). On every box of up to 21 cells the count of distinct
+  center columns reaches that bound, so there equal center columns are exactly the stripe classes and rows with equal
+  center columns have equal left parts; the last pair to separate waits 829 steps, on $[0, 20]$, and its left halves
+  merge after one step, so the open step is a first-passage statement for differences confined to the right half
+  ([center classes](findings/frames/center-classes.md)).
   Completeness, that rows in different classes always have different center columns, is open; on the boxes $[-A, A]$
   for every $A$ it would give `EdgeObservable` for the orbit's rows, hence Problem 1. *Assessment:* a counting
   statement with an exact target on every box, but a statement about all rows of a box at once, the single cell's
@@ -333,7 +340,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 ## Problem 2: does each color occur with density 1/2?
 
 - **Invariant measures and random rows.** *Closed.* Exact for random rows ([LeftWindow](Rule30Open/RandomRows/LeftWindow.md)),
-  silent on the single cell ([random rows](negative-results/random-rows/almost-every-row.md)).
+  silent on the single cell ([random rows](negative-results/random-rows/almost-every-row.md)). At the speed of light to the right Rule 30
+  has uncountably many rows that come back after 12, 15 or 17 steps moved as many cells, a set of positive entropy, in
+  Lean, so measures invariant under the shift and the rule with positive entropy need not be uniform and a rigidity
+  theorem needs an ergodicity hypothesis along that direction ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
@@ -357,7 +367,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   the measured $3/4$, and the conjecture is equivalent to an upper large-deviation bound for the center column with
   column 1 replaced by fair coins, one that may lose an exponential factor against the first moment; from the white
   half the admissible words with $b$ black cells number at most 1.35 times their mean over random halves for $n$ from
-  20 to 150 ([the first moment](findings/diagonals/driver-first-moment.md)). A potential over
+  20 to 150 ([the first moment](findings/diagonals/driver-first-moment.md)). Every bound of this kind contains a density
+  statement for one explicit orbit: in the relaxed game where the controller harvests black pairs (value about $0.63T$
+  to $T = 180$, with exact lemmas reducing a bound to a charging property), the greedy play is Rule 30 on the half line
+  beside a cell held black, so a bound below 1 gives its column $-1$ a positive density of black cells, and the same
+  holds for the greedy driver of the game above ([the relaxed game](negative-results/diagonals/relaxed-density-game.md)).
+  A potential over
   27 row features certifies only 12/13 ([driver-density potentials](negative-results/diagonals/driver-density-potential.md)).
   With right cells $1 .. k$ exact and cell $k + 1$ free, the most white cells among $c(0..150)$ is 117 at $k = 1$, where
   the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
