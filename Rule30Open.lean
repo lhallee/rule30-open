@@ -196,6 +196,7 @@ public import Rule30Open.Complexity.LeftCutRank
 public import Rule30Open.Complexity.LateSeedCut
 public import Rule30Open.Complexity.LateSeedCutWide
 public import Rule30Open.Complexity.ParityLift
+public import Rule30Open.Complexity.BinomialDuality
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

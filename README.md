@@ -5,7 +5,7 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 196 Lean modules with 943
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 197 Lean modules with 964
 headline theorems, 71 findings and 82 negative results.
 
 ## The problems
@@ -104,6 +104,10 @@ Proved in Lean:
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
   cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+- **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
+  with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
+  1 and the first rung of Problem 3 are the same statements for the transform
+  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)).
 - **Reading the row from the left, for every $t$.** For $a \le 13$ an ordered decision diagram that reads the row from
   the left needs $2^a$ nodes at level $a$ at every $t$ from a threshold on, since white and single black cell
   completions tell the $2^a$ settings of the $a$ leftmost cells apart

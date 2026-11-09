@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-196 Lean modules with 943 headline theorems, 71 findings (proved on paper,
+197 Lean modules with 964 headline theorems, 71 findings (proved on paper,
 computed or conjectured) and 82 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 2 | 1 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 16 | 5 | 18 |
+| [Complexity](#complexity) | 17 | 5 | 18 |
 
 ## Open work
 
@@ -601,6 +601,7 @@ Prize Problem 3, and what an answer either way would imply.
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [The binomial transform over GF(2) is an involution that exchanges a period 2^a from 2^m with a period 2^m from 2^a at the same least witness, so the first rung of Problem 3, and Problem 1, hold for the center column exactly when they hold for its transform](Rule30Open/Complexity/BinomialDuality.md) | [`Complexity.BinomialDuality`](Rule30Open/Complexity/BinomialDuality.lean) | `binomial_eq_difs`, `bsub_eq_land`, `binomial_involutive`, `binomial_tail_difs`, `binomial_firstOne_iff`, `binomial_tail_iff`, `binomial_period_window_iff`, `binomial_period_iff`, `binomial_firstMismatch_iff`, `binomial_support_iff`, `binomial_periodic_iff`, `binomial_twoPow_iff`, `binomial_eventuallyPeriodic_iff`, `center_binomial_period_iff`, `center_binomial_rung_iff`, `center_binomial_firstMismatch_iff`, `problem1_iff_gamma`, `gamma_not_period_from_one`, `gamma_period_ge_262125`, `center_rung_le_seventeen`, `gamma_rung_le_seventeen` | 3, 1 | extends a kit result |
 | [The mixed derivative of the center over the comb -t+1, -t+3, ..., -t+2j+1, -t+2j+2 is C(t, j+1) mod 2 on every row, so every constant subcube meets each comb with an odd binomial](Rule30Open/Complexity/CertificateLower.md) | [`Complexity.CertificateLower`](Rule30Open/Complexity/CertificateLower.lean) | `combPar_zero`, `combPar_step`, `combPar_front`, `constOn_hits_comb`, `constOn_odd`, `constOn_two_mod_four` | 3 | not in the kit |
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [The center sees the two rightmost cells of its cone only through their OR, so an adversary must answer the first of them white, and depth 2t + 1 reduces to a function of 2t - 1 cells](Rule30Open/Complexity/CornerOr.md) | [`Complexity.CornerOr`](Rule30Open/Complexity/CornerOr.lean) | `center_corner_or`, `center_flip_beside_black`, `center_flip_corner_of_black`, `corner_tree_lift` | 3 | extends a kit result |

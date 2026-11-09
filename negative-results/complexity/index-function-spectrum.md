@@ -60,7 +60,9 @@ digits of the index, and the automaton bounds of [no small automaton](automaton-
 distinct rows of the matrix $c(h 2^k + l)$ (the split of the digits between two players in communication complexity), to
 measures that do not see a digit order. The kit proves in Lean that for almost every configuration the same function of
 its column needs circuits of more than $2^L / (8L)$ gates for all large $L$ (`Circuits`); like that theorem, these
-numbers do not reach the single cell's column at every $L$.
+numbers do not reach the single cell's column at every $L$. The normal form, complemented because $g_L(0) = 0$, is the
+binomial transform $\gamma$ of the column over GF(2), which has a period $2^m$ from $2^a$ exactly when $c$ has a period
+$2^a$ from $2^m$ and is eventually periodic exactly when $c$ is ([BinomialDuality](../../Rule30Open/Complexity/BinomialDuality.md)).
 
 **Reproduce.**
 

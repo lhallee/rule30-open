@@ -541,8 +541,14 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   sequences](negative-results/complexity/one-tape-crossing.md)).
   In models that read the digits of $n$, a lower bound that exceeds the cost of reading them by an unbounded amount
   implies Problem 1; unbounded one-tape time is equivalent to excluding every eventual period $2^a$, which the kit's
-  `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$ and a computation here for $k \le 20$, and
-  $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$. Two bounds hold for every $n$, a strip of width at
+  `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$, the window bound of
+  [WideWindow](Rule30Open/Columns/WideWindow.md) for $k \le 17$ (in Lean here, joined on paper with that branch), and a
+  computation here for $k \le 20$, and $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$.
+  Over GF(2) the binomial transform $\gamma(n) = \sum_{t \subseteq n} c(t)$, the column's normal form in the digits of
+  $n$, exchanges a period $2^a$ from $2^m$ with a period $2^m$ from $2^a$ at the same least witness and keeps eventual
+  periodicity, so this rung and Problem 1 are the same statements for $\gamma$, in Lean
+  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)); odd periods are not exchanged, and $\gamma$ looks
+  random, so the duality moves the question without easing it. Two bounds hold for every $n$, a strip of width at
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
   they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
