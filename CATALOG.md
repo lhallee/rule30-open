@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-194 Lean modules with 925 headline theorems, 69 findings (proved on paper,
+194 Lean modules with 925 headline theorems, 70 findings (proved on paper,
 computed or conjectured) and 78 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -19,7 +19,7 @@ takes effort of order `n`.
 | [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
-| [Random rows](#random-rows) | 2 | 0 | 1 |
+| [Random rows](#random-rows) | 2 | 1 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 14 | 5 | 17 |
@@ -50,6 +50,7 @@ approach stopped.
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
+- [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive](findings/random-rows/lightlike-rigidity.md): problems 2, 1
 
 **Findings proved in Lean in part**
 
@@ -545,6 +546,12 @@ What holds for a random initial row, and why it does not reach the single cell.
 |---|---|---|---|---|
 | [A random left window gives a fair center window, for every row](Rule30Open/RandomRows/LeftWindow.md) | [`RandomRows.LeftWindow`](Rule30Open/RandomRows/LeftWindow.lean) | `cone_left_xor`, `count_centerWindow`, `centerWindow_unique`, `count_adapted`, `count_periodic`, `seed_window` | 1, 2 | extends a kit result |
 | [Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, so the rows that travel at the speed of light carry invariant measures of positive entropy that are not uniform](Rule30Open/RandomRows/LightLikeEntropy.md) | [`RandomRows.LightLikeEntropy`](Rule30Open/RandomRows/LightLikeEntropy.lean) | `LightLikeEntropy.lightLike_blocks`, `LightLikeEntropy.blocks_window_determines`, `LightLikeEntropy.sigma12_entropy`, `LightLikeEntropy.sigma15_entropy`, `LightLikeEntropy.sigma17_entropy` | 2 | extends a kit result |
+
+**Findings**
+
+| Result | Status | Problems | Formalization |
+|---|---|---|---|
+| [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive](findings/random-rows/lightlike-rigidity.md) | proved on paper | 2, 1 | wanted |
 
 **Negative results**
 

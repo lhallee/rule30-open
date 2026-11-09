@@ -344,6 +344,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   has uncountably many rows that come back after 12, 15 or 17 steps moved as many cells, a set of positive entropy, in
   Lean, so measures invariant under the shift and the rule with positive entropy need not be uniform and a rigidity
   theorem needs an ergodicity hypothesis along that direction ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
+  With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
+  is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
+  Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
+  Problem 2 follows from three structural properties of its limit measures, all open
+  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs

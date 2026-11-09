@@ -60,7 +60,7 @@ $\nu = \bar\mu$ has positive entropy. $\square$
 So a rigidity theorem for Rule 30 of the form "an invariant measure is uniform or of zero entropy" needs a further
 hypothesis. On $\Sigma_p$ the light-like map $\sigma F$, $(\sigma F x)_i = x_i \oplus (x_{i+1} \lor x_{i+2})$, has
 period $p$, so an ergodicity hypothesis along the light-like direction is the natural one; the measures above are not
-ergodic for it.
+ergodic for it, and with it the alternative holds ([light-like rigidity](../../findings/random-rows/lightlike-rigidity.md)).
 
 ## What the kit has
 
