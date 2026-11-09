@@ -44,6 +44,14 @@ $k = t - 2$ and $t \le 17$ the counts are also proved in Lean.
 So $N_{\mathrm{L}}(t, k) = 2^k$ for $k \le t - 2$ and $t \le 17$, and for $k \le t - 3$ and $t \le 20$; the deficit at
 $k = t - 2$ is at most 26 of $2^{18}$ for $t \le 20$.
 
+Refining the prefixes with the columns of the letter words of the completions
+([LetterWords](../../Rule30Open/Complexity/LetterWords.md), `computations/letter_words.c refine`) extends the counts:
+$2^{t-2} - N_{\mathrm{L}}(t, t - 2) = 54, 88, 164, 270$ and $2^{t-3} - N_{\mathrm{L}}(t, t - 3) = 0, 8, 8, 16$ at $t =
+21, 22, 23, 24$, with $N_{\mathrm{L}}(t, t - 4) = 2^{t-4}$ at $t = 22, 23, 24$, and $2^{16} - N_{\mathrm{L}}(17, 16) =
+66$. So $L(t)$ fails for every $18 \le t \le 24$, the cells $x_{-t}, \dots, x_{-4}$ are distinguishable up to $t = 21$
+and not at 22, and the largest exact level is $t - 4$ at $t = 22, 23, 24$ ([the exponential
+width](exponential-left-width.md), which also lists the merged prefixes at $t = 22$).
+
 ## Where it fails
 
 Call a prefix a *stripe to $w$* when its cells alternate from $x_{-t}$ to a black cell $x_w$ ($x_w = 1$, $x_{w-1} = 0$,

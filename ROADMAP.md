@@ -501,6 +501,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   decidable in polynomial time, one for each color, which a fair-coin hypothesis that implies all three problems forbids
   ([the reduction route](negative-results/complexity/reduction-route.md)). Problem 3 implies Problem 1,
   proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
+  On unary input the kit's Problem 3 lies between two statements about the one-tape time of $\{1^n : c(n) = 1\}$
+  that differ only in $O$ against $o$ at $n \log n$: the upper one is, through exact converters, the binary statement
+  for time $O(n \log n)$, and the lower one is Problem 1 ([the unary sandwich](findings/complexity/unary-sandwich.md)).
 - **The cone as a Boolean function.** *Computed, with a proof.* An alternating left half fixes the center cell for
   every right half once $t \ge 8$ or 9, so the $2^t$ left halves give at most $2^t - 2$ functions of the right half;
   reading the row from the right gives far fewer subfunctions at $t \le 10$. No lower bound follows
@@ -540,7 +543,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([ParityLift](Rule30Open/Complexity/ParityLift.md)). Across a left cut the GF(2) rank of the cone after $a$ cells is
   $2 + \lfloor 2^a/3 \rfloor$ for every $a \le t - 3$ and $t \le 14$, as for Rule 45; windows of fixed width have rank 1
   at $t = 2^j$ (Lean), so an all-$t$ bound needs cells at distance $\log_2 t$ from the cut ([the left-cut
-  rank](findings/complexity/left-cut-rank.md), [LeftCutRank](Rule30Open/Complexity/LeftCutRank.md)). *Assessment:* a
+  rank](findings/complexity/left-cut-rank.md), [LeftCutRank](Rule30Open/Complexity/LeftCutRank.md)); that rank is not
+  $2 + \lfloor 2^a/3 \rfloor$ for every $t$: the completion acts on the left cells only through a word of
+  $T = t - \lceil a/2 \rceil + 1$ letters that avoids six two-letter patterns, at most $2P_{T+1}$ words (Pell numbers)
+  and $O(1.83^T)$ by computation, so the rank is at most that number, and at $a = t - 3$ it falls below
+  $2 + \lfloor 2^{t-3}/3 \rfloor$ from $t = 15$ on (computed) and for every $t \ge 24$ (Lean)
+  ([LetterWords](Rule30Open/Complexity/LetterWords.md), [the rank
+  ceiling](negative-results/complexity/left-cut-rank-ceiling.md)). *Assessment:* a
   lower bound in a restricted model is within reach only for finite ranges; an asymptotic one, even "the column is not
   automatic", needs structure of $c(n)$ as a function of the digits of $n$, which nothing here provides. Crossing
   sequences, the kit's method for one tape, give at most time of order $(\log n)^2$ for any function, and for $c$ only
@@ -548,15 +557,20 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   automata with a bounded number of passes is a proof that $c$ is not 2-automatic ([crossing
   sequences](negative-results/complexity/one-tape-crossing.md)).
   In models that read the digits of $n$, a lower bound that exceeds the cost of reading them by an unbounded amount
-  implies Problem 1; unbounded one-tape time is equivalent to excluding every eventual period $2^a$, which the kit's
-  `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$, the window bound of
-  [WideWindow](Rule30Open/Columns/WideWindow.md) for $k \le 17$ (in Lean here, joined on paper with that branch), and a
-  computation here for $k \le 20$, and $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$.
+  implies Problem 1; unbounded one-tape time is equivalent to excluding every eventual period $2^a$. What the kit's
+  `Rule30Problem3Bounds` (main branch) excludes for $k \le 13$, the window bound of
+  [WideWindow](Rule30Open/Columns/WideWindow.md) for $k \le 17$ (in Lean here, through
+  [PairReading](Rule30Open/Complexity/PairReading.md)), and a computation here for $k \le 20$, is the period $2^k$
+  from time $2^{k-1}$, the rung at level $k$ (time above $k$ on infinitely many inputs), not every eventual period
+  $2^k$; and $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$. For two columns read as one sequence,
+  and for every single column but at most one, Jen's theorem gives that rung at every scale, in Lean (the same module).
   Over GF(2) the binomial transform $\gamma(n) = \sum_{t \subseteq n} c(t)$, the column's normal form in the digits of
   $n$, exchanges a period $2^a$ from $2^m$ with a period $2^m$ from $2^a$ at the same least witness and keeps eventual
   periodicity, so this rung and Problem 1 are the same statements for $\gamma$, in Lean
-  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)); odd periods are not exchanged, and $\gamma$ looks
-  random, so the duality moves the question without easing it. Two bounds hold for every $n$, a strip of width at
+  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)); odd periods are not exchanged, and $\gamma$ passes
+  the same statistical tests as $c$ (a heuristic: 524,041 of its first $2^{20}$ values are 1, by
+  `computations/binomial_duality.py`), so the duality moves the question without easing it. Two bounds hold for every
+  $n$, a strip of width at
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
   they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined
@@ -725,3 +739,40 @@ In order of the assessment above.
      ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md), [LateSeedCutWide](Rule30Open/Complexity/LateSeedCutWide.md)).
      Width growing with $t$ needs a uniform version, for instance late seeds with $R \le c\,a$ separating the $2^a$
      settings for every $a$, a statement about the frozen-boundary automaton and the eventual blocks of the left edge.
+     Computed exactly to $t = 24$, the $2^a$ settings are pairwise distinguishable for $a \le t - 1$, $t - 2$, $t - 3$
+     and $t - 4$ from $t = 9$, 13, 18 and 22 on, about $7t/9$, at most one level below what unrestricted letter words
+     allow; late completions of any shape give the single cell's eventual left edge at a shifted phase, so they add
+     nothing to the late seeds, and every linear-algebra bound is capped by the letter language ([the exponential
+     width](negative-results/complexity/exponential-left-width.md)).
+6. **Checks and attacks prepared for the next session.**
+   - *Independent checks still owed.* These entries build, pass their tests and have their headline axioms audited,
+     but no second reader has yet re-derived their paper parts and numbers, as was done for
+     [BinomialDuality](Rule30Open/Complexity/BinomialDuality.md): [light-like
+     mixing](findings/random-rows/lightlike-mixing.md) with [LightLine](Rule30Open/RandomRows/LightLine.md),
+     [LightLike180](Rule30Open/Analogs/LightLike180.md) and [the soft
+     routes](negative-results/random-rows/lightlike-soft-routes.md); [the unary
+     sandwich](findings/complexity/unary-sandwich.md) with [PairReading](Rule30Open/Complexity/PairReading.md); and
+     [LetterWords](Rule30Open/Complexity/LetterWords.md) with [the exponential
+     width](negative-results/complexity/exponential-left-width.md) and [the rank
+     ceiling](negative-results/complexity/left-cut-rank-ceiling.md).
+   - *The kit's main branch.* Kit main (commit 2fdb1bb, November 9) is far past the pin, with modules that bear on
+     entries here: `Rule30BlackTimeGrowth` (black center cells grow at least like $\log_{8/5}$, from a white-run
+     erosion bound), `Rule30SourceEnergy` (Problem 2 from one autocorrelation estimate at power-of-two lags),
+     `Rule30BlackPhaseEscape` (`UBE`, the left half alone against every periodic word), `Rule30PeriodTwoWidth13`,
+     `Rule30PeriodTwoMass`, `Rule30PeriodTwoLadder`, `Rule30PeriodTwoNoFloor`, `Rule30ConeCube`,
+     `Rule30RightProfiles` and `Rule30ClosingLaw`. Next: read every module past the pin, fix the credits of the
+     entries they overlap, re-pin (item 4), and look for results that combine an entry here with one of them.
+   - *Period two, white right half.* Against a white right half the kit's `Rule30GateTrap` puts column 1 in its gap
+     trap from step 293, so `CQ01Empty` follows from `Q01Gap` alone; the kit's newest gap-language modules above and
+     [the shift model](findings/period-two/shift-model.md) are the materials for an attack on that case.
+   - *Period two, a failure law.* A proof that every integer with $M$ bits fails the held-map condition by some step
+     $cM$ gives `Q01`, and with it no eventual period two for the single cell (the kit's
+     `Rule30ZeroBoundary.no_eventual_period_two`). The counts show that such a law is what independent checks give
+     ([why 2M](findings/period-two/left-half-alone.md#why-2m)), so a proof needs structure the counting does not
+     supply.
+   - *Period two, ether tails.* (R) on ether tails, through a bound on the top of a defect in front of the ether
+     (item 5).
+   - *Lean.* The combinatorial core of [compact certificates](negative-results/columns/compact-certificates.md), a
+     König argument on finite windows in core Lean; and the converter from unary to binary input of [the unary
+     sandwich](findings/complexity/unary-sandwich.md), which would make "no unary decider in time $O(n \log n)$
+     implies the kit's `Problem3`" a theorem.

@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-199 Lean modules with 974 headline theorems, 72 findings (proved on paper,
-computed or conjectured) and 83 negative results. Prize problem 1 asks whether the center column
+201 Lean modules with 989 headline theorems, 73 findings (proved on paper,
+computed or conjectured) and 85 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 3 | 2 | 2 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 17 | 5 | 18 |
+| [Complexity](#complexity) | 19 | 6 | 20 |
 
 ## Open work
 
@@ -45,6 +45,7 @@ approach stopped.
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
 - [Windows of 20 cells exclude 0^q 10101 for every q of at least 26 and give every tail of up to eight cells but 1100001 a least white run; 1100001 has one, 37, at 22 cells](findings/columns/tail-families.md): problem 1
+- [Exact one-tape converters make time O(n log n) the same question for unary and binary input, so on unary input the kit's Problem 3 lies between no time O(n log n) and no time o(n log n), which is Problem 1](findings/complexity/unary-sandwich.md): problems 3, 1
 - [From almost every left half every admissible driver has black cells of upper density at most d* = 0.77291, the root of h(d) = d, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white half the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)](findings/diagonals/driver-first-moment.md): problem 2
 - [A sound abstraction of the seed rows by a window of times before the onset front gives T_j at most ceil(3j/2) + 5 for every seed and every j up to 1,252, at most ceil(8j/5) up to 87,866, and the exact latest onset to depth 88; the bound's slope falls from 2.03 to about 1.52 as the window grows from 0 to 8 times](findings/diagonals/seed-window-bounds.md): problem 2
 - [Over every pair word of period P at most 16, the front walk's largest cycle mean is at most 5/2, reached only by pairs of least period 6 and 7; from the start of a regime after a doubling it exceeds slope 5/2 by at most 21.5, its largest excess anywhere is at most 88.5, between 4P and 5.6P for P from 10 to 16, and the single cell's walk to depth 87,866 is a path of these graphs](findings/diagonals/walk-eigenvalue.md): problem 2
@@ -614,7 +615,9 @@ Prize Problem 3, and what an answer either way would imply.
 | [For 11 ≤ a ≤ 13 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ 19, 21, 24, by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCutWide.md) | [`Complexity.LateSeedCutWide`](Rule30Open/Complexity/LateSeedCutWide.lean) | `late_seed_cut_wide`, `late_seed_width_wide`, `lateSep_11`, `lateSep_12`, `lateSep_13` | 3 | not in the kit |
 | [Read from the left, the cells -t to -3 of the cone are pairwise distinguishable for 3 ≤ t ≤ 17, so left-to-right ordered decision diagrams of the center have width 2^(t-2) there, and not at t = 18](Rule30Open/Complexity/LeftCut.md) | [`Complexity.LeftCut`](Rule30Open/Complexity/LeftCut.lean) | `left_cut`, `left_cut_at`, `left_cut_factor`, `left_cut_width`, `left_cut_fails_18`, `stripe_three_18`, `stripe_four_18`, `left_cut_of_check`, `separates_of_refineMasks`, `testBit_sliceCenter` | 3 | not in the kit |
 | [Across a left cut, rows white beyond a window run on the T-function, a window of j + 1 cells has rank 1 after 2^j steps, and the GF(2) rank of the cut bounds its width](Rule30Open/Complexity/LeftCutRank.md) | [`Complexity.LeftCutRank`](Rule30Open/Complexity/LeftCutRank.lean) | `window_center`, `center_two_pow`, `tPhiIter_two_pow`, `testBit_tPhiIter`, `width_of_independent` | 3 | independent proof of a kit result |
+| [A completion acts on the left cut through words that avoid six two-letter patterns, at most 2 P(T + 1) of them, so the GF(2) rank of the left cut is at most that for every t, and the conjectured rank 2 + floor(2^(t-3)/3) at a = t - 3 fails for every t ≥ 24](Rule30Open/Complexity/LetterWords.md) | [`Complexity.LetterWords`](Rule30Open/Complexity/LetterWords.lean) | `letter_allowed`, `wordList_mem_allowed`, `allowedWords_length`, `lateCen_word`, `cut_rank_le`, `cut_rank_lt_rhoCut` | 3 | not in the kit |
 | [Every partial row that fixes the center cell fixes the leftmost cone cell, t - 1 cells suffice for t ≥ 9, and t - 1 is the least for 9 ≤ t ≤ 15 by computation](Rule30Open/Complexity/MinCertificate.md) | [`Complexity.MinCertificate`](Rule30Open/Complexity/MinCertificate.lean) | `constOn_fixes_left`, `screening_even_free`, `stripe_center`, `stripe_constOn`, `stripeRow_isSome` | 3 | not in the kit |
+| [Two columns read as one sequence cost every machine of the kit's model more than a steps on every window of 2^a inputs above 2^(a-1), at every scale by Jen's theorem, and the center column does up to a = 17](Rule30Open/Complexity/PairReading.md) | [`Complexity.PairReading`](Rule30Open/Complexity/PairReading.lean) | `pairOf_window_time`, `pair_window_time`, `pair_interval_time`, `column_window_time`, `column_window_time_or`, `center_window_time_le_seventeen`, `center_window_time_of_problem1`, `window_period`, `computes_eq_of_mod` | 3, 1 | extends a kit result |
 | [An odd-weight function has Walsh coefficients 2 mod 4 and an XOR lift that is its own inverse over GF(2), so the center after t steps has at least 2^(2t-1) nonzero Walsh coefficients and an XOR lift of GF(2) rank at least 2^(2t-1), where Rules 90 and 150 have 1 and 2](Rule30Open/Complexity/ParityLift.md) | [`Complexity.ParityLift`](Rule30Open/Complexity/ParityLift.lean) | `cubeWalsh_emod_four`, `lift_sq`, `liftApply_liftApply`, `lift_injective`, `walsh_support_of_flip`, `coneFn_flip`, `center_walsh_emod_four`, `center_lift_sq`, `center_walsh_support`, `center_odd_small` | 3 | not in the kit |
 | [A one-tape machine computes the center column in 2n² + 2n log n + O(n) steps, so the kit's Problem 3 asks for the exponent between 1 and 2](Rule30Open/Complexity/QuadraticTime.md) | [`Complexity.QuadraticTime`](Rule30Open/Complexity/QuadraticTime.lean) | `simulator_time`, `simulator_computes`, `center_computes_quadratic` | 3 | not in the kit |
 | [A decision tree for the center cell from an arbitrary row spends exactly one query on the leftmost cell, so with the kit's degree bound it reads at least 2t cells; computation gives all 2t + 1 for t ≤ 17](Rule30Open/Complexity/QueryDepth.md) | [`Complexity.QueryDepth`](Rule30Open/Complexity/QueryDepth.lean) | `depth_restrict_succ_le`, `eval_restrict`, `tree_drop_of_flip`, `center_tree_drop`, `center_tree_lift` | 3 | extends a kit result |
@@ -633,6 +636,7 @@ Prize Problem 3, and what an answer either way would imply.
 | [The right-edge cycle length L_n of the single cell doubles at 36 of the levels n ≤ 84 and reaches 2^36, about 2^(0.43 n), and two exact parities decide whether a stall of the period lasts one diagonal, two, or more; L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic](findings/complexity/right-edge-cycles.md) | conjecture | 3 | partial |
 | [Problems 1 and 3 follow from space lower bounds for the center column, and space √(n log n) suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | partial |
 | [The center column is computed in space √(n log n), and each simulation sets a threshold that a space lower bound must pass](findings/complexity/space-thresholds.md) | proved on paper | 3, 1 | partial |
+| [Exact one-tape converters make time O(n log n) the same question for unary and binary input, so on unary input the kit's Problem 3 lies between no time O(n log n) and no time o(n log n), which is Problem 1](findings/complexity/unary-sandwich.md) | proved on paper | 3, 1 | wanted |
 
 **Negative results**
 
@@ -641,8 +645,10 @@ Prize Problem 3, and what an answer either way would imply.
 | [The powers Φ^(2^k) of the right-edge step have minimal transducers of 3, 7, 35, 517 and 57,741 states, growing at every squaring for k ≤ 4, and Rules 90 and 150, whose cycles grow linearly, have larger ones](negative-results/complexity/automaton-group-sections.md) | dead end | 3 |
 | [No automaton with fewer than 131,070 states computes the column from the digits of t](negative-results/complexity/automaton-lower-bounds.md) | no signal | 3 |
 | [An all-t lower bound on the least certificate of the center stops at two cells from the algebra and at an unproved window lemma that would give t/6](negative-results/complexity/certificate-lower-routes.md) | dead end | 3 |
+| [Exponential width of left-to-right decision diagrams for every t is not reached; the a leftmost cells are pairwise distinguishable exactly up to a = t - 1, t - 2, t - 3, t - 4 for t in 9-12, 13-17, 18-21, 22-24, one level below what unrestricted letters allow, and every route to a bound for every t meets the eventual left edge of the single cell](negative-results/complexity/exponential-left-width.md) | barrier | 3 |
 | [The Unique Games Conjecture and the Exponential Time Hypothesis do not decide Problem 3](negative-results/complexity/hardness-hypotheses.md) | barrier | 3, 1, 2 |
 | [As a function of the digits of n, the center cell has the algebraic normal form and the Fourier and mod-3 spectra of a random function](negative-results/complexity/index-function-spectrum.md) | no signal | 3 |
+| [The GF(2) rank of the left cut after t - 3 cells falls below 2 + floor(2^(t-3)/3) from t = 15 on, because the completion acts through a thin language of words, so the stripe basis is not independent for every t](negative-results/complexity/left-cut-rank-ceiling.md) | refuted | 3 |
 | [The leftmost t - 2 cells of the cone are pairwise distinguishable for 3 ≤ t ≤ 17 and not for 18 ≤ t ≤ 22, where alternating stripes ending at -3 and -4 fix the center](negative-results/complexity/left-cut.md) | refuted | 3 |
 | [The linear complexity is n/2, the most a sequence can have](negative-results/complexity/linear-complexity.md) | no signal | 1, 3 |
 | [The routing lemma for the least certificate of the center fails at t = 12, and the sets that one step maps into themselves are too weak for an induction](negative-results/complexity/min-certificate-routing.md) | refuted | 3 |

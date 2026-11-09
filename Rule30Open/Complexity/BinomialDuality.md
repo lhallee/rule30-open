@@ -6,7 +6,7 @@ status: proved
 lean: Rule30Open.Complexity.BinomialDuality
 headline: [binomial_eq_difs, bsub_eq_land, binomial_involutive, binomial_tail_difs, binomial_firstOne_iff, binomial_tail_iff, binomial_period_window_iff, binomial_period_iff, binomial_firstMismatch_iff, binomial_support_iff, binomial_periodic_iff, binomial_twoPow_iff, binomial_eventuallyPeriodic_iff, center_binomial_period_iff, center_binomial_rung_iff, center_binomial_firstMismatch_iff, problem1_iff_gamma, gamma_not_period_from_one, gamma_period_ge_262125, center_rung_le_seventeen, gamma_rung_le_seventeen]
 kit: refines
-kit_modules: [Rule30DifferenceOrder, Rule30Jen, Rule30Prize, Rule30Equivalents.TwoAdicPeriods, Rule30Equivalents.DiophantineGraph, Rule30Equivalents.AlgebraicDegree]
+kit_modules: [Rule30DifferenceOrder, Rule30Jen, Rule30Prize, Rule30Equivalents.TwoAdicPeriods, Rule30Equivalents.DiophantineGraph, Rule30Equivalents.AlgebraicDegree, Rule30Equivalents.TransformsSeeds]
 evidence: [computations/binomial_duality.py, tests/test_binomial_duality.py]
 ---
 
@@ -96,26 +96,24 @@ shift $E$ into $\Delta = 1 + E$ and back.
 then so does $\zeta g$; the converse is the same statement for $\zeta g$, by item 2. The first 1 of $g$ is at $j$ when
 $g$ vanishes below $j$ and not below $j + 1$.
 
-**Item 4.** Apply item 3 to $g(j) = \Delta^r f(j + s)$, whose transform is $\Delta^s \zeta f(i + r)$ by item 2. The
-form on $[s, \infty)$ takes $N$ large.
+**Item 4.** Apply item 3 to $g(j) = \Delta^r f(j + s)$, whose transform is $\Delta^s \zeta f(i + r)$ by item 2. The form
+on $[s, \infty)$ takes $N$ large.
 
-**Item 5.** Substitute $r = 2^a$ and $s = 2^m$ in item 4 and item 3: $\Delta^{2^a} f(t) = 0$ says
-$f(t + 2^a) = f(t)$. For the extreme cases take $r = 0$ or $s = 0$. If $f$ has period $2^a$ from $T$, it has it from
-$2^m$ for any $2^m \ge T$, for example $m = T$, so $\zeta f$ has period $2^m$ from $2^a$; the converse is the same
-statement for $\zeta f$.
+**Item 5.** Substitute $r = 2^a$ and $s = 2^m$ in item 4 and item 3: $\Delta^{2^a} f(t) = 0$ says $f(t + 2^a) = f(t)$.
+For the extreme cases take $r = 0$ or $s = 0$. If $f$ has period $2^a$ from $T$, it has it from $2^m$ for any $2^m \ge
+T$, for example $m = T$, so $\zeta f$ has period $2^m$ from $2^a$; the converse is the same statement for $\zeta f$.
 
-**Item 6.** Let $f$ have period $P > 0$ from $T$. Every difference $\Delta^k f$ has period $P$ from $T$
-(`difs_period`), so it is fixed by its window on $[0, T + P)$ (`eq_of_agree_window`). Among the $2^{T+P} + 1$ windows
-of $\Delta^0 f, \dots, \Delta^{2^{T+P}} f$ two agree (the kit's `Rule30Jen.pigeonhole`), say those of
-$\Delta^m f$ and $\Delta^n f$ with $m < n$, so $\Delta^m f = \Delta^n f$, and then
-$\zeta f(t + n - m) = \Delta^{t - m}\Delta^n f(0) = \Delta^{t - m}\Delta^m f(0) = \zeta f(t)$ for $t \ge m$. The
-converse is the same statement for $\zeta f$, by item 2.
+**Item 6.** Let $f$ have period $P > 0$ from $T$. Every difference $\Delta^k f$ has period $P$ from $T$ (`difs_period`),
+so it is fixed by its window on $[0, T + P)$ (`eq_of_agree_window`). Among the $2^{T+P} + 1$ windows of $\Delta^0 f,
+\dots, \Delta^{2^{T+P}} f$ two agree (the kit's `Rule30Jen.pigeonhole`), say those of $\Delta^m f$ and $\Delta^n f$ with
+$m < n$, so $\Delta^m f = \Delta^n f$, and then $\zeta f(t + n - m) = \Delta^{t - m}\Delta^n f(0) = \Delta^{t -
+m}\Delta^m f(0) = \zeta f(t)$ for $t \ge m$. The converse is the same statement for $\zeta f$, by item 2.
 
 **Item 7.** Items 5 and 6 for $f = c$. Problem 1 is the statement that $c$ is not eventually periodic. For the
-unconditional parts: a period $2^m$ of $\gamma$ on $[1, \infty) = [2^0, \infty)$ would be a period $1$ of $c$ on
-$[2^m, \infty)$, which the kit excludes; a period $2^m$ of $\gamma$ on $[2^a, \infty)$ is a period $2^a$ of $c$ on
-$[2^m, \infty)$, so $2^m + 2^a \ge 262{,}125$ by `transient_add_period_ge_262125`; and for $k \le 16$,
-$2^k + 2^{k+1} \le 3 \cdot 2^{16} = 196{,}608 < 262{,}125$, so $c$ is not $2^{k+1}$-periodic from $2^k$.
+unconditional parts: a period $2^m$ of $\gamma$ on $[1, \infty) = [2^0, \infty)$ would be a period $1$ of $c$ on $[2^m,
+\infty)$, which the kit excludes; a period $2^m$ of $\gamma$ on $[2^a, \infty)$ is a period $2^a$ of $c$ on $[2^m,
+\infty)$, so $2^m + 2^a \ge 262{,}125$ by `transient_add_period_ge_262125`; and for $k \le 16$, $2^k + 2^{k+1} \le 3
+\cdot 2^{16} = 196{,}608 < 262{,}125$, so $c$ is not $2^{k+1}$-periodic from $2^k$.
 
 **Generating functions** (paper, not used in the Lean proofs). With $C(x) = \sum_t c(t) x^t$ and
 $\Gamma(x) = \sum_n \gamma(n) x^n$ in $\mathbb{F}_2[[x]]$, $\sum_n \binom{n}{t} x^n = x^t / (1 + x)^{t+1}$ gives
@@ -149,69 +147,70 @@ $\Gamma = (1 + x)^4 / (1 + x + x^4)$, of period 15.
 | period | 1 | 1 | 3 | 1 | 15 | 6 | 7 | 1 | 63 | 30 | 341 | 12 | 819 | 15 | 255 | 63 | 31 |
 | transient | 1 | 2 | 1 | 4 | 1 | 2 | 1 | 8 | 1 | 2 | 1 | 4 | 1 | 1 | 1 | 1 | 1 |
 
-  For $q = 2^e$ the transform vanishes from $2^e$ on (item 5); the odd periods $2^j - 1$ stay, the others grow
-  ($5 \to 15$, $9 \to 63$, $11 \to 341$, $13 \to 819$, $17 \to 255$).
+For $q = 2^e$ the transform vanishes from $2^e$ on (item 5); the odd periods $2^j - 1$ stay, the others grow ($5 \to
+15$, $9 \to 63$, $11 \to 341$, $13 \to 819$, $17 \to 255$).
 
-`tests/test_binomial_duality.py` checks the transform against the direct subset sums, the binomial sums and the
-iterated differences at every $n < 300$ of a random sequence; the involution; the operator identity of item 2 for
-$r, s \le 6$; the least witnesses of item 5 on random sequences and on sequences with a planted break, for
-$a, m \le 4$; the generating function above for $q \le 12$; and the numbers of the center column against
+`tests/test_binomial_duality.py` checks the transform against the direct subset sums, the binomial sums and the iterated
+differences at every $n < 300$ of a random sequence; the involution; the operator identity of item 2 for $r, s \le 6$;
+the least witnesses of item 5 on random sequences and on sequences with a planted break, for $a, m \le 4$; the
+generating function above for $q \in \{1, 2, 3, 5, 6, 9, 12\}$; and the numbers of the center column against
 `restricted_models.dyadic_witnesses` and `index_spectrum.monomial_profile`.
 
 ## What it means
 
-The transform moves the first rung of Problem 3 and Problem 1 to $\gamma$ without changing them. The witnesses that
-the first rung needs for $c$, a time $m \ge 2^{k-1}$ with $c(m) \ne c(m + 2^k)$, are exactly the witnesses for
-$\gamma$ with period and transient exchanged, at the same offset, so any proof of the rung for every $k$ is a proof of
-the dual statement for $\gamma$, and conversely; and $c$ is eventually periodic exactly when $\gamma$ is. In models that
-read the digits of $n$ the first rung is the same for both functions: for every function, one-tape time that is
-eventually at most $k$ makes it $2^k$-periodic from $2^{k-1}$ (the kit's
-`Rule30Problem3Bounds.period_of_eventually_time_le`, main branch), and an eventual period $2^a$ gives bounded time
+The transform moves the first rung of Problem 3 and Problem 1 to $\gamma$ without changing them. A witness that the
+first rung needs for $c$, a time $m \ge 2^{k-1}$ with $c(m) \ne c(m + 2^k)$, exists exactly when one exists for $\gamma$
+with period and transient exchanged, and the least witnesses have the same offset (the full sets of witnesses differ),
+so any proof of the rung for every $k$ is a proof of the dual statement for $\gamma$, and conversely; and $c$ is
+eventually periodic exactly when $\gamma$ is. In models that read the digits of $n$ the first rung is the same for both
+functions: for every function, one-tape time that is eventually at most $k$ makes it $2^k$-periodic from $2^{k-1}$ (the
+kit's `Rule30Problem3Bounds.period_of_eventually_time_le`, main branch), and an eventual period $2^a$ gives bounded time
 (the lemma of [restricted models](../../negative-results/complexity/restricted-models.md)), so by
 `center_binomial_twoPow_iff` every machine computing $c$ has unbounded time if and only if every machine computing
-$\gamma$ does (on paper, from those two). Nothing is gained toward a proof: $\gamma$ is the normal form that
-[the index spectrum](../../negative-results/complexity/index-function-spectrum.md) finds indistinguishable from a random
-function, about half its values are 1, and the duality gives no reason why either side should be easier.
+$\gamma$ does (on paper, from those two). Nothing is gained toward a proof: $\gamma$ is the normal form that [the index
+spectrum](../../negative-results/complexity/index-function-spectrum.md) finds indistinguishable from a random function,
+about half its values are 1, and the duality gives no reason why either side should be easier.
 
 What the transform does show is which periods are special. Only powers of two are exchanged with transients, because the
 binomial transform conjugates the shift into the difference operator and $\Delta^{2^a}$ is the difference at distance
 $2^a$; an odd period is carried to another period, often a different one. So the first rung, and the open periods 2 and
 4 of [the roadmap](../../ROADMAP.md), have an exact dual form, and odd periods are only carried along. The window bound
 of [WideWindow](../Columns/WideWindow.md) gives the rung in Lean for every $k \le 17$ (`center_rung_le_seventeen`), past
-the $k \le 13$ of the kit's main branch (`time_unbounded_le_thirteen`, from its window of 16,359); with that branch's
-`period_of_eventually_time_le` it makes every one-tape machine computing $c$ take more than $k$ steps infinitely often
-for $k \le 17$, a consequence joined on paper because that theorem is not at this repository's pinned commit.
+the $k \le 13$ of the kit's main branch (`time_unbounded_le_thirteen`, from its window of 16,359); with the locality of
+one-tape machines it makes every machine computing $c$ take more than $k$ steps on some input of every window of $2^k$
+inputs above $2^{k-1}$ for $k \le 17$, in Lean ([PairReading](PairReading.md), `center_window_time_le_seventeen`).
 
 ## The kit, the repository and the literature
 
-The kit has the pure-period case in an existential form, for every prime $p$: `TwoAdicPeriods.exists_fwdDiff_eq_zero_iff`
-says that $u : \mathbb{N} \to \mathbb{F}_p$ has some period $p^k$ if and only if its Mahler coefficients
-$\Delta^n u(0)$ vanish for all large $n$, and `noTwoPowPeriod_iff_fwdDiff` restates the absence of an eventual period
-$2^k$ through the Mahler coefficients of every tail of $c$; `fwdDiff_iter_zero` writes them with binomial
-coefficients over GF(2). Its `Rule30DifferenceOrder` has the iterated differences and `difs_two_pow`; its
-`DiophantineGraph.sub_iff_odd_choose` is Lucas's theorem modulo 2; its `AlgebraicDegree` uses the Moebius transform for
-functions of the cells of a row, not of the digits of the index. Neither the pinned kit nor its main branch (at
-4f4fb5a) has the involution, the exchange of a period $2^a$ from $2^m$ with a period $2^m$ from $2^a$, the equality of
-least witnesses, or the invariance of eventual periodicity, so this entry refines `TwoAdicPeriods` with exact
-thresholds and both parameters. Its main branch's `Rule30Problem3Bounds` has the first rung for $k \le 13$, for the
-center column only.
+The kit has the pure-period case in an existential form, for every prime $p$:
+`TwoAdicPeriods.exists_fwdDiff_eq_zero_iff` says that $u : \mathbb{N} \to \mathbb{F}_p$ has some period $p^k$ if and
+only if its Mahler coefficients $\Delta^n u(0)$ vanish for all large $n$, and `noTwoPowPeriod_iff_fwdDiff` restates the
+absence of an eventual period $2^k$ through the Mahler coefficients of every tail of $c$; `fwdDiff_iter_zero` writes
+them with binomial coefficients over GF(2). Its `Rule30DifferenceOrder` has the iterated differences and `difs_two_pow`;
+its `DiophantineGraph.sub_iff_odd_choose` is Lucas's theorem modulo 2; its `AlgebraicDegree` uses the Moebius transform
+for functions of the cells of a row, not of the digits of the index. Its `TransformsSeeds` has the other transforms that
+keep Problem 1 (the XOR derivative, the running parity and right-permutive sliding codes); $\zeta$ is none of them.
+Neither the pinned kit nor its main branch (at 2fdb1bb) has the involution, the exchange of a period $2^a$ from $2^m$
+with a period $2^m$ from $2^a$, the equality of least witnesses, or the invariance of eventual periodicity, so this
+entry refines `TwoAdicPeriods` with exact thresholds and both parameters. Its main branch's `Rule30Problem3Bounds` has
+the first rung for $k \le 13$, for the center column only.
 
 In the repository, [the index spectrum](../../negative-results/complexity/index-function-spectrum.md) measures $\gamma$
-(complemented) as a function of the digits; [TwoIndex](TwoIndex.md) defines `bsub` with Pascal's rule; and
-[right-edge cycles](../../findings/complexity/right-edge-cycles.md) expands each right diagonal $R_j$, of period
-$P_j = 2^{e_j}$, on one period as $\sum_{k < P_j} a_k \binom{t}{k}$: that is item 5 with $m = 0$, $a_k = \zeta R_j(k)$
-and $\zeta R_j = 0$ from $P_j$ on. Its $K_j$, the last $k$ with $a_k = 1$, is the last 1 of $\zeta R_j$, and by item 4
-with $s = 0$ ($\Delta^r f = 0$ if and only if $\zeta f$ vanishes from $r$ on) $K_j + 1$ is the least $r$ with
-$\Delta^r R_j = 0$, the linear complexity of $R_j$, and $P_j - 1 - K_j$ is the kit's difference order
+(complemented) as a function of the digits; [TwoIndex](TwoIndex.md) defines `bsub` with Pascal's rule; and [right-edge
+cycles](../../findings/complexity/right-edge-cycles.md) expands each right diagonal $R_j$, of period $P_j = 2^{e_j}$, on
+one period as $\sum_{k < P_j} a_k \binom{t}{k}$: that is the extreme case `binomial_periodic_iff` (item 4 with $s = 0$),
+$a_k = \zeta R_j(k)$ and $\zeta R_j = 0$ from $P_j$ on. Its $K_j$, the last $k$ with $a_k = 1$, is the last 1 of $\zeta
+R_j$, and by item 4 with $s = 0$ ($\Delta^r f = 0$ if and only if $\zeta f$ vanishes from $r$ on) $K_j + 1$ is the least
+$r$ with $\Delta^r R_j = 0$, the linear complexity of $R_j$, and $P_j - 1 - K_j$ is the kit's difference order
 (`Rule30DifferenceOrder.order`), as that entry says.
 
 That the binomial transform is its own inverse over GF(2), Lucas's theorem, and the generating function $\Gamma(x) =
 C(x/(1+x))/(1+x)$ are classical. Computing the linear complexity of a sequence of period $2^a$, one more than the last 1
-of $\zeta f$ by the case $s = 0$, is what the algorithm of Games and Chan does; its record was seen here only through
-search results. The title of Nersissian (2026, in [the literature](../../literature/rule-30.md)) names Newton supports
-of Rule 30's diagonals, which are expansions of this kind; its text was not read here. A search found no statement of
-the two-parameter exchange, of the equality of least witnesses, or of its reading for the first rung; the argument is
-elementary, and the result may well be folklore.
+of $\zeta f$ by the case $s = 0$, is what the algorithm of Games and Chan does (IEEE Transactions on Information Theory,
+1983). The title of Nersissian (2026, in [the literature](../../literature/rule-30.md)) names Newton supports of Rule
+30's diagonals, which are expansions of this kind. No published statement of the two-parameter exchange, of the equality
+of least witnesses, or of its reading for the first rung is known here; the argument is elementary, and the result may
+well be folklore.
 
 ## Reproduce
 

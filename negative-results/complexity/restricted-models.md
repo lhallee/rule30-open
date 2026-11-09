@@ -60,14 +60,18 @@ so for every $k \le 20$ every machine computing $c$ takes more than $k$ steps on
 infinitely many inputs (the kit's own bound stops at $k = 13$, from `Rule30FactorWindow`). For $k \le 17$ the rung is in
 Lean: the window bound $T + P \ge 262{,}125$ of [WideWindow](../../Rule30Open/Columns/WideWindow.md) excludes the period
 $2^k$ from $2^{k-1}$, since $3 \cdot 2^{16} < 262{,}125$ (`center_rung_le_seventeen` in
-[BinomialDuality](../../Rule30Open/Complexity/BinomialDuality.md)), so with the kit's `period_of_eventually_time_le`
-every machine computing $c$ takes more than $k$ steps on infinitely many inputs for $k \le 17$, joined on paper because
-that theorem is on the kit's main branch. The same offsets are the least witnesses of the dual statement for the
+[BinomialDuality](../../Rule30Open/Complexity/BinomialDuality.md)), so every machine computing $c$ takes more than $k$
+steps on some input of every window of $2^k$ inputs above $2^{k-1}$, hence on infinitely many inputs, for $k \le 17$,
+in Lean (`center_window_time_le_seventeen` of [PairReading](../../Rule30Open/Complexity/PairReading.md), which proves
+the locality behind the kit's `period_of_eventually_time_le` again at the pinned commit). The same offsets are the
+least witnesses of the dual statement for the
 binomial transform $\gamma(n) = \sum_{t \subseteq n} c(t) \bmod 2$, that $\gamma$ is not $2^{k-1}$-periodic from
 $2^k$, at every $k$ (Lean, the same entry). The offsets show no pattern (a heuristic reading, not a
 test): the first pair already differs for 9 of the 20 values of $k$, about half as for a random sequence, and no offset exceeds 5.
 For all $k$ this is the statement that $c$ has no eventual period $2^a$, which Problem 1 implies and nothing here
-proves.
+proves. For two columns read as one sequence, $g(2t) = \mathrm{cell}(t, j)$ and $g(2t + 1) = \mathrm{cell}(t, k)$ with
+$j \ne k$, and for every single column but at most one, Jen's theorem gives the rung at every $k$ and on every window
+of $2^k$ inputs above $2^{k-1}$, in Lean ([PairReading](../../Rule30Open/Complexity/PairReading.md)).
 
 *Second rung.* The kit's `computes_const_on_dyadic_ray` makes $c$ constant on the ray
 $\{m \ge 2^{k-1} : m \equiv n \pmod{2^k}\}$ when a machine halts within $k$ steps on one input $n \ge 2^{k-1}$ of it. So

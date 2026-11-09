@@ -94,7 +94,14 @@ linear rule has rank at most 2 at every cut.
 
 ## What it means
 
-The conjecture these tables support, open: for every $t$ and every $a \le t - 3$ the rows of $B_a$ are independent, so
+**Refuted.** The conjecture below is false: $\mathrm{rank}(15, 12) = 1035 < \rho(12) = 1367$, the rank at $a = t - 3$
+stays below $\rho(t - 3)$ at every $t$ computed from 15 to 20, and for every $t \ge 24$ it is proved in Lean
+([LetterWords](../../Rule30Open/Complexity/LetterWords.md), `cut_rank_lt_rhoCut`), because the completion acts on the
+left cells only through a word of $t - \lceil a/2 \rceil + 1$ letters from a thin language, so the rank is at most the
+number of such words ([the rank ceiling](../../negative-results/complexity/left-cut-rank-ceiling.md)). The paragraph is
+kept as it was stated.
+
+The conjecture these tables supported, now refuted: for every $t$ and every $a \le t - 3$ the rows of $B_a$ are independent, so
 $N_{\mathrm{L}}(t, a) \ge \mathrm{rank}(t, a) = \rho(a)$. At $a = t - 3$ it would give every ordered decision diagram
 that reads the row from the left a level of width at least $2 + \lfloor 2^{t-3}/3 \rfloor$, for every $t \ge 4$, where
 Rules 90 and 150 have width 2; no ordered model has a lower bound for every $t$ yet
