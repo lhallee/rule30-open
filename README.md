@@ -6,7 +6,7 @@ computational finding comes with the code that reproduces it. And every approach
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
 None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 196 Lean modules with 943
-headline theorems, 70 findings and 82 negative results.
+headline theorems, 71 findings and 82 negative results.
 
 ## The problems
 
@@ -57,7 +57,9 @@ Proved in Lean:
   21 cells reaches it ([center classes](findings/frames/center-classes.md)).
 - **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
   when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
-  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)).
+  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)); for every linear rule the periodic columns come from a
+  symmetry of an algebraic column curve, which the asymmetric radius-2 rules over GF(2) lack
+  ([column curves](findings/analogs/column-curves.md)).
 
 Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
 ([the shift model](findings/period-two/shift-model.md)); every right half of up to 20 cells enters the kit's family

@@ -53,7 +53,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   and 150 the cause is exactly the seed's symmetry: a column of a finite row is eventually periodic if and only if the
   row is mirror-symmetric about it, so from the single cell the center is the only eventually periodic column of Rules
   90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
-  two steps being one step on each sublattice, neither of which Rule 30 has. A proof through the center cannot treat the
+  two steps being one step on each sublattice, neither of which Rule 30 has. For every linear rule over a finite field a
+  column is eventually periodic exactly when a sum over the small roots of its column curve is fixed by the curve's
+  Galois group: at radius 1 that is a twisted mirror symmetry of the row, and the asymmetric radius-2 rules over GF(2),
+  with group $S_4$, have no eventually periodic column but those white from time 1; Rule 30's center has no algebraic
+  curve, only the Duhamel series, so the argument stops there ([column curves](findings/analogs/column-curves.md)). A
+  proof through the center cannot treat the
   two halves as black boxes either: either half can be replaced by a causal adversary that makes the center eventually
   periodic, the single cell's own left half admits the white tail $1, 1, 0, 0, \dots$, and beyond period one the route
   returns to the open left-half checks and right-half channel statements

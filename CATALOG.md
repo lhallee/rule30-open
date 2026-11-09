@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-196 Lean modules with 943 headline theorems, 70 findings (proved on paper,
+196 Lean modules with 943 headline theorems, 71 findings (proved on paper,
 computed or conjectured) and 82 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -16,7 +16,7 @@ takes effort of order `n`.
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 13 | 12 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 2 |
-| [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
+| [Sibling rules](#sibling-rules) | 3 | 1 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
 | [Random rows](#random-rows) | 2 | 1 | 1 |
@@ -41,6 +41,7 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
+- [A column of a linear automaton over a finite field is eventually periodic exactly when a sum over the small roots of its column curve is fixed by the curve's Galois group; at radius 1 this is a twisted mirror symmetry of the row, and the four asymmetric radius-2 rules over GF(2), whose curves have group S_4, have no eventually periodic column except those white from time 1](findings/analogs/column-curves.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
 - [Windows of 20 cells exclude 0^q 10101 for every q of at least 26 and give every tail of up to eight cells but 1100001 a least white run; 1100001 has one, 37, at 22 cells](findings/columns/tail-families.md): problem 1
@@ -489,6 +490,12 @@ Results for Rules 90, 150 and 210 that show which features of Rule 30 a proof ha
 | [The linear analog of period two is true](Rule30Open/Analogs/Rule150Descent.md) | [`Analogs.Rule150Descent`](Rule30Open/Analogs/Rule150Descent.lean) | `held150_even_steps`, `held150_odd_steps`, `descent150` | 1 | not in the kit |
 | [Rule 210 keeps the period-two condition](Rule30Open/Analogs/Rule210.md) | [`Analogs.Rule210`](Rule30Open/Analogs/Rule210.lean) | `rule210_finite_half`, `orbit210_checkerboard` | 1 | not in the kit |
 | [Under Rules 90 and 150 a column is eventually periodic exactly at a mirror axis](Rule30Open/Analogs/SymmetricAxes.md) | [`Analogs.SymmetricAxes`](Rule30Open/Analogs/SymmetricAxes.lean) | `iter90_column_periodic_iff`, `iter150_column_periodic_iff`, `linear_column_periodic_iff`, `at_most_one_periodic_column`, `run90_column_periodic_iff`, `run150_column_periodic_iff`, `run210_column_periodic_iff` | 1 | extends a kit result |
+
+**Findings**
+
+| Result | Status | Problems | Formalization |
+|---|---|---|---|
+| [A column of a linear automaton over a finite field is eventually periodic exactly when a sum over the small roots of its column curve is fixed by the curve's Galois group; at radius 1 this is a twisted mirror symmetry of the row, and the four asymmetric radius-2 rules over GF(2), whose curves have group S_4, have no eventually periodic column except those white from time 1](findings/analogs/column-curves.md) | proved on paper | 1 | wanted |
 
 **Negative results**
 
