@@ -105,7 +105,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
     to 20 cells ([window locks](negative-results/columns/window-locks.md)). The Conley index of the window graphs, taken as
-    the class of the relation's matrix over GF(2), excludes no block ([Conley index](negative-results/columns/conley-index.md)). Wider ones exist for one block or more of
+    the class of the relation's matrix over GF(2), excludes no block ([Conley index](negative-results/columns/conley-index.md)).
+    A certificate that is a closed set of rows excludes a block for the single cell only if the center column has
+    bounded stretches of it, and none excludes a block for all rows with a leftmost black cell
+    ([compact certificates](negative-results/columns/compact-certificates.md)). Wider ones exist for one block or more of
     each of these periods, the locks of seeds with long runs of 1s carried leftward through columns the rule determines
     ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
@@ -344,8 +347,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 - **Invariant measures and random rows.** *Closed.* Exact for random rows ([LeftWindow](Rule30Open/RandomRows/LeftWindow.md)),
   silent on the single cell ([random rows](negative-results/random-rows/almost-every-row.md)). At the speed of light to the right Rule 30
   has uncountably many rows that come back after 12, 15 or 17 steps moved as many cells, a set of positive entropy, in
-  Lean, so measures invariant under the shift and the rule with positive entropy need not be uniform and a rigidity
-  theorem needs an ergodicity hypothesis along that direction ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
+  Lean (12 is the least such period, by the kit's main branch), so measures invariant under the shift and the rule with
+  positive entropy need not be uniform and a rigidity theorem needs an ergodicity hypothesis along that direction
+  ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
   Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
@@ -478,7 +482,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   exponential time ([the barrier](negative-results/complexity/problem-three-barrier.md)). Hypotheses about
   satisfiability, settled or not, do not reach it ([the hardness hypotheses](negative-results/complexity/hardness-hypotheses.md)),
   nor does probabilistic checking, and a circuit form of it would give $\mathrm{P} = \mathrm{BPP}$
-  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). Problem 3 implies Problem 1,
+  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). The route the barrier names, a
+  reduction from a problem hard for exponential time, would itself make $c$ constant on infinite sets of times
+  decidable in polynomial time, one for each color, which a fair-coin hypothesis that implies all three problems forbids
+  ([the reduction route](negative-results/complexity/reduction-route.md)). Problem 3 implies Problem 1,
   proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
 - **The cone as a Boolean function.** *Computed, with a proof.* An alternating left half fixes the center cell for
   every right half once $t \ge 8$ or 9, so the $2^t$ left halves give at most $2^t - 2$ functions of the right half;
@@ -691,4 +698,10 @@ In order of the assessment above.
      level, where every linear rule has 2 ([LeftCut](Rule30Open/Complexity/LeftCut.md)); for $18 \le t \le 22$
      alternating stripes ending at $-3$ and $-4$ fix the center and the exact statement fails (Lean at 18, computed to
      22; [the left cut](negative-results/complexity/left-cut.md)). A lower bound for every $t$ that allows for stripe
-     prefixes, such as $N_{\mathrm{L}}(t, t-2) \ge 2^{t-3}$, which every count to $t = 20$ satisfies, is open.
+     prefixes, such as $N_{\mathrm{L}}(t, t-2) \ge 2^{t-3}$, which every count to $t = 20$ satisfies, is open. With the
+     number $a$ of cells fixed instead, the $2^a$ settings of the $a$ leftmost cells are pairwise distinguishable at
+     every $t \ge a + 2$ for $a \le 10$, and from $t = 19$, 21 and 24 for $a = 11$, 12 and 13, by white and single
+     black cell completions, in Lean: the first left-cut bounds for every $t$
+     ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md), [LateSeedCutWide](Rule30Open/Complexity/LateSeedCutWide.md)).
+     Width growing with $t$ needs a uniform version, for instance late seeds with $R \le c\,a$ separating the $2^a$
+     settings for every $a$, a statement about the frozen-boundary automaton and the eventual blocks of the left edge.

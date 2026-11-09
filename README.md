@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 194 Lean modules with 925
-headline theorems, 70 findings and 80 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 196 Lean modules with 943
+headline theorems, 70 findings and 82 negative results.
 
 ## The problems
 
@@ -102,11 +102,17 @@ Proved in Lean:
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
   cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+- **Reading the row from the left, for every $t$.** For $a \le 13$ an ordered decision diagram that reads the row from
+  the left needs $2^a$ nodes at level $a$ at every $t$ from a threshold on, since white and single black cell
+  completions tell the $2^a$ settings of the $a$ leftmost cells apart
+  ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md), [LateSeedCutWide](Rule30Open/Complexity/LateSeedCutWide.md)).
 
 Computed: no automaton under 131,070 states computes the column; linear complexity $n/2$; no learned shortcut.
 
 Where it stops: a lower bound for the single starting cell amounts to an exponential lower bound for one explicit
-function ([why it is hard](negative-results/complexity/problem-three-barrier.md)); as a space lower bound it sits
+function ([why it is hard](negative-results/complexity/problem-three-barrier.md)), and the route through a reduction
+from a problem hard for exponential time would make the center column constant on infinite sets of times decidable in
+polynomial time ([the reduction route](negative-results/complexity/reduction-route.md)); as a space lower bound it sits
 between the order $\sqrt{n}$ that Paterson's theorem needs and the $\sqrt{n} \log n$ that tree evaluation uses
 ([the space ladder](findings/complexity/space-ladder.md)).
 

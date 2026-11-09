@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-194 Lean modules with 925 headline theorems, 70 findings (proved on paper,
-computed or conjectured) and 80 negative results. Prize problem 1 asks whether the center column
+196 Lean modules with 943 headline theorems, 70 findings (proved on paper,
+computed or conjectured) and 82 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -12,7 +12,7 @@ takes effort of order `n`.
 |---|---:|---:|---:|
 | [Foundations](#foundations) | 3 | 0 | 0 |
 | [Seeds](#seeds) | 1 | 1 | 0 |
-| [Columns](#columns) | 139 | 27 | 18 |
+| [Columns](#columns) | 139 | 27 | 19 |
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 13 | 12 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 2 |
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 2 | 1 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 14 | 5 | 17 |
+| [Complexity](#complexity) | 16 | 5 | 18 |
 
 ## Open work
 
@@ -314,6 +314,7 @@ What an eventually periodic column forces on its neighbors, and which eventual p
 | [Truncated backgrounds add no class of halves that enter the carried traps; they are inside at once or refute them](negative-results/columns/background-truncations.md) | refuted | 1 |
 | [The exact channel from a free column into column 1 keeps positive entropy at every width up to 30 beside the three words of period four](negative-results/columns/channel-ladder.md) | no signal | 1 |
 | [The right channel cuts the free reading of the kit's C3 for 0001 to 0.35 bit per period and no left half of up to 180 cells meets the constrained statement, but the search does not close](negative-results/columns/channel-left-c3.md) | dead end | 1 |
+| [A closed set of rows that contains the single cell's orbit and no row whose center repeats a block w exists exactly when the w-periodic stretches of the center column are bounded, so no compact certificate excludes a block unless the center column avoids long stretches of it](negative-results/columns/compact-certificates.md) | barrier | 1, 2 |
 | [The Conley index of the windows beside a repeating column excludes no block, and over GF(2) it vanishes for a block that a background repeats](negative-results/columns/conley-index.md) | refuted | 1 |
 | [Constraining the free bits of column -1 by the right half lowers the entropy of the left-half statements for 001 and 011, and no finite left game closes](negative-results/columns/constrained-left-halves.md) | dead end | 1 |
 | [Column words that fix the cell beside the column exclude no block the finite game misses, up to period 20](negative-results/columns/forcing-words.md) | no signal | 1 |
@@ -596,6 +597,8 @@ Prize Problem 3, and what an answer either way would imply.
 | [The mixed derivative of the center over the comb -t+1, -t+3, ..., -t+2j+1, -t+2j+2 is C(t, j+1) mod 2 on every row, so every constant subcube meets each comb with an odd binomial](Rule30Open/Complexity/CertificateLower.md) | [`Complexity.CertificateLower`](Rule30Open/Complexity/CertificateLower.lean) | `combPar_zero`, `combPar_step`, `combPar_front`, `constOn_hits_comb`, `constOn_odd`, `constOn_two_mod_four` | 3 | not in the kit |
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [The center sees the two rightmost cells of its cone only through their OR, so an adversary must answer the first of them white, and depth 2t + 1 reduces to a function of 2t - 1 cells](Rule30Open/Complexity/CornerOr.md) | [`Complexity.CornerOr`](Rule30Open/Complexity/CornerOr.lean) | `center_corner_or`, `center_flip_beside_black`, `center_flip_corner_of_black`, `corner_tree_lift` | 3 | extends a kit result |
+| [For a ≤ 10 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ a + 2, from a threshold on by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCut.md) | [`Complexity.LateSeedCut`](Rule30Open/Complexity/LateSeedCut.lean) | `late_seed_cut`, `late_seed_factor`, `late_seed_width`, `left_cut_every`, `left_cut_width_every`, `lateSep_all`, `lateSep_step`, `lateCen_shift`, `lateSep_of_check`, `nevo_two_pow`, `edgeFrame_periodic`, `nevo_mod`, `lateCen_eq` | 3 | not in the kit |
+| [For 11 ≤ a ≤ 13 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ 19, 21, 24, by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCutWide.md) | [`Complexity.LateSeedCutWide`](Rule30Open/Complexity/LateSeedCutWide.lean) | `late_seed_cut_wide`, `late_seed_width_wide`, `lateSep_11`, `lateSep_12`, `lateSep_13` | 3 | not in the kit |
 | [Read from the left, the cells -t to -3 of the cone are pairwise distinguishable for 3 ≤ t ≤ 17, so left-to-right ordered decision diagrams of the center have width 2^(t-2) there, and not at t = 18](Rule30Open/Complexity/LeftCut.md) | [`Complexity.LeftCut`](Rule30Open/Complexity/LeftCut.lean) | `left_cut`, `left_cut_at`, `left_cut_factor`, `left_cut_width`, `left_cut_fails_18`, `stripe_three_18`, `stripe_four_18`, `left_cut_of_check`, `separates_of_refineMasks`, `testBit_sliceCenter` | 3 | not in the kit |
 | [Across a left cut, rows white beyond a window run on the T-function, a window of j + 1 cells has rank 1 after 2^j steps, and the GF(2) rank of the cut bounds its width](Rule30Open/Complexity/LeftCutRank.md) | [`Complexity.LeftCutRank`](Rule30Open/Complexity/LeftCutRank.lean) | `window_center`, `center_two_pow`, `tPhiIter_two_pow`, `testBit_tPhiIter`, `width_of_independent` | 3 | independent proof of a kit result |
 | [Every partial row that fixes the center cell fixes the leftmost cone cell, t - 1 cells suffice for t ≥ 9, and t - 1 is the least for 9 ≤ t ≤ 15 by computation](Rule30Open/Complexity/MinCertificate.md) | [`Complexity.MinCertificate`](Rule30Open/Complexity/MinCertificate.lean) | `constOn_fixes_left`, `screening_even_free`, `stripe_center`, `stripe_constOn`, `stripeRow_isSome` | 3 | not in the kit |
@@ -636,6 +639,7 @@ Prize Problem 3, and what an answer either way would imply.
 | [Self-similar restrictions, restricted top coefficients and congruences do not prove that the center needs its whole cone for every t](negative-results/complexity/query-adversary-routes.md) | dead end | 3 |
 | [Sensitivity, certificates, fixed answers and one-step lifting do not show that the center needs its whole cone](negative-results/complexity/query-depth-routes.md) | barrier | 3 |
 | [The derivative along the second cell, gates after restrictions and measures other than adaptive certificates do not prove that the center needs its whole cone for every t](negative-results/complexity/query-evasive-routes.md) | dead end | 3 |
+| [A proof of Problem 3 by a reduction from a problem hard for exponential time would make the center column constant on an infinite set of times decidable in polynomial time, a structure that fair coins do not have](negative-results/complexity/reduction-route.md) | barrier | 3, 1, 2 |
 | [Restricted models give the center cell no new lower bound for every n; past reading the digits they imply Problem 1, and spacetime bounds hold for Rule 90](negative-results/complexity/restricted-models.md) | barrier | 3, 1 |
 | [Every route tried toward L_n / n unbounded for the single cell's right edge stops at a parity over the middle of a period; bit filling holds only right after a doubling, the two edges fix one end of the expansions, counting and renormalization return to the white runs, no GF(2) rule of at most three terms among 18 weight parities predicts a doubling except its definition, and the seeds ±1/3 and Rule 150 bar any argument without the light cone and the product term](negative-results/complexity/right-edge-cycle-routes.md) | dead end | 3 |
 | [One step of Rule 30 on a ring loses almost no information, less than Rule 90 does, so erased information gives no lower bound](negative-results/complexity/ring-information-loss.md) | refuted | 3 |

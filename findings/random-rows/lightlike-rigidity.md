@@ -29,7 +29,8 @@ $\sigma$-algebra of the cells $\ge k$.
    or $x_{-1}$ is almost surely a function of $x_{\ge 0}$. The same for $\sigma$- and $F^q$-invariant measures with
    $G^q$ ergodic.
 4. **The hypothesis is needed** (Lean). The rows that come back after 12 steps moved 12 cells to the right form a set of
-   positive entropy ([LightLikeEntropy](../../Rule30Open/RandomRows/LightLikeEntropy.md)); it carries measures invariant
+   positive entropy ([LightLikeEntropy](../../Rule30Open/RandomRows/LightLikeEntropy.md); 12 is the least such period,
+   by the kit's main branch, `Rule30MovingWaves`); it carries measures invariant
    under $\sigma$ and $F$ with positive entropy that are not uniform, and on it $G^{12}$ is the identity, so those
    measures are not ergodic for $G$.
 5. **Consequences for the single cell** (paper). Every limit point $\mu$ of the averages
@@ -111,4 +112,6 @@ asks which other automata have $\lambda$ as their only ergodic invariant measure
 read, so items 1 and 2 are claimed as new only against the kit and this repository. Item 4 shows that the constraint in
 the form without ergodicity fails for Rule 30. The kit's `Mixing` proves that the lines of velocity other than 1 are
 fair coins under $\lambda$ and excepts velocity 1, and `PeriodicPoints` excludes recurring rows at every velocity in
-$[-1, 1)$; neither treats invariant measures other than $\lambda$ or the light-like direction.
+$[-1, 1)$; neither treats invariant measures other than $\lambda$ or the light-like direction. The kit's main branch,
+after the pinned commit, has the light-like direction in `Rule30MovingWaves`, which proves that 12 is the least period
+at which the rows travelling at light speed to the right have positive entropy; it does not treat invariant measures.

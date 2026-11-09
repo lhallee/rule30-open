@@ -15,7 +15,9 @@ The kit proves that Rule 30 has no gliders slower than light: a row that comes b
 with velocity $-d/k$ in $[-1, 1)$, is spatially periodic, and at most $4^k$ rows do so. The one velocity it leaves out
 is the speed of light to the right. There the picture changes completely: for $p = 12$, 15 and 17 the rows that come
 back after $p$ steps moved $p$ cells to the right form a set of positive entropy, so it is uncountable, and it carries
-measures invariant under the shift and under Rule 30 that have positive entropy and are not the uniform measure.
+measures invariant under the shift and under Rule 30 that have positive entropy and are not the uniform measure. The
+kit's main branch, after the pinned commit, has the case $p = 12$ and shows that 12 is the least such period
+([What the kit has](#what-the-kit-has)); the periods 15 and 17 and the invariant measures are not there.
 
 ## Statement
 
@@ -71,3 +73,9 @@ $-d/k$ in $[-1, 1)$; for $|d| > k$ an easier argument (each cell a function of t
 same. The case $d = -k$, velocity 1 to the right, is the one its argument leaves out: there the permutive cell
 $x_{i-k}$ is the cell being compared, and it cancels. This module settles that case for $k = 12$, 15 and 17, in the
 other direction.
+
+The kit's main branch, after the pinned commit, adds `Rule30MovingWaves`: for $p = 12$ two tiles of 34 cells
+concatenate freely into rows of $\Sigma_{12}$ (`free_binary_period_twelve`, `exponential_words_twelve`), and for
+$1 \le p \le 11$ the rows of $\Sigma_p$ have at most $81 + 14m$ words of length $m$ (`low_period_linear_words`), so
+$\Sigma_p$ has zero entropy there and 12 is the least period with positive entropy. Item 3 for $p = 12$ is that result,
+proved here independently; the periods 15 and 17 and item 4 are not in it.
