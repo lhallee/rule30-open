@@ -62,44 +62,43 @@ adds:
   leaves it; `s01_class_count`: there are exactly $N(A, B)$ of them; `tail_of_Phi_stripe`: the rows whose image under
   one step reads a stripe word.
 
-So the bound on center columns is exactly the number of S01 classes: completeness of S01 on a box is the statement
-that the box has $N(A, B)$ center columns.
+So the bound on center columns is exactly the number of S01 classes: completeness of S01 on a box is the statement that
+the box has $N(A, B)$ center columns.
 
 ## The classes, written out, and their sizes
 
 This section is proved on paper; the Lean modules do not state it.
 
-**Representatives.** Each class holds one row that is its own representative (`rep_cases`, `boxRep_fixed`): a row
-with cell $B$ black, or a row with an empty right half whose left part does not end in $0\,1$. A representative of the
-second kind is alone in its class, since `rep` takes every other row to a row with cell $B$ black. By its definition
-`rep` changes only the cells $1, \dots, B$, so no class mixes left parts.
+**Representatives.** Each class holds one row that is its own representative (`rep_cases`, `boxRep_fixed`): a row with
+cell $B$ black, or a row with an empty right half whose left part does not end in $0\,1$. A representative of the second
+kind is alone in its class, since `rep` takes every other row to a row with cell $B$ black. By its definition `rep`
+changes only the cells $1, \dots, B$, so no class mixes left parts.
 
-**The class of a row with cell $B$ black.** Let $r$ have cell $B$ black, let $N$ be the largest $n \le B + 1$ such
-that $r$ reads $s^*_n$ on the cells $B - n + 1, \dots, B$, and let $q = B - N + 1$. The class of $r$ is the set of
-rows that agree with $r$ left of cell $q$ and read a stripe word on $q, \dots, B$, except the word $1\,0 \cdots 0$
-when cell $q - 1$ is black. It has $N$ rows, or $N - 1$ in that case.
+**The class of a row with cell $B$ black.** Let $r$ have cell $B$ black, let $N$ be the largest $n \le B + 1$ such that
+$r$ reads $s^*_n$ on the cells $B - n + 1, \dots, B$, and let $q = B - N + 1$. The class of $r$ is the set of rows that
+agree with $r$ left of cell $q$ and read a stripe word on $q, \dots, B$, except the word $1\,0 \cdots 0$ when cell $q -
+1$ is black. It has $N$ rows, or $N - 1$ in that case.
 
-*Proof.* Let $p < B$ be the last black cell of a row. If cell $p - 1$ is white and $p \ge 0$, `rep` writes
-$s^*_{B-p+1}$ on the cells $p, \dots, B$ (time 0); if cell $p - 1$ is black and $p \ge 1$, it writes
-$1\,0\,s^*_{B-p} = s^*_{B-p+2}$ on the cells $p - 1, \dots, B$ (time 1); otherwise it leaves the row. Read backward,
-the rows other than $r$ with representative $r$ are, for each $n \le B + 1$ such that $r$ ends in $s^*_n$, the row
-$r$ with that suffix replaced by $1\,0^{n-1}$, when $n \ge 2$ and the cell before the suffix is white, and by
-$1\,1\,0^{n-2}$, when $n \ge 3$. These $n$ are 1 and the $n \le N$ of the parity of $N$, and for them
-$s^*_N = (10)^{(N-n)/2}\,s^*_n$, so the cell before the suffix is white when $n < N$. The rows obtained are
-$w\,(10)^i\,1\,0^a$ and $w\,(10)^i\,11\,0^a$ with $w$ the cells of $r$ left of $q$: every stripe word on
-$q, \dots, B$ but $s^*_N$, which is $r$, and but $1\,0 \cdots 0$ when cell $q - 1$ is black. $\square$
+*Proof.* Let $p < B$ be the last black cell of a row. If cell $p - 1$ is white and $p \ge 0$, `rep` writes $s^*_{B-p+1}$
+on the cells $p, \dots, B$ (time 0); if cell $p - 1$ is black and $p \ge 1$, it writes $1\,0\,s^*_{B-p} = s^*_{B-p+2}$
+on the cells $p - 1, \dots, B$ (time 1); otherwise it leaves the row. Read backward, the rows other than $r$ with
+representative $r$ are, for each $n \le B + 1$ such that $r$ ends in $s^*_n$, the row $r$ with that suffix replaced by
+$1\,0^{n-1}$, when $n \ge 2$ and the cell before the suffix is white, and by $1\,1\,0^{n-2}$, when $n \ge 3$. These $n$
+are 1 and the $n \le N$ of the parity of $N$, and for them $s^*_N = (10)^{(N-n)/2}\,s^*_n$, so the cell before the
+suffix is white when $n < N$. The rows obtained are $w\,(10)^i\,1\,0^a$ and $w\,(10)^i\,11\,0^a$ with $w$ the cells of
+$r$ left of $q$: every stripe word on $q, \dots, B$ but $s^*_N$, which is $r$, and but $1\,0 \cdots 0$ when cell $q - 1$
+is black. $\square$
 
-**S01 relates the rows of a class directly**, not only through a chain. If cell $q - 1$ is white, the time-0 cut at
-$q$ relates them all. If it is black, then $N \ge 2$, the rows read $1\,1\,0 \cdots 0$ or $1\,0\,\sigma$ from $q$ on,
-with $\sigma$ a stripe word, one step takes these tails to stripe words after a white cell (the table of one step on
-stripe tails in [StripeClassCount](../../Rule30Open/Frames/StripeClassCount.md), step 2), and the time-1 cut at
-$q + 2$ relates them all. The rows of a class agree left of $q$ and are black at $q \ge 0$, so they have one left
-edge.
+**S01 relates the rows of a class directly**, not only through a chain. If cell $q - 1$ is white, the time-0 cut at $q$
+relates them all. If it is black, then $N \ge 2$, the rows read $1\,1\,0 \cdots 0$ or $1\,0\,\sigma$ from $q$ on, with
+$\sigma$ a stripe word, one step takes these tails to stripe words after a white cell (the table of one step on stripe
+tails in [StripeClassCount](../../Rule30Open/Frames/StripeClassCount.md), step 2), and the time-1 cut at $q + 2$ relates
+them all. The rows of a class agree left of $q$ and are black at $q \ge 0$, so they have one left edge.
 
 **The class-size law.** Fix a left part $\lambda$ and $B \ge 1$, and take the $2^B$ rows $\lambda\rho$ with $\rho$ a
 right half inside $[1, B]$. A class of a row with cell $B$ black is fixed by $q$ and the cells left of $q$, and $N$ is
-the largest length exactly when the cells $q - 2, q - 1$ do not read $1\,0$ (then $s^*_{N+2}$ would fit) and, for
-$N = 1$, cell $B - 1$ is white (else $s^*_2 = 11$ fits). Cells $\le 0$ belong to $\lambda$. So the classes are:
+the largest length exactly when the cells $q - 2, q - 1$ do not read $1\,0$ (then $s^*_{N+2}$ would fit) and, for $N =
+1$, cell $B - 1$ is white (else $s^*_2 = 11$ fits). Cells $\le 0$ belong to $\lambda$. So the classes are:
 
 - $q \ge 2$ with cell $q - 1$ black: $2^{q-2}$ classes (cells $1, \dots, q - 2$ free) of $B - q$ rows (none when
   $q = B$);
@@ -111,24 +110,23 @@ $N = 1$, cell $B - 1$ is white (else $s^*_2 = 11$ fits). Cells $\le 0$ belong to
 - the empty right half alone when $\lambda$ does not end in $0\,1$.
 
 Summing over $q$: the nonempty right halves form $2^{B-1-k}$ classes of $k$ rows for $1 \le k \le B - 1$ and one class
-of $B$ rows, and the empty right half is alone or joins the class of $B$ rows. For the single black cell
-($\lambda = 1$, which ends in $0\,1$) that class is $\{(10)^k1, (10)^k11\}$ inside $[0, B]$, its $B + 1$ stripe seeds,
-which have its center column in Lean ([SeedExtensions](../../Rule30Open/Seeds/SeedExtensions.md)). That no other row
-of $[0, B]$ has it is the census below for $B \le 20$, and [the extension search](../seeds/no-other-extensions.md)
-for this one class to 40 cells.
+of $B$ rows, and the empty right half is alone or joins the class of $B$ rows. For the single black cell ($\lambda = 1$,
+which ends in $0\,1$) that class is $\{(10)^k1, (10)^k11\}$ inside $[0, B]$, its $B + 1$ stripe seeds, which have its
+center column in Lean ([SeedExtensions](../../Rule30Open/Seeds/SeedExtensions.md)). That no other row of $[0, B]$ has it
+is the census below for $B \le 20$, and [the extension search](../seeds/no-other-extensions.md) for this one class to 40
+cells.
 
 **Checks.** `family_labels` builds the classes from this description, with no relation and no step of the rule. The
-tests compare it with the fibers of `rep` on every box of up to 10 cells, the census compares it with the classes of
-the kit's definitions on every box and left part below, and `stripe_classes.class_sizes` checks the class-size law on
-every box of up to 13 cells. The tests check the direct relation on every class of $[-3, 4]$.
+tests compare it with the fibers of `rep` on every box of up to 10 cells, the census compares it with the classes of the
+kit's definitions on every box and left part below, and `stripe_classes.class_sizes` checks the class-size law on every
+box of up to 13 cells. The tests check the direct relation on every class of $[-3, 4]$.
 
 ## Completeness on boxes of up to 21 cells
 
 Rows whose first $H$ center cells differ have different center columns, so for every box and every $H$
 $$\#\{\text{prefixes of length } H\} \;\le\; \#\{\text{center columns}\} \;\le\; N(A, B),$$
 the second inequality by the Lean bound. A box on which $N(A, B)$ rows have pairwise different prefixes therefore has
-exactly $N(A, B)$ center columns, and since each of its $N(A, B)$ S01 classes (`s01_class_count`) has one center
-column (the kit's soundness), its column classes are exactly the S01 classes. Finite prefixes decide it; no horizon
+exactly $N(A, B)$ center columns, and since each of its $N(A, B)$ S01 classes (`s01_class_count` for $A, B \ge 1$; counted by the census on the 41 boxes with $A = 0$ or $B = 0$) has one center column (the kit's soundness), its column classes are exactly the S01 classes. Finite prefixes decide it; no horizon
 is assumed. `center_classes` finds the rows in three steps:
 
 1. the first $T_1$ center cells of every row of the box, and the groups of rows with equal prefixes ($T_1 = 400$ in
@@ -139,10 +137,10 @@ is assumed. `center_classes` finds the rows in three steps:
 3. one row of each class in every prefix group that holds two or more classes, all of them stepped together until
    every two have differed, or $T_2 = 20{,}000$.
 
-No pair reached $T_2$: on each of the 231 boxes of up to 21 cells one row per class gives $N(A, B)$ different
-prefixes. The *latest separation* of a box is the largest time at which two rows of different classes first differ,
-the horizon at which a single count of prefixes would reach $N(A, B)$ there. Up to 11 cells no prefix group of
-$T_1 = 400$ needed splitting.
+No pair reached $T_2$: on each of the 231 boxes of up to 21 cells one row per class gives $N(A, B)$ different prefixes.
+The *latest separation* of a box is the largest time at which two rows of different classes first differ, the horizon at
+which a single count of prefixes would reach $N(A, B)$ there. Up to 11 cells no prefix group of $T_1 = 400$ needed
+splitting.
 
 | Cells | Latest separation | on | Rows with different left edges agree on at most | on |
 |---:|---:|---|---:|---|
@@ -199,16 +197,16 @@ The 21 boxes of 21 cells (the time-0 relation alone leaves as many classes or mo
 
 "Groups split" counts the prefix groups of $T_1 = 128$ that held two or more classes. The time-0 relation alone also
 leaves 12 classes on $[-1, 2]$ and 24 on $[-2, 2]$, against 11 and 22: time 1 adds the joins of the classes whose cell
-$q - 1$ is black, which join a row ending in $1\,1\,1$ at $q - 1, q, q + 1$ to the rows ending in
-$1\,1\,0\,\sigma$, with $\sigma$ a stripe word from $q + 2$.
+$q - 1$ is black, which join a row ending in $1\,1\,1$ at $q - 1, q, q + 1$ to the rows ending in $1\,1\,0\,\sigma$,
+with $\sigma$ a stripe word from $q + 2$.
 
-**Per left part.** The census also checks the class-size law on every left part of every box above, and on longer
-left parts: the left parts of the single cell's rows $R_1, \dots, R_{10}$ (that of $R_{10}$, on cells
-$-10, \dots, 0$, is the integer 1602), every left part of up to four cells, and 2741 (an arbitrary one of 12 cells),
-each with $B = 1, \dots, 10$ (240 runs); the left parts of $R_1, \dots, R_{14}$ and 2741 with $B = 16$ (latest
-separations 489 to 666); and that of $R_{10}$ with $B = 20$ ($2^{20}$ rows, 524,289 classes, latest separation 689).
-By `right_half_columns` each run is exact in the same way: every one has $2^{B-1} + 1$ center columns, or $2^{B-1}$
-when the left part ends in $0\,1$, in classes of the sizes of the class-size law.
+**Per left part.** The census also checks the class-size law on every left part of every box above, and on longer left
+parts: the left parts of the single cell's rows $R_1, \dots, R_{10}$ (that of $R_{10}$, on cells $-10, \dots, 0$, is the
+integer 1602), every left part of up to four cells, and 2741 (an arbitrary one of 12 cells), each with $B = 1, \dots,
+10$ (240 runs); the left parts of $R_1, \dots, R_{14}$ and 2741 with $B = 16$ (latest separations 489 to 666); and that
+of $R_{10}$ with $B = 20$ ($2^{20}$ rows, 524,289 classes, latest separation 689). By `right_half_columns` each run is
+exact in the same way: every one has $2^{B-1} + 1$ center columns, or $2^{B-1}$ when the left part ends in $0\,1$, in
+classes of the sizes of the class-size law.
 
 **A late pair.** The last pair of $[-10, 10]$ to differ, the rows `1..1.1.11..1.1..1111` and `1..1.11...1..11....1` on
 cells $-9, \dots, 10$, differ at time 0 on cells $-3, -2, -1$ and on six cells of the right half. From time 1 on their
@@ -219,8 +217,8 @@ the left half from the center column; the census needs none, since it runs each 
 
 ## Three facts about equal columns
 
-These are proved on paper and not in Lean. For two configurations $x, y$ (finite or not) write
-$d_j(t) = x_j(t) \oplus y_j(t)$.
+These are proved on paper and not in Lean. For two configurations $x, y$ (finite or not) write $d_j(t) = x_j(t) \oplus
+y_j(t)$.
 
 - **Masking.** If $x$ and $y$ have the same column 0, $c$, then $d_{-1}(t) = (1 - c(t))\,d_1(t)$ for every $t$.
   *Proof.* $c(t + 1) = x_{-1}(t) \oplus (c(t) \lor x_1(t))$, and the same for $y$. If $c(t) = 1$ both give
@@ -247,21 +245,20 @@ The tests check masking and the distinct right halves on every pair of rows with
 ## Consequences
 
 **Rows with equal center columns keep the left part.** On every box of up to 21 cells, rows with equal center columns
-are joined by S01, so they agree on every cell $\le 0$ and have the same left edge: the kit's `EdgeObservable` holds
-for every two rows supported in one box of up to 21 cells.
+are joined by S01, so they agree on every cell $\le 0$ and have the same left edge: the kit's `EdgeObservable` holds for
+every two rows supported in one box of up to 21 cells.
 
-**Problem 1 from a count.** Let $C(A)$ be the number of distinct center columns of the rows supported in $[-A, A]$.
-Then $C(A) \le N(A, A) = 4^A + 3 \cdot 2^{A-1}$ for every $A \ge 1$ (`box_columns`), and if $C(A) = N(A, A)$ for
-infinitely many $A$, the center column is not eventually periodic. *Proof.* If $C(A) = N(A, A)$, the column classes
-of $[-A, A]$ are its S01 classes (as above), and every row of a box inside $[-A, A]$ is a row of $[-A, A]$. Two finite
-rows with equal center columns lie in such a box for large $A$, so they are joined, have one representative and one
-left part, and so one left edge (if the left parts are white, both left edges are at least 1 and the kit's
-`edges_equal_of_nonnegative` applies). That is `EdgeObservable`, and the kit's `problem1_of_edgeObservable` gives
-Problem 1. Directly: an eventual period $P$ from $T$ would give the single cell's rows $R_T$ and $R_{T+P}$, with left
-edges $-T$ and $-(T + P)$, equal center columns inside $[-(T + P), T + P]$. $\square$ The hypothesis is a lower bound
-on the size of the image of a finite map, from the $2^{2A+1}$ rows of a box to center columns. It is not a statement
-about one orbit, but a single missing column on a single box breaks it: it says again that every two rows that S01
-does not join differ at the center.
+**Problem 1 from a count.** Let $C(A)$ be the number of distinct center columns of the rows supported in $[-A, A]$. Then
+$C(A) \le N(A, A) = 4^A + 3 \cdot 2^{A-1}$ for every $A \ge 1$ (`box_columns`), and if $C(A) = N(A, A)$ for infinitely
+many $A$, the center column is not eventually periodic. *Proof.* If $C(A) = N(A, A)$, the column classes of $[-A, A]$
+are its S01 classes (as above), and every row of a box inside $[-A, A]$ is a row of $[-A, A]$. Two finite rows with
+equal center columns lie in such a box for large $A$, so they are joined, have one representative and one left part, and
+so one left edge (if the left parts are white, both left edges are at least 1 and the kit's `edges_equal_of_nonnegative`
+applies). That is `EdgeObservable`, and the kit's `problem1_of_edgeObservable` gives Problem 1. Directly: an eventual
+period $P$ from $T$ would give the single cell's rows $R_T$ and $R_{T+P}$, with left edges $-T$ and $-(T + P)$, equal
+center columns inside $[-(T + P), T + P]$. $\square$ The hypothesis is a lower bound on the size of the image of a
+finite map, from the $2^{2A+1}$ rows of a box to center columns. It is not a statement about one orbit, but a single
+missing column on a single box breaks it: it says again that every two rows that S01 does not join differ at the center.
 
 ## What it means
 
@@ -273,29 +270,29 @@ does not join differ at the center.
   of the center.
 - **Where a proof would have to work.** In the late pair the left halves merge after one step. From then on the
   difference lies in cells $\ge 1$, the cells $\le 0$ agree, and the center columns stay equal until the first time
-  $t$ at which cell 1 differs while the center is white; they differ at $t + 1$ (masking). Completeness says this
-  happens for every two rows that S01 does not join. A proof needs that first-passage statement for differences in
+  $t$ at which cell 1 differs while the center is white; they differ at $t + 1$ (masking). Completeness says this happens for every two rows that S01 does not join whose left halves agree from some time on. A proof needs that first-passage statement for differences in
   the right half; the kit's other open route to `EdgeObservable`, `ObserverCriterion` of `Rule30DividedDifference`,
   asks for the same kind of observation of a difference.
 - **Formalization.** The classes, their number and the bound on center columns are in Lean
   ([StripeClassCount](../../Rule30Open/Frames/StripeClassCount.md), [StripeClasses](../../Rule30Open/Frames/StripeClasses.md)).
   Not yet: the written-out classes and the class-size law (finite combinatorics on `rep`), the direct relation within
-  a class, the three facts above, and the reduction of Problem 1 to $C(A) = N(A, A)$, which needs only `box_columns`,
-  `s01_class_count`, `joined_iff`, that `rep` keeps the left part, and the kit's `problem1_of_edgeObservable`. The
+  a class, the three facts above, and the reduction of Problem 1 to $C(A) = N(A, A)$, which needs only `s01_class_count`, `joined_iff`, the soundness `column_eq_of_stripe` and `column_eq_of_stripe_one`, that `rep` keeps the left part, and the kit's `edges_equal_of_nonnegative` and `problem1_of_edgeObservable`. The
   census itself, $2^{21}$ rows over hundreds of steps per box, is beyond the kernel.
 
 ## The kit
 
 `Rule30StripeMeeting` defines the stripe relation and proves its soundness (`stripe_related_same_trace`,
 `stripe_related_preserves_two`) and that it is entered at time 0 or 1 if at all (`stripe_meeting_is_early`,
-`no_delayed_stripe_meeting`, `eventually_stripe_iff_early`); its docstring leaves completeness for equal infinite
-traces open. It does not describe or count the classes. `Rule30TraceEdge` states `EdgeObservable` as open and proves
-`problem1_of_edgeObservable` and `edges_equal_of_nonnegative`; `Rule30DividedDifference` gives a second open route to
-it (`ObserverCriterion`). The equivalent forms prove the stripe seeds (`TransformsSeeds`, `stripeSeed_center`) and
-check numerically that among the nonzero seeds in $[0, 13)$ exactly they reproduce the column for 300 steps, which is
-the single cell's class on the box $[0, 12]$ here; `AlgebraicDegree.card_trace` counts prefixes (each word of length
-$n + 1$ is the trace of exactly $2^n$ of the configurations on $[-n, n]$), not whole columns of finite rows. Neither
-part counts the center columns of a box.
+`no_delayed_stripe_meeting`, `eventually_stripe_iff_early`); its docstring leaves completeness for equal infinite traces
+open. It does not describe or count the classes. `Rule30TraceEdge` states `EdgeObservable` as open and proves
+`problem1_of_edgeObservable` and `edges_equal_of_nonnegative`; `Rule30DividedDifference` gives a second open route to it
+(`ObserverCriterion`). The equivalent forms prove the stripe seeds (`TransformsSeeds`, `stripeSeed_center`) and check
+numerically that among the nonzero seeds in $[0, 13)$ exactly they reproduce the column for 300 steps, which is the
+single cell's class on the box $[0, 12]$ here; `AlgebraicDegree.card_trace` counts prefixes (each word of length $n + 1$
+is the trace of exactly $2^n$ of the configurations on $[-n, n]$), not whole columns of finite rows. Neither part counts
+the center columns of a box. Kit main's `Rule30TraceEdge` proves `problem1_iff_seedTraceShiftFree` (Problem 1 holds iff
+no two rows $R_T$, $R_{T+P}$, $P > 0$, of the single cell have equal center columns) and
+`seedTraceShiftFree_of_edgeObservable`, the direct form of the last step of Problem 1 from a count.
 
 ## Reproduce
 
@@ -312,8 +309,8 @@ python -m computations.stripe_classes --sizes 13                  # the class-si
 
 `--c` takes the prefix groups from [center_classes_census.c](../../computations/center_classes_census.c), compiled on
 first use (`cc -O2 center_classes_census.c -o center_classes_census` builds it by hand). Each line of output is one box
-or left part; `boxes` ends with a line per width, and on the boxes of up to 6 cells also joins every pair with the
-kit's relation transcribed literally (`stripe_classes.classes_all_pairs`).
+or left part; `boxes` ends with a line per width, and on the boxes of up to 6 cells also joins every pair with the kit's
+relation transcribed literally (`stripe_classes.classes_all_pairs`).
 [tests/test_center_classes.py](../../tests/test_center_classes.py) checks the counts against every row of the boxes of
 up to 7 cells and of $[-4, 4]$ run with `rule30.step`, the keyed classes against every pair and against the fibers of
 `rep`, the written-out classes and their sizes, the split (with survivors at a short horizon), the C program against

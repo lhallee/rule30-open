@@ -11,15 +11,16 @@ kit_modules: [Rule30StripeMeeting]
 
 # A right half of B cells gives at most 2^(B-1) + 1 center columns to each left part
 
-Fix the cells left of the center and fill the $B$ cells right of it in all $2^B$ ways. The center columns of these
-rows take at most $2^{B-1} + 1$ values, and at most $2^{B-1}$ when cell $-1$ is white and cell $0$ black. So the rows
-supported in $[-A, B]$ have at most $2^{A+B} + 3 \cdot 2^{A-1}$ center columns. The kit's stripe relation does all
-the work: every row is one stripe step, at time 0 or at time 1, from a row whose cell $B$ is black.
+Fix the center cell and the cells left of it and fill the $B$ cells right of it in all $2^B$ ways. The center columns of
+these rows take at most $2^{B-1} + 1$ values, and at most $2^{B-1}$ when cell $-1$ is white and cell $0$ black. So the
+rows supported in $[-A, B]$ have at most $2^{A+B} + 3 \cdot 2^{A-1}$ center columns. The kit's stripe relation does all
+the work: every row with a nonempty right half, and every row with an empty one whose left part ends in $0\,1$, is one
+stripe step, at time 0 or at time 1, from a row whose cell $B$ is black.
 
 ## Statement
 
-A row's *left part* is its restriction to the cells $\le 0$, its *right half* its restriction to the cells
-$1, \dots, B$. The left part *ends in $0\,1$* when cell $-1$ is white and cell $0$ is black.
+A row's *left part* is its restriction to the cells $\le 0$, its *right half* its restriction to the cells $1, \dots,
+B$. The left part *ends in $0\,1$* when cell $-1$ is white and cell $0$ is black.
 
 - `right_half_center_columns`: for every finite left part and $B \ge 1$, every nonempty right half, and the empty one
   when the left part ends in $0\,1$, gives the center column of a row with the same left part whose cell $B$ is black.
@@ -35,12 +36,12 @@ $1, \dots, B$. The left part *ends in $0\,1$* when cell $-1$ is white and cell $
 
 ## Argument
 
-Work in the kit's frame with center index $B$ (`Rule30StripeMeeting`): a row white right of $B$ is the number whose
-bit $k$ is cell $B - k$, one step is $\Phi(a) = a \oplus ((a \ll 1) \lor (a \ll 2))$, and the center cell at time $t$
-is bit $B + t$ of $\Phi^t(a)$ (`evolve_eq_phiRows` checks the frame against `evolve`). The kit's `StripeRelated a b c`
-lets two rows exchange their bits $0, \dots, j$ ($j \le c$) when both blocks are stripe words $0^a 1 (01)^k$ or
-$0^a 11 (01)^k$ (read from bit 0), bit $j + 1$ is white in both and the rows agree above; its theorem
-`stripe_related_same_trace` says such rows have the same center column.
+Work in the kit's frame with center index $B$ (`Rule30StripeMeeting`): a row white right of $B$ is the number whose bit
+$k$ is cell $B - k$, one step is $\Phi(a) = a \oplus ((a \ll 1) \lor (a \ll 2))$, and the center cell at time $t$ is bit
+$B + t$ of $\Phi^t(a)$ (`evolve_eq_phiRows` checks the frame against `evolve`). The kit's `StripeRelated a b c` lets two
+rows exchange their bits $0, \dots, j$ ($j \le c$) when both blocks are stripe words $0^a 1 (01)^k$ or $0^a 11 (01)^k$
+(read from bit 0), bit $j + 1$ is white in both and the rows agree above; its theorem `stripe_related_same_trace` says
+such rows have the same center column.
 
 1. **Time one** (`column_eq_of_stripe_one`). If two rows have the same cell 0 and their images under $\Phi$ are
    stripe-related at center index $B + 1$, the kit's theorem applied to the images gives equal center cells at every
@@ -65,16 +66,16 @@ $0^a 11 (01)^k$ (read from bit 0), bit $j + 1$ is white in both and the rows agr
 ## In Lean
 
 `column B x t` is `(phiRows x t).testBit (B + t)`. The moves are proved bit by bit from the kit's `Phi_testBit`, with
-`StripeWord` built from its three constructors (`stripeWord_stripeLow`, `stripeWord_single_bit`). `rowOf B a` is the
-row whose cell $B - j$ is bit $j$ of $a$ and `rowNat` encodes a row of the box as a number; `evolve_eq_phiRows` proves
-the frame, so the headline results hold for `evolve`. `center_eq_right_extension` uses `evolve_single_center`.
+`StripeWord` built from its three constructors (`stripeWord_stripeLow`, `stripeWord_single_bit`). `rowOf B a` is the row
+whose cell $B - j$ is bit $j$ of $a$ and `rowNat` encodes a row of the box as a number; `evolve_eq_phiRows` proves the
+frame, so the headline results hold for `evolve`. `center_eq_right_extension` uses `evolve_single_center`.
 
 ## What the kit has
 
 The kit proves that stripe-related rows have the same center column (`stripe_related_same_trace`), that a stripe
-relation reached later with agreeing observations was already there at time 0 or 1 (`stripe_meeting_is_early`), and
-that every stripe seed $1, 11, 101, 1011, \dots$ has the single cell's column (`TransformsSeeds`). It does not count
-classes of rows or bound the number of center columns. [StripeClassCount](StripeClassCount.md) proves that the bound
-is exactly the number of classes of the stripe relation at time 0 or 1, so the stripe relation can do no better; that
-rows in different classes have different center columns (which would make the bound exact, and which by the edge
-argument implies Problem 1) is open.
+relation reached later with agreeing observations was already there at time 0 or 1 (`stripe_meeting_is_early`), and that
+every stripe seed $1, 11, 101, 1011, \dots$ has the single cell's column (`TransformsSeeds`). It does not count classes
+of rows or bound the number of center columns. [StripeClassCount](StripeClassCount.md) proves that the bound is exactly
+the number of classes of the stripe relation at time 0 or 1, so the stripe relation can do no better; that rows in
+different classes have different center columns (which would make the bound exact, and which by the edge argument
+implies Problem 1) is open.
