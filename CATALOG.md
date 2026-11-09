@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 194 Lean modules with 925 headline theorems, 70 findings (proved on paper,
-computed or conjectured) and 78 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 80 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -14,8 +14,8 @@ takes effort of order `n`.
 | [Seeds](#seeds) | 1 | 1 | 0 |
 | [Columns](#columns) | 139 | 27 | 18 |
 | [Period two](#period-two) | 16 | 15 | 12 |
-| [Diagonals](#diagonals) | 10 | 13 | 11 |
-| [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 1 |
+| [Diagonals](#diagonals) | 10 | 13 | 12 |
+| [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 2 |
 | [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
@@ -443,6 +443,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [The relaxed driver game G has value about 0.63 T to T = 180, its lemmas reduce a black density below 1 to a charging property, and every such bound contains a positive density for one explicit orbit, Rule 30 beside a cell held black](negative-results/diagonals/relaxed-density-game.md) | dead end | 2 |
 | [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
+| [A white rate below 1 at the first rung of the right ladder needs a positive density for one explicit orbit, the half line beside a cell held white started from one black cell, just as the black rate needs one beside a cell held black](negative-results/diagonals/white-rate-ladder.md) | dead end | 2 |
 | [A potential that grows with the white runs does not turn the window bounds into a slope below 2 for every depth, and the step bounds the white runs only by the period; the window bounds grow linearly faster than 3j/2 while W_j is constant, a certificate that knows only the white runs needs slope 7/3, and words with one black cell per period occur at periods 4, 8 and 16](negative-results/diagonals/white-run-potential.md) | dead end | 2 |
 
 ## Frames and the seed's past
@@ -473,6 +474,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 
 | Result | Kind | Problems |
 |---|---|---|
+| [The cycle data of the right-edge map cannot see the center column, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal](negative-results/frames/diagonal-freedom.md) | barrier | 1, 2 |
 | [A periodic column does not force a periodic row](negative-results/frames/periodic-column-preperiodic-row.md) | refuted | 1 |
 
 ## Sibling rules

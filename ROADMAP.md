@@ -304,7 +304,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   7, and by census for 8 more.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
-  ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
+  ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)), and
+  no argument from the cycle data of the right-edge map can work, since a map with the same cycle lengths, differing on
+  a set of small measure, reads any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Equal center columns and the left edge.** *Open.* The kit proves that its open statement `EdgeObservable`, that
   two finite rows with the same center column have the same leftmost black cell, implies Problem 1: rows $T$ and
   $T + P$ of an eventually periodic orbit share a center column and not a left edge. The kit's stripe relation, at
@@ -348,7 +350,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
   Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
   Problem 2 follows from three structural properties of its limit measures, all open
-  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)).
+  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)) The cycle data of the right-edge map cannot
+  decide either problem: a map with every cycle length of Rule 30's, differing from it on a set of small measure, reads
+  any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
@@ -383,7 +387,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
   both colors' rates fall with $k$, to 0.66 and 0.68 at $k = 16$ ([the right ladder](findings/diagonals/right-ladder.md)).
   A proof that the white rate stays below 1 at one exact right column would give the single cell a positive lower
-  density of black cells. Every configuration white left of a black cell settles to
+  density of black cells; at the first rung it needs a positive density for column $-2$ of the half line beside a cell
+  held white, started from one black cell, the white twin of the held black cell above
+  ([the white rate](negative-results/diagonals/white-rate-ladder.md)). Every configuration white left of a black cell settles to
   the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
   ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
   followed by a doubling period, which the computation confirms below depth 53,207. Behind a white diagonal with no

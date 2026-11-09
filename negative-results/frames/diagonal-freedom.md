@@ -1,0 +1,64 @@
+---
+title: The cycle data of the right-edge map cannot see the center column, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal
+category: frames
+problems: [1, 2]
+status: negative
+kind: barrier
+---
+
+# The cycle data of the right-edge map cannot see the center column, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal
+
+**Question.** In the frame of its right edge the single cell is the orbit of 1 under the 2-adic map
+$\Phi(y) = y \oplus (2y \lor 4y)$, an invertible T-function (bit $i$ of $\Phi(y)$ is $y_i$ plus a function of the
+lower bits), and the center column is its diagonal, $c(t) = $ bit $t$ of $\Phi^t(1)$. The cycle lengths $L_n$ of 1
+modulo $2^n$, the doubling parities, the odometer structure of the orbit closure and the measure-theoretic properties of
+$\Phi$ are all well understood (the kit's `TFunction`, `TFunctionCycles`, `Odometer`; [right-edge
+cycles](../../findings/complexity/right-edge-cycles.md)). Can an argument built from such data decide whether the
+diagonal is eventually periodic, or how often it is black?
+
+**Outcome.** No. The data do not constrain the diagonal at all.
+
+**Theorem (diagonal freedom; proved on paper).** Let $F$ be an invertible T-function, bit $i$ of $F(y)$ equal to
+$y_i \oplus f_i(y \bmod 2^i)$, let $x$ be a seed with cycle lengths $L_i$ modulo $2^i$ and doubling parities $\pi_i$
+($L_{i+1} = L_i(1 + \pi_i)$), let $t_0 \ge 1$, and let $d : \mathbb{N} \to \{0, 1\}$ be any sequence. There is an invertible
+T-function $G$, with level functions $g_i$, such that
+
+1. $g_i = f_i$ for $i < t_0$, so $G = F$ modulo $2^{t_0}$;
+2. for $i \ge t_0$, $g_i$ and $f_i$ differ at no more than two residues modulo $2^i$, so $G$ and $F$ differ on a set of
+   Haar measure at most $\sum_{i \ge t_0} 2 \cdot 2^{-i} = 2^{2 - t_0}$;
+3. $x$ has the same cycle length $L_i$ under $G$ as under $F$, at every level;
+4. for every $t \ge t_0$ with $L_t \nmid t$, bit $t$ of $G^t(x)$ is $d(t)$; when $L_t \mid t$ it is
+   $x_t \oplus (t/L_t)\pi_t$, the same for every map with these cycle lengths.
+
+*Proof.* Build $g_i$ level by level, keeping the $G$-cycle of $x$ modulo $2^i$ of length $L_i$. Let $o_s = G^s(x) \bmod
+2^i$, distinct for $s < L_i$, and $u(s) = g_i(o_s)$. Bit $i$ of $G^s(x)$ is $x_i \oplus \sum_{r < s} u(r)$, the sum
+taken around the cycle, so with $t = i = qL_i + r$, $0 \le r < L_i$, it is $x_i \oplus qP \oplus \sum_{s < r} u(s)$,
+where $P = \sum_{s < L_i} u(s)$ is the parity of the level. Start from $u = f_i(o_s)$. If $r \ge 1$, flip $u$ at $o_0$
+if needed to make the partial sum over $s < r$ give $d(i)$, then at $o_{L_i - 1}$, which is at or after $r$, if needed
+to make $P = \pi_i$. Then $L_{i+1} = L_i(1 + P)$ is unchanged, and bit $i$ of $G^i(x)$ is $d(i)$. If $r = 0$ the value
+$x_i \oplus qP$ is forced. Any family of level functions defines an invertible T-function. $\square$
+
+If $L_i \ge i + w$ for every $i \ge t_0$, the same flips at the orbit times before $i, i + 1, \dots, i + w - 1$ prescribe
+the bits $i$ of $G^i(x), \dots, G^{i+w-1}(x)$ together. For Rule 30, $L_i > i$ for $5 \le i \le 84$ ([right-edge
+cycles](../../findings/complexity/right-edge-cycles.md)), and with $w = 2$ these bits are the center at time $i$ and
+column 1 at time $i + 1$: two adjacent columns can be prescribed at once. So Jen's theorem, that no two adjacent
+columns are eventually periodic, is not a consequence of the T-function structure, the cycle lengths, or any property
+of $\Phi$ that holds off a set of small measure.
+
+**The center-override form for Rule 30.** For $F = \Phi$ and $x = 1$, put the flips at the orbit times $i - 1$ and
+$L_i - 1$ only. Then the map $G$ keeps the light cone and both edges ($G^s(1)$ has exactly $2s + 1$ binary digits), and
+along the orbit it differs from Rule 30 only at the center cells where the prescribed word differs from the rule, and in
+the part of each right diagonal after its first period. So the left half of the $G$-world evolves exactly by Rule 30
+driven by the prescribed center column. This was checked by direct iteration to 40 levels with $t_0 = 8$ for four
+prescribed words (all white, all black, $(10)^\infty$, $(110)^\infty$), by code that is not in this repository.
+
+**What it means.** No argument whose ingredients hold in the modified world can prove Problem 1 or Problem 2: $\Phi$
+modulo any fixed $2^{t_0}$; the cycle lengths, the doubling parities and the odometer structure; the antiperiodic
+diagonals at doubling levels; the light cone and both edges; any property of the map off a set of small measure; and
+the Rule 30 law at every cell but the center column and the right diagonals after their first period. The kit's
+`TFunctionCycles.exists_diagonal_prefix` is the seed-side statement (for a fixed map every readout comes from some
+seed); this is the map-side one (for a fixed seed every readout comes from a map with the same cycle data). A proof has
+to use the Rule 30 law at the center, the coupling $c(t + 1) = x_{-1}(t) \oplus (c(t) \lor x_1(t))$, or in the zone that
+the repairs occupy. The kit's own remark in `TFunctionCycles`, that none of its cycle results reaches the center
+column, is here a theorem. The same holds for every 2-adic reformulation recorded in
+[reformulations](../dynamics/reformulations.md) that uses only cycle data.
