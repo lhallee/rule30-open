@@ -139,6 +139,24 @@ def test_held_map() -> None:
     assert [int(held_map.first_failures(20, phase).max()) for phase in (0, 1)] == [37, 30]
 
 
+def test_held_map_survivors() -> None:
+    """Survivor counts against stepping Python integers, and the exact count 2^((M - 1)/2) at step M - 1 for odd M."""
+    for support in range(1, 12):
+        brute = [0] * 30  # brute[T]: integers with `support` bits that keep the odd checks through step T
+        for U in range(1 << (support - 1), 1 << support):
+            V, failed = U, 30
+            for t in range(1, 30):
+                V = held_map.held(V)
+                if t % 2 == 1 and V % 2 == 0:
+                    failed = t
+                    break
+            for T in range(min(failed, 30)):
+                brute[T] += 1
+        assert held_map.survivor_counts(support, 30).tolist() == brute, support
+        if support % 2 == 1:
+            assert brute[support - 1] == 2 ** ((support - 1) // 2) == held_map.counting_prediction(support, support - 1)
+
+
 def test_held_map_0001() -> None:
     """The search for the condition of 0001 against Python integers for every support to 11, every phase, with and
     without the right half's check; and the latest first failures the ether-domain argument quotes, between M and
