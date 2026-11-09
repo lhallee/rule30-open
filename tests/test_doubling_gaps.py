@@ -7,7 +7,7 @@ import numpy as np
 
 from computations.doubling_gaps import (anti_classes, anti_word, backward_words, census, census_c, families, gaps_numpy,
                                         half_damage, next_sources, source_graph,
-                                        is_anti, least_period, orbit_gap, permutive_check, rot, scalar_gap,
+                                        is_anti, least_period, orbit_gap, permutive_check, rot, scalar_gap, even_weight,
                                         single_cell)
 from computations.settled_words import pair_next
 
@@ -56,6 +56,12 @@ def test_white_step_identity() -> None:
 def test_permutive_radius() -> None:
     # E_i(t) reads x(t .. t + floor((i-1)/2)) and, for odd i, flips with the last cell
     assert all(permutive_check(i, 7) for i in (3, 4, 5))
+
+
+def test_even_weight() -> None:
+    # E_{2k} has odd weight for 2 <= k <= 12 (full degree, so permutive in no cell); E_2 = x is balanced
+    assert all(even_weight(k) % 2 == 1 for k in range(2, 13))
+    assert even_weight(1) == 1 and even_weight(2) == 1  # E_2 = x(t) on one cell, E_4 = x(t) and not x(t+1)
 
 
 def test_single_cell_regimes() -> None:

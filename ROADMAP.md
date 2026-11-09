@@ -451,8 +451,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   $m(1), \dots, m(4) = 5, 21, 56, 88$ in Lean and $m(p)$ computed to $p = 16$ (414,989 there); diagonal $j + 4$ is
   eventually white exactly when diagonal $j$ is eventually the AND of the next two
   ([DoublingGaps](Rule30Open/Diagonals/DoublingGaps.md)). A shift of finite type that contains the start words gives
-  $m(p) > 49$ for every $p$ but 1, 2 and 5; a bound that grows with $p$, which would give periods $O(\log j)$, is open
-  ([doubling gaps](findings/diagonals/doubling-gaps.md)). Over every pair word of period $P \le 16$ the least front walk
+  $m(p) > 49$ for every $p$ but 1, 2 and 5; at odd gaps the sink condition is a shift register, which bounds the
+  period, but at every even gap it has full degree and is permutive in no cell, so a bound that grows with $p$, which
+  would give periods $O(\log j)$, is open ([doubling gaps](findings/diagonals/doubling-gaps.md)). Over every pair word of period $P \le 16$ the least front walk
   has largest cycle mean at most $5/2$ and an excess over slope $5/2$ between $4P$ and $5.6P$ for $P$ from 10 to 16
   ([walk eigenvalue](findings/diagonals/walk-eigenvalue.md)); no potential that reads the white run ahead and a window
   of at most three cells holding the phase or ending just before it proves this at the periods 5 to 10 ([local walk

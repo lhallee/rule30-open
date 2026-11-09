@@ -403,6 +403,13 @@ def odd_gap_radius(g: int) -> int:
     return (g - 3) // 2
 
 
+def even_weight(k: int) -> int:
+    """The number of windows x(0 .. k-1) with E_{2k}(0) = 1. E_{2k} reads exactly these k cells and, for k >= 2, has
+    full algebraic degree, so this number is odd: E_{2k} is not balanced and so is permutive in no cell."""
+    P = k + 2  # long enough that E_{2k}(0) does not wrap around the period
+    return sum(backward_words(w, P, 2 * k)[2 * k] & 1 for w in range(1 << k))
+
+
 def permutive_check(i: int, P: int) -> bool:
     """Checks on every word x of period P (P > i) that E_i(t) depends only on x(t .. t + r_i), r_i = floor((i-1)/2),
     and for odd i flips with x(t + r_i)."""
