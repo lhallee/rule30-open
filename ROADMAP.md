@@ -19,7 +19,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 
 | Problem | Route | Status | Where it stands |
 |---|---|---|---|
-| 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses |
+| 1 | Rigidity from the left edge | closed on its own | no two adjacent columns are eventually periodic; Rules 90, 150 and 210 share every fact it uses, and under 90 and 150 the eventually periodic columns of a finite row are exactly its mirror axes (Lean) |
 | 1 | Excluding eventual periods block by block | open | the finite game excludes 1,400 blocks of period at most 21, all in Lean, and reaches no block of period 2, 3, 5, 6, 7 or 9 |
 | 1 | Single blocks through traps | open | 16 of the 56 blocks of period 9, 23 of the 99 of period 10, 53 of the 186 of period 11, 96 of the 335 of period 12, 176 of the 630 of period 13, 334 of the 1,161 of period 14 and 612 of the 2,182 of period 15 come down to entry into some trap of the block, with a trap that every window of 20 cells can reach, in Lean, from walls at the edges of backgrounds periodic in time and space, all of which are known to period 14 and six of period 15, from the closed sets that driven right halves settle into, every block of periods 10 to 14 that a sampled half settles into a trap for (at 13 and 14 with windows of 16 cells), and from every locked window of 16 cells at periods 10 to 15, carried by its chain; for one block each of period 10, 11 and 12 every right half white past its first eight cells, to a bound of 1,610 to 3,058, enters, in Lean, and for two blocks of period 9 every right half white on its first $10^5$ cells or so enters from most phases; one block each of period 5 and 7 has a trap that passes the tests but that small halves almost never enter, and the four traps of the one block of period 6, which share their first 22 cells, fail the test in the game of 22 cells, and none of its windows of up to 22 cells is locked; entry into 360 other traps alone, most of them carried along a background's columns, is false, 184 of them in Lean, among them 48 natural traps that pass the test of reach but that a wider trap of their block is apart from, and the only trap of period 5, and 90 blocks need entry into one of several traps |
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
@@ -28,6 +28,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
+| 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 21 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
 | 1 | Random rows and probabilistic arguments | closed | true for almost every row, silent on the single cell |
 | 1 | Counterexamples | no signal for the problem | no small row has a periodic column; no right half found escapes the period-four lock; but 360 trap reductions here had false hypotheses, a closed set of windows apart from each trap, from the finite game, from where sampled halves settle or from another trap of the block, and so does the kit's own reduction of $001$ to its trap `t001` |
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
@@ -48,7 +49,15 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   sequence that, with the cells between, closes the strip to its right are never both eventually periodic: the center
   column and column 1 xor column 2, or the parity of columns 1 to $k$ for any $k$, in Lean
   ([ClosingObservable](Rule30Open/Columns/ClosingObservable.md)). The kit proves that Rules 90, 150 and 210 share every
-  fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone.
+  fact this argument uses and have eventually constant center columns, so it cannot imply Problem 1 alone. For Rules 90
+  and 150 the cause is exactly the seed's symmetry: a column of a finite row is eventually periodic if and only if the
+  row is mirror-symmetric about it, so from the single cell the center is the only eventually periodic column of Rules
+  90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
+  two steps being one step on each sublattice, neither of which Rule 30 has. A proof through the center cannot treat the
+  two halves as black boxes either: either half can be replaced by a causal adversary that makes the center eventually
+  periodic, the single cell's own left half admits the white tail $1, 1, 0, 0, \dots$, and beyond period one the route
+  returns to the open left-half checks and right-half channel statements
+  ([compositional halves](negative-results/dynamics/compositional-halves.md)).
 - **Excluding eventual periods block by block.** *Open.* Each block needs its own certificate outside a few families,
   and the share of blocks covered falls with the period. [The coverage](findings/columns/coverage.md) counts, period by
   period up to 15, the blocks excluded, reduced to entry into a trap that passes the two tests entry needs, reduced by
@@ -96,7 +105,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
     long run exclude no block the game misses up to period 20 ([forcing
     words](negative-results/columns/forcing-words.md)). No block of period 2, 3, 5, 6, 7 or 9 has a locked window of up
     to 20 cells ([window locks](negative-results/columns/window-locks.md)). The Conley index of the window graphs, taken as
-    the class of the relation's matrix over GF(2), excludes no block ([Conley index](negative-results/columns/conley-index.md)). Wider ones exist for one block or more of
+    the class of the relation's matrix over GF(2), excludes no block ([Conley index](negative-results/columns/conley-index.md)).
+    A certificate that is a closed set of rows excludes a block for the single cell only if the center column has
+    bounded stretches of it, and none excludes a block for all rows with a leftmost black cell
+    ([compact certificates](negative-results/columns/compact-certificates.md)). Wider ones exist for one block or more of
     each of these periods, the locks of seeds with long runs of 1s carried leftward through columns the rule determines
     ([lock chains](findings/columns/lock-chains.md)), and six are traps in Lean that reduce $01$, $001$, $01111$,
     $001011$, $0011101$ and $001011101$ to entry ([WordTraps](Rule30Open/Columns/WordTraps.md)). Period 9 has a wall of
@@ -295,7 +307,25 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   7, and by census for 8 more.
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
-  ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)).
+  ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)), and
+  no argument from the cycle data of the right-edge map can work, since a map with the same cycle lengths, differing on
+  a set of small measure, reads any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
+- **Equal center columns and the left edge.** *Open.* The kit proves that its open statement `EdgeObservable`, that
+  two finite rows with the same center column have the same leftmost black cell, implies Problem 1: rows $T$ and
+  $T + P$ of an eventually periodic orbit share a center column and not a left edge. The kit's stripe relation, at
+  time 0 or after one step with cell 0 shared, joins rows with equal center columns, and on the rows supported in
+  $[-A, B]$ it has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes, each inside one left part, with an explicit
+  representative; so those rows have at most that many center columns, and the $B$ cells right of the center add at
+  most $2^{B-1} + 1$ center columns to each left part, in Lean ([StripeClasses](Rule30Open/Frames/StripeClasses.md),
+  [StripeClassCount](Rule30Open/Frames/StripeClassCount.md)). On every box of up to 21 cells the count of distinct
+  center columns reaches that bound, so there equal center columns are exactly the stripe classes and rows with equal
+  center columns have equal left parts; the last pair to separate waits 829 steps, on $[0, 20]$, and its left halves
+  merge after one step, so the open step is a first-passage statement for differences confined to the right half
+  ([center classes](findings/frames/center-classes.md)).
+  Completeness, that rows in different classes always have different center columns, is open; on the boxes $[-A, A]$
+  for every $A$ it would give `EdgeObservable` for the orbit's rows, hence Problem 1. *Assessment:* a counting
+  statement with an exact target on every box, but a statement about all rows of a box at once, the single cell's
+  among them.
 - **Random rows and probabilistic arguments.** *Closed.* The problems hold for random rows, provably, and no amount of
   randomness reaches the single cell ([random rows](negative-results/random-rows/almost-every-row.md)).
 - **Counterexamples.** *No signal for the problem; found for hypotheses.* No row of up to 24 cells has a column that
@@ -315,7 +345,18 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 ## Problem 2: does each color occur with density 1/2?
 
 - **Invariant measures and random rows.** *Closed.* Exact for random rows ([LeftWindow](Rule30Open/RandomRows/LeftWindow.md)),
-  silent on the single cell ([random rows](negative-results/random-rows/almost-every-row.md)).
+  silent on the single cell ([random rows](negative-results/random-rows/almost-every-row.md)). At the speed of light to the right Rule 30
+  has uncountably many rows that come back after 12, 15 or 17 steps moved as many cells, a set of positive entropy, in
+  Lean (12 is the least such period, by the kit's main branch), so measures invariant under the shift and the rule with
+  positive entropy need not be uniform and a rigidity theorem needs an ergodicity hypothesis along that direction
+  ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
+  With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
+  is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
+  Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
+  Problem 2 follows from three structural properties of its limit measures, all open
+  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)) The cycle data of the right-edge map cannot
+  decide either problem: a map with every cycle length of Rule 30's, differing from it on a set of small measure, reads
+  any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
@@ -333,13 +374,26 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   among $c(0..T)$ is 141 at $T = 190$ exactly and at least 2,254 at $T = 3{,}000$ (a beam that is exact to 190), a rate
   near 3/4, and chaining dense periodic words does not raise it, since a long stretch is mostly followed by a gap of
   comparable length; so the conjecture that the black count is at most $\rho T + C$ with $\rho < 1$ would give the single
-  cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). A potential over
+  cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). From a
+  uniformly random left half, almost surely every driver it admits, so the center column beside every right half at
+  once, has black cells of upper density at most $0.7729$, the root of $h(d) = d$; this first-moment bound is just above
+  the measured $3/4$, and the conjecture is equivalent to an upper large-deviation bound for the center column with
+  column 1 replaced by fair coins, one that may lose an exponential factor against the first moment; from the white
+  half the admissible words with $b$ black cells number at most 1.35 times their mean over random halves for $n$ from
+  20 to 150 ([the first moment](findings/diagonals/driver-first-moment.md)). Every bound of this kind contains a density
+  statement for one explicit orbit: in the relaxed game where the controller harvests black pairs (value about $0.63T$
+  to $T = 180$, with exact lemmas reducing a bound to a charging property), the greedy play is Rule 30 on the half line
+  beside a cell held black, so a bound below 1 gives its column $-1$ a positive density of black cells, and the same
+  holds for the greedy driver of the game above ([the relaxed game](negative-results/diagonals/relaxed-density-game.md)).
+  A potential over
   27 row features certifies only 12/13 ([driver-density potentials](negative-results/diagonals/driver-density-potential.md)).
   With right cells $1 .. k$ exact and cell $k + 1$ free, the most white cells among $c(0..150)$ is 117 at $k = 1$, where
   the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
   both colors' rates fall with $k$, to 0.66 and 0.68 at $k = 16$ ([the right ladder](findings/diagonals/right-ladder.md)).
   A proof that the white rate stays below 1 at one exact right column would give the single cell a positive lower
-  density of black cells. Every configuration white left of a black cell settles to
+  density of black cells; at the first rung it needs a positive density for column $-2$ of the half line beside a cell
+  held white, started from one black cell, the white twin of the held black cell above
+  ([the white rate](negative-results/diagonals/white-rate-ladder.md)). Every configuration white left of a black cell settles to
   the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
   ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
   followed by a doubling period, which the computation confirms below depth 53,207. Behind a white diagonal with no
@@ -428,7 +482,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   exponential time ([the barrier](negative-results/complexity/problem-three-barrier.md)). Hypotheses about
   satisfiability, settled or not, do not reach it ([the hardness hypotheses](negative-results/complexity/hardness-hypotheses.md)),
   nor does probabilistic checking, and a circuit form of it would give $\mathrm{P} = \mathrm{BPP}$
-  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). Problem 3 implies Problem 1,
+  ([probabilistic checking](negative-results/complexity/probabilistic-checking.md)). The route the barrier names, a
+  reduction from a problem hard for exponential time, would itself make $c$ constant on infinite sets of times
+  decidable in polynomial time, one for each color, which a fair-coin hypothesis that implies all three problems forbids
+  ([the reduction route](negative-results/complexity/reduction-route.md)). Problem 3 implies Problem 1,
   proved in the kit's equivalent forms, so an affirmative answer to Problem 3 needs everything Problem 1 needs.
 - **The cone as a Boolean function.** *Computed, with a proof.* An alternating left half fixes the center cell for
   every right half once $t \ge 8$ or 9, so the $2^t$ left halves give at most $2^t - 2$ functions of the right half;
@@ -454,8 +511,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   both the diagonal $j$ and the time $t$, periodicity of the column does not help: a 2-automatic array of two indices
   with eventually periodic rows has row periods $O(j)$, so Rule 30's array of right diagonals is not 2-automatic if the
   right-edge cycle length $L_n$ grows faster than linearly, while Rule 90's is 2-automatic, in Lean
-  ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 25 of the levels $n \le 61$ and reaches $2^{25}$
-  ([right-edge cycles](findings/complexity/right-edge-cycles.md)); the transducers of the powers of the right-edge step
+  ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 36 of the levels $n \le 84$ and reaches $2^{36}$,
+  and two exact parities decide whether a stall of the period lasts one diagonal or two, after which each doubling is
+  the parity of a half-period difference ([right-edge cycles](findings/complexity/right-edge-cycles.md)); every route
+  tried toward $L_n / n$ unbounded (bit filling, the two edges, counting on the restart, weight parities,
+  renormalization) stops at a parity over the middle of a period, and the 2-adic seeds $\pm 1/3$ and Rule 150 bar any
+  argument without both the light cone and the product term ([the routes](negative-results/complexity/right-edge-cycle-routes.md));
+  the transducers of the powers of the right-edge step
   grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)).
   In parity models the center is separated from the linear rules for every $t$, in Lean: a function of odd weight has
   Walsh coefficients 2 mod 4 and an XOR lift that is its own inverse over GF(2), so with the kit's top monomial $c_t$ has
@@ -636,4 +698,10 @@ In order of the assessment above.
      level, where every linear rule has 2 ([LeftCut](Rule30Open/Complexity/LeftCut.md)); for $18 \le t \le 22$
      alternating stripes ending at $-3$ and $-4$ fix the center and the exact statement fails (Lean at 18, computed to
      22; [the left cut](negative-results/complexity/left-cut.md)). A lower bound for every $t$ that allows for stripe
-     prefixes, such as $N_{\mathrm{L}}(t, t-2) \ge 2^{t-3}$, which every count to $t = 20$ satisfies, is open.
+     prefixes, such as $N_{\mathrm{L}}(t, t-2) \ge 2^{t-3}$, which every count to $t = 20$ satisfies, is open. With the
+     number $a$ of cells fixed instead, the $2^a$ settings of the $a$ leftmost cells are pairwise distinguishable at
+     every $t \ge a + 2$ for $a \le 10$, and from $t = 19$, 21 and 24 for $a = 11$, 12 and 13, by white and single
+     black cell completions, in Lean: the first left-cut bounds for every $t$
+     ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md), [LateSeedCutWide](Rule30Open/Complexity/LateSeedCutWide.md)).
+     Width growing with $t$ needs a uniform version, for instance late seeds with $R \le c\,a$ separating the $2^a$
+     settings for every $a$, a statement about the frozen-boundary automaton and the eventual blocks of the left edge.

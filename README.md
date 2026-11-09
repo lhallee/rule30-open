@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 190 Lean modules with 904
-headline theorems, 67 findings and 75 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 196 Lean modules with 943
+headline theorems, 70 findings and 82 negative results.
 
 ## The problems
 
@@ -49,6 +49,15 @@ Proved in Lean:
 - **Every period** comes down to one statement about the left half for each block
   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). Many blocks of period 9 to 15 come down to entry into a trap, while
   entry into 360 other traps alone is false, and so is the kit's own statement of entry into its trap for $001$.
+- **Equal center columns.** On the rows supported in $[-A, B]$ the kit's stripe relation, which joins rows with equal
+  center columns, has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes, none mixing left parts, so those rows have at most
+  that many center columns ([StripeClassCount](Rule30Open/Frames/StripeClassCount.md),
+  [StripeClasses](Rule30Open/Frames/StripeClasses.md)). If every box $[-A, A]$ reached that count, rows with equal
+  center columns would have equal left edges, the kit's `EdgeObservable`, which implies Problem 1; every box of up to
+  21 cells reaches it ([center classes](findings/frames/center-classes.md)).
+- **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
+  when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
+  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)).
 
 Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
 ([the shift model](findings/period-two/shift-model.md)); every right half of up to 20 cells enters the kit's family
@@ -68,10 +77,17 @@ by a three-case law, so a gain of 2/3 diagonal per step gives that slope
 
 Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
 every center column the left half allows, black cells grow at a rate near 3/4
-([driver density](findings/diagonals/driver-density.md)).
+([driver density](findings/diagonals/driver-density.md)). From a uniformly random left half, almost surely every center column
+the half allows, whatever the right half, has black cells of upper density at most 0.7729, the root of $h(d) = d$
+(proved on paper, [the first moment](findings/diagonals/driver-first-moment.md)); the white start is one half of
+measure zero.
 
-Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open. Random
-rows satisfy the problem but do not reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)).
+Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open, and
+every bound on the black rate contains a positive density for one explicit orbit, Rule 30 beside a cell held black
+([the relaxed game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
+reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)), and invariant measures of
+positive entropy need not be uniform: rows moving right at the speed of light form a set of positive entropy, in Lean
+([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
 
 ### Problem 3: does the $n$th cell need about $n$ steps?
 
@@ -86,11 +102,17 @@ Proved in Lean:
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
   cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+- **Reading the row from the left, for every $t$.** For $a \le 13$ an ordered decision diagram that reads the row from
+  the left needs $2^a$ nodes at level $a$ at every $t$ from a threshold on, since white and single black cell
+  completions tell the $2^a$ settings of the $a$ leftmost cells apart
+  ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md), [LateSeedCutWide](Rule30Open/Complexity/LateSeedCutWide.md)).
 
 Computed: no automaton under 131,070 states computes the column; linear complexity $n/2$; no learned shortcut.
 
 Where it stops: a lower bound for the single starting cell amounts to an exponential lower bound for one explicit
-function ([why it is hard](negative-results/complexity/problem-three-barrier.md)); as a space lower bound it sits
+function ([why it is hard](negative-results/complexity/problem-three-barrier.md)), and the route through a reduction
+from a problem hard for exponential time would make the center column constant on infinite sets of times decidable in
+polynomial time ([the reduction route](negative-results/complexity/reduction-route.md)); as a space lower bound it sits
 between the order $\sqrt{n}$ that Paterson's theorem needs and the $\sqrt{n} \log n$ that tree evaluation uses
 ([the space ladder](findings/complexity/space-ladder.md)).
 

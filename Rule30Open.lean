@@ -173,9 +173,13 @@ public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Frames.SeedPastRing
 public import Rule30Open.Frames.SeedPastTable
+public import Rule30Open.Frames.StripeClasses
+public import Rule30Open.Frames.StripeClassCount
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
+public import Rule30Open.Analogs.SymmetricAxes
 public import Rule30Open.RandomRows.LeftWindow
+public import Rule30Open.RandomRows.LightLikeEntropy
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth
@@ -189,6 +193,8 @@ public import Rule30Open.Complexity.CertificateLower
 public import Rule30Open.Complexity.RingImages
 public import Rule30Open.Complexity.TwoIndex
 public import Rule30Open.Complexity.LeftCutRank
+public import Rule30Open.Complexity.LateSeedCut
+public import Rule30Open.Complexity.LateSeedCutWide
 public import Rule30Open.Complexity.ParityLift
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
