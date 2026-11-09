@@ -10,23 +10,23 @@ evidence: [computations/relaxed_game.py, computations/relaxed_game.c, tests/test
 # The relaxed driver game G has value about 0.63 T to T = 180, its lemmas reduce a black density below 1 to a charging property, and every such bound contains a positive density for one explicit orbit, Rule 30 beside a cell held black
 
 **Question.** The conjecture $S_B$ of [driver density](../../findings/diagonals/driver-density.md) bounds the black
-cells of every center column that the single cell's left half allows by $\rho T + C$ with $\rho < 1$. Can it be
-proved through a simpler game in which the controller harvests black pairs, and if not, where does the proof stop?
+cells of every center column that the single cell's left half allows by $\rho T + C$ with $\rho < 1$. Can it be proved
+through a simpler game in which the controller harvests black pairs, and if not, where does the proof stop?
 
-**The game.** The left half $x$ (cells $-1, -2, \dots$) starts white. At each time $t$ the controller picks
-$e(t) \in \{0, 1\}$, with $e(t) = 1$ allowed only when $x_{-1}(t) = 0$, and the left half takes one Rule 30 step with
-cell 0 equal to $e(t)$. The payoff of a play of $T$ moves is $\#\{t < T : e(t) = 1\}$, and $E(T)$ is its largest value.
-Conjecture $S_G$: $E(T) \le \rho T + C$ for some $\rho < 1$.
+**The game.** The left half $x$ (cells $-1, -2, \dots$) starts white. At each time $t$ the controller picks $e(t) \in
+\{0, 1\}$, with $e(t) = 1$ allowed only when $x_{-1}(t) = 0$, and the left half takes one Rule 30 step with cell 0 equal
+to $e(t)$. The payoff of a play of $T$ moves is $\#\{t < T : e(t) = 1\}$, and $E(T)$ is its largest value. Conjecture
+$S_G$: $E(T) \le \rho T + C$ for some $\rho < 1$.
 
 **The reduction.** For a driver $c$ of $\Lambda_L$ put $e(t) = c(t) \land c(t + 1)$. The left half sees $c(t)$ only
-through $x_{-1}(t) \lor c(t)$, and $x_{-1} \lor c = x_{-1} \lor e$ in both cases ($c(t) = 0$ gives $e(t) = 0$;
-$c(t) = 1$ gives $c(t + 1) = \lnot x_{-1}(t)$, so $e(t) = \lnot x_{-1}(t)$ and both ORs are 1). So $e$ is a play of G
-that drives the same left half, and $e(t) = 1$ exactly at the black pairs of $c$. A black run of length $L$ holds
-$L - 1$ black pairs and the runs are separated by white cells, so the black cells $B$ among $c(0), \dots, c(T - 1)$
-satisfy $B \le (E + T + 1)/2$. Hence $S_G$ implies $S_B$, and gives the single cell's center column white cells of
-lower density at least $(1 - \rho)/2$. Proposition 3(e) of [the first moment](../../findings/diagonals/driver-first-moment.md)
-is the converse direction over $\Lambda_L$ alone: $S_B$ holds exactly when the black pairs of every driver of
-$\Lambda_L$ number at most $\rho' T + C'$; G lets the controller choose them freely.
+through $x_{-1}(t) \lor c(t)$, and $x_{-1} \lor c = x_{-1} \lor e$ in both cases ($c(t) = 0$ gives $e(t) = 0$; $c(t) =
+1$ gives $c(t + 1) = \lnot x_{-1}(t)$, so $e(t) = \lnot x_{-1}(t)$ and both ORs are 1). So $e$ is a play of G that
+drives the same left half, and $e(t) = 1$ exactly at the black pairs of $c$. A black run of length $L$ holds $L - 1$
+black pairs and the runs are separated by white cells, so the black cells $B$ among $c(0), \dots, c(T - 1)$ satisfy $B
+\le (E + T + 1)/2$. Hence $S_G$ implies $S_B$, and gives the single cell's center column white cells of lower density at
+least $(1 - \rho)/2$. Proposition 3(e) of [the first moment](../../findings/diagonals/driver-first-moment.md) is the
+converse direction over $\Lambda_L$ alone: $S_B$ holds exactly when the black pairs of every driver of $\Lambda_L$
+number at most $\rho' T + C'$; G lets the controller choose them freely.
 
 ## Outcome
 
@@ -40,16 +40,17 @@ $t$ to its cells $-1, \dots, -(T - t)$, the only cells that later moves can read
 
 A beam that keeps the 20,000 best states equals $E(T)$ at every even $T \le 180$; with 60,000 states it gives the lower
 bound $E(3{,}000) \ge 1{,}994$ (0.6647). The greedy play, $e = 1$ whenever allowed, has payoff 9,959 at $T = 20{,}000$
-(0.4980), so the best plays are greedy between a few skips.
+(0.4980), well below the best plays found.
 
-**Lemmas** (proved on paper, each checked exhaustively on all rows or words of the width stated, `relaxed_game
-lemmas`). Write $m(x)$ for the length of the longest prefix of cells $-1, -2, \dots$ that reads $0, 1, 0, 1, \dots$
-(phase A).
+**Lemmas** (proved on paper and checked by `relaxed_game lemmas`: L1 to L3, L6 and L7 exhaustively on the widths stated,
+L4 and L5 on 60 random plays of 80 moves, and L4 also in its rest-frame form on every word of 14 cells). Write $m(x)$
+for the length of the longest prefix of cells $-1, -2, \dots$ that reads $0, 1, 0, 1, \dots$ (phase A).
 
 - **L1 (runs).** From a left half $x$, $e = 1$ can be played $k$ times in a row exactly when $m(x) \ge k$, and $m$
   drops by exactly one at each such step. (All rows of width 16.)
 - **L2, L3 (erosion and the right end).** An alternating stretch loses its left end cell at every step, whatever lies
-  beyond, and its rightmost black cell advances by 0, 2 or 4 cells, by 4 exactly over $0\,0\,0\,1$. (All 262,208
+  beyond, and its rightmost black cell advances by 0, 2 or 4 cells, and by 4 exactly when the stretch ends black and the four
+  cells after its repeated end cell read $0\,0\,0\,1$. (All 262,208
   stretches in words of 18 cells.)
 - **L4 (moving frame).** Index cell $-k$ at time $t$ by $n = k + t$ and put
   $P_n(t) = x_{-k}(t) \oplus [k \text{ even}]$. Then $P_n(t + 1) = P_n(t) \oplus [\text{cells } n - 1 \text{ and }
@@ -59,8 +60,10 @@ lemmas`). Write $m(x)$ for the length of the longest prefix of cells $-1, -2, \d
   evolves independently of the controller. (By L4, no cell of a stretch is preceded by two white cells.)
 - **L6, L7 (backward trapezoid and slope 3/5).** If a row alternates on the cells $p, \dots, q$ with $q - p \ge 4$, it
   alternated on $p - 1, \dots, q - 4$ one step earlier, so a long prefix was born long before, far from cell 0, inside
-  the light cone, and $m(x(a)) \le (3a + 9)/5$ in every play: the kit's black-run slope 3/5 (its main branch) in the
-  language of G. (All words of 16 cells; every state reachable at $t \le 100$, where the largest prefix
+  the light cone, and $m(x(a)) \le (3a + 9)/5$ in every play. L6 is `Rule30BlackRunErosion.erode_step_pat` on the kit's main branch,
+  stated there for the rows of the single cell. L7 is that module's black-run slope 3/5 in the language of G
+  (`black_run_le_erosion`: a black center run of length $L$ from time $a \ge 1$ has $L + 2\lfloor (a - 1)/5 \rfloor
+  \le a$). (All words of 16 cells; every state reachable at $t \le 100$, where the largest prefix
   is 12 at $t = 60$ and 16 at $t = 100$.)
 - **L8 (accounting).** For every play,
   $$\#\{t < T : e(t) = 0\} = \#\{t \le T - 2 : x_{-2}(t) = 0\} + 2W + [x_{-1}(T - 1) = 0 = e(T - 1)],$$
@@ -85,13 +88,13 @@ lemmas`). Write $m(x)$ for the length of the longest prefix of cells $-1, -2, \d
   black cells of lower density at least $1 - \rho$ (`relaxed_game greedy`: 10,041 black among its first 20,000 cells,
   19,997 among 40,000, 0.4999, and no period up to 5,000 in the last 20,000). The same holds for $S_B$ and the greedy
   driver of $\Lambda_L$, black whenever the next value is free: 2,014 black cells among $c(0), \dots, c(3{,}000)$
-  (0.6711) and 13,346 among $c(0), \dots, c(20{,}000)$ (0.6673). Nothing in the kit or this repository proves a
-  positive density of a color in a column of any explicit Rule 30 orbit; the kit's density results hold for almost
+  (0.6711) and 13,346 among $c(0), \dots, c(20{,}000)$ (0.6673). Nothing in the kit or this repository proves a positive density of a color in a column that is not eventually
+  periodic, for any Rule 30 orbit from a finite start; the kit's density results hold for almost
   every row. For this orbit column $-1$ is not eventually constant (Jen's theorem for driven left halves, the kit's
-  `Rule30DrivenLeft`), and each color occurs at least about $\log_{8/5} T$ times by L7.
+  `Rule30DrivenLeft`), and each color occurs at least about $\log_{8/5} T$ times: black by L7, which bounds the white runs, and white by L6
+  applied to the stretch $1, 0, 1, \dots$ at cells $-1, -2, \dots$ that a black run of column $-1$ forces.
 - **(B2) The kinematics allow density 1.** A schedule of harvests whose far ends grow by the factor $8/5$, each run
-  born inside the light cone and brought to cell $-1$ at the front speed of L3, satisfies the conclusions of L1 to L7
-  and has a density of ones $1 - O(\log T / T)$. So a proof must use what the dynamics do behind a stretch (which L5
+  born inside the light cone and brought to cell $-1$ at the front speed of L3, is, as a sketch, consistent with the conclusions of L1 to L7 and has a density of ones $1 - O(\log T / T)$. So a proof must use what the dynamics do behind a stretch (which L5
   says nothing about), not only how fast things move.
 - **(B3) Charging over windows proportional to the run weakens with time.** The fewest zeros in the $2k$ moves before a
   prefix of length $k$, from a state reachable at time $s$ (`relaxed_game costs`): for $k = 14$, 14, 10 and 5 at
@@ -99,18 +102,19 @@ lemmas`). Write $m(x)$ for the length of the longest prefix of cells $-1, -2, \d
   back, as the windows of [driver density](../../findings/diagonals/driver-density.md) already suggest; the potential
   route stops at the same point ([driver-density potentials](driver-density-potential.md)).
 
-**What it means.** G is a clean relaxation with exact laws (L1 to L9), and its best plays sit at about 0.665 per move,
-well below 1; but no argument that bounds every play can avoid bounding the greedy play, which is one deterministic
-orbit of Rule 30 on a half line. So a proof of $S_G$ or $S_B$ is at least a proof that one explicit orbit has a column
-with a positive density of a color, a statement of the kind Problem 2 asks for.
+**What it means.** G is a clean relaxation with exact laws (L1 to L9), and the best plays found sit at about 0.665 per
+move to $T = 3{,}000$ (a lower bound; the exact values to $T = 180$ are about 0.63), well below 1; but no argument that
+bounds every play can avoid bounding the greedy play, which is one deterministic orbit of Rule 30 on a half line. So a
+proof of $S_G$ or $S_B$ is at least a proof that one explicit orbit has a column with a positive density of a color, a
+statement of the kind Problem 2 asks for.
 
 ## Reproduce
 
 ```bash
-python -m computations.relaxed_game values                                  # E(t) to t = 150: about 15 s
+python -m computations.relaxed_game values --steps 150                      # E(t) to t = 150: about 15 s
 python -m computations.relaxed_game values --steps 180                      # to t = 180: about 4 min, 2 GB
 python -m computations.relaxed_game beam --steps 3000 --width 60000         # the lower bound at 3,000: about 6 min
-python -m computations.relaxed_game beam --steps 180 --width 20000 --check  # the beam against E(t) to 180: about 1 min
+python -m computations.relaxed_game beam --steps 180 --width 20000 --check 180  # the beam against E(t) to 180: about 3 min, 2 GB
 python -m computations.relaxed_game greedy                                  # B1's orbit to 40,000: a few seconds
 python -m computations.relaxed_game lemmas                                  # L1 to L7: a few seconds
 python -m computations.relaxed_game costs --times 100 --width 44 --cells 64 # B3 at s = 100: about 2 min

@@ -9,21 +9,22 @@ evidence: [computations/two_index.py, tests/test_two_index.py, computations/righ
 
 # The right-edge cycle length L_n of the single cell doubles at 36 of the levels n ≤ 84 and reaches 2^36, about 2^(0.43 n), and two exact parities decide whether a stall of the period lasts one diagonal, two, or more; L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic
 
-Read row $t$ of the single black cell leftward from its right edge as the binary number $h(t) = \Phi^t(1)$,
-$\Phi(x) = x \oplus (2x \lor 4x)$ (the kit's `TFunction`): bit $j$ is the cell $(t, t - j)$, on the right diagonal $R_j$.
-Let $L_n$ be the cycle length of 1 under $\Phi$ modulo $2^n$. Then $L_n$ is the least period of $R_{n-1}$, and of every
-$R_i$, $i < n$, together (the kit's `TFunctionCycles.seed_rows_return_iff` with `Rule30RightPeriods.per_mono_all`); it is
-a power of two that doubles from level $n$ to $n + 1$ exactly when the input $g_n = R_{n-1} \lor R_{n-2}$ of the next
-diagonal has an odd number of black cells in one cycle (the kit's `TFunctionCycles.lift_iff`, `Rule30RightPeriods.e_step`),
-where $R_j(t + 1) = R_j(t) \oplus g_j(t)$. Let $W(2^m)$ be the number of white cells immediately left of the right edge at
+Read row $t$ of the single black cell leftward from its right edge as the binary number $h(t) = \Phi^t(1)$, $\Phi(x) = x
+\oplus (2x \lor 4x)$ (the kit's `TFunction`): bit $j$ is the cell $(t, t - j)$, on the right diagonal $R_j$. Let $L_n$
+be the cycle length of 1 under $\Phi$ modulo $2^n$. Then $L_n$ is the least period of $R_{n-1}$, and of every $R_i$, $i
+< n$, together (the kit's `TFunctionCycles.seed_rows_return_iff` with `Rule30RightPeriods.per_mono_all`); it is a power
+of two that doubles from level $n$ to $n + 1$ exactly when the input $g_n = R_{n-1} \lor R_{n-2}$ of the next diagonal
+has an odd number of black cells in one cycle (the kit's `TFunctionCycles.lift_iff`, `Rule30RightPeriods.e_step`), where
+$R_j(t + 1) = R_j(t) \oplus g_j(t)$. Let $W(2^m)$ be the number of white cells immediately left of the right edge at
 time $2^m$.
 
-Write $P_j = L_{j+1}$ for the least period of $R_j$, and say that diagonal $j \ge 1$ *doubles* when $P_j = 2P_{j-1}$, that
-is when $L$ doubles at level $j + 1$. Write $J_k = W(2^k)$: by the kit's `Rule30RightPeriods.per_iff_gap` it is the last
-diagonal whose period divides $2^k$, so $L_n \le 2^k$ if and only if $J_k \ge n - 1$. The diagonals of least period
-$2^{k+1}$ are $J_k + 1, \dots, J_{k+1}$; call them the *stall* at period $2^{k+1}$, of length $d_k = J_{k+1} - J_k$. Diagonal
-$J_k + 1$ doubles and opens it. $\Phi$ is a bijection of the 2-adic integers, so $h(\tau) = \Phi^\tau(1)$ is defined for
-every integer $\tau$; for $\tau < 0$ it is the single cell's past ([the seed's past](../frames/seed-past.md)).
+Write $P_j = L_{j+1}$ for the least period of $R_j$, and say that diagonal $j \ge 1$ *doubles* when $P_j = 2P_{j-1}$,
+that is when $L$ doubles at level $j + 1$. Write $J_k = W(2^k)$: by the kit's `Rule30RightPeriods.per_iff_gap` it is the
+last diagonal whose period divides $2^k$, so $L_n \le 2^k$ if and only if $J_k \ge n - 1$. The diagonals of least period
+$2^{k+1}$ are $J_k + 1, \dots, J_{k+1}$; call them the *stall* at period $2^{k+1}$, of length $d_k = J_{k+1} - J_k$.
+Diagonal $J_k + 1$ doubles and opens it. $\Phi$ is a bijection of the 2-adic integers, so $h(\tau) = \Phi^\tau(1)$ is
+defined for every integer $\tau$; for $\tau < 0$ it is the single cell's past ([the seed's
+past](../frames/seed-past.md)).
 
 ## Result
 
@@ -111,8 +112,8 @@ every integer $\tau$; for $\tau < 0$ it is the single cell's past ([the seed's p
 ## Proofs
 
 **Facts used.** For $f$ of period $P = 2^e$ write $f(t) = \sum_{k < P} a_k(f) \binom{t}{k} \bmod 2$ and $K(f)$ for the
-largest $k$ with $a_k(f) = 1$. By Lucas $\binom{t}{k}$ is odd if and only if every binary digit of $k$ is a digit of $t$,
-so $a_k(f)$ is the sum of $f(s)$ over the $s$ whose digits are digits of $k$, and:
+largest $k$ with $a_k(f) = 1$. By Lucas $\binom{t}{k}$ is odd if and only if every binary digit of $k$ is a digit of
+$t$, so $a_k(f)$ is the sum of $f(s)$ over the $s$ whose digits are digits of $k$, and:
 
 - (F1) $f$ has period $2^b$, $b \le e$, if and only if $K(f) < 2^b$;
 - (F2) $a_{P-1}(f)$ is the parity of $\sum_{t < P} f(t)$;
@@ -123,9 +124,9 @@ so $a_k(f)$ is the sum of $f(s)$ over the $s$ whose digits are digits of $k$, an
 From the pinned kit: $R_j(t + 1) = R_j(t) \oplus g_j(t)$ (`Rule30Diagonals.R_step`), and in `Rule30RightPeriods`, a
 doubling diagonal $j$ has $R_j(t + P_{j-1}) = \lnot R_j(t)$ (`antiperiod`); for $j \ge 3$ every period of $g_j$ is a
 multiple of $P_{j-1}$ (`inp_least_period`), and diagonal $j$ doubles if and only if $g_j$ has an odd number of black
-cells in $P_{j-1}$ (`S_rule`); $P_j$ is $P_{j-1}$ or $2P_{j-1}$ (`e_step`); $R_j(t) = 0$ for $2t < j$ and
-$R_j(\lceil j/2 \rceil) = 1$ for $j \ge 1$ (`R_lt`, `R_half`). The doubling diagonals are $1, 3, 4, 6, 7, \dots$:
-diagonal 2 does not double, so a doubling diagonal $i \ge 2$ has $i \ge 3$.
+cells in $P_{j-1}$ (`S_rule`); $P_j$ is $P_{j-1}$ or $2P_{j-1}$ (`e_step`); $R_j(t) = 0$ for $2t < j$ and $R_j(\lceil
+j/2 \rceil) = 1$ for $j \ge 1$ (`R_lt`, `R_half`). The doubling diagonals are $1, 3, 4, 6, 7, \dots$: diagonal 2 does
+not double, so a doubling diagonal $i \ge 2$ has $i \ge 3$.
 
 **Lemma 1 (top-bit decomposition).** Let $f$ have period $P = 2H \ge 2$ and put $Df(t) = f(t + H) \oplus f(t)$, of
 period $H$. Then $a_{H + k}(f) = a_k(Df)$ for $0 \le k < H$, the right side taken on $\mathbb{Z}/H$. So $f$ has period
@@ -133,15 +134,15 @@ $H$ if and only if $Df = 0$; otherwise $K(f) = H + K(Df)$; and $K(f) = H$ if and
 every $t$.
 
 *Proof.* For $0 \le t < H$ and $k < H$, Lucas gives $\binom{t + H}{k} \equiv \binom{t}{k}$ ($k$ has no digit $H$),
-$\binom{t}{H + k} \equiv 0$ and $\binom{t + H}{H + k} \equiv \binom{t}{k}$. Subtracting the expansions at $t + H$ and $t$
-gives $Df(t) = \sum_{k < H} a_{H+k}(f) \binom{t}{k}$ for $0 \le t < H$, which is the expansion of $Df$ on $\mathbb{Z}/H$.
-Then $Df = 0$ if and only if $a_k(f) = 0$ for every $k \ge H$, that is (F1) period $H$; and $K(Df) = 0$ with $Df \ne 0$
-means $Df \equiv 1$. $\square$ The kit's `Rule30DifferenceOrder.difs_two_pow` and `difs_add` state the same in difference
-form: the $H$-th difference of $f$ is $Df$.
+$\binom{t}{H + k} \equiv 0$ and $\binom{t + H}{H + k} \equiv \binom{t}{k}$. Subtracting the expansions at $t + H$ and
+$t$ gives $Df(t) = \sum_{k < H} a_{H+k}(f) \binom{t}{k}$ for $0 \le t < H$, which is the expansion of $Df$ on
+$\mathbb{Z}/H$. Then $Df = 0$ if and only if $a_k(f) = 0$ for every $k \ge H$, that is (F1) period $H$; and $K(Df) = 0$
+with $Df \ne 0$ means $Df \equiv 1$. $\square$ The kit's `Rule30DifferenceOrder.difs_two_pow` and `difs_add` state the
+same in difference form: the $H$-th difference of $f$ is $Df$.
 
 **Item 5(a).** Let $j \ge 1$. $R_j$ does not have period $P_j/2$, so $K_j \ge P_j/2$ by (F1). If $j$ doubles,
-`antiperiod` and Lemma 1 give $K_j = P_j/2$. If $j \ge 3$ does not double and $K_j = H = P_j/2$, Lemma 1 gives
-$R_j(t + H) = \lnot R_j(t)$ for every $t$, so $g_j(t) = R_j(t + 1) \oplus R_j(t)$ has the period $H = P_{j-1}/2$, against
+`antiperiod` and Lemma 1 give $K_j = P_j/2$. If $j \ge 3$ does not double and $K_j = H = P_j/2$, Lemma 1 gives $R_j(t +
+H) = \lnot R_j(t)$ for every $t$, so $g_j(t) = R_j(t + 1) \oplus R_j(t)$ has the period $H = P_{j-1}/2$, against
 `inp_least_period`. $\square$
 
 **Theorem A (the diagonal after a doubling).** Let diagonal $i \ge 3$ double, $H = P_{i-1}$, $P = P_i = 2H$.
@@ -151,12 +152,12 @@ $R_j(t + H) = \lnot R_j(t)$ for every $t$, so $g_j(t) = R_j(t + 1) \oplus R_j(t)
 - (ii) If it does not, then $D_{i+1}(t) = R_{i+1}(t + H) \oplus R_{i+1}(t)$ is $R_{i+1}(H) \oplus S(\lnot R_{i-1})$, and
   $K_{i+1} = H + K_{i-1} + 1$, that is $v_{i+1} = v_{i-1} - 1$.
 
-*Proof.* `antiperiod` gives $R_i(t + H) = \lnot R_i(t)$, and $R_{i-1}$ has period $H$. For bits,
-$(\lnot a \lor b) \oplus (a \lor b) = \lnot b$, so $g_{i+1}(t + H) \oplus g_{i+1}(t) = \lnot R_{i-1}(t)$. Hence the number
-of black cells of $g_{i+1}$ in $P$ has the parity of $\sum_{t < H} \lnot R_{i-1}(t) = H - \sum_{t < H} R_{i-1}(t)$, and
-$H \ge 2$ is even; with `S_rule` at $i + 1 \ge 4$ this is the first equivalence of (i), and (F2) with (F1) gives the
-others. For (ii), $D_{i+1}(t + 1) \oplus D_{i+1}(t) = \lnot R_{i-1}(t)$ gives $D_{i+1} = R_{i+1}(H) \oplus S(\lnot R_{i-1})$.
-Now $\lnot R_{i-1}$ has an even number of black cells in $H$, and it is not constant ($i - 1 \ge 2$, `R_lt`, `R_half`), so
+*Proof.* `antiperiod` gives $R_i(t + H) = \lnot R_i(t)$, and $R_{i-1}$ has period $H$. For bits, $(\lnot a \lor b)
+\oplus (a \lor b) = \lnot b$, so $g_{i+1}(t + H) \oplus g_{i+1}(t) = \lnot R_{i-1}(t)$. Hence the number of black cells
+of $g_{i+1}$ in $P$ has the parity of $\sum_{t < H} \lnot R_{i-1}(t) = H - \sum_{t < H} R_{i-1}(t)$, and $H \ge 2$ is
+even; with `S_rule` at $i + 1 \ge 4$ this is the first equivalence of (i), and (F2) with (F1) gives the others. For
+(ii), $D_{i+1}(t + 1) \oplus D_{i+1}(t) = \lnot R_{i-1}(t)$ gives $D_{i+1} = R_{i+1}(H) \oplus S(\lnot R_{i-1})$. Now
+$\lnot R_{i-1}$ has an even number of black cells in $H$, and it is not constant ($i - 1 \ge 2$, `R_lt`, `R_half`), so
 $K(\lnot R_{i-1}) = K_{i-1} \ge 1$ and, by (F3), $K(D_{i+1}) = K_{i-1} + 1$. $R_{i+1}$ has least period $P$ (`e_step`),
 so Lemma 1 gives $K_{i+1} = H + K_{i-1} + 1$. $\square$
 
@@ -169,54 +170,53 @@ In the kit's main branch at commit
 inequality $v_{i-1} \le v_{i+1} + 1$, `order_countdown`.
 
 **Item 5(c), the bound.** Let $i \ge 3$ double and $i + 1$ not. Diagonal 4 doubles, so $i \ge 4$ and $i - 1 \ge 3$, and
-by (a) $K_{i-1} \ge P_{i-1}/2$ with equality if and only if $i - 1$ doubles. Theorem A(ii) gives
-$K_{i+1} = H + K_{i-1} + 1 \ge 3H/2 + 1 = 3P_{i+1}/4 + 1$ with $H = P_{i-1}$, and equality if and only if $i - 1$ doubles.
-The only first diagonal after a doubling with $P_j < 8$ is $j = 2$, after diagonal 1. $\square$
+by (a) $K_{i-1} \ge P_{i-1}/2$ with equality if and only if $i - 1$ doubles. Theorem A(ii) gives $K_{i+1} = H + K_{i-1}
++ 1 \ge 3H/2 + 1 = 3P_{i+1}/4 + 1$ with $H = P_{i-1}$, and equality if and only if $i - 1$ doubles. The only first
+diagonal after a doubling with $P_j < 8$ is $j = 2$, after diagonal 1. $\square$
 
 **Lemma 2 (half-period differences in a stall).** Let diagonal $m \ge 3$ double, $P = P_m = 2H$, and let $i \ge m + 1$
-with $P_{i-1} = P$. For every diagonal $l$ whose period divides $P$ put $D_l(t) = R_l(t + H) \oplus R_l(t)$ (so $D_l = 0$
-when $P_l$ divides $H$, and $D_m \equiv 1$), and put $\Gamma_i(t) = g_i(t + H) \oplus g_i(t)$. Then
+with $P_{i-1} = P$. For every diagonal $l$ whose period divides $P$ put $D_l(t) = R_l(t + H) \oplus R_l(t)$ (so $D_l =
+0$ when $P_l$ divides $H$, and $D_m \equiv 1$), and put $\Gamma_i(t) = g_i(t + H) \oplus g_i(t)$. Then
 
 - (a) $\Gamma_i = D_{i-1}(1 \oplus R_{i-2}) \oplus D_{i-2}(1 \oplus R_{i-1}) \oplus D_{i-1} D_{i-2}$;
 - (b) $\Gamma_i$ has period $H$, and diagonal $i$ doubles if and only if $\sum_{t < H} \Gamma_i(t)$ is odd;
 - (c) if diagonal $i$ does not double, then $D_i = R_i(H) \oplus S\Gamma_i$, $\Gamma_i \ne 0$, and
   $K_i = H + 1 + K(\Gamma_i)$, $K(\Gamma_i)$ taken on $\mathbb{Z}/H$.
 
-*Proof.* (a) For bits, $((a \oplus x) \lor (b \oplus y)) \oplus (a \lor b) = x(1 \oplus b) \oplus y(1 \oplus a) \oplus xy$
-(expand $p \lor q = p \oplus q \oplus pq$ on both sides); apply it with $a = R_{i-1}(t)$, $b = R_{i-2}(t)$,
-$x = D_{i-1}(t)$, $y = D_{i-2}(t)$, since $R_l(t + H) = R_l(t) \oplus D_l(t)$. (b) $g_i$ has period $P$, so
-$\Gamma_i(t + H) = \Gamma_i(t)$, and the number of black cells of $g_i$ in $P$ has the parity of $\sum_{t < H}(g_i(t) +
-g_i(t + H))$, that is of $\sum_{t < H} \Gamma_i(t)$; apply `S_rule`. (c) $D_i(t + 1) \oplus D_i(t) = \Gamma_i(t)$ and
-$D_i(0) = R_i(H)$, so $D_i = R_i(H) \oplus S\Gamma_i$. If $\Gamma_i = 0$, $g_i$ has period $H < P_{i-1}$, against
+*Proof.* (a) For bits, $((a \oplus x) \lor (b \oplus y)) \oplus (a \lor b) = x(1 \oplus b) \oplus y(1 \oplus a) \oplus
+xy$ (expand $p \lor q = p \oplus q \oplus pq$ on both sides); apply it with $a = R_{i-1}(t)$, $b = R_{i-2}(t)$, $x =
+D_{i-1}(t)$, $y = D_{i-2}(t)$, since $R_l(t + H) = R_l(t) \oplus D_l(t)$. (b) $g_i$ has period $P$, so $\Gamma_i(t + H)
+= \Gamma_i(t)$, and the number of black cells of $g_i$ in $P$ has the parity of $\sum_{t < H}(g_i(t) + g_i(t + H))$,
+that is of $\sum_{t < H} \Gamma_i(t)$; apply `S_rule`. (c) $D_i(t + 1) \oplus D_i(t) = \Gamma_i(t)$ and $D_i(0) =
+R_i(H)$, so $D_i = R_i(H) \oplus S\Gamma_i$. If $\Gamma_i = 0$, $g_i$ has period $H < P_{i-1}$, against
 `inp_least_period`. By (b) $\Gamma_i$ has an even number of black cells in $H$, so $K(D_i) = K(\Gamma_i) + 1 \ge 1$ by
 (F3), and $R_i$ has least period $P$, so $K_i = H + K(D_i)$ by Lemma 1. $\square$
 
 At $i = m + 1$, where $D_{i-1} = D_m \equiv 1$ and $D_{i-2} = 0$, this is Theorem A.
 
 **Theorem B (the second diagonal after a doubling).** Let diagonal $i \ge 3$ double and $i + 1$ not, $P = P_i = 2H$.
-Then diagonal $i + 2$ doubles if and only if $\sum_{t < H} R_{i+1}(t) + \sum_{t < H} R_i(t) D_{i+1}(t)$ is odd; if it does
-not, $K_{i+2} = H + 1 + K(\Gamma)$ with $\Gamma = \lnot R_{i+1} \oplus R_i D_{i+1}$ on $\mathbb{Z}/H$.
+Then diagonal $i + 2$ doubles if and only if $\sum_{t < H} R_{i+1}(t) + \sum_{t < H} R_i(t) D_{i+1}(t)$ is odd; if it
+does not, $K_{i+2} = H + 1 + K(\Gamma)$ with $\Gamma = \lnot R_{i+1} \oplus R_i D_{i+1}$ on $\mathbb{Z}/H$.
 
-*Proof.* Lemma 2(a) at $i + 2$, with $D_i \equiv 1$, gives
-$\Gamma_{i+2} = D_{i+1}(1 \oplus R_i) \oplus (1 \oplus R_{i+1}) \oplus D_{i+1} = \lnot R_{i+1} \oplus R_i D_{i+1}$. Its
-number of black cells in $H$ has the parity of $H + \sum R_{i+1} + \sum R_i D_{i+1}$, and $H$ is even; apply Lemma 2(b)
-and (c). $\square$
+*Proof.* Lemma 2(a) at $i + 2$, with $D_i \equiv 1$, gives $\Gamma_{i+2} = D_{i+1}(1 \oplus R_i) \oplus (1 \oplus
+R_{i+1}) \oplus D_{i+1} = \lnot R_{i+1} \oplus R_i D_{i+1}$. Its number of black cells in $H$ has the parity of $H +
+\sum R_{i+1} + \sum R_i D_{i+1}$, and $H$ is even; apply Lemma 2(b) and (c). $\square$
 
 With $D_{i+1} = R_{i+1}(H) \oplus S(\lnot R_{i-1})$ (Theorem A) and $R_{i+1} = S g_{i+1}$, the parity of Theorem B is a
 function of $R_i$ on $[0, H)$ and of $R_{i-1}$ alone; all four combinations of its two sums occur for $j \le 65$.
 
-**Item 6.** Let $k \ge 1$; then $i = J_k + 1 \ge 3$ doubles and $P_i = 2^{k+1}$, $P_{i-1} = 2^k = H$. The stall has
-$d_k = 1$ if and only if $i + 1$ doubles, which is Theorem A(i) with $R_{i-1} = R_{J_k}$. Otherwise $d_k = 2$ if and only
-if $i + 2$ doubles, which is Theorem B. Otherwise the diagonals $i + 1$ and $i + 2$ do not double, and Lemma 2(b)
-decides each later diagonal of period $P_i$ and the one that ends the stall. $\square$
+**Item 6.** Let $k \ge 1$; then $i = J_k + 1 \ge 3$ doubles and $P_i = 2^{k+1}$, $P_{i-1} = 2^k = H$. The stall has $d_k
+= 1$ if and only if $i + 1$ doubles, which is Theorem A(i) with $R_{i-1} = R_{J_k}$. Otherwise $d_k = 2$ if and only if
+$i + 2$ doubles, which is Theorem B. Otherwise the diagonals $i + 1$ and $i + 2$ do not double, and Lemma 2(b) decides
+each later diagonal of period $P_i$ and the one that ends the stall. $\square$
 
 **Item 7 (Theorem C).** $\Phi$ is a bijective isometry of the 2-adic integers: bit $j$ of $\Phi(y)$ is $y_j$ plus a
-function of lower bits (the kit's `Rule30Equivalents.Odometer`, `G_bijective` and `agree_G_iff`). So
-$v_2(\Phi(x) - \Phi(y)) = v_2(x - y)$, and the same holds for every power $\Phi^b$, $b \in \mathbb{Z}$. Hence
-$v_2(h(a) - h(b)) = v_2\big(\Phi^b(h(a - b)) - \Phi^b(h(0))\big) = v_2(h(a - b) - 1)$, and by symmetry we may take
-$\tau = a - b > 0$, $\tau = 2^k u$ with $u$ odd. The kit's `Rule30RightPeriods.rows_at_powers_of_two` says that row
-$2^k u$ reads $1\,0^J\,1$ leftward from its right edge, where $J$ is the last diagonal of period $2^k$, that is $J_k$
-(`per_iff_gap`). So $v_2(h(\tau) - 1) = J_k + 1$. The case $a = 2^k$, $b = -2^k$ has $v_2(a - b) = k + 1$. $\square$
+function of lower bits (the kit's `Rule30Equivalents.Odometer`, `G_bijective` and `agree_G_iff`). So $v_2(\Phi(x) -
+\Phi(y)) = v_2(x - y)$, and the same holds for every power $\Phi^b$, $b \in \mathbb{Z}$. Hence $v_2(h(a) - h(b)) =
+v_2\big(\Phi^b(h(a - b)) - \Phi^b(h(0))\big) = v_2(h(a - b) - 1)$, and by symmetry we may take $\tau = a - b > 0$, $\tau
+= 2^k u$ with $u$ odd. The kit's `Rule30RightPeriods.rows_at_powers_of_two` says that row $2^k u$ reads $1\,0^J\,1$
+leftward from its right edge, where $J$ is the last diagonal of period $2^k$, that is $J_k$ (`per_iff_gap`). So
+$v_2(h(\tau) - 1) = J_k + 1$. The case $a = 2^k$, $b = -2^k$ has $v_2(a - b) = k + 1$. $\square$
 
 **Item 8 (Proposition D).** For $\lambda > 1$, $J_k + C/(\lambda - 1)$ grows at most by the factor $\lambda$ per step
 for $k \ge k_0$, so $J_k \le A \lambda^k$ for some $A$ and every $k$. $L_n = 2^{k(n)}$ with $k(n)$ the least $k$ with
@@ -230,31 +230,35 @@ with `Rule30RightPeriods.antiperiod`), the forward half of Theorem A(i) (`order_
 Theorem A(ii) (`order_countdown`), Lemma 1 in difference form (`difs_two_pow`, `difs_add`), and the facts the proofs
 use. Its main branch at commit 368d1c7 has Theorem A in full (`Rule30ClosingLaw.order_countdown_exact_or`,
 `not_period_two_mul_of_order_zero_or`), the count of the orders along alternating runs of doublings (`closing_run`,
-`closing_law_or`; the countdown 8190, 8189, 8188, 8187 of item 5(d)) and `no_1101011`. Neither has the strict
+`closing_law_or`; the countdown 8190, 8189, 8188, 8187 of item 5(d)) and `no_1101011`. Kit main after that commit adds
+`Rule30ConeCube`, whose `d j` is $J_j + 1$: with `per_mono_all`, its `per_below_d`, `not_per_d`, `fresh_digit` and
+`period_d` give item 7 for times $a, b \ge 0$ (two lines from `per_iff_gap` and `antiperiod` in the pinned kit as well).
+It also adds `Rule30RightProfiles.rightDiag_shift_law`, which decides after the doubling letters 1 0 1 whether the next
+diagonal doubles by a parity of the diagonal before the first doubling at its even times. Neither part has the strict
 inequality of item 5(a) at non-doubling diagonals (two lines from Lemma 1 and `inp_least_period`), Lemma 2 past the
-first diagonal of a stall, Theorem B, the anatomy of item 6, the agreement identity, Proposition D, or the data past
-$n = 61$.
+first diagonal of a stall, Theorem B, the anatomy of item 6, the agreement identity at negative times, Proposition D, or
+the data past $n = 61$.
 
 ## Method
 
-`computations/two_index.py` builds the diagonals by level lifting: $R_i(t)$ is the prefix XOR of its input
-$R_{i-1} \lor R_{i-2}$ over one cycle, tiled twice when the input has an odd number of black cells, so each level is one
-numpy prefix XOR and $n = 61$ takes about a second. The test checks the cycle lengths against iterating $\Phi$ modulo $2^n$ until 1
+`computations/two_index.py` builds the diagonals by level lifting: $R_i(t)$ is the prefix XOR of its input $R_{i-1} \lor
+R_{i-2}$ over one cycle, tiled twice when the input has an odd number of black cells, so each level is one numpy prefix
+XOR and $n = 61$ takes about a second. The test checks the cycle lengths against iterating $\Phi$ modulo $2^n$ until 1
 returns ($n \le 14$), the diagonals against a direct run of the rule table, and the white runs three ways (integer rows,
 cycle lengths, rule table) for $m \le 7$. The Mahler coefficients come from the Möbius transform over the bits of $t$,
 checked against a sum with `math.comb`.
 
-`computations/right_edge_runs.c` iterates $\Phi$ on 128-bit integers from 1 to time $2^{36}$ and prints $W(2^k)$ and
-the row at each time $2^k$, and the row at each time $2^{36} - 2^k$, which is $h(-2^k)$ modulo $2^{84}$ because
-$L_{84} = 2^{36}$; `computations/right_edge_runs.py` drives it and reads off the cycle lengths, the stalls and the
-agreement identity. Its `stall_laws` lifts the diagonals to period $2^{27}$ ($j \le 65$), computes each $K_j$ by
-Lemma 1 (halving the period while a difference survives) and checks every law above at every diagonal where it applies:
-item 5(a) at 64 diagonals, Theorem A(i) at 26 and (ii) at 18, Lemma 2(a) and (b) at 62 and (c) at 37, Theorem B at 17
-(and its formula for $K$ at 7), with no failure; it also prints the cases of items 5(c) and 5(d), the orders and the
-stalls. `tests/test_right_edge_runs.py` checks the C program against Python integers stepped one at a time and against
-the white runs and cycle lengths of `two_index` ($k \le 16$), its backward rows against $\Phi$ inverted bit by bit,
-the agreement identity for every pair of times in $[-24, 24]$, the degrees of Lemma 1 against the full Möbius transform,
-and the laws at every diagonal $j \le 46$.
+`computations/right_edge_runs.c` iterates $\Phi$ on 128-bit integers from 1 to time $2^{36}$ and prints $W(2^k)$ and the
+row at each time $2^k$, and the row at each time $2^{36} - 2^k$, which is $h(-2^k)$ modulo $2^{84}$ because $L_{84} =
+2^{36}$; `computations/right_edge_runs.py` drives it and reads off the cycle lengths, the stalls and the agreement
+identity. Its `stall_laws` lifts the diagonals to period $2^{27}$ ($j \le 65$), computes each $K_j$ by Lemma 1 (halving
+the period while a difference survives) and checks every law above at every diagonal where it applies: item 5(a) at 64
+diagonals, Theorem A(i) at 26 and (ii) at 18, Lemma 2(a) and (b) at 62 and (c) at 37, Theorem B at 17 (and its formula
+for $K$ at 7), with no failure; it also prints the cases of items 5(c) and 5(d), the orders and the stalls.
+`tests/test_right_edge_runs.py` checks the C program against Python integers stepped one at a time and against the white
+runs and cycle lengths of `two_index` ($k \le 16$), its backward rows against $\Phi$ inverted bit by bit, the agreement
+identity for every pair of times in $[-24, 24]$, the degrees of Lemma 1 against the full Möbius transform, and the laws
+at every diagonal $j \le 46$.
 
 ## Reproduce
 

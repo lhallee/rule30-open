@@ -36,7 +36,7 @@ crossing sequences. For one tape the rungs are, for every machine that computes 
 
 | Lower bound on the time $T(n)$ | Relation to the problems | Status |
 |---|---|---|
-| $T$ unbounded | equivalent to: $c$ has no eventual period that is a power of two; implied by Problem 1 | open; for $k \le 13$ the kit proves $T > k$ infinitely often, computed here for $k \le 20$ |
+| $T$ unbounded | equivalent to: $c$ has no eventual period that is a power of two; implied by Problem 1 | open; for $k \le 13$ the kit proves $T > k$ infinitely often, the period $2^k$ from $2^{k-1}$ is excluded in Lean here for $k \le 17$, computed here for $k \le 20$ |
 | $T(n) \ge \lfloor \log_2 n \rfloor + 2$ for every $n \ge 1$ | implies the first rung; not a consequence of Problems 1 and 2 | open; the kit proves it for $n < 16$, computed here for $n < 2^{16}$ |
 | $T(n) - \ell(n)$ unbounded | implies Problem 1 (the lemma) | open |
 | $T$ not $o(\ell \log \ell)$ | equivalent to: $c$ is not 2-automatic (the kit's `OneTapeRegular`, `OneTapeGap`) | open |
@@ -57,7 +57,14 @@ $k = 1, \dots, 20$, is $2^{k-1}$ plus
 | offset | 1 | 1 | 0 | 1 | 5 | 0 | 4 | 0 | 0 | 3 | 2 | 4 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
 
 so for every $k \le 20$ every machine computing $c$ takes more than $k$ steps on some input of the window and on
-infinitely many inputs (the kit's own bound stops at $k = 13$, from `Rule30FactorWindow`). The offsets show no pattern (a heuristic reading, not a
+infinitely many inputs (the kit's own bound stops at $k = 13$, from `Rule30FactorWindow`). For $k \le 17$ the rung is in
+Lean: the window bound $T + P \ge 262{,}125$ of [WideWindow](../../Rule30Open/Columns/WideWindow.md) excludes the period
+$2^k$ from $2^{k-1}$, since $3 \cdot 2^{16} < 262{,}125$ (`center_rung_le_seventeen` in
+[BinomialDuality](../../Rule30Open/Complexity/BinomialDuality.md)), so with the kit's `period_of_eventually_time_le`
+every machine computing $c$ takes more than $k$ steps on infinitely many inputs for $k \le 17$, joined on paper because
+that theorem is on the kit's main branch. The same offsets are the least witnesses of the dual statement for the
+binomial transform $\gamma(n) = \sum_{t \subseteq n} c(t) \bmod 2$, that $\gamma$ is not $2^{k-1}$-periodic from
+$2^k$, at every $k$ (Lean, the same entry). The offsets show no pattern (a heuristic reading, not a
 test): the first pair already differs for 9 of the 20 values of $k$, about half as for a random sequence, and no offset exceeds 5.
 For all $k$ this is the statement that $c$ has no eventual period $2^a$, which Problem 1 implies and nothing here
 proves.

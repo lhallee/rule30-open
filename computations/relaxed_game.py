@@ -20,13 +20,13 @@ drives the same left half, so G relaxes the driver game of `driver_density`.
 8. `lambda_values`: over Lambda_L, the most black cells M(T) and the most times with c(t) = c(t + 1) = 1, the count of
    Proposition 3(e) of `driver_counts` and the payoff of G on the plays that come from Lambda_L.
 
-    python -m computations.relaxed_game values                                  # E(t) to t = 150, about 15 s
+    python -m computations.relaxed_game values --steps 150                      # E(t) to t = 150, about 15 s
     python -m computations.relaxed_game values --steps 180                      # to t = 180, about 4 min, 2 GB
     python -m computations.relaxed_game beam                                    # T = 1,000, width 20,000, 20 s
     python -m computations.relaxed_game beam --steps 3000 --width 60000         # about 6 min, 1 GB
-    python -m computations.relaxed_game beam --steps 180 --width 20000 --check  # the beam against E(t), 1 min
+    python -m computations.relaxed_game beam --steps 180 --width 20000 --check 180  # against E(t), 3 min, 2 GB
     python -m computations.relaxed_game greedy                                  # B1's orbit to t = 40,000, 5 s
-    python -m computations.relaxed_game lemmas                                  # L1 to L7, about 1 min
+    python -m computations.relaxed_game lemmas                                  # L1 to L7, a few seconds
     python -m computations.relaxed_game reach                                   # N(t) and prefixes to 100, 10 s
     python -m computations.relaxed_game reach --steps 120                       # to t = 120, about 1 min, 1 GB
     python -m computations.relaxed_game windows                                 # s = 30, 60, 90, about 10 s

@@ -53,7 +53,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   and 150 the cause is exactly the seed's symmetry: a column of a finite row is eventually periodic if and only if the
   row is mirror-symmetric about it, so from the single cell the center is the only eventually periodic column of Rules
   90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
-  two steps being one step on each sublattice, neither of which Rule 30 has. A proof through the center cannot treat the
+  two steps being one step on each sublattice, neither of which Rule 30 has. For every linear rule over a finite field a
+  column is eventually periodic exactly when a sum over the small roots of its column curve is fixed by the curve's
+  Galois group: at radius 1 that is a twisted mirror symmetry of the row, and the four radius-2 rules over GF(2) with both outer coefficients 1 and $a \ne c$, with group $S_4$, have no
+  eventually periodic column but the all-white ones; Rule 30's center has no known algebraic curve (it has one exactly
+  when it is 2-automatic, which is open), only the Duhamel series, so the argument stops there ([column curves](findings/analogs/column-curves.md)). A
+  proof through the center cannot treat the
   two halves as black boxes either: either half can be replaced by a causal adversary that makes the center eventually
   periodic, the single cell's own left half admits the white tail $1, 1, 0, 0, \dots$, and beyond period one the route
   returns to the open left-half checks and right-half channel statements
@@ -308,8 +313,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 - **2-adic frames and exact reformulations.** *Closed as tried.* The 2-adic isometry, the seed's unique past and the
   strobed, group and stable-set forms all stop at a statement about the chaotic region
   ([reformulations](negative-results/dynamics/reformulations.md), [frames](CATALOG.md#frames-and-the-seeds-past)), and
-  no argument from the cycle data of the right-edge map can work, since a map with the same cycle lengths, differing on
-  a set of small measure, reads any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
+  no argument from the cycle data of the right-edge map can decide Problem 2, nor Problem 1 if $L_t > t$ for every large
+  $t$, since a map with the same cycle lengths, differing on a set of small measure, reads any prescribed center column
+  except at the times $t$ with $L_t \mid t$ (powers of two; none with $5 \le t \le 84$) ([diagonal
+  freedom](negative-results/frames/diagonal-freedom.md)).
 - **Equal center columns and the left edge.** *Open.* The kit proves that its open statement `EdgeObservable`, that
   two finite rows with the same center column have the same leftmost black cell, implies Problem 1: rows $T$ and
   $T + P$ of an eventually periodic orbit share a center column and not a left edge. The kit's stripe relation, at
@@ -352,11 +359,17 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
-  Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
-  Problem 2 follows from three structural properties of its limit measures, all open
-  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)) The cycle data of the right-edge map cannot
-  decide either problem: a map with every cycle length of Rule 30's, differing from it on a set of small measure, reads
-  any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
+  Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive far left of the
+  center, and Problem 2 follows from three structural properties of those limit points, all open ([light-like
+  rigidity](findings/random-rows/lightlike-rigidity.md)). Whether the uniform measure itself is ergodic for the
+  light-like map is open: the map is invertible almost everywhere and not exact, its light lines avoid $00100$ and
+  $11011$ in every diagram (Lean, [LightLine](Rule30Open/RandomRows/LightLine.md)), and its correlations decay in every
+  test to lag 1,024, while Rule 180's light-like map, of the same structure, is not ergodic (Lean core,
+  [LightLike180](Rule30Open/Analogs/LightLike180.md)), so a proof has to use the OR ([light-like
+  mixing](findings/random-rows/lightlike-mixing.md), [the soft
+  routes](negative-results/random-rows/lightlike-soft-routes.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
+  with every cycle length of Rule 30's, differing from it on a set of small measure, reads any prescribed center column
+  except at the times $t$ with $L_t \mid t$ ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
   [conservation laws](negative-results/structure/conservation-laws.md)).
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
@@ -376,7 +389,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   comparable length; so the conjecture that the black count is at most $\rho T + C$ with $\rho < 1$ would give the single
   cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). From a
   uniformly random left half, almost surely every driver it admits, so the center column beside every right half at
-  once, has black cells of upper density at most $0.7729$, the root of $h(d) = d$; this first-moment bound is just above
+  once, has black cells of upper density at most $d^* = 0.77291$, the root of $h(d) = d$; this first-moment bound is just above
   the measured $3/4$, and the conjecture is equivalent to an upper large-deviation bound for the center column with
   column 1 replaced by fair coins, one that may lose an exponential factor against the first moment; from the white
   half the admissible words with $b$ black cells number at most 1.35 times their mean over random halves for $n$ from
@@ -391,8 +404,8 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   the left half alone allows 149; the best free words found gain about 0.80 white cells per step to $T = 3{,}000$, and
   both colors' rates fall with $k$, to 0.66 and 0.68 at $k = 16$ ([the right ladder](findings/diagonals/right-ladder.md)).
   A proof that the white rate stays below 1 at one exact right column would give the single cell a positive lower
-  density of black cells; at the first rung it needs a positive density for column $-2$ of the half line beside a cell
-  held white, started from one black cell, the white twin of the held black cell above
+  density of black cells; at the first rung it needs a linear cost bound for column $-1$ of the half line beside a cell held white, started from
+  one black cell, which a positive density of black cells in its column $-2$ would give
   ([the white rate](negative-results/diagonals/white-rate-ladder.md)). Every configuration white left of a black cell settles to
   the single cell's pairs of left diagonals up to a time shift, by a step and base in Lean
   ([DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md)) and an induction that holds while each white diagonal is
@@ -446,8 +459,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   $m(1), \dots, m(4) = 5, 21, 56, 88$ in Lean and $m(p)$ computed to $p = 16$ (414,989 there); diagonal $j + 4$ is
   eventually white exactly when diagonal $j$ is eventually the AND of the next two
   ([DoublingGaps](Rule30Open/Diagonals/DoublingGaps.md)). A shift of finite type that contains the start words gives
-  $m(p) > 49$ for every $p$ but 1, 2 and 5; a bound that grows with $p$, which would give periods $O(\log j)$, is open
-  ([doubling gaps](findings/diagonals/doubling-gaps.md)). Over every pair word of period $P \le 16$ the least front walk
+  $m(p) > 49$ for every $p$ but 1, 2 and 5; at odd gaps the sink condition is a shift register, which bounds the
+  period, but at every even gap it has full degree and is permutive in no cell, so a bound that grows with $p$, which
+  would give periods $O(\log j)$, is open ([doubling gaps](findings/diagonals/doubling-gaps.md)). Over every pair word of period $P \le 16$ the least front walk
   has largest cycle mean at most $5/2$ and an excess over slope $5/2$ between $4P$ and $5.6P$ for $P$ from 10 to 16
   ([walk eigenvalue](findings/diagonals/walk-eigenvalue.md)); no potential that reads the white run ahead and a window
   of at most three cells holding the phase or ending just before it proves this at the periods 5 to 10 ([local walk
@@ -535,8 +549,14 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   sequences](negative-results/complexity/one-tape-crossing.md)).
   In models that read the digits of $n$, a lower bound that exceeds the cost of reading them by an unbounded amount
   implies Problem 1; unbounded one-tape time is equivalent to excluding every eventual period $2^a$, which the kit's
-  `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$ and a computation here for $k \le 20$, and
-  $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$. Two bounds hold for every $n$, a strip of width at
+  `Rule30Problem3Bounds` (main branch) does for $2^k$ with $k \le 13$, the window bound of
+  [WideWindow](Rule30Open/Columns/WideWindow.md) for $k \le 17$ (in Lean here, joined on paper with that branch), and a
+  computation here for $k \le 20$, and $T(n) \ge \lfloor \log_2 n \rfloor + 2$ holds for $n < 2^{16}$.
+  Over GF(2) the binomial transform $\gamma(n) = \sum_{t \subseteq n} c(t)$, the column's normal form in the digits of
+  $n$, exchanges a period $2^a$ from $2^m$ with a period $2^m$ from $2^a$ at the same least witness and keeps eventual
+  periodicity, so this rung and Problem 1 are the same statements for $\gamma$, in Lean
+  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)); odd periods are not exchanged, and $\gamma$ looks
+  random, so the duality moves the question without easing it. Two bounds hold for every $n$, a strip of width at
   least $(n - 1)/2$ and certificates of at least about $n^2/8$ cells, but Rule 90, whose column is white, meets both, so
   they bound the model and not $c$ ([restricted models](negative-results/complexity/restricted-models.md)). For a row
   given as input, a decision tree for the center cell after $t$ steps reads at least $2t$ cells (a Lean reduction joined

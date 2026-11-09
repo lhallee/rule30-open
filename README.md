@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 196 Lean modules with 943
-headline theorems, 70 findings and 82 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 199 Lean modules with 974
+headline theorems, 72 findings and 83 negative results.
 
 ## The problems
 
@@ -57,7 +57,10 @@ Proved in Lean:
   21 cells reaches it ([center classes](findings/frames/center-classes.md)).
 - **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
   when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
-  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)).
+  ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)); for every linear rule the periodic columns come from a
+  symmetry of an algebraic column curve, which the four radius-2 rules over GF(2) with both outer coefficients 1 and $a
+  \ne c$ lack
+  ([column curves](findings/analogs/column-curves.md)).
 
 Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
 ([the shift model](findings/period-two/shift-model.md)); every right half of up to 20 cells enters the kit's family
@@ -78,13 +81,14 @@ by a three-case law, so a gain of 2/3 diagonal per step gives that slope
 Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
 every center column the left half allows, black cells grow at a rate near 3/4
 ([driver density](findings/diagonals/driver-density.md)). From a uniformly random left half, almost surely every center column
-the half allows, whatever the right half, has black cells of upper density at most 0.7729, the root of $h(d) = d$
+the half allows, whatever the right half, has black cells of upper density at most $d^* = 0.77291$, the root of $h(d) = d$
 (proved on paper, [the first moment](findings/diagonals/driver-first-moment.md)); the white start is one half of
 measure zero.
 
 Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open, and
-every bound on the black rate contains a positive density for one explicit orbit, Rule 30 beside a cell held black
-([the relaxed game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
+every bound on the black rate contains a positive density for one explicit orbit, the greedy driver of the game, and
+every bound on its relaxation one for Rule 30 beside a cell held black ([the relaxed
+game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
 reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)), and invariant measures of
 positive entropy need not be uniform: rows moving right at the speed of light form a set of positive entropy, in Lean
 ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
@@ -102,6 +106,10 @@ Proved in Lean:
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
   cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+- **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
+  with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
+  1 and the first rung of Problem 3 are the same statements for the transform
+  ([BinomialDuality](Rule30Open/Complexity/BinomialDuality.md)).
 - **Reading the row from the left, for every $t$.** For $a \le 13$ an ordered decision diagram that reads the row from
   the left needs $2^a$ nodes at level $a$ at every $t$ from a threshold on, since white and single black cell
   completions tell the $2^a$ settings of the $a$ leftmost cells apart

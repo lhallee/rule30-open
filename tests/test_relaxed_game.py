@@ -117,7 +117,7 @@ def test_greedy_is_the_held_black_half_line() -> None:
     assert a.skips == a.wasteful == 0 and sum(play) == 1 + sum(full[t][1] for t in range(T - 1))
     assert x_minus_one_follows_minus_two(full)
     g = rg.greedy_play(1000)
-    assert (sum(g[:100]), sum(g)) == (54, 495)  # quoted
+    assert (sum(g[:100]), sum(g)) == (54, 495)  # small-case values
 
 
 def x_minus_one_follows_minus_two(full: list[list[int]]) -> bool:
@@ -192,7 +192,7 @@ def test_lemma_checks() -> None:
     assert rg.check_moving_frame(4, 40) == 4 * 40 * 40 and rg.check_shielding(4, 40) > 0
     assert all(r.longest <= rg.slope_bound(r.t) for r in rg.reach(60))
     r60 = rg.reach(60)[-1]
-    assert (r60.states, r60.best, r60.longest) == (31221, 38, 12)  # quoted
+    assert (r60.states, r60.best, r60.longest) == (31221, 38, 12)  # small-case values
 
 
 def test_checks_catch_a_wrong_rule() -> None:
@@ -246,7 +246,7 @@ def test_covering_lemma() -> None:
             assert ones <= Kp / (Kp + 1) * (T + 1) + 1e-9
 
 
-def test_held_black_column_quoted() -> None:
+def test_held_black_column_small() -> None:
     col = rg.held_black_column(1000)  # (1000,)
     assert int(col.sum()) == 505 and rg.least_period(col[-600:], 200) is None
     assert rg.least_period(np.tile(np.array([0, 1, 1], dtype=np.uint8), 50), 10) == 3

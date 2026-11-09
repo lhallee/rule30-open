@@ -128,6 +128,16 @@ lower bounds need.
   cell of $X$ from the $(g-3)/2$ before it. A periodic $X$ is then a cycle of a map on $2^{(g-3)/2}$ windows, and its
   least period, which is the regime's period, is at most $2^{(g-3)/2}$. So **a regime of least period $q$ that ends
   at an odd distance $g$ has $g \ge 2 \log_2 q + 3$**, for every start word, doubling or not.
+- **Even gaps (paper).** For $k \ge 2$, $E_{2k}$ is a function of the $k$ cells $X(t), \dots, X(t + k - 1)$ of full
+  algebraic degree, so it has odd weight, is not balanced, and is permutive in no cell: at no even $g \ge 6$ does
+  $E_{g-2} = 1$ fix one cell of $X$ from the others, and the odd-gap bound has no analog at any even gap. *Proof.*
+  Count the windows of $k$ cells on which a term is 1, modulo 2, in
+  $E_{2k} = E_{2k-2}(t+1) \oplus E_{2k-1} \oplus E_{2k-2} \oplus E_{2k-1} E_{2k-2}$. The first and third terms
+  ignore one of the $k$ cells, so they count evenly; the second is right-permutive and counts $2^{k-1}$; the last,
+  summed over the last cell with the others fixed, counts the windows of $E_{2k-2}$, since $E_{2k-1}$ is 1 for exactly
+  one value of that cell. So the weight of $E_{2k}$ has the parity of that of $E_{2k-2}$, and $E_2 = X(t)$ has weight
+  1. An odd weight is the top monomial, so the degree is full. $\square$
+  (`even_weight`; `tests/test_doubling_gaps.py` checks the odd weight for $2 \le k \le 12$.)
 - **Every gap up to 49 (computation).** For each $g$, `source_graph` builds the shift of finite type of the
   bi-infinite $X$ with $E_{g-2}$ all black, trimmed to the windows on bi-infinite paths, and the two-track graph of the
   pairs $(X, X')$, $X' = \mathrm{rot}_p X$, of such words with $E_{g-1}(X') = \lnot E_{g-1}(X)$ at every time: an
@@ -146,7 +156,7 @@ class at $p = 2$ has gap 21): their $X$ has period 4 and their $Y = E_{25}$ has 
 from $Y$, then a doubling white diagonal, then a regime of gap 21; a search of every $X$ of least period at most 16
 finds the same. So **$m(p) > 49$ for every $p$ other than 1, 2 and 5**, a bound for all $p$ from finitely
 many finite graphs. The one-track graph branches at $g = 8, 14, 16, 32, 44, 48$, where its words have arbitrarily
-large least periods, so the odd-gap argument has no analog for every even gap; it is empty at $g = 6, 10, 18, 22, 34$: no regime
+large least periods, as the even-gap lemma allows; it is empty at $g = 6, 10, 18, 22, 34$: no regime
 of any period, and so no two consecutive white diagonals of the single cell, is 6, 10, 18, 22 or 34 depths long. The
 graphs of $g = 49$ have $2^{24}$ windows; the method costs $2^{g/2}$ and stops near there in 4 GB.
 
@@ -204,5 +214,5 @@ python -m computations.doubling_gaps --damage 5-12 --cap 60000      # the half d
 
 `tests/test_doubling_gaps.py` checks $m(1), m(2), m(3)$ against the diagonal recursion run cell by cell, the C program
 against numpy, the white-step identity on sinks built backward and on forward words, the radius and permutivity of
-the backward words, the single cell's first regimes against a Rule 30 run, the source graphs against every regime of
+the backward words, the odd weight of $E_{2k}$ for $k \le 12$, the single cell's first regimes against a Rule 30 run, the source graphs against every regime of
 period at most 10 with gap at most 24, and the words behind a white diagonal.

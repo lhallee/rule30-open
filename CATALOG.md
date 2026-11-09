@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-196 Lean modules with 943 headline theorems, 70 findings (proved on paper,
-computed or conjectured) and 82 negative results. Prize problem 1 asks whether the center column
+199 Lean modules with 974 headline theorems, 72 findings (proved on paper,
+computed or conjectured) and 83 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -16,13 +16,13 @@ takes effort of order `n`.
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 13 | 12 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 2 |
-| [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
+| [Sibling rules](#sibling-rules) | 4 | 1 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
-| [Random rows](#random-rows) | 2 | 1 | 1 |
+| [Random rows](#random-rows) | 3 | 2 | 2 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 16 | 5 | 18 |
+| [Complexity](#complexity) | 17 | 5 | 18 |
 
 ## Open work
 
@@ -41,16 +41,17 @@ approach stopped.
 
 **Findings that want a Lean proof**
 
+- [For a finite row under a linear automaton over a finite field whose column curve has simple small roots, a column is eventually periodic exactly when a sum over those roots is fixed by the curve's Galois group; at radius 1 this is a twisted mirror symmetry of the row, and under the four rules x_(i-2) + a x_(i-1) + b x_i + c x_(i+1) + x_(i+2) over GF(2) with a != c, whose curves have group S_4, only the all-white columns are eventually periodic](findings/analogs/column-curves.md): problem 1
 - [Locked windows of 20 or 22 cells give traps that pass both tests to 14 blocks whose other traps all fail](findings/columns/own-locks.md): problem 1
 - [A random right half driven by a period-four word, the exact law of its row and a zero-one reduction of entry](findings/columns/random-halves.md): problem 1
 - [Windows of 20 cells exclude 0^q 10101 for every q of at least 26 and give every tail of up to eight cells but 1100001 a least white run; 1100001 has one, 37, at 22 cells](findings/columns/tail-families.md): problem 1
-- [From a random left half every admissible driver has black density at most 0.7729, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white start the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)](findings/diagonals/driver-first-moment.md): problem 2
+- [From almost every left half every admissible driver has black cells of upper density at most d* = 0.77291, the root of h(d) = d, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white half the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)](findings/diagonals/driver-first-moment.md): problem 2
 - [A sound abstraction of the seed rows by a window of times before the onset front gives T_j at most ceil(3j/2) + 5 for every seed and every j up to 1,252, at most ceil(8j/5) up to 87,866, and the exact latest onset to depth 88; the bound's slope falls from 2.03 to about 1.52 as the window grows from 0 to 8 times](findings/diagonals/seed-window-bounds.md): problem 2
 - [Over every pair word of period P at most 16, the front walk's largest cycle mean is at most 5/2, reached only by pairs of least period 6 and 7; from the start of a regime after a doubling it exceeds slope 5/2 by at most 21.5, its largest excess anywhere is at most 88.5, between 4P and 5.6P for P from 10 to 16, and the single cell's walk to depth 87,866 is a path of these graphs](findings/diagonals/walk-eigenvalue.md): problem 2
 - [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md): problem 1
 - [No row with its leftmost 1 within 120 cells has an alternating center](findings/period-two/alternating-within-120.md): problem 1
 - [Rows of radius up to 26 keep an alternating center from time 0 for at most 36 steps, with no law like the constant center's radius plus 2](findings/period-two/condrey-carryover.md): problem 1
-- [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive](findings/random-rows/lightlike-rigidity.md): problems 2, 1
+- [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive](findings/random-rows/lightlike-rigidity.md): problems 2, 1
 
 **Findings proved in Lean in part**
 
@@ -96,6 +97,7 @@ approach stopped.
 - [Beyond the stripes and the ether, every periodic tail of up to 12 cells falls onto a background where the tops of most defects run away, and no head of up to 16 cells on one of them is in K](findings/period-two/tail-census.md): problem 1
 - [The kit's wedge hypotheses BWH and RW are statements about 2^n forced runs; no witness of BWH for 7 <= n <= 31 or of RW for n <= 26](findings/period-two/wedge-forced-runs.md): problem 1
 - [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
+- [Rule 30's light-like map is invertible and not exact, has entropy at most 0.68 bits, and its correlations fall below 10^-4 by lag 48 in every test, while Rule 180's has the same shape and is not ergodic](findings/random-rows/lightlike-mixing.md): problem 2
 - [No other right extension up to 40 cells keeps the center column](findings/seeds/no-other-extensions.md): problems 1, 2, 3
 - [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md): problem 3
 
@@ -419,7 +421,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [After a period doubling to period 2p the next white diagonal comes m(p) depths later; m(p) is computed for p up to 16, exceeds 49 for every p but 1, 2 and 5, grows like a minimum of fair waiting times, and no structured family of start words gives short gaps to p = 40](findings/diagonals/doubling-gaps.md) | computed | 2 | partial |
 | [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md) | conjecture | 2 | wanted |
 | [Over every center column that the left half allows, the most black cells among c(0..T) is 141 at T = 190 exactly and at least 2,254 at T = 3,000, a rate near 3/4; chaining dense periodic words does not raise it, and a long stretch is mostly followed by a gap of comparable length](findings/diagonals/driver-density.md) | conjecture | 2 | wanted |
-| [From a random left half every admissible driver has black density at most 0.7729, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white start the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)](findings/diagonals/driver-first-moment.md) | computed | 2 | wanted |
+| [From almost every left half every admissible driver has black cells of upper density at most d* = 0.77291, the root of h(d) = d, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white half the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)](findings/diagonals/driver-first-moment.md) | computed | 2 | wanted |
 | [Where the left diagonals turn white, to depth 100,000](findings/diagonals/left-records.md) | computed | 1 | partial |
 | [To depth 200,000 the single cell's onset front, the edge of the pattern against its translate by the period, gains 0.752 depth per step and moves with the frequencies of the damage edge of random rows and of backgrounds of period 32, within 2.1 combined standard errors; in a game where the settled cells are fair coins, no transient that keeps four or more cells right of the edge holds the gain at 2/3](findings/diagonals/onset-edge.md) | computed | 2 | partial |
 | [With right cells 1 to k exact and cell k + 1 free, the most white cells of the center column among c(0..150) is 117 at k = 1 (exact), where the left half alone allows 149, the best free words found gain about 0.80 white cells per step to T = 3,000 at k = 1 and 2, and both colors' rates fall with k, to 0.66 and 0.68 at k = 16](findings/diagonals/right-ladder.md) | conjecture | 2 | wanted |
@@ -444,7 +446,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [The relaxed driver game G has value about 0.63 T to T = 180, its lemmas reduce a black density below 1 to a charging property, and every such bound contains a positive density for one explicit orbit, Rule 30 beside a cell held black](negative-results/diagonals/relaxed-density-game.md) | dead end | 2 |
 | [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
-| [A white rate below 1 at the first rung of the right ladder needs a positive density for one explicit orbit, the half line beside a cell held white started from one black cell, just as the black rate needs one beside a cell held black](negative-results/diagonals/white-rate-ladder.md) | dead end | 2 |
+| [A white rate below 1 at the first rung of the right ladder needs a linear cost bound for one explicit orbit, the half line beside a cell held white started from one black cell, which a positive density of black cells in its column -2 would give, as a bound on the relaxed driver game needs a positive density beside a cell held black](negative-results/diagonals/white-rate-ladder.md) | dead end | 2 |
 | [A potential that grows with the white runs does not turn the window bounds into a slope below 2 for every depth, and the step bounds the white runs only by the period; the window bounds grow linearly faster than 3j/2 while W_j is constant, a certificate that knows only the white runs needs slope 7/3, and words with one black cell per period occur at periods 4, 8 and 16](negative-results/diagonals/white-run-potential.md) | dead end | 2 |
 
 ## Frames and the seed's past
@@ -475,7 +477,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 
 | Result | Kind | Problems |
 |---|---|---|
-| [The cycle data of the right-edge map cannot see the center column, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal](negative-results/frames/diagonal-freedom.md) | barrier | 1, 2 |
+| [The cycle data of the right-edge map fix the center column only at the times t with L_t dividing t, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal at every other time from t0 on](negative-results/frames/diagonal-freedom.md) | barrier | 1, 2 |
 | [A periodic column does not force a periodic row](negative-results/frames/periodic-column-preperiodic-row.md) | refuted | 1 |
 
 ## Sibling rules
@@ -486,9 +488,16 @@ Results for Rules 90, 150 and 210 that show which features of Rule 30 a proof ha
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [Rule 180's light-like map is not ergodic for the uniform measure, because each of its light lines is constant where the next one is white](Rule30Open/Analogs/LightLike180.md) | [`Analogs.LightLike180`](Rule30Open/Analogs/LightLike180.lean) | `LightLike180.const_on_zeros`, `LightLike180.no_zero_between`, `LightLike180.pair_dichotomy`, `LightLike180.line_const_iff` | 2 | not in the kit |
 | [The linear analog of period two is true](Rule30Open/Analogs/Rule150Descent.md) | [`Analogs.Rule150Descent`](Rule30Open/Analogs/Rule150Descent.lean) | `held150_even_steps`, `held150_odd_steps`, `descent150` | 1 | not in the kit |
 | [Rule 210 keeps the period-two condition](Rule30Open/Analogs/Rule210.md) | [`Analogs.Rule210`](Rule30Open/Analogs/Rule210.lean) | `rule210_finite_half`, `orbit210_checkerboard` | 1 | not in the kit |
 | [Under Rules 90 and 150 a column is eventually periodic exactly at a mirror axis](Rule30Open/Analogs/SymmetricAxes.md) | [`Analogs.SymmetricAxes`](Rule30Open/Analogs/SymmetricAxes.lean) | `iter90_column_periodic_iff`, `iter150_column_periodic_iff`, `linear_column_periodic_iff`, `at_most_one_periodic_column`, `run90_column_periodic_iff`, `run150_column_periodic_iff`, `run210_column_periodic_iff` | 1 | extends a kit result |
+
+**Findings**
+
+| Result | Status | Problems | Formalization |
+|---|---|---|---|
+| [For a finite row under a linear automaton over a finite field whose column curve has simple small roots, a column is eventually periodic exactly when a sum over those roots is fixed by the curve's Galois group; at radius 1 this is a twisted mirror symmetry of the row, and under the four rules x_(i-2) + a x_(i-1) + b x_i + c x_(i+1) + x_(i+2) over GF(2) with a != c, whose curves have group S_4, only the all-white columns are eventually periodic](findings/analogs/column-curves.md) | proved on paper | 1 | wanted |
 
 **Negative results**
 
@@ -548,19 +557,22 @@ What holds for a random initial row, and why it does not reach the single cell.
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
 | [A random left window gives a fair center window, for every row](Rule30Open/RandomRows/LeftWindow.md) | [`RandomRows.LeftWindow`](Rule30Open/RandomRows/LeftWindow.lean) | `cone_left_xor`, `count_centerWindow`, `centerWindow_unique`, `count_adapted`, `count_periodic`, `seed_window` | 1, 2 | extends a kit result |
-| [Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, so the rows that travel at the speed of light carry invariant measures of positive entropy that are not uniform](Rule30Open/RandomRows/LightLikeEntropy.md) | [`RandomRows.LightLikeEntropy`](Rule30Open/RandomRows/LightLikeEntropy.lean) | `LightLikeEntropy.lightLike_blocks`, `LightLikeEntropy.blocks_window_determines`, `LightLikeEntropy.sigma12_entropy`, `LightLikeEntropy.sigma15_entropy`, `LightLikeEntropy.sigma17_entropy` | 2 | extends a kit result |
+| [Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, a set of positive entropy; on paper it carries invariant measures of positive entropy that are not uniform](Rule30Open/RandomRows/LightLikeEntropy.md) | [`RandomRows.LightLikeEntropy`](Rule30Open/RandomRows/LightLikeEntropy.lean) | `LightLikeEntropy.lightLike_blocks`, `LightLikeEntropy.blocks_window_determines`, `LightLikeEntropy.sigma12_entropy`, `LightLikeEntropy.sigma15_entropy`, `LightLikeEntropy.sigma17_entropy` | 2 | extends a kit result |
+| [The light-like map of Rule 30 has one preimage after every 010, so it is invertible almost everywhere and not exact, and no right diagonal of any space-time diagram reads 00100 or 11011](Rule30Open/RandomRows/LightLine.md) | [`RandomRows.LightLine`](Rule30Open/RandomRows/LightLine.lean) | `LightLine.eq_true_of_window`, `LightLine.eq_of_light_eq_of_window`, `LightLine.eq_of_light_eq_of_frequently`, `LightLine.lightIter_cell`, `LightLine.lightLine_avoids`, `LightLine.diag_avoids` | 2 | extends a kit result |
 
 **Findings**
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
-| [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive](findings/random-rows/lightlike-rigidity.md) | proved on paper | 2, 1 | wanted |
+| [Rule 30's light-like map is invertible and not exact, has entropy at most 0.68 bits, and its correlations fall below 10^-4 by lag 48 in every test, while Rule 180's has the same shape and is not ergodic](findings/random-rows/lightlike-mixing.md) | computed | 2 | partial |
+| [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive](findings/random-rows/lightlike-rigidity.md) | proved on paper | 2, 1 | wanted |
 
 **Negative results**
 
 | Result | Kind | Problems |
 |---|---|---|
 | [Randomness proves Problems 1 and 2 for almost every row and stops at the single cell](negative-results/random-rows/almost-every-row.md) | barrier | 1, 2, 3 |
+| [The structure of Rule 30's light-like map does not decide its ergodicity, because Rule 180's light-like map shares it and is not ergodic](negative-results/random-rows/lightlike-soft-routes.md) | barrier | 2 |
 
 ## Statistics
 
@@ -594,10 +606,11 @@ Prize Problem 3, and what an answer either way would imply.
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [The binomial transform over GF(2) is an involution that exchanges a period 2^a from 2^m with a period 2^m from 2^a at the same least witness, so the first rung of Problem 3, and Problem 1, hold for the center column exactly when they hold for its transform](Rule30Open/Complexity/BinomialDuality.md) | [`Complexity.BinomialDuality`](Rule30Open/Complexity/BinomialDuality.lean) | `binomial_eq_difs`, `bsub_eq_land`, `binomial_involutive`, `binomial_tail_difs`, `binomial_firstOne_iff`, `binomial_tail_iff`, `binomial_period_window_iff`, `binomial_period_iff`, `binomial_firstMismatch_iff`, `binomial_support_iff`, `binomial_periodic_iff`, `binomial_twoPow_iff`, `binomial_eventuallyPeriodic_iff`, `center_binomial_period_iff`, `center_binomial_rung_iff`, `center_binomial_firstMismatch_iff`, `problem1_iff_gamma`, `gamma_not_period_from_one`, `gamma_period_ge_262125`, `center_rung_le_seventeen`, `gamma_rung_le_seventeen` | 3, 1 | extends a kit result |
 | [The mixed derivative of the center over the comb -t+1, -t+3, ..., -t+2j+1, -t+2j+2 is C(t, j+1) mod 2 on every row, so every constant subcube meets each comb with an odd binomial](Rule30Open/Complexity/CertificateLower.md) | [`Complexity.CertificateLower`](Rule30Open/Complexity/CertificateLower.lean) | `combPar_zero`, `combPar_step`, `combPar_front`, `constOn_hits_comb`, `constOn_odd`, `constOn_two_mod_four` | 3 | not in the kit |
 | [An alternating left half fixes the center cell whatever the right half is](Rule30Open/Complexity/ConeScreening.md) | [`Complexity.ConeScreening`](Rule30Open/Complexity/ConeScreening.lean) | `screening_odd`, `screening_even`, `stripe`, `pair_back`, `evo_local`, `front_xor`, `flip_center`, `center_decomp`, `decomp_local`, `four_words` | 3 | extends a kit result |
 | [The center sees the two rightmost cells of its cone only through their OR, so an adversary must answer the first of them white, and depth 2t + 1 reduces to a function of 2t - 1 cells](Rule30Open/Complexity/CornerOr.md) | [`Complexity.CornerOr`](Rule30Open/Complexity/CornerOr.lean) | `center_corner_or`, `center_flip_beside_black`, `center_flip_corner_of_black`, `corner_tree_lift` | 3 | extends a kit result |
-| [For a ≤ 10 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ a + 2, from a threshold on by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCut.md) | [`Complexity.LateSeedCut`](Rule30Open/Complexity/LateSeedCut.lean) | `late_seed_cut`, `late_seed_factor`, `late_seed_width`, `left_cut_every`, `left_cut_width_every`, `lateSep_all`, `lateSep_step`, `lateCen_shift`, `lateSep_of_check`, `nevo_two_pow`, `edgeFrame_periodic`, `nevo_mod`, `lateCen_eq` | 3 | not in the kit |
+| [For 2 ≤ a ≤ 10 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ a + 2, from a threshold on by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCut.md) | [`Complexity.LateSeedCut`](Rule30Open/Complexity/LateSeedCut.lean) | `late_seed_cut`, `late_seed_factor`, `late_seed_width`, `left_cut_every`, `left_cut_width_every`, `lateSep_all`, `lateSep_step`, `lateCen_shift`, `lateSep_of_check`, `nevo_two_pow`, `edgeFrame_periodic`, `nevo_mod`, `lateCen_eq` | 3 | not in the kit |
 | [For 11 ≤ a ≤ 13 the a leftmost cells of the cone are pairwise distinguishable at every t ≥ 19, 21, 24, by white and single black cell completions, so left-to-right ordered decision diagrams of the center have width 2^a at level a for every such t](Rule30Open/Complexity/LateSeedCutWide.md) | [`Complexity.LateSeedCutWide`](Rule30Open/Complexity/LateSeedCutWide.lean) | `late_seed_cut_wide`, `late_seed_width_wide`, `lateSep_11`, `lateSep_12`, `lateSep_13` | 3 | not in the kit |
 | [Read from the left, the cells -t to -3 of the cone are pairwise distinguishable for 3 ≤ t ≤ 17, so left-to-right ordered decision diagrams of the center have width 2^(t-2) there, and not at t = 18](Rule30Open/Complexity/LeftCut.md) | [`Complexity.LeftCut`](Rule30Open/Complexity/LeftCut.lean) | `left_cut`, `left_cut_at`, `left_cut_factor`, `left_cut_width`, `left_cut_fails_18`, `stripe_three_18`, `stripe_four_18`, `left_cut_of_check`, `separates_of_refineMasks`, `testBit_sliceCenter` | 3 | not in the kit |
 | [Across a left cut, rows white beyond a window run on the T-function, a window of j + 1 cells has rank 1 after 2^j steps, and the GF(2) rank of the cut bounds its width](Rule30Open/Complexity/LeftCutRank.md) | [`Complexity.LeftCutRank`](Rule30Open/Complexity/LeftCutRank.lean) | `window_center`, `center_two_pow`, `tPhiIter_two_pow`, `testBit_tPhiIter`, `width_of_independent` | 3 | independent proof of a kit result |

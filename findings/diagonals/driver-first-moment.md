@@ -1,5 +1,5 @@
 ---
-title: From a random left half every admissible driver has black density at most 0.7729, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white start the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)
+title: From almost every left half every admissible driver has black cells of upper density at most d* = 0.77291, the root of h(d) = d, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white half the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)
 category: diagonals
 problems: [2]
 status: computed
@@ -7,7 +7,7 @@ formalization: wanted
 evidence: [computations/driver_counts.py]
 ---
 
-# From a random left half every admissible driver has black density at most 0.7729, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white start the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)
+# From almost every left half every admissible driver has black cells of upper density at most d* = 0.77291, the root of h(d) = d, and the driver-density conjecture S_B is a large-deviation bound for the center column with column 1 random; from the white half the admissible words with b black cells number at most 1.35 times their mean count over random left halves for n from 20 to 150, and at most 0.69 times it when b ≥ 0.68 (n - 1)
 
 **Setting.** As in [driver density](driver-density.md): a driver $c(0) = 1, c(1), c(2), \ldots$ is *admissible* from a
 left half $x$ when, with $x$ driven by $c$, $c(t + 1) = \lnot x_{-1}(t)$ whenever $c(t) = 1$. Since
@@ -55,7 +55,7 @@ and $a \ge 0$,
 $$P\bigl(B_n \ge d^* (n - 2) + 1 + a\bigr) \le \frac{2^{-\kappa a}}{1 - 2^{-\kappa}}.$$
 Hence, almost surely, for all large $T$ every driver admissible from $x$ has at most
 $d^* T + 0.73 \log_2 T + 2$ black cells among $c(0), \ldots, c(T)$, and its black cells have upper density at most
-$d^* = 0.7729$. Since the center column of every row is admissible from the row's left half, this holds at once for
+$d^* = 0.77291$. Since the center column of every row is admissible from the row's left half, this holds at once for
 every right half beside $x$. (The words with $w(0) = 0$ obey the estimate with the bound doubled and without the 1, so
 the conclusion holds with a white center cell at time 0 as well.)
 
@@ -133,7 +133,7 @@ $1 - h(\delta)$, far larger for small $\delta$.
 value $b$ with at most $C$ times the probability that $1 + \mathrm{Bin}(n - 2, 1/2)$ does.
 
 **Proposition 4 (proved on paper).** (a) Q implies $M(T) \le d^* T + 1 + \log_2(C) / \kappa$ for every $T$: $S_B$ with
-$\rho = d^* = 0.7729$. (b) If for some $\rho \in (d^*, 1)$ and some $\theta < \rho - h(\rho)$ the bound
+$\rho = d^* = 0.77291$. (b) If for some $\rho \in (d^*, 1)$ and some $\theta < \rho - h(\rho)$ the bound
 $N_n(b) \le 2^{\theta n} E_n(b)$ holds for all large $n$ and every $b \ge \rho (n - 1)$, then $S_B$ holds with that
 $\rho$. Conversely $S_B$ with some $\rho' < \rho$ gives the bound with $\theta = 0$, so (b) is equivalent to $S_B$. The
 loss $\rho - h(\rho)$ that (b) allows is 0.0781 at $\rho = 0.8$, 0.2402 at 0.85, 0.4310 at 0.9 and 0.6636 at 0.95.
@@ -191,7 +191,7 @@ smaller than that of all of them but one.
 ## From random halves the rate is near 3/4 too (computed)
 
 Write $M_x(T)$ for the most black cells among $c(0), \ldots, c(T)$ over the drivers admissible from $x$. Theorem 2
-gives $\limsup_T M_x(T)/T \le 0.7729$ for almost every $x$. From three uniformly random halves (`random`, seed 12345)
+gives $\limsup_T M_x(T)/T \le d^* = 0.77291$ for almost every $x$. From three uniformly random halves (`random`, seed 12345)
 the exact values at $T = 60$ are 46, 44 and 44, against $M(60) = 44$ from the white half, and a beam that keeps 20,000
 states (a lower bound attained by a driver) gives $M_x(1{,}000) \ge 753$, 750 and 749, ratios to $T + 1$ of 0.7522,
 0.7493 and 0.7483, against 749 (0.7483) from the white half, the count of [driver density](driver-density.md).
@@ -199,7 +199,7 @@ states (a lower bound attained by a driver) gives $M_x(1{,}000) \ge 753$, 750 an
 ## What it means
 
 - **The first moment is nearly the truth.** From random halves the measured ratios at $T = 1{,}000$, 0.748 to 0.752
-  (lower bounds on $M_x(1{,}000)/1{,}001$), sit just below the proved limit 0.7729, and the white half measures the same
+  (lower bounds on $M_x(1{,}000)/1{,}001$), sit just below the proved bound $d^* = 0.77291$, and the white half measures the same
   (0.7511 at $T = 3{,}000$ in [driver density](driver-density.md)). Read heuristically, the dependence between the
   forced values along the tree of drivers lowers the rate below the first-moment threshold by about 0.02, from random
   halves and from the white half alike.

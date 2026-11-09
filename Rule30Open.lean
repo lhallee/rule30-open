@@ -178,8 +178,10 @@ public import Rule30Open.Frames.StripeClassCount
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.Analogs.SymmetricAxes
+public import Rule30Open.Analogs.LightLike180
 public import Rule30Open.RandomRows.LeftWindow
 public import Rule30Open.RandomRows.LightLikeEntropy
+public import Rule30Open.RandomRows.LightLine
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth
@@ -196,6 +198,7 @@ public import Rule30Open.Complexity.LeftCutRank
 public import Rule30Open.Complexity.LateSeedCut
 public import Rule30Open.Complexity.LateSeedCutWide
 public import Rule30Open.Complexity.ParityLift
+public import Rule30Open.Complexity.BinomialDuality
 
 /-! The whole library. Each module's path names its category, and each has its natural-language argument beside it,
 a Markdown file of the same name. -/

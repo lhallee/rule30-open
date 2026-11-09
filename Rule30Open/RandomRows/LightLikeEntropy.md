@@ -1,18 +1,18 @@
 ---
-title: Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, so the rows that travel at the speed of light carry invariant measures of positive entropy that are not uniform
+title: Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, a set of positive entropy; on paper it carries invariant measures of positive entropy that are not uniform
 category: random-rows
 problems: [2]
 status: proved
 lean: Rule30Open.RandomRows.LightLikeEntropy
 headline: [LightLikeEntropy.lightLike_blocks, LightLikeEntropy.blocks_window_determines, LightLikeEntropy.sigma12_entropy, LightLikeEntropy.sigma15_entropy, LightLikeEntropy.sigma17_entropy]
 kit: refines
-kit_modules: [Rule30Equivalents.PeriodicPoints]
+kit_modules: [Rule30Equivalents.PeriodicPoints, Rule30LightCone]
 ---
 
-# Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, so the rows that travel at the speed of light carry invariant measures of positive entropy that are not uniform
+# Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, a set of positive entropy; on paper it carries invariant measures of positive entropy that are not uniform
 
-The kit proves that Rule 30 has no gliders slower than light: a row that comes back after $k$ steps moved $d$ cells,
-with velocity $-d/k$ in $[-1, 1)$, is spatially periodic, and at most $4^k$ rows do so. The one velocity it leaves out
+The kit proves that Rule 30 has no gliders at any velocity in $[-1, 1)$, light speed to the left included: a row that
+comes back after $k$ steps moved $d$ cells to the left, with velocity $-d/k$ in $[-1, 1)$, is spatially periodic, and at most $4^k$ rows do so. The one velocity it leaves out
 is the speed of light to the right. There the picture changes completely: for $p = 12$, 15 and 17 the rows that come
 back after $p$ steps moved $p$ cells to the right form a set of positive entropy, so it is uncountable, and it carries
 measures invariant under the shift and under Rule 30 that have positive entropy and are not the uniform measure. The
@@ -28,7 +28,7 @@ whose block on the cells $Lq, \dots, Lq + L - 1$ is $X$ when $s(q) = 1$ and $Y$ 
 
 1. **Rows of blocks** (`lightLike_blocks`). If $p \le L$ and the finite check `checkG p L X Y` passes, every row
    `blocks L X Y s` lies in $\Sigma_p$.
-2. **The blocks can be read off** (`blocks_window_determines`). If $X$ and $Y$ differ at one cell, the cells
+2. **The blocks can be read off** (`blocks_window_determines`). If $X$ and $Y$ differ at some cell $r_0 < L$, the cells
    $0, \dots, Ln - 1$ of `blocks L X Y s` determine $s(0), \dots, s(n - 1)$.
 3. **Three instances** (`sigma12_entropy`, `sigma15_entropy`, `sigma17_entropy`). The check passes for $p = 12$ with
    $L = 34$, $X = ab$ and $Y = ba$, where $a = 11110010011110111100$ and $b = 11110010011110$, for $p = 15$ with two
@@ -41,14 +41,14 @@ whose block on the cells $Lq, \dots, Lq + L - 1$ is $X$ when $s(q) = 1$ and $Y$ 
 
 ## Argument
 
-**Items 1 to 3.** Rule 30 is permutive in its left cell, so $F^p(x)_i$ reads the cells $i - p, \dots, i + p$, and the
+**Items 1 to 3.** One step of Rule 30 reads a cell and its two neighbors, so $F^p(x)_i$ reads the cells $i - p, \dots, i + p$, and the
 module checks this light cone on finite words (`iterate_getD`). With $i = Lq + r$, $0 \le r < L$, these $2p + 1$ cells
 lie in the blocks $q - 1$, $q$ and $q + 1$ when $p \le L$ (`window3_spec`). So whether $F^p(x)_i = x_{i-p}$ depends
 only on $s(q - 1)$, $s(q)$, $s(q + 1)$ and $r$: $8L$ cases, which `checkG` runs and the kernel evaluates
-(`check12`, `check15`, `check17`, by `decide +kernel`). Two words that differ at cell $r_0$ make $s(q)$ the cell
-$Lq + r_0$ of the row (`blocks_determines`).
+(`check12`, `check15`, `check17`, by `decide +kernel`). Two words that differ at cell $r_0$ make the cell $Lq + r_0$
+of the row determine $s(q)$ (`blocks_determines`).
 
-**Item 4.** $F$ commutes with $\sigma$, so $\Sigma_p$ is closed, invariant under $\sigma$, and mapped into itself by
+**Item 4.** $F$ is continuous and commutes with $\sigma$, so $\Sigma_p$ is closed, invariant under $\sigma$, and mapped into itself by
 $F$; on $\Sigma_p$, $F^p = \sigma^{-p}$ is a bijection, so $F$ is a homeomorphism of $\Sigma_p$ that commutes with
 $\sigma$. By the variational principle $\Sigma_p$ carries a $\sigma$-invariant measure $\mu$ whose entropy is the
 topological entropy of $\Sigma_p$, positive by item 3. Each $F^j_* \mu$ is $\sigma$-invariant with the same entropy,
@@ -69,7 +69,7 @@ ergodic for it, and with it the alternative holds ([light-like rigidity](../../f
 The kit's `Rule30Equivalents.PeriodicPoints` (`eq_of_recurs_of_eq_on`, `recurs_add_factorial`, `ncard_recurs_le`)
 proves that a row with $F^k x = \sigma^d x$ is determined to the left by any $2k$ adjacent cells and is spatially
 periodic when $1 - k \le d \le k$, so at most $4^k$ rows do this, and that Rule 30 has no gliders at the velocities
-$-d/k$ in $[-1, 1)$; for $|d| > k$ an easier argument (each cell a function of the $d + k$ cells on one side) gives the
+$-d/k$ in $[-1, 1)$; for $|d| > k$ an easier argument (each cell a function of the $|d| + k$ cells on one side) gives the
 same. The case $d = -k$, velocity 1 to the right, is the one its argument leaves out: there the permutive cell
 $x_{i-k}$ is the cell being compared, and it cancels. This module settles that case for $k = 12$, 15 and 17, in the
 other direction.
@@ -78,4 +78,9 @@ The kit's main branch, after the pinned commit, adds `Rule30MovingWaves`: for $p
 concatenate freely into rows of $\Sigma_{12}$ (`free_binary_period_twelve`, `exponential_words_twelve`), and for
 $1 \le p \le 11$ the rows of $\Sigma_p$ have at most $81 + 14m$ words of length $m$ (`low_period_linear_words`), so
 $\Sigma_p$ has zero entropy there and 12 is the least period with positive entropy. Item 3 for $p = 12$ is that result,
-proved here independently; the periods 15 and 17 and item 4 are not in it.
+proved here independently; the periods 15 and 17 and item 4 are not in it. The main branch's `Rule30RingOrbits` defines
+the light-like map `Phi` and proves `orbit_eq_iff` ($\Sigma_P$ is `orbit x P = x`), and `Rule30MovingWaves` also proves
+that its rows have least moving period exactly 12 (`exact_period_twelve`) and that one is spatially aperiodic
+(`aperiodic_travelling_wave`), a glider of the kind `PeriodicPoints` rules out at the other velocities. The pinned kit's
+`Rule30LightCone` has the light cone (`evol_window`) and the three-block locality (`block_step`) that `iterate_getD` and
+`window3_spec` reprove here.
