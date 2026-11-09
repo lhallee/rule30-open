@@ -115,7 +115,7 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q -p no:cacheprovider --durations=60` collects 713 tests: 712 pass and 1 is skipped
+`python -m pytest -q -p no:cacheprovider --durations=60` collects 721 tests: 720 pass and 1 is skipped
 (`test_late_onset.py` needs `pysat`, which this environment lacks). Serially on an idle machine with four cores the
 suite takes about 38 s of wall time. With the 647 tests it had before, on one core of a machine with four at a load
 average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations sum to 43 to 46 s, and

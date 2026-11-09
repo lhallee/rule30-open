@@ -51,10 +51,14 @@ $\sigma$-algebra of the cells $\ge k$.
    y_2)$; an invariant function splits into an invariant function one cell further right and a twisted part $h$ with
    $h \circ G = (-1)^{y_0 \lor y_1} h$ (after reindexing), and since the product measure has a trivial tail, $\lambda$
    is ergodic for $G$ exactly when this twisted equation has no nonzero square-integrable solution. Not settled here.
-   It is a case of the conjecture of Shirvani and Rogers (Comm. Math. Phys. 136 (1991), record seen only through search
-   results) that every onto one-dimensional automaton other than the identity and the inversion is ergodic for
-   $\lambda$. The kit's proof that $F$ is mixing (`Mixing.tendsto_measure_inter_preimage`) flips the coin at the foot
-   $a - t$ of each cell; for $G$ every cell above column $a$ has foot $a$, so it does not transfer.
+   The kit's proof that $F$ is mixing (`Mixing.tendsto_measure_inter_preimage`) flips the coin at the foot $a - t$ of
+   each cell; for $G$ every cell above column $a$ has foot $a$, so it does not transfer. [Light-like
+   mixing](lightlike-mixing.md) shows that $G$ is invertible almost everywhere and not exact, computes the
+   correlations, which decay in every test, and shows with Rule 180, whose light-like map has the same structure and is
+   not ergodic ([LightLike180](../../Rule30Open/Analogs/LightLike180.md)), that a proof has to use the OR. A conjecture
+   of Shirvani and Rogers (Comm. Math. Phys. 136 (1991), record seen only through search results), reported as saying
+   that every onto one-dimensional automaton other than the identity and the inversion is ergodic for $\lambda$, cannot
+   hold in that form for the same reason.
 
 ## Proofs
 

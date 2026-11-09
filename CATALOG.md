@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-197 Lean modules with 964 headline theorems, 71 findings (proved on paper,
-computed or conjectured) and 82 negative results. Prize problem 1 asks whether the center column
+199 Lean modules with 974 headline theorems, 72 findings (proved on paper,
+computed or conjectured) and 83 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -16,10 +16,10 @@ takes effort of order `n`.
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 13 | 12 |
 | [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 2 |
-| [Sibling rules](#sibling-rules) | 3 | 1 | 1 |
+| [Sibling rules](#sibling-rules) | 4 | 1 | 1 |
 | [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
-| [Random rows](#random-rows) | 2 | 1 | 1 |
+| [Random rows](#random-rows) | 3 | 2 | 2 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 17 | 5 | 18 |
@@ -97,6 +97,7 @@ approach stopped.
 - [Beyond the stripes and the ether, every periodic tail of up to 12 cells falls onto a background where the tops of most defects run away, and no head of up to 16 cells on one of them is in K](findings/period-two/tail-census.md): problem 1
 - [The kit's wedge hypotheses BWH and RW are statements about 2^n forced runs; no witness of BWH for 7 <= n <= 31 or of RW for n <= 26](findings/period-two/wedge-forced-runs.md): problem 1
 - [Against a white right half, no left half of fewer than a million cells keeps the center alternating](findings/period-two/white-right-half.md): problem 1
+- [Rule 30's light-like map is invertible and not exact, has entropy at most 0.68 bits, and its correlations fall below 10^-4 by lag 48 in every test, while Rule 180's has the same shape and is not ergodic](findings/random-rows/lightlike-mixing.md): problem 2
 - [No other right extension up to 40 cells keeps the center column](findings/seeds/no-other-extensions.md): problems 1, 2, 3
 - [On a ring of W cells Rule 30 reaches all but (p_W + 1)/2 - [3 | W] rows, p_W the power sums of the roots of x³ - x² - 2, so one step loses about 0.85^W bits](findings/structure/ring-images.md): problem 3
 
@@ -487,6 +488,7 @@ Results for Rules 90, 150 and 210 that show which features of Rule 30 a proof ha
 
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
+| [Rule 180's light-like map is not ergodic for the uniform measure, because each of its light lines is constant where the next one is white](Rule30Open/Analogs/LightLike180.md) | [`Analogs.LightLike180`](Rule30Open/Analogs/LightLike180.lean) | `LightLike180.const_on_zeros`, `LightLike180.no_zero_between`, `LightLike180.pair_dichotomy`, `LightLike180.line_const_iff` | 2 | not in the kit |
 | [The linear analog of period two is true](Rule30Open/Analogs/Rule150Descent.md) | [`Analogs.Rule150Descent`](Rule30Open/Analogs/Rule150Descent.lean) | `held150_even_steps`, `held150_odd_steps`, `descent150` | 1 | not in the kit |
 | [Rule 210 keeps the period-two condition](Rule30Open/Analogs/Rule210.md) | [`Analogs.Rule210`](Rule30Open/Analogs/Rule210.lean) | `rule210_finite_half`, `orbit210_checkerboard` | 1 | not in the kit |
 | [Under Rules 90 and 150 a column is eventually periodic exactly at a mirror axis](Rule30Open/Analogs/SymmetricAxes.md) | [`Analogs.SymmetricAxes`](Rule30Open/Analogs/SymmetricAxes.lean) | `iter90_column_periodic_iff`, `iter150_column_periodic_iff`, `linear_column_periodic_iff`, `at_most_one_periodic_column`, `run90_column_periodic_iff`, `run150_column_periodic_iff`, `run210_column_periodic_iff` | 1 | extends a kit result |
@@ -556,11 +558,13 @@ What holds for a random initial row, and why it does not reach the single cell.
 |---|---|---|---|---|
 | [A random left window gives a fair center window, for every row](Rule30Open/RandomRows/LeftWindow.md) | [`RandomRows.LeftWindow`](Rule30Open/RandomRows/LeftWindow.lean) | `cone_left_xor`, `count_centerWindow`, `centerWindow_unique`, `count_adapted`, `count_periodic`, `seed_window` | 1, 2 | extends a kit result |
 | [Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, a set of positive entropy; on paper it carries invariant measures of positive entropy that are not uniform](Rule30Open/RandomRows/LightLikeEntropy.md) | [`RandomRows.LightLikeEntropy`](Rule30Open/RandomRows/LightLikeEntropy.lean) | `LightLikeEntropy.lightLike_blocks`, `LightLikeEntropy.blocks_window_determines`, `LightLikeEntropy.sigma12_entropy`, `LightLikeEntropy.sigma15_entropy`, `LightLikeEntropy.sigma17_entropy` | 2 | extends a kit result |
+| [The light-like map of Rule 30 has one preimage after every 010, so it is invertible almost everywhere and not exact, and no right diagonal of any space-time diagram reads 00100 or 11011](Rule30Open/RandomRows/LightLine.md) | [`RandomRows.LightLine`](Rule30Open/RandomRows/LightLine.lean) | `LightLine.eq_true_of_window`, `LightLine.eq_of_light_eq_of_window`, `LightLine.eq_of_light_eq_of_frequently`, `LightLine.lightIter_cell`, `LightLine.lightLine_avoids`, `LightLine.diag_avoids` | 2 | extends a kit result |
 
 **Findings**
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
+| [Rule 30's light-like map is invertible and not exact, has entropy at most 0.68 bits, and its correlations fall below 10^-4 by lag 48 in every test, while Rule 180's has the same shape and is not ergodic](findings/random-rows/lightlike-mixing.md) | computed | 2 | partial |
 | [A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive](findings/random-rows/lightlike-rigidity.md) | proved on paper | 2, 1 | wanted |
 
 **Negative results**
@@ -568,6 +572,7 @@ What holds for a random initial row, and why it does not reach the single cell.
 | Result | Kind | Problems |
 |---|---|---|
 | [Randomness proves Problems 1 and 2 for almost every row and stops at the single cell](negative-results/random-rows/almost-every-row.md) | barrier | 1, 2, 3 |
+| [The structure of Rule 30's light-like map does not decide its ergodicity, because Rule 180's light-like map shares it and is not ergodic](negative-results/random-rows/lightlike-soft-routes.md) | barrier | 2 |
 
 ## Statistics
 

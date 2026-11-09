@@ -178,8 +178,10 @@ public import Rule30Open.Frames.StripeClassCount
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.Analogs.SymmetricAxes
+public import Rule30Open.Analogs.LightLike180
 public import Rule30Open.RandomRows.LeftWindow
 public import Rule30Open.RandomRows.LightLikeEntropy
+public import Rule30Open.RandomRows.LightLine
 public import Rule30Open.Complexity.QuadraticTime
 public import Rule30Open.Complexity.ConeScreening
 public import Rule30Open.Complexity.QueryDepth

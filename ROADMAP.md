@@ -360,8 +360,14 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
   Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive far left of the
-  center, and Problem 2 follows from three structural properties of those limit points, all open
-  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
+  center, and Problem 2 follows from three structural properties of those limit points, all open ([light-like
+  rigidity](findings/random-rows/lightlike-rigidity.md)). Whether the uniform measure itself is ergodic for the
+  light-like map is open: the map is invertible almost everywhere and not exact, its light lines avoid $00100$ and
+  $11011$ in every diagram (Lean, [LightLine](Rule30Open/RandomRows/LightLine.md)), and its correlations decay in every
+  test to lag 1,024, while Rule 180's light-like map, of the same structure, is not ergodic (Lean core,
+  [LightLike180](Rule30Open/Analogs/LightLike180.md)), so a proof has to use the OR ([light-like
+  mixing](findings/random-rows/lightlike-mixing.md), [the soft
+  routes](negative-results/random-rows/lightlike-soft-routes.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
   with every cycle length of Rule 30's, differing from it on a set of small measure, reads any prescribed center column
   except at the times $t$ with $L_t \mid t$ ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
