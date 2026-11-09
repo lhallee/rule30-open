@@ -4,6 +4,7 @@ category: diagonals
 problems: [2]
 status: negative
 kind: dead-end
+evidence: [computations/white_rate_ladder.py, tests/test_white_rate_ladder.py]
 ---
 
 # A white rate below 1 at the first rung of the right ladder needs a linear cost bound for one explicit orbit, the half line beside a cell held white started from one black cell, which a positive density of black cells in its column -2 would give, as a bound on the relaxed driver game needs a positive density beside a cell held black
@@ -41,11 +42,11 @@ through its kicks, and between kicks it runs as the zero-boundary half line (the
   $y(t + 1) = y(t) \oplus x_{-2}(t)$, so the falls of $y$ are half of the black cells of column $-2$, and with the bound
   above a positive density of black cells in column $-2$ of that orbit implies this cost bound. Conversely, if every play has $K + aE \ge vT - C'$ for some $v > 0$ and some $a \ge 1$ (kicks remove falls at an
   amortized rate of at most $a$), then $S_W(1)$ holds with $\rho = 1 - v/(a + 1)$: kicks are black cells, and either they are many or the falls are.
-- **Numbers** (computed by code that is not in this repository: an exact dynamic program over the reachable states,
-  checked against every free word for $T \le 14$ and against the repository's right ladder at $T = 150$). $M_0(1, T)$ is
-  157, 173, 189, 206, 221 and 237 at $T = 200, 220, \dots, 300$. In the kick-free sub-game the most white cells are
-  750,504 among $10^6$ (0.7505), and column $-1$ of the half line beside the held white cell has 0.2501 falls per step to
-  $10^6$, as fair coins have 0.25. The fewest kicks after time 0 that a play can get away with are 0, 2 and 6 at levels
+- **Numbers** (`computations/white_rate_ladder.py`, whose dynamic programs the tests check against every free word for
+  small $T$). $M_0(1, 150) = 117$ ([the right ladder](../../findings/diagonals/right-ladder.md), exact). In the
+  kick-free sub-game the most white cells among $c(1), \dots, c(T)$ are 104, 737, 7,504, 75,163 and 750,504 at $T = 150,
+  10^3, 10^4, 10^5, 10^6$ (0.7505 at $10^6$), and column $-1$ of the half line beside the held white cell has 250,093
+  falls in $10^6$ steps (0.2501 per step), as fair coins have 0.25. The fewest kicks after time 0 that a play can get away with are 0, 2 and 6 at levels
   1, 2 and 3 to $T = 150$: from level 3 on, the word $0010000$ in column $-1$ forces a kick from every state of cells 1 to
   3, so the reduction to one sequence is a level-1 phenomenon, and $S_W(k)$ for $k \ge 3$ is a statement about a family
   of kicked orbits.
@@ -67,3 +68,14 @@ black by `Rule30DrivenLeft.light_cone` and `permutive`), and for these starts no
 proves a positive density, beyond logarithmic counts (`Rule30ZeroBoundary.jen_clock` beside a cell held white;
 `Rule30DrivenLeft.ones_fails` and L6, L7 of [the relaxed game](relaxed-density-game.md) beside a cell held black). These
 are two explicit orbits on which a statement of the kind Problem 2 asks for is needed.
+
+## Reproduce
+
+```bash
+python -m computations.white_rate_ladder kickfree --steps 1000000   # the kick-free sub-game to 10^6 (about 45 s)
+python -m computations.white_rate_ladder kicks --steps 150          # the fewest kicks at levels 1, 2, 3 (seconds)
+python -m computations.white_rate_ladder force --word 0010000      # the forcing word at levels 1 to 5 (seconds)
+```
+
+`tests/test_white_rate_ladder.py` checks the zero-boundary half line against the rule run cell by cell, and both
+dynamic programs against every free word run through `right_ladder.simulate`.

@@ -4,6 +4,7 @@ category: frames
 problems: [1, 2]
 status: negative
 kind: barrier
+evidence: [computations/diagonal_freedom.py, tests/test_diagonal_freedom.py]
 ---
 
 # The cycle data of the right-edge map fix the center column only at the times t with L_t dividing t, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal at every other time from t0 on
@@ -56,9 +57,12 @@ $5 \le i \le 84$, not proved beyond; the kit gives $L_i \ge (i + 1)/2$), put the
 $L_i - 1$ only. Then the map $G$ keeps the light cone and both edges ($G^s(1)$ has exactly $2s + 1$ binary digits).
 Along the orbit it differs from Rule 30 only at the center cells where the prescribed word differs from the rule, and at
 the times $t \ge L_i$ on each right diagonal $i$; at a doubling diagonal some of these lie inside its least period
-$L_{i+1}$. So the left half of the $G$-world evolves exactly by Rule 30 driven by the prescribed center column. This was
-checked by direct iteration to 40 levels with $t_0 = 8$ for four prescribed words (all white, all black, $(10)^\infty$,
-$(110)^\infty$), by code that is not in this repository.
+$L_{i+1}$. So the left half of the $G$-world evolves exactly by Rule 30 driven by the prescribed center column.
+`computations/diagonal_freedom.py` checks this by direct iteration to 40 levels with $t_0 = 8$ for four prescribed words
+(all white, all black, $(10)^\infty$, $(110)^\infty$): the cycle lengths, the readout, the light cone and both edges
+hold, and the Rule 30 law fails only at 15 to 20 center cells and at 10 to 13 cells with $L_i \le t < L_{i+1}$, never
+before $L_i$. On 300 random invertible T-functions of 10 levels the construction of the theorem keeps every cycle
+length, gives the prescribed or forced readout, and changes at most two residues per level.
 
 **What it means.** No argument whose ingredients hold in the modified world can prove Problem 2, and none can prove
 Problem 1 if the times $t$ with $L_t \mid t$ are finite in number (true if $L_t > t$ for every large $t$, which the
@@ -73,3 +77,13 @@ proof has to use the Rule 30 law at the center, the coupling $c(t + 1) = x_{-1}(
 cells that the flips change. The kit's own remark in `TFunctionCycles`, that none of its cycle results reaches the
 center column, is here a theorem. The same holds for every 2-adic reformulation recorded in
 [reformulations](../dynamics/reformulations.md) that uses only cycle data.
+
+## Reproduce
+
+```bash
+python -m computations.diagonal_freedom --override 40 8   # the center-override form, four words (about 45 s)
+python -m computations.diagonal_freedom --random 10 300   # the theorem on random T-functions (about 1 s)
+```
+
+`tests/test_diagonal_freedom.py` checks the bitwise map against the closed form of $\Phi$, the cycle lengths against a
+direct orbit, and both constructions on small cases.
