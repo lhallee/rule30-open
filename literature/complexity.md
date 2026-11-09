@@ -106,7 +106,9 @@ any natural function in exponential time (see the barrier entry).
   A deterministic one-tape machine that decides a nonregular language needs time of order $n \log n$ (Hennie with
   Trakhtenbrot, 1964, and Hartmanis, as the kit's `OneTapeGap` attributes it), proved by counting crossing sequences.
   *Here:* the kit proves it in Lean for digit input, and [the crossing-sequence barrier](../negative-results/complexity/one-tape-crossing.md)
-  asks what the same method can give for the center column beyond it.
+  asks what the same method can give for the center column beyond it. On unary input the kit's Problem 3 lies between
+  time $o(n \log n)$, which this gap makes Problem 1, and time $O(n \log n)$
+  ([the unary sandwich](../findings/complexity/unary-sandwich.md)).
 - **Cook and Mertz (2024).** [Tree evaluation is in space O(log n · log log n)](https://doi.org/10.1145/3618260.3649664).
   STOC 2024, 1268 to 1278; ECCC TR23-174; *SIAM Journal on Computing*, 2025,
   [DOI 10.1137/24m1690126](https://doi.org/10.1137/24m1690126) (the record was checked through Crossref).

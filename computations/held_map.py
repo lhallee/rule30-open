@@ -17,6 +17,7 @@ statement; `--tree c3` is the kit's open `Rule30PeriodFourSkeleton.C3` for each 
 phases: the left half, with the center replaced by the kit's effective boundary, keeping cell -1 on the kit's pattern.
 
     python -m computations.held_map 24   # the latest first failure for every support up to 24, both phases
+    python -m computations.held_map 23 --survivors   # survivors of the odd checks at each step, against counting
     python -m computations.held_map 22 --word 0001   # the same for the condition of 0001
     python -m computations.held_map 100 --tree check   # the condition of 0001 below 2^100, in seconds
     python -m computations.held_map 56 --tree c3   # C3 for the three words, every left half of up to 56 cells
@@ -57,6 +58,20 @@ def first_failures(support: int, phase: int, limit: int = 63) -> np.ndarray:
                 break
         V = ((V >> ONE) ^ (V | (V << ONE))) & np.uint64((1 << (limit - t)) - 1)  # (m,)
     return failure  # (n,)
+
+
+def survivor_counts(support: int, limit: int = 63) -> np.ndarray:
+    """N(T) for T = 0 .. limit - 1: how many U with exactly `support` bits have H^t(U) odd at every odd t <= T."""
+    failure = first_failures(support, 0, limit)  # (n,)
+    return np.array([int((failure > T).sum()) for T in range(limit)], dtype=np.int64)  # (limit,)
+
+
+def counting_prediction(support: int, T: int) -> float:
+    """The survivors through step T if every odd check past step `support` halved them: 2^(ceil(M/2) - 1 - k), with k
+    the number of odd steps in [M, T]. For odd M the count at step M - 1 is exact (the odd bits of U are forced and the
+    even bits below the top are free); later checks are equations in the free bits, and the halving is the heuristic."""
+    k = sum(1 for t in range(support, T + 1) if t % 2 == 1)
+    return 2.0 ** (-(-support // 2) - 1 - k)
 
 
 def first_failures_0001(support: int, phase: int, check: bool, limit: int = 63) -> np.ndarray:
@@ -162,10 +177,21 @@ def main() -> None:
     parser.add_argument("max_support", type=int)
     parser.add_argument("--word", choices=["01", "0001", "0011", "0111"],
                         help="the condition: 01 (default) or 0001; with --tree c3, one period-four word instead of all three")
+    parser.add_argument("--survivors", action="store_true",
+                        help="for the support max_support, the survivors of the odd checks at each step, and the "
+                             "counting prediction")
     parser.add_argument("--tree", choices=["check", "c3"],
                         help="along the tree of readings: 0001 with the check at phase 0, or C3 for the three words")
     args = parser.parse_args()
 
+    if args.survivors:
+        M = args.max_support
+        counts = survivor_counts(M)  # (63,)
+        for T in range(M - 1, min(2 * M + 9, 63), 2):
+            print(f"step {T}: {counts[T]} of the integers with {M} bits keep the condition; counting prediction "
+                  f"{counting_prediction(M, T):.4g}")
+        print(f"latest first failure: step {int(np.flatnonzero(counts)[-1]) + 1}; 2M = {2 * M}")
+        return
     if args.tree == "check":
         latest, branches = tree_failures("0001", args.max_support, 0, True)
         for support in range(4, args.max_support + 1, 4):
