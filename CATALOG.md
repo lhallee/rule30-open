@@ -3,8 +3,8 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-193 Lean modules with 920 headline theorems, 68 findings (proved on paper,
-computed or conjectured) and 76 negative results. Prize problem 1 asks whether the center column
+194 Lean modules with 925 headline theorems, 69 findings (proved on paper,
+computed or conjectured) and 77 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -15,11 +15,11 @@ takes effort of order `n`.
 | [Columns](#columns) | 139 | 27 | 18 |
 | [Period two](#period-two) | 16 | 15 | 12 |
 | [Diagonals](#diagonals) | 10 | 13 | 10 |
-| [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 3 | 1 |
+| [Frames and the seed's past](#frames-and-the-seeds-past) | 6 | 4 | 1 |
 | [Sibling rules](#sibling-rules) | 3 | 0 | 1 |
-| [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 3 |
+| [Dynamics of the two halves](#dynamics-of-the-two-halves) | 0 | 1 | 4 |
 | [Hidden structure](#hidden-structure) | 0 | 3 | 7 |
-| [Random rows](#random-rows) | 1 | 0 | 1 |
+| [Random rows](#random-rows) | 2 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
 | [Complexity](#complexity) | 14 | 5 | 17 |
@@ -83,6 +83,7 @@ approach stopped.
 - [To depth 200,000 the single cell's onset front, the edge of the pattern against its translate by the period, gains 0.752 depth per step and moves with the frequencies of the damage edge of random rows and of backgrounds of period 32, within 2.1 combined standard errors; in a game where the settled cells are fair coins, no transient that keeps four or more cells right of the edge holds the gain at 2/3](findings/diagonals/onset-edge.md): problem 2
 - [To depth 250,000 the settled skeletons of the rows white left of a black cell form a tree of 8 branches that leave the single cell's at 53,207; no branch doubles its period before the single cell's, but their antiphase alternations reach 11 against its 9 and their walks advance 1.99 to 2.02 per depth](findings/diagonals/skeleton-tree.md): problem 2
 - [Information reaches the center from the left at speed 1, from the right at about 0.4](findings/dynamics/one-way-valve.md): problems 1, 2
+- [On every box [-A, B] of up to 21 cells two rows have the same center column exactly when the kit's stripe relation at time 0 or 1 joins them, so the box reaches the Lean bound of 2^(A+B) + 3 · 2^(A-1) center columns (A, B ≥ 1) and rows with equal center columns have equal left parts](findings/frames/center-classes.md): problem 1
 - [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md): problem 1
 - [Every defect of up to 20 cells on the ether settles, so (R) holds for those ether tails; a potential on top windows fails even along one real orbit](findings/period-two/ether-defect-census.md): problem 1
 - [Beside an alternating center every right half of up to 20 cells enters a gap trap, the kit's ether family or a lock of period seven](findings/period-two/gate-census.md): problem 1
@@ -461,6 +462,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 
 | Result | Status | Problems | Formalization |
 |---|---|---|---|
+| [On every box [-A, B] of up to 21 cells two rows have the same center column exactly when the kit's stripe relation at time 0 or 1 joins them, so the box reaches the Lean bound of 2^(A+B) + 3 · 2^(A-1) center columns (A, B ≥ 1) and rows with equal center columns have equal left parts](findings/frames/center-classes.md) | computed | 1 | partial |
 | [Only the stripe and the ether backgrounds give a periodic column](findings/frames/periodic-backgrounds.md) | computed | 1 | wanted |
 | [The single cell has a unique past, and every row of it is periodic](findings/frames/seed-past.md) | proved on paper | 1 | partial |
 | [The center column is the image of 1 under a 2-adic isometry](findings/frames/two-adic-trace.md) | proved on paper | 1 | proved in the kit |
@@ -503,6 +505,7 @@ How information crosses the center column, and reformulations of Problem 1 that 
 
 | Result | Kind | Problems |
 |---|---|---|
+| [A compositional proof through the center needs both halves' own dynamics, the left half's from a finite start; either half can be replaced by a causal adversary that makes the center eventually periodic, and at period one the left half alone forbids only the black tail, which Jen's theorem forbids](negative-results/dynamics/compositional-halves.md) | dead end | 1 |
 | [Bounding the left half by the right channel needs Problem 1 itself](negative-results/dynamics/left-half-complexity.md) | dead end | 1 |
 | [Reformulations of Problem 1 that did not close](negative-results/dynamics/reformulations.md) | dead end | 1 |
 | [Driven halves never synchronize](negative-results/dynamics/synchronization.md) | no signal | 1 |
@@ -540,6 +543,7 @@ What holds for a random initial row, and why it does not reach the single cell.
 | Result | Module | Headline theorems | Problems | Kit |
 |---|---|---|---|---|
 | [A random left window gives a fair center window, for every row](Rule30Open/RandomRows/LeftWindow.md) | [`RandomRows.LeftWindow`](Rule30Open/RandomRows/LeftWindow.lean) | `cone_left_xor`, `count_centerWindow`, `centerWindow_unique`, `count_adapted`, `count_periodic`, `seed_window` | 1, 2 | extends a kit result |
+| [Uncountably many rows come back after 12, 15 or 17 steps moved as many cells to the right, so the rows that travel at the speed of light carry invariant measures of positive entropy that are not uniform](Rule30Open/RandomRows/LightLikeEntropy.md) | [`RandomRows.LightLikeEntropy`](Rule30Open/RandomRows/LightLikeEntropy.lean) | `LightLikeEntropy.lightLike_blocks`, `LightLikeEntropy.blocks_window_determines`, `LightLikeEntropy.sigma12_entropy`, `LightLikeEntropy.sigma15_entropy`, `LightLikeEntropy.sigma17_entropy` | 2 | extends a kit result |
 
 **Negative results**
 
