@@ -26,11 +26,37 @@ def trial_factor_degrees(P: int) -> list[int]:
                 P = quotient
                 degrees.append(d)
         d += 1
-        if d > 4:
-            break
+        if 2 * d > P.bit_length() - 1:
+            break  # a factor left of degree below 2d has no factor of degree below d, so it is irreducible
     if P.bit_length() > 1:
         degrees.append(P.bit_length() - 1)
     return sorted(degrees)
+
+
+def norm_degrees(a: int, b: int, c: int, pi: int) -> list[int]:
+    """Degrees of the irreducible factors over F_2 of the norm of Q modulo pi: the product of Q(theta, z) over the
+    conjugates theta of the class of s in F_2[s]/pi, by polynomial arithmetic over F_2[s]/pi and trial division. The
+    norm factors with degree k d for each factor of degree d over F_(2^k) whose roots do not lie in a smaller field,
+    so its degrees give the Frobenius pattern without counting roots."""
+    k = pi.bit_length() - 1
+
+    def mul(x: int, y: int) -> int:
+        """Product in F_2[s]/pi."""
+        return cc.poly_mod(cc.clmul(x, y), pi)
+
+    conj = [cc.poly_mod(0b10, pi)]  # the class of s and its Frobenius images
+    for _ in range(k - 1):
+        conj.append(mul(conj[-1], conj[-1]))
+    prod = [1]  # coefficients of the norm, lowest first
+    for th in conj:
+        f = [th, th if c else 0, 1 ^ (th if b else 0), th if a else 0, th]
+        out = [0] * (len(prod) + len(f) - 1)
+        for i, x in enumerate(prod):
+            for j, y in enumerate(f):
+                out[i + j] ^= mul(x, y)
+        prod = out
+    assert all(v in (0, 1) for v in prod)  # the norm has coefficients in F_2
+    return trial_factor_degrees(sum(v << i for i, v in enumerate(prod)))
 
 
 def test_fields() -> None:
@@ -53,10 +79,19 @@ def test_patterns_at_s_equal_one() -> None:
         degrees = trial_factor_degrees(P)
         counts = cc.frobenius_pattern(a, b, c, 0b11)
         for d, n in zip((1, 2, 3, 4), counts):
-            if len(set(degrees)) == len(degrees):  # squarefree: roots in F_(2^d) = sum of degrees dividing d
+            if len(set(degrees)) == len(degrees):  # distinct factor degrees (so squarefree): roots in F_(2^d)
                 assert n == sum(e for e in degrees if d % e == 0)
     assert trial_factor_degrees(0b10111) == [1, 3]  # z^4 + z^2 + z + 1 = (z + 1)(z^3 + z^2 + 1)
     assert trial_factor_degrees(0b10011) == [4]  # z^4 + z + 1
+
+
+def test_certificates_by_norms() -> None:
+    # the certificates of the entry from the factor degrees of the norms: [1, 3] and [4] at s + 1, [12] (an irreducible
+    # quartic over F_8) at s^3 + s + 1, and [2, 6] (a root and a cubic over F_4) at s^2 + s + 1
+    for rule in ((0, 0, 1), (1, 0, 0)):
+        assert norm_degrees(*rule, 0b11) == [1, 3] and norm_degrees(*rule, 0b1011) == [12]
+    for rule in ((0, 1, 1), (1, 1, 0)):
+        assert norm_degrees(*rule, 0b11) == [4] and norm_degrees(*rule, 0b111) == [2, 6]
 
 
 def test_certificates() -> None:
@@ -85,14 +120,14 @@ def test_run_row_cell_by_cell() -> None:
 
 
 def test_radius_two_criterion() -> None:
-    # Theorem 2 on rows of up to 5 cells: the eventually periodic columns of the asymmetric rules are white from time 1
+    # result 3 of the entry on rows of up to 5 cells: the eventually periodic columns of the four rules are all white
     for a, b, c in cc.ASYMMETRIC:
         found = cc.ep_columns([1, a, b, c, 1], 2, 2, 5, 4, 512, 16)
-        assert found and all(not col[1:].any() for _, _, col in found)
+        assert found and all(not col.any() for _, _, col in found)
 
 
 def test_radius_one_criterion() -> None:
-    # Theorem 1 on rows of up to 3 cells over F_3 and up to 6 cells over F_2: periodic exactly at the twisted axes
+    # result 2 of the entry on rows of up to 3 cells over F_3 and up to 6 cells over F_2: periodic exactly at the axes
     for q, width in [(3, 3), (2, 6)]:
         for a in range(1, q):
             for b in range(q):

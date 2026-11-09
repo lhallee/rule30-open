@@ -58,7 +58,8 @@ Proved in Lean:
 - **The linear barrier, explained.** Under Rules 90 and 150 a column of a finite row is eventually periodic exactly
   when the row is mirror-symmetric about it, so their eventually periodic centers come from the seed's symmetry alone
   ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)); for every linear rule the periodic columns come from a
-  symmetry of an algebraic column curve, which the asymmetric radius-2 rules over GF(2) lack
+  symmetry of an algebraic column curve, which the four radius-2 rules over GF(2) with both outer coefficients 1 and $a
+  \ne c$ lack
   ([column curves](findings/analogs/column-curves.md)).
 
 Computed: every integer below $2^{63}$ fails the period-two condition of the integer map
@@ -80,7 +81,7 @@ by a three-case law, so a gain of 2/3 diagonal per step gives that slope
 Computed: density 0.500169 over $2^{22}$ cells; that point gains about 0.75 diagonal per step to depth 200,000; over
 every center column the left half allows, black cells grow at a rate near 3/4
 ([driver density](findings/diagonals/driver-density.md)). From a uniformly random left half, almost surely every center column
-the half allows, whatever the right half, has black cells of upper density at most 0.7729, the root of $h(d) = d$
+the half allows, whatever the right half, has black cells of upper density at most $d^* = 0.77291$, the root of $h(d) = d$
 (proved on paper, [the first moment](findings/diagonals/driver-first-moment.md)); the white start is one half of
 measure zero.
 

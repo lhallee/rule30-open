@@ -55,9 +55,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   90, 150 and 210, in Lean ([SymmetricAxes](Rule30Open/Analogs/SymmetricAxes.md)). The proof runs on linearity and on
   two steps being one step on each sublattice, neither of which Rule 30 has. For every linear rule over a finite field a
   column is eventually periodic exactly when a sum over the small roots of its column curve is fixed by the curve's
-  Galois group: at radius 1 that is a twisted mirror symmetry of the row, and the asymmetric radius-2 rules over GF(2),
-  with group $S_4$, have no eventually periodic column but those white from time 1; Rule 30's center has no algebraic
-  curve, only the Duhamel series, so the argument stops there ([column curves](findings/analogs/column-curves.md)). A
+  Galois group: at radius 1 that is a twisted mirror symmetry of the row, and the four radius-2 rules over GF(2) with both outer coefficients 1 and $a \ne c$, with group $S_4$, have no
+  eventually periodic column but the all-white ones; Rule 30's center has no known algebraic curve (it has one exactly
+  when it is 2-automatic, which is open), only the Duhamel series, so the argument stops there ([column curves](findings/analogs/column-curves.md)). A
   proof through the center cannot treat the
   two halves as black boxes either: either half can be replaced by a causal adversary that makes the center eventually
   periodic, the single cell's own left half admits the white tail $1, 1, 0, 0, \dots$, and beyond period one the route
@@ -389,7 +389,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   comparable length; so the conjecture that the black count is at most $\rho T + C$ with $\rho < 1$ would give the single
   cell's white cells a positive lower density ([driver density](findings/diagonals/driver-density.md)). From a
   uniformly random left half, almost surely every driver it admits, so the center column beside every right half at
-  once, has black cells of upper density at most $0.7729$, the root of $h(d) = d$; this first-moment bound is just above
+  once, has black cells of upper density at most $d^* = 0.77291$, the root of $h(d) = d$; this first-moment bound is just above
   the measured $3/4$, and the conjecture is equivalent to an upper large-deviation bound for the center column with
   column 1 replaced by fair coins, one that may lose an exponential factor against the first moment; from the white
   half the admissible words with $b$ black cells number at most 1.35 times their mean over random halves for $n$ from

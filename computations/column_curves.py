@@ -18,7 +18,7 @@ Psi(z) = z^(-p) X(z) B(z) / (r' B(z) - z B'(z)) over the r' small roots of Q plu
 
     python -m computations.column_curves --certificates        # the S_4 certificates (seconds)
     python -m computations.column_curves --radius-two 9        # radius 2 over F_2, rows of up to 9 cells (about 1 min)
-    python -m computations.column_curves --radius-one 3 5      # radius 1 over F_3, rows of up to 5 cells (about 1 min)
+    python -m computations.column_curves --radius-one 3 5      # radius 1 over F_3, rows of up to 5 cells (seconds)
 """
 
 from __future__ import annotations
@@ -183,7 +183,12 @@ def twisted_symmetric(row: list[int], p: int, a: int, c: int, q: int) -> bool:
     """x_(p+m) = -(a/c)^m x_(p-m) for every integer m, with negative powers taken in F_q."""
     ratio = (a * pow(c, q - 2, q)) % q
     inv_ratio = pow(ratio, q - 2, q)
-    cell = lambda i: row[i] if 0 <= i < len(row) else 0  # noqa: E731
+
+    def cell(i: int) -> int:
+        """Cell i of the row, white outside it."""
+        return row[i] if 0 <= i < len(row) else 0
+
+    
     span = len(row) + abs(p) + 1
     for m in range(-span, span + 1):
         power = pow(ratio, m, q) if m >= 0 else pow(inv_ratio, -m, q)
@@ -207,9 +212,9 @@ def main() -> None:
     if args.radius_two:
         for a, b, c in ASYMMETRIC:
             found = ep_columns([1, a, b, c, 1], 2, 2, args.radius_two, args.reach, args.steps, args.pmax)
-            bad = [(row, p) for row, p, col in found if col[1:].any()]
+            bad = [(row, p) for row, p, col in found if col.any()]
             print(f"(a, b, c) = ({a}, {b}, {c}): {len(found)} eventually periodic columns, "
-                  f"{len(bad)} not white from time 1 on")
+                  f"{len(bad)} not white at every time")
     if args.radius_one:
         q, width = args.radius_one
         mismatches = total = 0
