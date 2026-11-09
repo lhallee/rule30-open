@@ -1,12 +1,12 @@
 ---
-title: A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive
+title: A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive
 category: random-rows
 problems: [2, 1]
 status: paper
 formalization: wanted
 ---
 
-# A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit measure of the single cell keeps that entropy positive
+# A measure invariant under the shift and Rule 30 that is ergodic for the light-like map is uniform or has zero entropy, the entropy of a cell given the cells to its right can only grow rightward, and Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive
 
 Write $F$ for Rule 30, $F(x)_i = x_{i-1} \oplus (x_i \lor x_{i+1})$, $\sigma$ for the shift, $(\sigma x)_i = x_{i+1}$,
 and $G = \sigma F$ for the *light-like map*, $(Gx)_i = x_i \oplus (x_{i+1} \lor x_{i+2})$: Rule 30 in the frame that
@@ -28,7 +28,7 @@ $\sigma$-algebra of the cells $\ge k$.
    which holds exactly when $G$ on the right halves $X_0$ is ergodic for the law of $x_{\ge 0}$, then $\mu = \lambda$
    or $x_{-1}$ is almost surely a function of $x_{\ge 0}$. The same for $\sigma$- and $F^q$-invariant measures with
    $G^q$ ergodic.
-4. **The hypothesis is needed** (Lean). The rows that come back after 12 steps moved 12 cells to the right form a set of
+4. **The hypothesis is needed** (the positive entropy in Lean, the measures on paper). The rows that come back after 12 steps moved 12 cells to the right form a set of
    positive entropy ([LightLikeEntropy](../../Rule30Open/RandomRows/LightLikeEntropy.md); 12 is the least such period,
    by the kit's main branch, `Rule30MovingWaves`); it carries measures invariant
    under $\sigma$ and $F$ with positive entropy that are not uniform, and on it $G^{12}$ is the identity, so those
@@ -44,13 +44,17 @@ $\sigma$-algebra of the cells $\ge k$.
    - *Problem 2 as rigidity.* If a limit point is $\sigma$-invariant (H1), ergodic for $G$ (H2) and of positive entropy
      (H3), it is $\lambda$ by item 3, and along that subsequence the center column has density $1/2$ (under $\lambda$ the
      center column is a sequence of fair coins, the kit's `Mixing.measurePreserving_line`). If every limit point
-     satisfies them, the center column is normal. All three are open for the single cell, and item 4 shows that (H2)
-     cannot be dropped.
+     satisfies them, the center column is normal. All three are open for the single cell, and item 4 shows that item 3
+     is false without (H2).
 6. **Open: is $\lambda$ itself ergodic for $G$?** The positive branch of items 2 and 3 is used only if it is. On the
    right halves, $G$ is a skew product with fiber $\{0, 1\}$ over a copy of itself, $y_0 \mapsto y_0 \oplus (y_1 \lor
    y_2)$; an invariant function splits into an invariant function one cell further right and a twisted part $h$ with
    $h \circ G = (-1)^{y_0 \lor y_1} h$ (after reindexing), and since the product measure has a trivial tail, $\lambda$
    is ergodic for $G$ exactly when this twisted equation has no nonzero square-integrable solution. Not settled here.
+   It is a case of the conjecture of Shirvani and Rogers (Comm. Math. Phys. 136 (1991), record seen only through search
+   results) that every onto one-dimensional automaton other than the identity and the inversion is ergodic for
+   $\lambda$. The kit's proof that $F$ is mixing (`Mixing.tendsto_measure_inter_preimage`) flips the coin at the foot
+   $a - t$ of each cell; for $G$ every cell above column $a$ has foot $a$, so it does not transfer.
 
 ## Proofs
 
@@ -64,8 +68,8 @@ $x_{\ge k}$ the map $x_{[k-n, k-1]} \mapsto F(x)_{[k-n+1, k]}$ is a bijection (R
 the same two steps apply; for $F^q$, $F^q(x)_k = x_{k-q} \oplus g_q(\dots)$ does the same with a shift of $q$.
 $\square$
 
-**Item 2.** $H$-invariance and $(Hx)_{k-1} = x_{k-1} \oplus \eta(x_{[k, k+r-1]})$ give, by the same computation without
-conditioning on a coarser algebra, $s_k \circ H_k = E[\omega^\eta_k s_k \mid H_k^{-1}\mathcal{B}]$ with
+**Item 2.** $H$-invariance and $(Hx)_{k-1} = x_{k-1} \oplus \eta(x_{[k, k+r-1]})$ give, by the same computation on one half
+line, with the coarser algebra $H_k^{-1}\mathcal{B}_{\ge k}$ in place of $\Phi_k^{-1}\mathcal{B}_{\ge k+1}$, $s_k \circ H_k = E[\omega^\eta_k s_k \mid H_k^{-1}\mathcal{B}_{\ge k}]$ with
 $\omega^\eta_k = (-1)^{\eta}$; since $H_k$ preserves the law of $x_{\ge k}$, both sides have the same $L^2$ norm, so
 $s_k \circ H_k = \omega^\eta_k s_k$ almost surely. So $|s_k|$ is $H_k$-invariant, hence constant, $c$, the factor
 $(X_k, H_k)$ of an ergodic system being ergodic. If $c = 0$ the cell is free. If $c > 0$, $u = s_k/c$ has
@@ -76,8 +80,10 @@ free, every cylinder has measure $2^{-\text{length}}$ by peeling off its leftmos
 determined, $h_\mu(\sigma) = H_\mu(x_{-1} \mid \mathcal{B}_{\ge 0}) = 0$. $\square$
 
 **Item 3.** Item 2 with $H = G$ (or $G^q$). For $\sigma$-invariant $\mu$ the shift identifies $(X_k, G)$ with
-$(X_0, G)$ for every $k$; if $G$ on $X_0$ is ergodic, an invariant function on the whole line has constant conditional
-expectations on every $\mathcal{B}_{\ge k}$, and these converge to it as $k \to -\infty$ (Lévy), so $(\mu, G)$ is ergodic.
+$(X_0, G)$ for every $k$; if $G$ on $X_0$ is ergodic, an invariant function $f$ on the whole line has constant conditional
+expectations $f_k = E[f \mid \mathcal{B}_{\ge k}]$: since $G^{-1}\mathcal{B}_{\ge k} \subset \mathcal{B}_{\ge k}$,
+$f_k \circ G = E[f_k \mid G^{-1}\mathcal{B}_{\ge k}]$, which has the $L^2$ norm of $f_k$, so $f_k \circ G = f_k$ as in item 2,
+and $f_k$ is constant on the ergodic $(X_k, G)$; these converge to $f$ as $k \to -\infty$ (Lévy), so $(\mu, G)$ is ergodic.
 The converse is a factor. $\square$
 
 **Item 4.** [LightLikeEntropy](../../Rule30Open/RandomRows/LightLikeEntropy.md) proves the positive entropy in Lean and
@@ -95,23 +101,30 @@ and a tail function, which is constant for $\lambda$. $\square$
 
 ## What it means
 
-Problem 2 asks for $\mu(x_0 = 1) = 1/2$ at every limit point of the single cell's orbit. Item 3 turns it into three
-structural properties of those limit points, none of which is a statement about fair coins, and item 5 turns Problem 1
-into the positivity of one conditional entropy. Item 4 says that the light-like ergodicity cannot be dropped, because
+Problem 2 asks for $\mu(x_0 = 1) = 1/2$ at every limit point of the single cell's orbit. Item 3 gives a sufficient
+condition for it, three structural properties of those limit points, none of which is a statement about fair coins,
+and item 5 a sufficient condition for Problem 1, the positivity of one conditional entropy. Item 4 says that the
+light-like ergodicity cannot be dropped from item 3, because
 Rule 30 has rows that travel at the speed of light in uncountable families. The obstacle is the same as everywhere in
 this repository: nothing proves any of (H1) to (H3), or the positive entropy, for the single cell, whose rows have zero
 spatial entropy.
 
 ## Relation to the literature and the kit
 
-Measure rigidity is known for automata that are permutive on both sides: Host, Maass and Martínez for affine ones,
-Pivato (2005) and Sablik (2007) for algebraic and bipermutative ones ([measures and analogs](../../literature/measure-and-analogs.md)).
-Rule 30 is permutive only in its left cell, and its light-like map only in its own cell. A preprint of Tal
-(arXiv:2604.10124, 2026), seen only as a record, states a constraint for invariant measures of bipermutative automata and
+Measure rigidity is known for automata that are permutive on both sides: Pivato (2003) for bipermutative ones
+([measures and analogs](../../literature/measure-and-analogs.md)), and, seen only through search results, Host, Maass
+and Martínez (2003) for affine ones and Sablik (2007). Those theorems assume ergodicity for the shift and positive
+entropy of the automaton; item 2 assumes ergodicity for the automaton and uses the entropy of the shift, also for its
+bipermutative members $x_i \oplus x_{i+1}$ and $x_i \oplus x_{i+2}$.
+Rule 30 is permutive only in its left cell, and its light-like map only in its own cell. A preprint,
+"On a constraint on invariant measures of certain cellular automata (bi-permutative and more)" (arXiv:2604.10124,
+2026, seen only through search results), states a constraint for invariant measures of bipermutative automata and
 asks which other automata have $\lambda$ as their only ergodic invariant measure of positive entropy; its text was not
-read, so items 1 and 2 are claimed as new only against the kit and this repository. Item 4 shows that the constraint in
-the form without ergodicity fails for Rule 30. The kit's `Mixing` proves that the lines of velocity other than 1 are
-fair coins under $\lambda$ and excepts velocity 1, and `PeriodicPoints` excludes recurring rows at every velocity in
-$[-1, 1)$; neither treats invariant measures other than $\lambda$ or the light-like direction. The kit's main branch,
-after the pinned commit, has the light-like direction in `Rule30MovingWaves`, which proves that 12 is the least period
-at which the rows travelling at light speed to the right have positive entropy; it does not treat invariant measures.
+read, so items 1 and 2 are claimed as new only against the kit and this repository. Item 4 shows that for Rule 30 a measure invariant under
+$\sigma$ and $F$ with positive entropy need not be $\lambda$, nor $t\lambda + (1 - t)\nu$ with $\nu$ of zero entropy, so some
+ergodicity hypothesis is needed. The kit's `Mixing` proves that the lines of velocity other than 1 are
+fair coins under $\lambda$ and excepts velocity 1, and `PeriodicPoints` proves that a row recurring at a velocity in
+$[-1, 1)$ is spatially periodic, so Rule 30 has no gliders there; neither treats invariant measures other than $\lambda$ or the light-like direction. The kit's main branch,
+after the pinned commit, has the light-like map itself as `Rule30RingOrbits.Phi` and the light-like direction in
+`Rule30MovingWaves`, which proves that 12 is the least period at which the rows traveling at light speed to the right
+have positive entropy; it does not treat invariant measures.

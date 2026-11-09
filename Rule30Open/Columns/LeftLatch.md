@@ -59,8 +59,8 @@ three at every step.
 
 ## What it covers
 
-`LeftLatch b` is open for every block but the black one: it is one statement for each eventual period, not a proof
-of any. For $01$, $001$, $011$ and $0111$ the checks are the patterns of the kit's `Q01`, `Q001`, `C3w` and `C3`, so
+`LeftLatch b` is open for every block with both colors, and fails for the white block (the white half with a white
+right cell keeps every condition: no kick fires): it is one statement for each eventual period, not a proof of any. For $01$, $001$, $011$ and $0111$ the checks are the patterns of the kit's `Q01`, `Q001`, `C3w` and `C3`, so
 each of those statements implies `LeftLatch` of its word, by shifting the phase; that implication is not formalized
 here. The latch adds readings only at a 0 of the block that is
 not followed by two 1s: for $01$ it is the kit's golden condition (`period_two_golden` in

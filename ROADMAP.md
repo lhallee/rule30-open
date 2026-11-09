@@ -357,9 +357,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
-  Problem 1 holds if one limit measure of the single cell keeps that entropy positive far left of the center, and
-  Problem 2 follows from three structural properties of its limit measures, all open
-  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)) The cycle data of the right-edge map cannot
+  Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive far left of the
+  center, and Problem 2 follows from three structural properties of those limit points, all open
+  ([light-like rigidity](findings/random-rows/lightlike-rigidity.md)). The cycle data of the right-edge map cannot
   decide either problem: a map with every cycle length of Rule 30's, differing from it on a set of small measure, reads
   any prescribed center column ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
