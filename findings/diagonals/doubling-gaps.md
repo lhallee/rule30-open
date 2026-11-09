@@ -130,11 +130,13 @@ lower bounds need.
   at an odd distance $g$ has $g \ge 2 \log_2 q + 3$**, for every start word, doubling or not.
 - **Even gaps (paper).** For $k \ge 2$, $E_{2k}$ is a function of the $k$ cells $X(t), \dots, X(t + k - 1)$ of full
   algebraic degree, so it has odd weight, is not balanced, and is permutive in no cell: at no even $g \ge 6$ does
-  $E_{g-2} = 1$ fix one cell of $X$ from the others, and the odd-gap bound has no analog at any even gap. *Proof.* In
-  $E_{2k} = E_{2k-2}(t+1) \oplus E_{2k-1} \oplus E_{2k-2} \oplus E_{2k-1} E_{2k-2}$ the monomial
-  $X(t) \cdots X(t+k-1)$ is not in $E_{2k-2}(t+1)$, which misses $X(t)$, nor in $E_{2k-2}$, which misses
-  $X(t+k-1)$, nor in $E_{2k-1}$, where $X(t+k-1)$ enters only linearly; in the product it comes exactly from
-  $X(t+k-1)$ times the top monomial of $E_{2k-2}$. Induction from $E_4 = X(t) \oplus X(t) X(t+1)$. $\square$
+  $E_{g-2} = 1$ fix one cell of $X$ from the others, and the odd-gap bound has no analog at any even gap. *Proof.*
+  Count the windows of $k$ cells on which a term is 1, modulo 2, in
+  $E_{2k} = E_{2k-2}(t+1) \oplus E_{2k-1} \oplus E_{2k-2} \oplus E_{2k-1} E_{2k-2}$. The first and third terms
+  ignore one of the $k$ cells, so they count evenly; the second is right-permutive and counts $2^{k-1}$; the last,
+  summed over the last cell with the others fixed, counts the windows of $E_{2k-2}$, since $E_{2k-1}$ is 1 for exactly
+  one value of that cell. So the weight of $E_{2k}$ has the parity of that of $E_{2k-2}$, and $E_2 = X(t)$ has weight
+  1. An odd weight is the top monomial, so the degree is full. $\square$
   (`even_weight`; `tests/test_doubling_gaps.py` checks the odd weight for $2 \le k \le 12$.)
 - **Every gap up to 49 (computation).** For each $g$, `source_graph` builds the shift of finite type of the
   bi-infinite $X$ with $E_{g-2}$ all black, trimmed to the windows on bi-infinite paths, and the two-track graph of the
