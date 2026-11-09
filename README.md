@@ -85,8 +85,9 @@ the half allows, whatever the right half, has black cells of upper density at mo
 measure zero.
 
 Where it stops: a proof that the gain is at least 2/3 per step, or that the black rate stays below 1, is open, and
-every bound on the black rate contains a positive density for one explicit orbit, Rule 30 beside a cell held black
-([the relaxed game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
+every bound on the black rate contains a positive density for one explicit orbit, the greedy driver of the game, and
+every bound on its relaxation one for Rule 30 beside a cell held black ([the relaxed
+game](negative-results/diagonals/relaxed-density-game.md)). Random rows satisfy the problem but do not
 reach the single cell ([almost every row](negative-results/random-rows/almost-every-row.md)), and invariant measures of
 positive entropy need not be uniform: rows moving right at the speed of light form a set of positive entropy, in Lean
 ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).

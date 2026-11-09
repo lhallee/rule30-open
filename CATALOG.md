@@ -445,7 +445,7 @@ The periodic diagonals of the regular left side, and where their periods grow.
 | [The relaxed driver game G has value about 0.63 T to T = 180, its lemmas reduce a black density below 1 to a charging property, and every such bound contains a positive density for one explicit orbit, Rule 30 beside a cell held black](negative-results/diagonals/relaxed-density-game.md) | dead end | 2 |
 | [No finite certificate with a bounded potential bounds the seed onsets at every depth unless the white runs of the settled diagonals stay bounded; one step can cost 24 by depth 200,000, the abstractions that keep the periodic pair have no cycle on the pairs that occur, and the pair graphs keep cycle mean 7/3 until the window covers the period](negative-results/diagonals/seed-finite-certificate.md) | dead end | 2 |
 | [A seed-uniform induction on the onsets of the left diagonals stops at slope 2; the later row is a seed whose settled prefix leaves the rest free, the fresh-seed subadditivity fails at one diagonal, and the single cell is the worst seed up to a delay of 8 at every depth to 76 but not at depth 139](negative-results/diagonals/seed-uniform-induction.md) | dead end | 2 |
-| [A white rate below 1 at the first rung of the right ladder needs a positive density for one explicit orbit, the half line beside a cell held white started from one black cell, just as the black rate needs one beside a cell held black](negative-results/diagonals/white-rate-ladder.md) | dead end | 2 |
+| [A white rate below 1 at the first rung of the right ladder needs a linear cost bound for one explicit orbit, the half line beside a cell held white started from one black cell, which a positive density of black cells in its column -2 would give, as a bound on the relaxed driver game needs a positive density beside a cell held black](negative-results/diagonals/white-rate-ladder.md) | dead end | 2 |
 | [A potential that grows with the white runs does not turn the window bounds into a slope below 2 for every depth, and the step bounds the white runs only by the period; the window bounds grow linearly faster than 3j/2 while W_j is constant, a certificate that knows only the white runs needs slope 7/3, and words with one black cell per period occur at periods 4, 8 and 16](negative-results/diagonals/white-run-potential.md) | dead end | 2 |
 
 ## Frames and the seed's past
@@ -476,7 +476,7 @@ Rule 30 as a bijection of the 2-adic integers, the center column as a trace, and
 
 | Result | Kind | Problems |
 |---|---|---|
-| [The cycle data of the right-edge map cannot see the center column, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal](negative-results/frames/diagonal-freedom.md) | barrier | 1, 2 |
+| [The cycle data of the right-edge map fix the center column only at the times t with L_t dividing t, since a map that keeps every cycle length and differs from Rule 30's on a set of measure at most 2^(2 - t0) reads any prescribed word on the diagonal at every other time from t0 on](negative-results/frames/diagonal-freedom.md) | barrier | 1, 2 |
 | [A periodic column does not force a periodic row](negative-results/frames/periodic-column-preperiodic-row.md) | refuted | 1 |
 
 ## Sibling rules
