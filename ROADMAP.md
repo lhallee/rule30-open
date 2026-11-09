@@ -478,8 +478,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   both the diagonal $j$ and the time $t$, periodicity of the column does not help: a 2-automatic array of two indices
   with eventually periodic rows has row periods $O(j)$, so Rule 30's array of right diagonals is not 2-automatic if the
   right-edge cycle length $L_n$ grows faster than linearly, while Rule 90's is 2-automatic, in Lean
-  ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 25 of the levels $n \le 61$ and reaches $2^{25}$
-  ([right-edge cycles](findings/complexity/right-edge-cycles.md)); the transducers of the powers of the right-edge step
+  ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). $L_n$ doubles at 36 of the levels $n \le 84$ and reaches $2^{36}$,
+  and two exact parities decide whether a stall of the period lasts one diagonal or two, after which each doubling is
+  the parity of a half-period difference ([right-edge cycles](findings/complexity/right-edge-cycles.md)); every route
+  tried toward $L_n / n$ unbounded (bit filling, the two edges, counting on the restart, weight parities,
+  renormalization) stops at a parity over the middle of a period, and the 2-adic seeds $\pm 1/3$ and Rule 150 bar any
+  argument without both the light cone and the product term ([the routes](negative-results/complexity/right-edge-cycle-routes.md));
+  the transducers of the powers of the right-edge step
   grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)).
   In parity models the center is separated from the linear rules for every $t$, in Lean: a function of odd weight has
   Walsh coefficients 2 mod 4 and an XOR lift that is its own inverse over GF(2), so with the kit's top monomial $c_t$ has

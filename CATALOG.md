@@ -4,7 +4,7 @@ Every result in this repository, by category. `python scripts/catalog.py write` 
 front matter of the entries; edit the entries, not this page.
 
 193 Lean modules with 920 headline theorems, 68 findings (proved on paper,
-computed or conjectured) and 75 negative results. Prize problem 1 asks whether the center column
+computed or conjectured) and 76 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
 
@@ -22,7 +22,7 @@ takes effort of order `n`.
 | [Random rows](#random-rows) | 1 | 0 | 1 |
 | [Statistics](#statistics) | 0 | 0 | 4 |
 | [Learned models](#learned-models) | 0 | 0 | 2 |
-| [Complexity](#complexity) | 14 | 5 | 16 |
+| [Complexity](#complexity) | 14 | 5 | 17 |
 
 ## Open work
 
@@ -32,7 +32,7 @@ approach stopped.
 **Conjectures to prove or refute**
 
 - [The three words of period four lock the right half](findings/columns/period-four-locking.md): problem 1
-- [The right-edge cycle length L_n of the single cell doubles at 25 of the levels n ≤ 61 and reaches 2^25, about 2^(0.41 n); L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic](findings/complexity/right-edge-cycles.md): problem 3
+- [The right-edge cycle length L_n of the single cell doubles at 36 of the levels n ≤ 84 and reaches 2^36, about 2^(0.43 n), and two exact parities decide whether a stall of the period lasts one diagonal, two, or more; L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic](findings/complexity/right-edge-cycles.md): problem 3
 - [Whatever the center column, the left half it drives allows a black run from time t of at most 0.13t to 0.18t and a white run of at most 0.15t to 0.28t for t from 75 to 175, far below the kit's slopes 3/5 and 1](findings/diagonals/driven-left-runs.md): problem 2
 - [Over every center column that the left half allows, the most black cells among c(0..T) is 141 at T = 190 exactly and at least 2,254 at T = 3,000, a rate near 3/4; chaining dense periodic words does not raise it, and a long stretch is mostly followed by a gap of comparable length](findings/diagonals/driver-density.md): problem 2
 - [With right cells 1 to k exact and cell k + 1 free, the most white cells of the center column among c(0..150) is 117 at k = 1 (exact), where the left half alone allows 149, the best free words found gain about 0.80 white cells per step to T = 3,000 at k = 1 and 2, and both colors' rates fall with k, to 0.66 and 0.68 at k = 16](findings/diagonals/right-ladder.md): problem 2
@@ -600,7 +600,7 @@ Prize Problem 3, and what an answer either way would imply.
 |---|---|---|---|
 | [An alternating left half fixes the center cell whatever the right half is, so the left half of the cone is not incompressible](findings/complexity/cone-screening.md) | proved on paper | 3 | partial |
 | [The GF(2) rank of the cone across a left cut after a cells is 2 + floor(2^a / 3) for every a ≤ t - 3 and t ≤ 14, spanned by the settings without an alternating stripe ending 11, and no window of fixed width carries it to every t](findings/complexity/left-cut-rank.md) | computed | 3 | partial |
-| [The right-edge cycle length L_n of the single cell doubles at 25 of the levels n ≤ 61 and reaches 2^25, about 2^(0.41 n); L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic](findings/complexity/right-edge-cycles.md) | conjecture | 3 | partial |
+| [The right-edge cycle length L_n of the single cell doubles at 36 of the levels n ≤ 84 and reaches 2^36, about 2^(0.43 n), and two exact parities decide whether a stall of the period lasts one diagonal, two, or more; L_n / n unbounded, equivalently white runs W(2^m) = o(2^m) along a subsequence, is conjectured and would make Rule 30's diagram not 2-automatic](findings/complexity/right-edge-cycles.md) | conjecture | 3 | partial |
 | [Problems 1 and 3 follow from space lower bounds for the center column, and space √(n log n) suffices](findings/complexity/space-ladder.md) | proved on paper | 3, 1 | partial |
 | [The center column is computed in space √(n log n), and each simulation sets a threshold that a space lower bound must pass](findings/complexity/space-thresholds.md) | proved on paper | 3, 1 | partial |
 
@@ -623,4 +623,5 @@ Prize Problem 3, and what an answer either way would imply.
 | [Sensitivity, certificates, fixed answers and one-step lifting do not show that the center needs its whole cone](negative-results/complexity/query-depth-routes.md) | barrier | 3 |
 | [The derivative along the second cell, gates after restrictions and measures other than adaptive certificates do not prove that the center needs its whole cone for every t](negative-results/complexity/query-evasive-routes.md) | dead end | 3 |
 | [Restricted models give the center cell no new lower bound for every n; past reading the digits they imply Problem 1, and spacetime bounds hold for Rule 90](negative-results/complexity/restricted-models.md) | barrier | 3, 1 |
+| [Every route tried toward L_n / n unbounded for the single cell's right edge stops at a parity over the middle of a period; bit filling holds only right after a doubling, the two edges fix one end of the expansions, counting and renormalization return to the white runs, no GF(2) rule of at most three terms among 18 weight parities predicts a doubling except its definition, and the seeds ±1/3 and Rule 150 bar any argument without the light cone and the product term](negative-results/complexity/right-edge-cycle-routes.md) | dead end | 3 |
 | [One step of Rule 30 on a ring loses almost no information, less than Rule 90 does, so erased information gives no lower bound](negative-results/complexity/ring-information-loss.md) | refuted | 3 |
