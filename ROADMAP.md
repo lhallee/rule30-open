@@ -34,13 +34,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
 | 2 | Conservation laws | closed | none over four steps |
 | 2 | Bounds on runs | open | runs at most linear in their start time; slope 3/13 for black runs if the onset edge gains 2/3 per step (Lean) |
-| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and in every strip of at least five columns (sharp; Lean for 5 to 9 columns), 1/3 for three adjacent columns (sharp) and 5/18 for two, $(2J - 2)/5$ of the first $J$ right diagonals over a period; nothing for the center column alone or for black cells |
+| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and in every strip of at least five columns (sharp on paper), 1/3 for three adjacent columns (sharp) and 5/18 for two, $(2J - 2)/5$ of the first $J$ right diagonals over a period; nothing for the center column alone or for black cells |
 | 2 | Statistics | no signal | the column passes every test tried |
 | 3 | An upper bound | proved in Lean | a one-tape machine of the kit's model computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps, so Problem 3 is the question whether the exponent 2 can fall to 1 |
 | 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
 | 3 | A space lower bound | open, as hard | space $O(\sqrt{n \log n})$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
 | 3 | A shortcut | no signal | automata, recurrences and learned predictors find none |
-| 3 | Restricted models | open | no automaton below 131,070 states on the range searched; in models fed an arbitrary row, linear bounds that separate Rule 30 from the linear rules (Lean); not 2-automatic in two indices if the right-edge cycles grow superlinearly (Lean); the right-edge map's periodic points are 0 and the shifted rain pair for every period not divisible by 64 (Lean) |
+| 3 | Restricted models | open | no automaton below 131,070 states on the range searched; in models fed an arbitrary row, linear bounds that separate Rule 30 from the linear rules (Lean); not 2-automatic in two indices if the right-edge cycles grow superlinearly (Lean); a row white right of a black cell that returns at the speed of light after $L$ steps, 64 not dividing $L$, is a rain row (Lean) |
 
 ## Problem 1: is the center column eventually periodic?
 
@@ -385,9 +385,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   mixing](findings/random-rows/lightlike-mixing.md), [the soft
   routes](negative-results/random-rows/lightlike-soft-routes.md)). The rows that come back after 12, 15 or 17 steps
   all have black cells arbitrarily far right, except the white row and the rain rows: a row white right of some cell
-  that comes back moved at the speed of light after $L$ steps, 64 not dividing $L$, is white or a rain row, in Lean
-  with `evolve` ([LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md) for 32 not dividing $L$,
-  [EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md) for 64), and by exact computation the
+  that comes back moved at the speed of light after $L$ steps, 32 not dividing $L$, is white or a rain row, in Lean
+  with `evolve` ([LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)), a row white right of a black
+  cell that does so with 64 not dividing $L$ is a rain row, in Lean
+  ([EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md)), and by exact computation the
   right-edge map has no periodic point of period not divisible by 128 but 0 and the rain pair $\pm 1/3$ with its
   shifts ([edge periodic points](findings/frames/edge-periodic-points.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
   with every cycle length of Rule 30's, differing from it on a set of small measure, reads any prescribed center column
@@ -517,10 +518,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   nothing about the single cell's own density). In every orbit, three adjacent columns have lower white density at
   least 1/3, attained by the fixed point $(10)^\infty$, and two adjacent columns at least 5/18 (Lean,
   [PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)), so a pair or triple of columns containing the
-  center column is at least 5/18 or 1/3 white for the single cell. In every orbit a strip of $J = 5$ to 9 adjacent
+  center column is at least 5/18 or 1/3 white for the single cell. In every orbit a strip of $J \ge 5$ adjacent
   columns has at least $2J(n - 1)/5$ white cells in its first $n$ rows (Lean,
-  [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md)); splitting a wider strip gives the same for every
-  $J \ge 5$ (on paper), and the orbit of $(11001)^\infty$ attains 2/5 (on paper, checked for $J \le 11$). The sharp
+  [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md), from widths 5 to 9 by splitting a wider strip),
+  and the orbit of $(11001)^\infty$ attains 2/5 (on paper, checked for $J \le 11$). The sharp
   lower white densities of $J$ adjacent columns over all orbits are: $J = 1$: 0; $J = 2$: open, in $[5/18, 1/3]$;
   $J = 3$: 1/3; $J = 4$: open, in $[11/28, 2/5]$ (computed); $J \ge 5$: 2/5. So a block of at least five columns
   around the center column is at least 2/5 white for the single cell, and no argument valid for every orbit gives
@@ -533,11 +534,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   [SkeletonWhiteDensity](Rule30Open/Diagonals/SkeletonWhiteDensity.md)); the settled words are about half white
   (computed: 0.5002 at period 16, depths 400 to 53,200). On the right edge, every code and its image satisfy
   $3W + 2W' \ge 2J - 2$ on their first $J$ bits, so at least $(2J - 2)/5$ of the single cell's first $J$ right
-  diagonals are white over a period (Lean, [RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)); over one
+  diagonals are white on average over a period (Lean, [RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)); over one
   period of the first $N + 1$ right diagonals the doubling diagonals force black density at least
   $(2 + e_N)/(2(N + 1))$, with $e_N$ the period exponent (Lean, [RightEdgeBlack](Rule30Open/Frames/RightEdgeBlack.md)),
-  so a positive black density on the right-edge strip reduces to linear growth of the period exponents, $e_N \ge cN$,
-  which is open (the kit's bound gives only about $\log_2 N$). Black density stays open: a paper bound
+  so this route gives a positive black density on the right-edge strip exactly when the period exponents grow
+  linearly, $e_N \ge cN$, which is open (the kit's bound gives only about $\log_2 N$). Black density stays open: a paper bound
   $A(n) \ge 2n^2/(M_n + 3)$ reduces it to bounding the longest black run $M_n$ of the rows, for which no bound is known
   ([black density from row runs](negative-results/structure/black-density-from-row-runs.md)). On the regular side the
   left step, read in depth, gives an exact weight identity for three consecutive settled words but no density bound
@@ -632,7 +633,8 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   code or reaches a branch state, where an alternating column is followed by an equal one, in Lean with no
   periodicity assumed ([EdgeTree](Rule30Open/Frames/EdgeTree.md)); a checker for the branch tree is proved sound for
   every period, and its kernel evaluation at period 32 shows that the only codes of period 32 with a black edge cell
-  are the rain codes, so the row statement holds in Lean for every $L$ not divisible by 64
+  are the rain codes, so a row white right of a black cell that comes back moved at the speed of light after $L$ steps,
+  64 not dividing $L$, is a rain row, in Lean
   ([EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md)). For periods divisible by 64 but not by 128 the
   classification rests on the exact computation above. On paper, for every even $L$, every periodic point other than 0
   and $2^m(\pm 1/3)$ passes through one branch state $(P, P)$, up to rotation, so the classification at period $L$ is
