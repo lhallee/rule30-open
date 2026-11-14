@@ -318,7 +318,7 @@ def main(argv: list[str] | None = None) -> int:
         all(any(q % (p * p) == 0 for p in range(3, q, 2)) for q in vanishing),
     )
     print(
-        "non-squarefree odd q <= 200 not in the list:",
+        f"non-squarefree odd q <= {limit} not in the list:",
         [
             q
             for q in range(3, limit + 1, 2)

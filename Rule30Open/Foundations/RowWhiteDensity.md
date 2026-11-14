@@ -27,7 +27,7 @@ $-t, \dots, t$, so $B(t) + W(t) = 2t + 1$.
    exactly $2/5$ white and every pair $x, y$ of consecutive rows has $2 B(y) = 3 W(x)$ per period. So no inequality
    between the colors of finitely many consecutive rows that holds for every row, with boundary terms bounded
    independently of the window, gives a lower white density above $2/5$. This says nothing about the single cell's
-   own density, which is about $1/2$ in the computed range.
+   own density, which is about $1/2$ up to $n = 3000$ (Remarks).
 
 Parts 1 to 3 and the orbit of part 4 are proved in Lean (`two_black_le`, `row_pair`, `triangle_white`,
 `period_five_shift` and `period_five_count`). The per-pair consequence in part 3 and the optimality statement in part 4
@@ -123,8 +123,8 @@ period, as it is for the stripe $(100)^\infty \mapsto 1^\infty$.
   against the bound's $0.388$ to $0.400$; the slack $3W(s) + 6 - 2B(s + 1)$ is 0 at $s = 0, 1, 2$ and at least 1 for $3 \le s < 2999$
   (`python -m computations.row_white_density --n 3000`).
 - The asymmetry is the OR. Rule 90 has black density tending to 0 in its triangle ($3^k$ black cells in $4^k$), so a
-  lower bound for black cells has to use the OR, and part 1 is the place where Rule 30's OR acts: a black cell of $y$
-  whose left neighbor $x_{i-1}$ is black needs $x_i = x_{i+1} = 0$. White cells pay for black cells locally; black cells do not pay
+  lower bound for black cells has to use the OR, and part 1 is the place where Rule 30's OR acts: a black cell $y_i$
+  with $x_{i-1}$ black needs $x_i = x_{i+1} = 0$. White cells pay for black cells locally; black cells do not pay
   for white ones.
 
 ## Reproduce

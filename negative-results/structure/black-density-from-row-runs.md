@@ -17,7 +17,8 @@ density, $A(n) \ge \delta n^2$ with $A(n)$ the black cells of the triangle?
 **Answer.** Not unconditionally. The white cells of the triangle are covered by white triangles, each started under a
 black run of the row above, which gives
 $$A(n) \ge \frac{2 n^2}{M_n + 3},$$
-with $M_n$ the longest black run of the rows $0, \dots, n - 2$ (proved on paper below; checked to $n = 3000$). So
+with $M_n$ the longest black run of the rows $0, \dots, n - 2$ (proved on paper below; checked on the single cell for
+every $n \le 3000$). So
 positive density of black cells follows from bounded black runs in the rows, and density $c / \log n$ from runs of
 length $O(\log n)$. No bound on $M_n$ better than the trivial $2n - 1$ is known, the steps where a local argument for
 one stop are below, and no count that holds for every row can give black cells a positive density at all.
@@ -53,13 +54,15 @@ $n$ checked, and of the white runs of rows 1 to 599 every one is a continuation 
 
 - **Every count valid for all rows gives black density 0.** The all-white word is a preimage of every white run, and the
   all-white row is an orbit. So an inequality between the colors of finitely many consecutive rows that holds for
-  every row bounds black cells below by boundary terms only. White cells are different: a black cell of the image over
-  a black cell needs two white cells to its right, which is the whole content of
+  every row bounds black cells below by boundary terms only. White cells are different: a black cell $y_i$ of the image
+  with $x_{i-1}$ black needs $x_i = x_{i+1} = 0$, two white cells, which is the whole content of
   [RowWhiteDensity](../../Rule30Open/Foundations/RowWhiteDensity.md). A positive density of black cells has to use the
   seed, for example through the edges $\pm t$ being black, which only gives $A(n) \ge 2n - 1$.
 - **The rows above a long black run are not contradictory at any finite depth.** A black run of length $m$ in row $s$
-  forces row $s - 1$ to the stripe $(100)^\infty$ on $m + 2$ cells (the four preimages of $1^m$), row $s - 2$ to
-  $(110)^\infty$, and further up rows that are, away from the right end of the window, spatially periodic words
+  forces row $s - 1$ to the stripe $(100)^\infty$ on the $m + 1$ cells $[u - 1, v]$ (the four preimages of $1^m$ on
+  $m + 2$ cells agree with the stripe there, and one of them ends in $11$), row $s - 2$ to $(110)^\infty$ except for a
+  few cells at the right end (at most 7 at $m = 9, 12, 15$), and further up rows that are, away from the right end of
+  the window, spatially periodic words
   determined by two cells per row at the right (the backward step $x_{i-1} = y_i \oplus (x_i \lor x_{i+1})$ is
   deterministic leftward). Rule 30 is onto, so every finite word has preimages of every depth, and no window of bounded
   depth above the run is inconsistent. A contradiction can only come from row 0.

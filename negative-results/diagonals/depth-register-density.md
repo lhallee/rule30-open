@@ -1,13 +1,13 @@
 ---
-title: The left step read in the depth direction gives an exact weight identity for three consecutive settled words but no density bound uniform in the period; for every K up to 8, K consecutive words that obey the step can have total weight independent of the period (2 for K = 3), while the single cell's settled words keep at least 9 of 48 cells black on every 3 consecutive diagonals of period 16
+title: The left step read in the depth direction gives an exact weight identity for three consecutive settled words but no density bound uniform in the period; for every K up to 8, K consecutive words that obey the step can have total weight independent of the period (2 for K = 3), while the single cell's settled words keep at least 9 of 48 cells black on every 3 consecutive diagonals of period 16 at depths 400 to 53,200 (computed)
 category: diagonals
 problems: [2]
 status: negative
 kind: barrier
-evidence: [computations/depth_register.py]
+evidence: [computations/depth_register.py, tests/test_depth_register.py]
 ---
 
-# The left step read in the depth direction gives an exact weight identity for three consecutive settled words but no density bound uniform in the period; for every K up to 8, K consecutive words that obey the step can have total weight independent of the period (2 for K = 3), while the single cell's settled words keep at least 9 of 48 cells black on every 3 consecutive diagonals of period 16
+# The left step read in the depth direction gives an exact weight identity for three consecutive settled words but no density bound uniform in the period; for every K up to 8, K consecutive words that obey the step can have total weight independent of the period (2 for K = 3), while the single cell's settled words keep at least 9 of 48 cells black on every 3 consecutive diagonals of period 16 at depths 400 to 53,200 (computed)
 
 **Question.** On an eternal orbit of the left-edge frame ([EternalSkeleton](../../Rule30Open/Diagonals/EternalSkeleton.md)),
 and in particular on the single cell's shadow, every left diagonal $W_d$ is periodic, and three consecutive ones,
@@ -15,7 +15,7 @@ aligned at a common period $P$, satisfy $W_d(t+1) = W_{d-2}(t) \oplus (W_{d-1}(t
 direction, this step is a register: the pair $(W_{d-1}, W_d)$ determines the next word when $W_{d-1}$ is not white,
 and leaves zero or two choices when it is ([settled words](../../findings/diagonals/settled-words.md)). Does the step
 force a positive density of black cells, an inequality $|W_{d}| + \dots + |W_{d+K-1}| \ge cKP$ with $c > 0$ independent
-of $P$? Such a bound on the shadow would be the first unconditional density statement on the regular side.
+of $P$? Such a bound on the shadow would be an unconditional density statement for the settled cells of the left diagonals.
 
 ## The exact identity (proved on paper)
 
@@ -57,17 +57,20 @@ enumeration of every tuple at $P = 4$.
 | a minimizer valid at every $P \ge 5$ (bits as binary numbers) | 1, 1, 0 | 11, 10, 10, 0 | | 101, 100, 110, 100, 100, 0 | 1011, 1110, 1010, 1000, 1100, 1000, 1000, 0 |
 
 The minimizers in the last row are white at times $4, 5, \dots$, so by the lemma they are windows at every $P \ge 5$
-(the test checks $5 \le P \le 40$). **So for $K = 3, 4, 6, 8$ the step and the rule against two white neighbors admit
-$K$ consecutive words with a fixed number of black cells, and their density $m_K / (KP)$ tends to 0 with the period.**
-No inequality $\sum |W| \ge cKP$ with $c > 0$ independent of $P$ follows from the step over any fixed number of
-diagonals, as far as checked. A density bound for an eternal orbit must use which pairs are reachable from the frame
+(the test checks $5 \le P \le 40$). Consecutive words of a window form a window, so the first $K$ words of the
+$K = 8$ minimizer are windows at every $P \ge 5$ for every $K \le 8$, of weight at most 13; this covers $K = 5$ and
+$K = 7$, where the table has no period-independent minimizer (the $K = 5$ minimizer that `window_min` returns depends
+on $P$). **So for every $K \le 8$ the step and the rule against two white neighbors admit $K$ consecutive words with
+at most 13 black cells at every period $P \ge 5$, and their density tends to 0 with the period.** No inequality
+$\sum |W| \ge cKP$ with $c > 0$ independent of $P$ follows from the step over $K \le 8$ consecutive diagonals; larger
+$K$ was not checked. A density bound for an eternal orbit must use which pairs are reachable from the frame
 pair $(1, 1)$ through the pair map and the choices at white diagonals, a global property of the orbit, not the local
 register.
 
 ## The single cell's settled words are far from these minimizers (computed)
 
 `skeleton_weights` reads the single cell's settled words at period 16 (depths 0 to 53,200, from 82,000 steps; every
-onset is at most 71,102). Over depths 400 to 53,200, the stretch of period 16 before the first non-doubling white
+onset is at most 71,102, printed by the same command). Over depths 400 to 53,200, the stretch of period 16 before the first non-doubling white
 diagonal ends:
 
 | $K$ | 1 | 2 | 3 | 4 | 6 | 8 |

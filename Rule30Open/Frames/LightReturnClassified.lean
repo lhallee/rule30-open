@@ -10,6 +10,10 @@ public import Rule30Open.Frames.EdgePeriodSixteen
   `2 ^ a * q` cells right, with `q` odd and `a ≤ 4`, has the edge code `rainA` or `rainB` at `r`.** By
   `LightReturnRows.pow_two_return` it returns after `2 ^ a` steps, hence after 16, and
   `EdgePeriodSixteen.period_sixteen_iff` reads off the code.
+* `rain_of_return_mod`, `rain_rows_of_return`: the same for every `L` with `L % 32 ≠ 0` (`factor_of_mod`), and the
+  rows written out cell by cell.
+* `white_or_rain_of_return`: without a black edge cell, the row is white or a rain row at its rightmost black cell
+  (`rightmost_black`).
 * `frozen_T_eq`: the kit's edge map `Rule30FrozenRuler.T` is the map `EdgePeriodFour.T` restated there.
 
 The natural-language argument is `LightReturnClassified.md`, beside this file.
