@@ -53,9 +53,9 @@ diagonals where it lies between $10^{-6}$ and $0.03$; they are rough. For white 
 slope $0.4$ (for $k = 1$, $B(32) - B(24) = 3.201$): the $2/5$ white bound carries over to the left-edge frame, as it
 must, and nothing better appears for $k \le 4$.
 
-**The shape of the optimal pseudo-measure.** Up to some depth the optimum $\mu_d[R_d = 1]$ equals the true density of
+**The shape of the optimal pseudo-measure.** Up to some depth the optimum that HiGHS returns (optima need not be unique) has $\mu_d[R_d = 1]$ equal to the true density of
 black cells on diagonal $d$ of the single cell's cycle ($1, 1, 0, 1/2, 1, 1/2, 1/2, 0, 1/2, 1, 1/2, 1/4, 3/4, 3/4,
-\dots$, which the program reproduces to depth about 28 for $k = 5$ and 6, and to depth 3, 5, 10, 10 for $k = 1..4$).
+\dots$, through depth 3, 5, 8, 10, 28, 28 for $k = 1, \dots, 6$).
 Beyond that depth it mixes the true behavior with white and fades geometrically.
 
 ## Why it cannot reach exactly white (proved on paper)

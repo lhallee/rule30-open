@@ -66,10 +66,8 @@ $G_L$ would kill every infinite walk, including those from states that the start
 many: 9, 99 and 13,875 live states for $L = 2, 4, 8$, against 5 live states reachable from the start in each
 (`full_live_count`). So a potential, if one exists, must be defined only on the reachable states, that is it must
 carry the information of the right edge (the white half to the right). No such quantity is known. The least period of
-the pair $(W_{e-1}, W_e)$ never decreases along a walk from the start (by the doubling induction of
-[light-return words](../../findings/frames/light-return-words.md) item 1; computed with no decrease on the reachable
-states for $L = 4, 8$), but there it is the cycle length modulo $2^{e+1}$ and is bounded by $L$, so it cannot separate
-rain from the other walks. On the full graph it can decrease (32 edges of $G_4$ and 1,312 of $G_8$ lower it).
+the pair $(W_{e-1}, W_e)$ does not decrease along any edge between states reachable from the start (computed for
+$L \le 32$; not proved), and it is bounded by $L$, so it cannot separate rain from the other walks. On the full graph it can decrease (32 edges of $G_4$ and 1,312 of $G_8$ lower it).
 
 ## What it means
 
