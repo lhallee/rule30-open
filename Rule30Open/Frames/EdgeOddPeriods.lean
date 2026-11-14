@@ -90,4 +90,79 @@ theorem odd_period_eq_zero (c : Nat → Bool) (L : Nat) (hL : L % 2 = 1) (h : it
     ∀ k, c k = false :=
   fixed_point_eq_zero c (fixed_of_odd_period c L hL h)
 
+theorem col_period_of_odd (f g : Nat → Bool) (p q : Nat) (hq : q % 2 = 1)
+    (hstep : ∀ i, f (i + 1) = xor (f i) (g i)) (hg : ∀ i, g (i + p) = g i) (hper : f (p * q) = f 0) :
+    ∀ i, f (i + p) = f i := by
+  have hconst : ∀ i, xor (f (i + p)) (f i) = xor (f p) (f 0) := by
+    intro i
+    induction i with
+    | zero => simp
+    | succ i ih =>
+      have e : i + 1 + p = (i + p) + 1 := by omega
+      rw [e, hstep, hstep, hg]
+      rw [← ih]
+      generalize f (i + p) = A
+      generalize f i = B
+      generalize g i = G
+      cases A <;> cases B <;> cases G <;> rfl
+  have shift : ∀ i, f (i + p) = xor (f i) (xor (f p) (f 0)) := by
+    intro i
+    rw [← hconst i]
+    generalize f (i + p) = A
+    generalize f i = B
+    cases A <;> cases B <;> rfl
+  have even : ∀ m, f (p * (2 * m)) = f 0 := by
+    intro m
+    induction m with
+    | zero => simp
+    | succ m ih =>
+      have e : p * (2 * (m + 1)) = p * (2 * m) + p + p := by
+        rw [Nat.mul_add, Nat.mul_add]; omega
+      rw [e, shift, shift, ih]
+      generalize f 0 = A
+      generalize xor (f p) A = S
+      cases A <;> cases S <;> rfl
+  have hs : xor (f p) (f 0) = false := by
+    have e : p * q = p * (2 * (q / 2)) + p := by
+      have : q = 2 * (q / 2) + 1 := by omega
+      conv => lhs; rw [this]
+      rw [Nat.mul_add, Nat.mul_one]
+    have := hper
+    rw [e, shift, even] at this
+    revert this
+    generalize f 0 = A
+    generalize xor (f p) A = S
+    cases A <;> cases S <;> decide
+  intro i
+  rw [shift, hs]
+  cases f i <;> rfl
+
+theorem pow_two_period (c : Nat → Bool) (a q : Nat) (hq : q % 2 = 1) (h : iter (2 ^ a * q) c = c) :
+    iter (2 ^ a) c = c := by
+  have col : ∀ k, ∀ i, iter (i + 2 ^ a) c k = iter i c k := by
+    intro k
+    induction k using Nat.strongRecOn with
+    | _ k ih =>
+      have key : ∃ g : Nat → Bool, (∀ i, g (i + 2 ^ a) = g i) ∧
+          ∀ i, iter (i + 1) c k = xor (iter i c k) (g i) := by
+        match k, ih with
+        | 0, _ => exact ⟨fun _ => false, fun _ => rfl, fun i => by show T (iter i c) 0 = _; simp [T]⟩
+        | 1, ih =>
+          refine ⟨fun i => iter i c 0, fun i => ih 0 (by omega) i, fun i => ?_⟩
+          show T (iter i c) 1 = _
+          simp only [T]
+        | j + 2, ih =>
+          refine ⟨fun i => iter i c (j + 1) || iter i c j, fun i => ?_, fun i => ?_⟩
+          · show (iter (i + 2 ^ a) c (j + 1) || iter (i + 2 ^ a) c j) = _
+            rw [ih (j + 1) (by omega) i, ih j (by omega) i]
+          · show T (iter i c) (j + 2) = _
+            simp only [T]
+      obtain ⟨g, hgp, hg⟩ := key
+      have hper : iter (2 ^ a * q) c k = iter 0 c k := by rw [h]; rfl
+      exact col_period_of_odd (fun i => iter i c k) g (2 ^ a) q hq hg hgp hper
+  funext k
+  have := col k 0
+  rw [Nat.zero_add] at this
+  exact this
+
 end Rule30Open.Frames.EdgeOddPeriods

@@ -70,9 +70,9 @@ def pad (R : Nat → Bool) : Nat → Bool
 theorem leftStep_pad (R : Nat → Bool) (d : Nat) :
     leftStep R d = xor (pad R d) (pad R (d + 1) || pad R (d + 2)) := by
   match d with
-  | 0 => cases R 0 <;> rfl
-  | 1 => cases R 0 <;> cases R 1 <;> rfl
-  | j + 2 => rfl
+  | 0 => cases h : R 0 <;> simp [leftStep, pad, h]
+  | 1 => cases h0 : R 0 <;> cases h1 : R 1 <;> simp [leftStep, pad, h0, h1]
+  | j + 2 => simp [leftStep, pad]
 
 theorem whites_pad (R : Nat → Bool) : ∀ n, whites (pad R) (n + 2) = 2 + whites R n
   | 0 => rfl
@@ -87,6 +87,7 @@ theorem telescope (R : Nat → Bool) : ∀ n,
     have ih := telescope R n
     have h := local_ineq (pad R n) (pad R (n + 1)) (pad R (n + 2))
     rw [← leftStep_pad] at h
+    have e : psi (pad R (n + 1)) (pad R (n + 1 + 1)) = psi (pad R (n + 1)) (pad R (n + 2)) := rfl
     simp only [blacks, whites]
     omega
 
@@ -156,8 +157,7 @@ theorem eternal_white {R : Int → Nat → Bool} (hR : Eternal R) (t₀ : Int) (
     simp
   have h := orbit_white f hf J (2 ^ J)
   rw [hper] at h
-  have : (2 * J - 4) * 2 ^ J ≤ 2 * J * 2 ^ J - 4 * 2 ^ J := by
-    rw [Nat.sub_mul]
+  have : (2 * J - 4) * 2 ^ J ≤ 2 * J * 2 ^ J - 4 * 2 ^ J := Nat.le_of_eq (Nat.sub_mul _ _ _)
   show (2 * J - 4) * 2 ^ J ≤ 5 * sumW f J (2 ^ J)
   omega
 
