@@ -1,5 +1,5 @@
 ---
-title: The single cell's triangle of rows 0 to n - 1 has at least 2(n - 1)(n - 2)/5 white cells, from 2B(s + 1) <= 3W(s) + 6 for consecutive rows, and 2/5 is the most any local count gives
+title: The single cell's triangle of rows 0 to n - 1 has at least 2(n - 1)(n - 2)/5 white cells, from 2B(s + 1) <= 3W(s) + 6 for consecutive rows, and no count valid for every row with bounded boundary terms gives more than 2/5
 category: foundations
 problems: [2]
 status: proved
@@ -10,7 +10,7 @@ kit_modules: [Rule30Jen]
 evidence: [computations/row_white_density.py, tests/test_row_white_density.py]
 ---
 
-# The single cell's triangle of rows 0 to n - 1 has at least 2(n - 1)(n - 2)/5 white cells, from 2B(s + 1) <= 3W(s) + 6 for consecutive rows, and 2/5 is the most any local count gives
+# The single cell's triangle of rows 0 to n - 1 has at least 2(n - 1)(n - 2)/5 white cells, from 2B(s + 1) <= 3W(s) + 6 for consecutive rows, and no count valid for every row with bounded boundary terms gives more than 2/5
 
 Let $B(t)$ and $W(t)$ be the numbers of black and white cells of row $t$ of the single cell on its light-cone row
 $-t, \dots, t$, so $B(t) + W(t) = 2t + 1$.
@@ -24,11 +24,14 @@ $-t, \dots, t$, so $B(t) + W(t) = 2t + 1$.
    white cells have lower density at least $2/5$ in the triangle, and in every pair of consecutive rows $s, s + 1$ one
    of the two is at least $4s/(10s + 9)$ white.
 4. *(Sharpness.)* The row $(11001)^\infty$ is mapped by Rule 30 to its shift by two cells, so every row of its orbit is
-   exactly $2/5$ white and every pair $x, y$ of consecutive rows has $2 B(y) = 3 W(x)$ per period. No inequality
-   between the colors of finitely many consecutive rows that holds for every row gives a white density above $2/5$.
+   exactly $2/5$ white and every pair $x, y$ of consecutive rows has $2 B(y) = 3 W(x)$ per period. So no inequality
+   between the colors of finitely many consecutive rows that holds for every row, with boundary terms bounded
+   independently of the window, gives a lower white density above $2/5$. This says nothing about the single cell's
+   own density, which is about $1/2$ in the computed range.
 
-All four parts are proved in Lean (`two_black_le`, `row_pair`, `triangle_white`, `period_five_shift` and
-`period_five_count`); the per-pair consequence in part 3 is the two-line computation below.
+Parts 1 to 3 and the orbit of part 4 are proved in Lean (`two_black_le`, `row_pair`, `triangle_white`,
+`period_five_shift` and `period_five_count`). The per-pair consequence in part 3 and the optimality statement in part 4
+are consequences on paper, below.
 
 This is a density statement about the single cell's pattern that holds unconditionally, with an explicit constant. It
 is about white cells only. The matching statement for black cells is not local: the preimages of a white run include
@@ -49,14 +52,24 @@ at the times $0, \dots, n - 1$.
    least $(2J - 2)n/5$ white cells at the times $0, \dots, n$ (`strip_white`): lower white density at least
    $(2J - 2)/(5J)$, which is $4/15$ for the three columns $-1, 0, 1$ and tends to $2/5$.
 7. *(Two adjacent columns.)* If cells $a$ and $a + 1$ are black at time $t$, cell $a + 1$ is white at time $t + 1$
-   ($1 \oplus (1 \lor \cdot) = 0$, `pair_rule`). So $W_a(n) + W_{a+1}(n) + W_{a+1}(n + 1) \ge n$ (`pair_white`), and
-   the two columns have lower white density at least $1/4$, better than part 6's $1/5$ at $J = 2$.
+   ($1 \oplus (1 \lor \cdot) = 0$, `pair_rule`). So $W_a(n) + W_{a+1}(n) + W_{a+1}(n + 1) \ge n$ (`pair_white`), that
+   is $N_{a+1}(n) \le W_a(n) + W_{a+1}(n + 1)$ with $N$ the black cells of a column, and the two columns have lower
+   white density at least $1/4$, better than part 6's $1/5$ at $J = 2$.
 
 Parts 5 to 7 are in Lean. Proof of part 5: the telescoped count of part 1 with $n = J$ moves the white window one cell
 left; the two boundary terms are $3[x_{a-1} = 0] + \psi(x_{a-1}, x_a)$ and $3[x_{a+J-1} = 0] + \psi(x_{a+J-1}, x_{a+J})$,
 and $3[p = 0] + \psi(p, q)$ lies between 2 and 4 (`edge_bounds`), so they cost at most 2. Part 6 sums part 5 with
-$B = J - W$ as in part 3. [ColumnTransfer](../Columns/ColumnTransfer.md) bounds black counts of a column by those of its
-neighbors; it has no lower bound on white cells, and part 7 is not among its statements.
+$B = J - W$ as in part 3.
+
+For small $J$ there are better bounds. [PairWhiteDensity](PairWhiteDensity.md) proves, for every orbit, that two
+adjacent columns have lower white density at least $5/18$ and three adjacent columns at least $1/3$, which is sharp.
+These beat part 6 at $J = 3$ ($4/15$) and part 7 ($1/4$). So parts 6 and 7 matter as the general form
+$(2J - 2)/(5J)$ for $J \ge 4$ and as a two-column count of a different shape. The pointwise step of part 7 is, for the
+single cell, the kit's `Rule30MaskedJen.left_of_black` at $i = a + 1$, which
+[ColumnTransfer](../Columns/ColumnTransfer.md) uses as its pointwise step. Its `transfer_right_white`,
+$N_{i+1}(n) \le W_{i-1}(n) + W_i(n + 1)$, rearranges to $W_{i-1}(n) + W_i(n + 1) + W_{i+1}(n) \ge n$, a white lower
+bound on three columns of the single cell. Part 7 is the transfer for the column offset $a, a + 1$, summed, and it
+holds for every orbit.
 
 On the spatially periodic orbits of period at most 12, the least white fraction of a strip is 0 for $J = 1$ (the fixed
 point $(01)^\infty$), $1/3$ for $J = 2$ and $J = 3$, and $2/5$ for $J = 4, 5, 6$ (`periodic_strip_min`), so parts 6
@@ -101,16 +114,17 @@ period, as it is for the stripe $(100)^\infty \mapsto 1^\infty$.
 
 ## Remarks
 
-- The run form of part 1: a black run of $y$ of length $m$ on $[u, v]$ forces $x$ on $[u - 1, v + 1]$ to be one of the
-  four words of the stripe $(100)^\infty$ (backward from the right, $x_{i-1} = 1 \oplus (x_i \lor x_{i+1})$ is 1 exactly
-  after $00$), and $x$ has at least $\lfloor 2(m + 1)/3 \rfloor$ white cells on $[u - 1, v]$, with equality reached for
+- The run form of part 1: a black run of $y$ of length $m$ on $[u, v]$ has four preimages $x$ on $[u - 1, v + 1]$, and
+  on $[u - 1, v]$ ($m + 1$ cells) each is a word of the stripe $(100)^\infty$; the cell $x_{v+1}$ is free when
+  $x_v = 1$, so one of the four ends in $11$ (backward from the right, $x_{i-1} = 1 \oplus (x_i \lor x_{i+1})$ is 1
+  exactly after $00$). So $x$ has at least $\lfloor 2(m + 1)/3 \rfloor$ white cells on $[u - 1, v]$, with equality reached for
   every $m$ (`run_white_bound`, and the test that enumerates the preimages of $1^m$ for $m \le 10$).
 - On the single cell, the white fraction of the triangle is $0.480$, $0.495$, $0.498$, $0.499$ and $0.499$ at $n = 100, 300, 1000, 2000, 3000$
   against the bound's $0.388$ to $0.400$; the slack $3W(s) + 6 - 2B(s + 1)$ is 0 at $s = 0, 1, 2$ and at least 1 for $3 \le s < 2999$
   (`python -m computations.row_white_density --n 3000`).
 - The asymmetry is the OR. Rule 90 has black density tending to 0 in its triangle ($3^k$ black cells in $4^k$), so a
   lower bound for black cells has to use the OR, and part 1 is the place where Rule 30's OR acts: a black cell of $y$
-  over a black cell of $x$ needs $x_i = x_{i+1} = 0$. White cells pay for black cells locally; black cells do not pay
+  whose left neighbor $x_{i-1}$ is black needs $x_i = x_{i+1} = 0$. White cells pay for black cells locally; black cells do not pay
   for white ones.
 
 ## Reproduce

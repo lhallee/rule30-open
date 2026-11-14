@@ -214,9 +214,13 @@ def kernel_criterion(q: int) -> bool:
     """Some prime p has p^2 | q and 2^ord_(q/p)(2) != 1 mod q, i.e. <2> mod q contains the kernel of reduction
     mod q/p: the sufficient condition for a vanishing period."""
     for p in range(3, q + 1, 2):
-        if q % (p * p) == 0 and all(p % r for r in range(3, int(p**0.5) + 1, 2)):
-            if pow(2, multiplicative_order(2, q // p), q) != 1:
-                return True
+        prime = all(p % r for r in range(3, int(p**0.5) + 1, 2))
+        if (
+            prime
+            and q % (p * p) == 0
+            and pow(2, multiplicative_order(2, q // p), q) != 1
+        ):
+            return True
     return False
 
 
@@ -242,6 +246,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--bits", type=int, default=18, help="largest n, so 2^n center cells"
+    )
+    parser.add_argument(
+        "--moduli",
+        type=int,
+        default=200,
+        help="largest odd q for the exact Gauss period test",
     )
     args = parser.parse_args(argv)
     top = args.bits

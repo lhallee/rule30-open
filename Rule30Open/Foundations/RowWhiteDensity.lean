@@ -23,8 +23,9 @@ white cells at the times `0 .. n` (`strip_white`); for two adjacent columns, two
 right one white a step later (`pair_rule`), so `W_a(n) + W_(a+1)(n) + W_(a+1)(n + 1) ≥ n`
 (`pair_white`).
 
-The constant `2/5` is the best a local argument can give: the row `(11001)^∞` is mapped by Rule 30
-to a shift of itself (`period_five_shift`), so every row of its orbit is exactly `2/5` white.
+The row `(11001)^∞` is mapped by Rule 30 to a shift of itself (`period_five_shift`), so every row
+of its orbit is exactly `2/5` white. So no inequality valid for every row, with boundary terms bounded
+independently of the window, gives a white density above `2/5` (a consequence on paper).
 
 The natural-language argument is `RowWhiteDensity.md`, beside this file.
 -/

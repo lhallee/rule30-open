@@ -55,4 +55,69 @@ theorem rain_of_return (init : Int → Bool) (r : Int) (hr : ∀ p, r < p → in
   rw [← frozen_T_eq]
   exact h16
 
+theorem factor_of_mod (L : Nat) (hL : L % 32 ≠ 0) : ∃ a q : Nat, a ≤ 4 ∧ q % 2 = 1 ∧ L = 2 ^ a * q := by
+  by_cases h1 : L % 2 = 1
+  · exact ⟨0, L, by omega, h1, by omega⟩
+  by_cases h2 : L % 4 = 2
+  · exact ⟨1, L / 2, by omega, by omega, by show L = 2 * (L / 2); omega⟩
+  by_cases h3 : L % 8 = 4
+  · exact ⟨2, L / 4, by omega, by omega, by show L = 4 * (L / 4); omega⟩
+  by_cases h4 : L % 16 = 8
+  · exact ⟨3, L / 8, by omega, by omega, by show L = 8 * (L / 8); omega⟩
+  · exact ⟨4, L / 16, by omega, by omega, by show L = 16 * (L / 16); omega⟩
+
+theorem rain_of_return_mod (init : Int → Bool) (r : Int) (hr : ∀ p, r < p → init p = false)
+    (h0 : init r = true) (L : Nat) (hL : L % 32 ≠ 0) (h : ∀ x, evolve init L (x + (L : Int)) = init x) :
+    codeAt init r = Rule30Open.Frames.EdgePeriodFour.rainA ∨
+      codeAt init r = Rule30Open.Frames.EdgePeriodFour.rainB := by
+  obtain ⟨a, q, ha, hq, rfl⟩ := factor_of_mod L hL
+  exact rain_of_return init r hr h0 a q hq ha h
+
+theorem rain_rows_of_return (init : Int → Bool) (r : Int) (hr : ∀ p, r < p → init p = false)
+    (h0 : init r = true) (L : Nat) (hL : L % 32 ≠ 0) (h : ∀ x, evolve init L (x + (L : Int)) = init x) :
+    (∀ k : Nat, init (r - k) = (k % 2 == 0)) ∨ (∀ k : Nat, init (r - k) = (k == 0 || k % 2 == 1)) := by
+  rcases rain_of_return_mod init r hr h0 L hL h with hA | hB
+  · exact Or.inl fun k => congrFun hA k
+  · exact Or.inr fun k => congrFun hB k
+
+theorem rightmost_black (init : Int → Bool) :
+    ∀ n : Nat, ∀ s : Int, (∀ x, s < x → init x = false) → init (s - n) = true →
+      ∃ r', init r' = true ∧ ∀ x, r' < x → init x = false := by
+  intro n
+  induction n with
+  | zero =>
+    intro s hs h
+    exact ⟨s, by simpa using h, hs⟩
+  | succ n ih =>
+    intro s hs h
+    by_cases hb : init s = true
+    · exact ⟨s, hb, hs⟩
+    · apply ih (s - 1)
+      · intro x hx
+        by_cases e : x = s
+        · subst e; cases hx' : init x <;> simp_all
+        · exact hs x (by omega)
+      · have e : s - 1 - (n : Int) = s - ((n + 1 : Nat) : Int) := by omega
+        rw [e]; exact h
+
+theorem white_or_rain_of_return (init : Int → Bool) (r : Int) (hr : ∀ p, r < p → init p = false)
+    (L : Nat) (hL : L % 32 ≠ 0) (h : ∀ x, evolve init L (x + (L : Int)) = init x) :
+    (∀ x, init x = false) ∨
+      ∃ r', init r' = true ∧ (∀ p, r' < p → init p = false) ∧
+        (codeAt init r' = Rule30Open.Frames.EdgePeriodFour.rainA ∨
+          codeAt init r' = Rule30Open.Frames.EdgePeriodFour.rainB) := by
+  by_cases hw : ∃ p, init p = true
+  · obtain ⟨p, hp⟩ := hw
+    have hpr : p ≤ r := by
+      by_cases c : r < p
+      · rw [hr p c] at hp; exact absurd hp (by decide)
+      · omega
+    have e : r - (((r - p).toNat : Nat) : Int) = p := by omega
+    obtain ⟨r', h1, h2⟩ := rightmost_black init (r - p).toNat r hr (by rw [e]; exact hp)
+    exact Or.inr ⟨r', h1, h2, rain_of_return_mod init r' h2 h1 L hL h⟩
+  · refine Or.inl fun x => ?_
+    cases hx : init x
+    · rfl
+    · exact absurd ⟨x, hx⟩ hw
+
 end Rule30Open.Frames.LightReturnClassified
