@@ -23,6 +23,13 @@ rule-30 history defined for all times, every row white left of a frame moving le
   `leftStep^(2^d - 1) (R (t + 1))`. So `eternal_agree`: two eternal orbits that agree at one time agree at every time,
   and `leftStep` is injective on the rows of eternal orbits, with an inverse that is continuous coordinate by
   coordinate.
+* `shadow_unique`: two eternal orbits that agree, diagonal by diagonal from some time on, with the forward orbit of
+  the same row are equal.
+* `shadow_eternal`, `shadow_forward`, `shadow_unique_eternal`: for every row `x`, `shadow x` (diagonal `d` at time
+  `t` is the periodic part of diagonal `d` of the forward orbit of `x`, read at `t`) is an eternal orbit, it agrees
+  with the forward orbit on diagonal `d` from time `2 ^ d - 1` on, and it is the only eternal orbit that agrees with
+  the forward orbit on every diagonal from some time on. Every row converges to exactly one eternal orbit, its
+  shadow.
 * `eternal_edge`: if some row of an eternal orbit has a black cell at the frame, then at every time diagonal 0 and 1
   are black, diagonal 2 is white and diagonal 3 flips at every step. `seed_not_eternal`: the single black cell is not a
   row of any eternal orbit.
@@ -185,6 +192,132 @@ theorem eternal_edge {R : Int → Nat → Bool} (hR : Eternal R) (t₀ : Int) (h
   rw [hR]
   show xor (R t 1) (R t 2 || R t 3) = !R t 3
   rw [c1, c2]; cases R t 3 <;> rfl
+
+/-- Pure periodicity, iterated: `R (t + 2^d * k) d = R t d`. -/
+theorem eternal_periodic_mul {R : Int → Nat → Bool} (hR : Eternal R) (d : Nat) (t : Int) :
+    ∀ k : Nat, R (t + ((2 ^ d * k : Nat) : Int)) d = R t d
+  | 0 => by simp
+  | k + 1 => by
+    have e : t + ((2 ^ d * (k + 1) : Nat) : Int) = (t + ((2 ^ d * k : Nat) : Int)) + ((2 ^ d : Nat) : Int) := by
+      rw [Nat.mul_succ]; omega
+    rw [e, eternal_periodic hR d, eternal_periodic_mul hR d t k]
+
+/-- **Uniqueness of the shadow.** Two eternal orbits that both agree, on each diagonal from some time on, with the
+forward orbit of one row `x` are equal. -/
+theorem shadow_unique {R R' : Int → Nat → Bool} (hR : Eternal R) (hR' : Eternal R') (x : Nat → Bool)
+    (h : ∀ d, ∃ T : Nat, ∀ n : Nat, T ≤ n → R n d = iter n x d)
+    (h' : ∀ d, ∃ T : Nat, ∀ n : Nat, T ≤ n → R' n d = iter n x d) (t : Int) : R t = R' t := by
+  funext d
+  obtain ⟨T, hT⟩ := h d
+  obtain ⟨T', hT'⟩ := h' d
+  let k : Nat := T + T' + t.natAbs
+  have hkdef : k = T + T' + t.natAbs := rfl
+  have hk : k ≤ 2 ^ d * k := Nat.le_mul_of_pos_left k (Nat.two_pow_pos d)
+  let n : Nat := (t + ((2 ^ d * k : Nat) : Int)).toNat
+  have hn : ((n : Nat) : Int) = t + ((2 ^ d * k : Nat) : Int) := by omega
+  have hTn : T ≤ n := by omega
+  have hTn' : T' ≤ n := by omega
+  rw [← eternal_periodic_mul hR d t k, ← eternal_periodic_mul hR' d t k, ← hn, hT n hTn, hT' n hTn']
+
+/-! ## The shadow: every row converges to an eternal orbit -/
+
+/-- The kit's uniform period on a forward orbit of `leftStep`, with no condition on the row. -/
+theorem iter_periodic (x : Nat → Bool) (i n : Nat) (h : 2 ^ i - 1 ≤ n) : iter (n + 2 ^ i) x i = iter n x i :=
+  Ruliology.CellularAutomata.Rule30FiniteDiagonals.left_recurrence_uniform_period (fun i n => iter n x i)
+    (fun _ => rfl) (fun _ => rfl) (fun _ _ => rfl) i n h
+
+theorem iter_periodic_mul (x : Nat → Bool) (i n : Nat) (h : 2 ^ i - 1 ≤ n) :
+    ∀ k, iter (n + 2 ^ i * k) x i = iter n x i
+  | 0 => by simp
+  | k + 1 => by
+    rw [Nat.mul_succ, ← Nat.add_assoc, iter_periodic x i _ (by omega), iter_periodic_mul x i n h k]
+
+/-- The forward time at which the shadow reads diagonal `d` at the integer time `t`. -/
+def shadowTime (t : Int) (d : Nat) : Nat := (t + ((2 ^ d * (t.natAbs + 1) : Nat) : Int)).toNat
+
+theorem shadowTime_cast (t : Int) (d : Nat) :
+    ((shadowTime t d : Nat) : Int) = t + ((2 ^ d * (t.natAbs + 1) : Nat) : Int) := by
+  have : t.natAbs + 1 ≤ 2 ^ d * (t.natAbs + 1) := Nat.le_mul_of_pos_left _ (Nat.two_pow_pos d)
+  unfold shadowTime; omega
+
+theorem shadowTime_ge (t : Int) (d : Nat) : 2 ^ d - 1 ≤ shadowTime t d := by
+  have h1 : 2 ^ d * (t.natAbs + 1) = 2 ^ d * t.natAbs + 2 ^ d := Nat.mul_succ _ _
+  have h2 : t.natAbs ≤ 2 ^ d * t.natAbs := Nat.le_mul_of_pos_left _ (Nat.two_pow_pos d)
+  have := shadowTime_cast t d
+  omega
+
+/-- Reading diagonal `i` at the time chosen for a deeper diagonal `d` gives the same cell. -/
+theorem iter_shadowTime (x : Nat → Bool) (t : Int) {i d : Nat} (hid : i ≤ d) :
+    iter (shadowTime t d) x i = iter (shadowTime t i) x i := by
+  let L := t.natAbs + 1
+  let Q := 2 ^ (d - i) * L
+  have hQ : L ≤ Q := Nat.le_mul_of_pos_left _ (Nat.two_pow_pos _)
+  have hW : 2 ^ d * L = 2 ^ i * Q := by
+    show 2 ^ d * L = 2 ^ i * (2 ^ (d - i) * L)
+    rw [← Nat.mul_assoc, ← Nat.pow_add, show i + (d - i) = d by omega]
+  have hZ : 2 ^ i * (Q - L) = 2 ^ i * Q - 2 ^ i * L := Nat.mul_sub _ _ _
+  have hXY : 2 ^ i * L ≤ 2 ^ i * Q := Nat.mul_le_mul_left _ hQ
+  have cd := shadowTime_cast t d
+  have ci := shadowTime_cast t i
+  have e : shadowTime t d = shadowTime t i + 2 ^ i * (Q - L) := by
+    have : ((2 ^ d * (t.natAbs + 1) : Nat) : Int) = ((2 ^ d * L : Nat) : Int) := rfl
+    have : ((2 ^ i * (t.natAbs + 1) : Nat) : Int) = ((2 ^ i * L : Nat) : Int) := rfl
+    omega
+  rw [e, iter_periodic_mul x i _ (shadowTime_ge t i)]
+
+theorem iter_shadowTime_succ (x : Nat → Bool) (t : Int) (d : Nat) :
+    iter (shadowTime (t + 1) d) x d = iter (shadowTime t d + 1) x d := by
+  have c1 := shadowTime_cast (t + 1) d
+  have c0 := shadowTime_cast t d
+  have m0 : 2 ^ d * (t.natAbs + 1) = 2 ^ d * t.natAbs + 2 ^ d := Nat.mul_succ _ _
+  have m1 : 2 ^ d * ((t + 1).natAbs + 1) = 2 ^ d * (t + 1).natAbs + 2 ^ d := Nat.mul_succ _ _
+  rcases Int.le_or_lt 0 t with ht | ht
+  · have ha : (t + 1).natAbs = t.natAbs + 1 := by omega
+    have m2 : 2 ^ d * (t + 1).natAbs = 2 ^ d * t.natAbs + 2 ^ d := by rw [ha]; exact Nat.mul_succ _ _
+    have e : shadowTime (t + 1) d = (shadowTime t d + 1) + 2 ^ d := by omega
+    rw [e, iter_periodic x d _ (by have := shadowTime_ge t d; omega)]
+  · have ha : t.natAbs = (t + 1).natAbs + 1 := by omega
+    have m2 : 2 ^ d * t.natAbs = 2 ^ d * (t + 1).natAbs + 2 ^ d := by rw [ha]; exact Nat.mul_succ _ _
+    have e : shadowTime t d + 1 = shadowTime (t + 1) d + 2 ^ d := by omega
+    rw [e, iter_periodic x d _ (shadowTime_ge (t + 1) d)]
+
+/-- The shadow of a row: diagonal `d` at time `t` is the periodic part of the row's diagonal `d`, read at `t`. -/
+def shadow (x : Nat → Bool) (t : Int) (d : Nat) : Bool := iter (shadowTime t d) x d
+
+/-- **The shadow is an eternal orbit.** -/
+theorem shadow_eternal (x : Nat → Bool) : Eternal (shadow x) := by
+  intro t
+  funext d
+  show iter (shadowTime (t + 1) d) x d = leftStep (shadow x t) d
+  rw [iter_shadowTime_succ]
+  match d with
+  | 0 => rfl
+  | 1 =>
+    show leftStep (iter (shadowTime t 1) x) 1 = (shadow x t 0 || shadow x t 1)
+    show (iter (shadowTime t 1) x 0 || iter (shadowTime t 1) x 1) = (iter (shadowTime t 0) x 0 || shadow x t 1)
+    rw [iter_shadowTime x t (Nat.zero_le 1)]; rfl
+  | j + 2 =>
+    show xor (iter (shadowTime t (j + 2)) x j)
+        (iter (shadowTime t (j + 2)) x (j + 1) || iter (shadowTime t (j + 2)) x (j + 2)) =
+      xor (shadow x t j) (shadow x t (j + 1) || shadow x t (j + 2))
+    rw [iter_shadowTime x t (show j ≤ j + 2 by omega), iter_shadowTime x t (show j + 1 ≤ j + 2 by omega)]
+    rfl
+
+/-- **The shadow agrees with the forward orbit** on diagonal `d` from time `2 ^ d - 1` on. -/
+theorem shadow_forward (x : Nat → Bool) (d n : Nat) (h : 2 ^ d - 1 ≤ n) : shadow x n d = iter n x d := by
+  have e : shadowTime (n : Int) d = n + 2 ^ d * (n + 1) := by
+    have := shadowTime_cast (n : Int) d
+    have hn : (n : Int).natAbs = n := Int.natAbs_natCast n
+    rw [hn] at this
+    omega
+  show iter (shadowTime (n : Int) d) x d = _
+  rw [e, iter_periodic_mul x d n h]
+
+/-- **Every row converges to exactly one eternal orbit, its shadow.** -/
+theorem shadow_unique_eternal (x : Nat → Bool) {R : Int → Nat → Bool} (hR : Eternal R)
+    (h : ∀ d, ∃ T : Nat, ∀ n : Nat, T ≤ n → R n d = iter n x d) : R = shadow x := by
+  funext t
+  exact shadow_unique hR (shadow_eternal x) x h (fun d => ⟨2 ^ d - 1, fun n hn => shadow_forward x d n hn⟩) t
 
 /-- The single black cell, read from its own cell. -/
 def seedRow : Nat → Bool := fun d => d == 0

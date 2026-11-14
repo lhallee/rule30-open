@@ -78,3 +78,9 @@ def fixed_residues_cache(L: int, n: int) -> set[int]:
 def test_white_runs() -> None:
     # W(2^m), m = 0..6, from findings/complexity/right-edge-cycles.md
     assert [ep.white_run(k) for k in range(7)] == [0, 2, 3, 5, 6, 8, 14]
+
+
+def test_period_four_is_free_modulo_16() -> None:
+    # every odd residue modulo 16 has Phi^4(y) = y there, and only half of those modulo 32 do
+    assert len(fixed_residues(4, 4)) == 8
+    assert len(fixed_residues(4, 5)) == 8

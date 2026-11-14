@@ -82,3 +82,16 @@ def test_latch_entropy_against_counts_and_bounds() -> None:
         assert s.latch_entropy(block) >= math.log(2) / (P if P >= 2 else 2) - 1e-12
     assert s.latch_entropy("0") == 0.0
     assert [s.latch_count("0", k) for k in range(1, 8)] == [k + 1 for k in range(1, 8)]
+
+
+def test_grafted_periodic_tail_keeps_the_skeleton_on_a_small_band() -> None:
+    n, depth = 1500, 40
+    column = center_column(n)  # (n,)
+    skeleton = s.quadrant_diagonals(s.seed_left(), column, depth)  # (depth, n)
+    driver = column.copy()  # (n,)
+    driver[25:] = s.periodic_driver("110", n - 25, 1)
+    diagonals = s.quadrant_diagonals(s.seed_left(), driver, depth)  # (depth, n)
+    assert np.array_equal(diagonals[:25], skeleton[:25])  # Lemma 1: diagonals d <= 24 never read c(25), ...
+    assert column[25:28].tolist() != [1, 1, 0]  # the tail differs from the column, so the test has content
+    assert not np.array_equal(diagonals[25:], skeleton[25:])
+    assert s.skeleton_shift(diagonals, skeleton, range(30, 40), 30, 16) == 0

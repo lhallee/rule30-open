@@ -3,7 +3,7 @@ title: The right-edge map has no periodic 2-adic points of period dividing 64 ot
 category: frames
 problems: [3]
 status: computed
-formalization: wanted
+formalization: partial
 evidence: [computations/edge_periodic_points.py, tests/test_edge_periodic_points.py]
 ---
 
@@ -30,7 +30,8 @@ $\Sigma_{17}$ are uncountable, and the question is what a right edge leaves of t
    1\}$ with an edge $(u, v) \to (v, w)$ whenever $w(t + 1) \oplus w(t) = u(t) \lor v(t)$ for all $t \in \mathbb{Z}/L$.
    Then the odd $y$ with $\Phi^L(y) = y$ correspond one to one to the infinite walks in $G_L$ from $(0, 1)$ (the white
    word, the black word), by $y \mapsto (b_{e-1}, b_e)_{e \ge 0}$ with $b_e(t) = $ bit $e$ of $\Phi^t(y)$.
-   Moreover $\Phi^L(y) \equiv y \pmod{2^n}$ exactly when $y$'s walk has its first $n - 1$ edges in $G_L$.
+   Moreover, for odd $y$, $\Phi^L(y) \equiv y \pmod{2^n}$ exactly when the columns $b_0, \dots, b_{n-1}$ are
+   $L$-periodic, that is when $(b_{e-1}, b_e)_{0 \le e < n}$ is a walk of $n - 1$ edges in $G_L$ from $(0, 1)$.
 2. **The periodic points** (exact computation of a finite graph, $L = 2^k$, $k \le 6$). In $G_{2^k}$, $1 \le k \le 6$,
    the part reachable from $(0, 1)$ has 7, 11, 35, 67, 2,115 and 171,779 states, of which exactly 5 have an infinite
    forward walk: the start and four states that the walks of $\pm 1/3$ pass through, two at level 1 and two that
@@ -85,7 +86,8 @@ only on the cells $-e - t, \dots, -e + t$ at time 0, and those right of 0 are wh
 finite row $y \bmod 2^{e+1}$, which is bit $e$ of $\Phi^t(y)$ by the kit's `TFunction.testBit_orbit`. So $F^L x =
 \sigma^{-L} x$ for such a row exactly when $\Phi^L(y) = y$.
 
-**Item 2 for period 4, by hand.** The graph argument is short enough to follow on paper for $L = 4$. Write words on
+**Item 2 for period 4, by hand and in Lean.** The graph argument is short enough to follow on paper for $L = 4$, and
+[EdgePeriodFour](../../Rule30Open/Frames/EdgePeriodFour.md) proves it in Lean (`period_four_iff`). Write words on
 $\mathbb{Z}/4$ as $b(0)b(1)b(2)b(3)$. For odd $y$, $b_0 = 1111$, and $\Delta b_1 = 1111$ makes $b_1$ alternating
 ($0101$ or $1010$). Let $(u, v)$ be a state with $u$ and $v$ alternating. If $v = \bar u$, then $u \lor v = 1111$ has
 four ones and the two successors are $(v, u)$ and $(v, v)$. If $v = u$, then $u \lor v = u$ has two ones, so the
