@@ -1,7 +1,7 @@
 ---
 title: A row white right of some cell that comes back after an odd number of steps, moved as many cells right, is white, and one that comes back after 2^a q steps with q odd already comes back after 2^a
 category: frames
-problems: [1]
+problems: [3]
 status: proved
 lean: Rule30Open.Frames.LightReturnRows
 headline: [odd_return_white, pow_two_return, code_evolve]
@@ -40,6 +40,7 @@ The kit's `Rule30EdgeStaircases.period_two_iff` and [EdgePeriodFour](EdgePeriodF
    the code read from $r$. The return makes this code $c$ itself (`iter_code_of_return`).
 3. **Odd returns.** `EdgeOddPeriods.odd_period_eq_zero` makes $c$ white. That covers the cells $x \le r$, and the
    cells $x > r$ are white by hypothesis.
-4. **Power-of-two part.** `EdgeOddPeriods.pow_two_period` gives $\mathrm{iter}\ 2^a\ c = c$. By the bridge at
+4. **Power-of-two part.** `EdgeOddPeriods.pow_two_period` (for codes, the kit's `TFunctionCycles.per_eq_two_pow` gives
+   the same power-of-two cycle length modulo every $2^n$) gives $\mathrm{iter}\ 2^a\ c = c$. By the bridge at
    $t = 2^a$, the row at time $2^a$ agrees with $init$ moved $2^a$ cells right at every cell $x + 2^a$ with $x \le r$.
    For $x > r$ both sides are white.

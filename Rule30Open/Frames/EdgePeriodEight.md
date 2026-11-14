@@ -23,7 +23,10 @@ translate of a rain row (shifts of the code and the white row as in [edge period
 points](../../findings/frames/edge-periodic-points.md), item 2). The kit has period 2
 (`Rule30EdgeStaircases.period_two_iff`), EdgePeriodFour period 4, and the finding the computation for every period not
 divisible by 128; this module proves period 8 in Lean, hence every period $L$ with $16 \nmid L$ by the reduction of the
-finding (a periodic point's cycle lengths are powers of two dividing $L$).
+finding (a periodic point's cycle lengths are powers of two dividing $L$). The power-of-two step of that reduction is in
+Lean as [EdgeOddPeriods](EdgeOddPeriods.md)`.pow_two_period` (period $2^a q$ with $q$ odd gives period $2^a$); the
+remaining step, from a period dividing 4 to period 8 and the passage between rows and codes by shifts with
+$c(0) = 0$, stays on paper.
 
 ## Argument
 

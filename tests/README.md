@@ -115,8 +115,9 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q -p no:cacheprovider --durations=60` collects 737 tests: 736 pass and 1 is skipped
-(`test_late_onset.py` needs `pysat`, which this environment lacks). Serially on an idle machine with four cores the
+`python -m pytest -q -p no:cacheprovider --durations=60` collects 819 tests: 817 pass and 2 are skipped
+(`test_late_onset.py` needs `pysat` and `test_persistence.py` needs `ripser`, which this environment lacks). Under
+load from other jobs the suite took 62 s of wall time. Serially on an idle machine with four cores the
 suite takes about 38 s of wall time. With the 647 tests it had before, on one core of a machine with four at a load
 average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations sum to 43 to 46 s, and
 collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for `test_persistence.py` is

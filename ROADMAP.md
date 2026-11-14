@@ -850,6 +850,20 @@ In order of the assessment above.
      algebra](negative-results/complexity/block-algebra-solvability.md) cites, Moore (1997, 1998) and Barrington (1989)
      and Barrington and Therien (1988), are not yet in the [literature](literature/complexity.md) and have not been
      checked against the papers.
+     [SkeletonWhiteDensity](Rule30Open/Diagonals/SkeletonWhiteDensity.md),
+     [PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md), the EdgePeriod modules
+     ([EdgePeriods](Rule30Open/Frames/EdgePeriods.md) and those it imports) and the LightReturn modules
+     ([LightReturnRows](Rule30Open/Frames/LightReturnRows.md),
+     [LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)) are machine-checked, but their prose has had
+     at most one review pass, and [edge pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md) rests on
+     floating-point LP values.
+   - *Open questions from the density and right-edge results.* The sharp lower white density of two adjacent columns,
+     between 5/18 and 1/3 ([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)); the classification of the
+     right-edge map's periodic points for periods divisible by 32 in Lean, and for every period at all, which is the
+     finiteness of every tree $T_L$ ([light-return words](findings/frames/light-return-words.md)); a bound on the
+     longest black run $M_n$ of the rows, which would give black cells positive density in the triangle ([black density
+     from row runs](negative-results/structure/black-density-from-row-runs.md)); and a Lean proof that source energy
+     implies Problem 1 ([source energy](findings/structure/source-energy-dyadic.md)), after re-pinning the kit.
    - *The kit's main branch.* Kit main (commit 2fdb1bb, November 9) is far past the pin, with modules that bear on
      entries here: `Rule30BlackTimeGrowth` (black center cells grow at least like $\log_{8/5}$, from a white-run
      erosion bound), `Rule30SourceEnergy` (Problem 2 from one autocorrelation estimate at power-of-two lags; its

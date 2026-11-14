@@ -1,12 +1,12 @@
 ---
 title: The right-edge map's only fixed point is 0, a point that returns after an odd number of steps is fixed, and every periodic point has a power-of-two least period
 category: frames
-problems: [1]
+problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgeOddPeriods
 headline: [fixed_point_eq_zero, fixed_of_odd_period, odd_period_eq_zero, pow_two_period]
 kit: refines
-kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
+kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases, TFunctionCycles]
 ---
 
 # The right-edge map's only fixed point is 0, a point that returns after an odd number of steps is fixed, and every periodic point has a power-of-two least period
@@ -16,8 +16,11 @@ In the frame of its right edge, one step of Rule 30 acts on the edge code $c$ of
 $y(k) \oplus (y(k-1) \lor y(k-2))$, with bits below 0 white. `Rule30FrozenRuler.iter n` is its $n$-th iterate. The
 kit treats the period-two points (`Rule30EdgeStaircases.period_two_iff`) and
 [EdgePeriodFour](EdgePeriodFour.md) the period-four points. The kit's `Rule30EdgeStaircases.no_fixed_point` shows that
-no code with bit 0 black is fixed. `fixed_point_eq_zero` is the same fact for every code, and the reduction of every
-odd period to period one and of every period to its power-of-two part are new.
+no code with bit 0 black is fixed; `fixed_point_eq_zero` is the same fact for every code. The kit's equivalents
+module `TFunctionCycles` already shows that the cycle length of the edge map modulo $2^n$ is a power of two
+(`per_eq_two_pow`, with `iterate_mod_iff_dvd`), which gives `pow_two_period` for codes after a short limit argument
+over the levels $n$. This module proves the power-of-two reduction directly on 2-adic codes, without levels, and
+the reduction of every odd period to period one (`fixed_of_odd_period`, `odd_period_eq_zero`).
 
 ## Statement
 

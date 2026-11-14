@@ -1,5 +1,5 @@
 ---
-title: On every eternal orbit of the left-edge frame, the single cell's shadow included, at least (2J - 4)/5 of the first J left diagonals are white on average over a period; for every row, 3 W + 2 W' >= 2J - 4 over one step, with the constant attained
+title: On every eternal orbit of the left-edge frame, the single cell's shadow included, at least (2J - 4)/5 of the first J left diagonals are white on average over a period; for every row, 3 W + 2 W' >= 2J - 4 over one step, with the constant 4 attained for 2 <= J <= 12 (computed)
 category: diagonals
 problems: [2]
 status: proved
@@ -7,10 +7,10 @@ lean: Rule30Open.Diagonals.SkeletonWhiteDensity
 headline: [local_ineq, two_black_le, white_step, orbit_white, eternal_white]
 kit: new
 kit_modules: [Rule30FiniteDiagonals]
-evidence: [computations/skeleton_white_density.py]
+evidence: [computations/skeleton_white_density.py, tests/test_skeleton_white_density.py]
 ---
 
-# On every eternal orbit of the left-edge frame, the single cell's shadow included, at least (2J - 4)/5 of the first J left diagonals are white on average over a period; for every row, 3 W + 2 W' >= 2J - 4 over one step, with the constant attained
+# On every eternal orbit of the left-edge frame, the single cell's shadow included, at least (2J - 4)/5 of the first J left diagonals are white on average over a period; for every row, 3 W + 2 W' >= 2J - 4 over one step, with the constant 4 attained for 2 <= J <= 12 (computed)
 
 In the left-edge frame a row $R$ is read from its frame cell rightward, coordinate $d$ being left diagonal $d$, and
 one step of rule 30 is $\mathrm{leftStep}(R)_d = R_{d-2} \oplus (R_{d-1} \lor R_d)$ with $R_{-1} = R_{-2} = 0$
@@ -62,7 +62,7 @@ the skeleton tree ([SkeletonTree](SkeletonTree.md)) the orbit follows.
 
 ## What it means
 
-This is the first unconditional density statement about the regular left side of the single cell's pattern, and it
+This is an unconditional density statement about the regular left side of the single cell's pattern, and it
 concerns **white cells only**. On the shadow of the single cell, at least $2/5 - 4/(5J)$ of the cells of the first $J$
 diagonals are white, averaged over a period. It says nothing about black cells there. The step alone forces no
 positive density of black cells uniform in the period
@@ -87,6 +87,9 @@ periodicity. The local inequality is checked by `decide` on its eight cases; the
 
 ## Relation to the kit
 
-The kit has no density statement for white or black cells of the left diagonals. The potential is
+The kit has no density statement for white or black cells of the left diagonals. Its
+`Rule30AgedLeftDiagonals.Ld_white_witness_after_reset` gives white cells in intervals of left diagonals for every
+configuration that is white left of an anchor: white witnesses, not a density. [RowWhiteDensity](../Foundations/RowWhiteDensity.md)'s
+`triangle_white` bounds the white cells of the whole triangle, left side included, but not of the left diagonals alone. The potential is
 [RowWhiteDensity](../Foundations/RowWhiteDensity.md)'s, applied along the depth instead of along a row, with the frame
 supplying the two white cells that start the telescoping.

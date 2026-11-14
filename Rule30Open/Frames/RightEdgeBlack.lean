@@ -15,6 +15,7 @@ public import Ruliology.CellularAutomata.Rule30RightPeriods
 * `strip_black`: over one period `L = 2 ^ E N` of the first `N + 1` diagonals, for every `J ≤ N`,
   `L * (2 + E J) ≤ 2 * (black cells of diagonals 0 … J over times 0 … L - 1)`. In particular, for `J = N`,
   the black density of the first `N + 1` right diagonals over their common period is at least `(2 + E N) / (2 (N + 1))`.
+* `strip_white`: likewise `L * E J ≤ 2 * (white cells of diagonals 0 … J over times 0 … L - 1)`.
 
 The natural-language argument is `RightEdgeBlack.md`, beside this file.
 -/
@@ -89,6 +90,45 @@ theorem strip_black (N : Nat) : ∀ J, J ≤ N →
         rw [hL, hd, Nat.pow_succ]
         rw [Nat.mul_comm (2 ^ leastExp J) 2, Nat.mul_assoc]
       rw [hd, Nat.mul_add, Nat.mul_add] at *
+      have : 2 ^ leastExp N * (leastExp J + 1) = 2 ^ leastExp N * leastExp J + 2 ^ leastExp N := Nat.mul_succ _ _
+      omega
+    · have he : leastExp (J + 1) = leastExp J := by
+        revert hs; split <;> omega
+      rw [he]
+      omega
+
+/-- White cells of diagonals `0 … J - 1` over times `0 … L - 1`. -/
+def stripWhite (L : Nat) : Nat → Nat
+  | 0 => 0
+  | J + 1 => stripWhite L J + cnt (fun t => !R J t) 0 L
+
+theorem cnt_not (f : Nat → Bool) (a : Nat) : ∀ n, cnt f a n + cnt (fun t => !f t) a n = n
+  | 0 => rfl
+  | n + 1 => by
+    have := cnt_not f a n
+    show cnt f a n + (if f (a + n) then 1 else 0) + (cnt (fun t => !f t) a n + (if !f (a + n) then 1 else 0)) = n + 1
+    cases f (a + n) <;> simp <;> omega
+
+/-- **Over one period `L = 2 ^ E N`, the doubling diagonals force `L * E J ≤ 2 * white`.** -/
+theorem strip_white (N : Nat) : ∀ J, J ≤ N →
+    2 ^ leastExp N * leastExp J ≤ 2 * stripWhite (2 ^ leastExp N) (J + 1)
+  | 0, _ => by rw [leastExp_zero]; omega
+  | J + 1, hJ => by
+    have ih := strip_white N J (by omega)
+    show 2 ^ leastExp N * leastExp (J + 1) ≤
+      2 * (stripWhite (2 ^ leastExp N) (J + 1) + cnt (fun t => !R (J + 1) t) 0 (2 ^ leastExp N))
+    have hs := e_step (leastExp_spec J) (leastExp_spec (J + 1))
+    by_cases hd : leastExp (J + 1) = leastExp J + 1
+    · have hle : leastExp (J + 1) ≤ leastExp N := leastExp_mono N hJ
+      have hL : 2 ^ leastExp N = 2 ^ leastExp (J + 1) * 2 ^ (leastExp N - leastExp (J + 1)) := by
+        rw [← Nat.pow_add, show leastExp (J + 1) + (leastExp N - leastExp (J + 1)) = leastExp N by omega]
+      have hc := doubling_black hd 0 (2 ^ (leastExp N - leastExp (J + 1)))
+      rw [← hL] at hc
+      have hn := cnt_not (R (J + 1)) 0 (2 ^ leastExp N)
+      have h2 : 2 ^ leastExp N = 2 * (2 ^ leastExp J * 2 ^ (leastExp N - leastExp (J + 1))) := by
+        rw [hL, hd, Nat.pow_succ]
+        rw [Nat.mul_comm (2 ^ leastExp J) 2, Nat.mul_assoc]
+      rw [hd]
       have : 2 ^ leastExp N * (leastExp J + 1) = 2 ^ leastExp N * leastExp J + 2 ^ leastExp N := Nat.mul_succ _ _
       omega
     · have he : leastExp (J + 1) = leastExp J := by
