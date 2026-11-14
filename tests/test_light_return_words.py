@@ -23,6 +23,7 @@ def test_every_walk_is_rain_until_the_branch_state() -> None:
         for _ in range(6):
             level = [c for s in level for c in w.children(s, L)]
             assert {s for s in level if s not in rain} <= branch | {c for b in branch for c in _descendants(b, L, 6)}
+        assert len(rain) == 4
         # one step from a rain state: one rain child and one branch child
         for s in rain:
             kids = set(w.children(s, L))
@@ -38,10 +39,23 @@ def _descendants(state: w.State, L: int, depth: int) -> set[w.State]:
     return out
 
 
+def test_children_parity_identity_exhaustive() -> None:
+    # |v or w| + |v or not w| = |v| + L for every pair of words of length L <= 8 (independent of the tree)
+    for L in range(1, 9):
+        full = (1 << L) - 1
+        for v in range(1 << L):
+            for x in range(1 << L):
+                assert bin(v | x).count("1") + bin(v | (x ^ full)).count("1") == bin(v).count("1") + L
+
+
 def test_children_fertility_parity() -> None:
-    for L in (8, 16, 32):
+    # the whole trees; the case |v| odd first occurs at L = 32 (208 of 527 inner nodes)
+    assert w.fertility_counts(8) == (7, 0, 0)
+    assert w.fertility_counts(16) == (15, 0, 0)
+    assert w.fertility_counts(32) == (527, 208, 0)
+    for L in (8, 16, 32):  # direct check, written out
         level = [(w.alternating(L), w.alternating(L))]
-        for _ in range(8):
+        while level:
             for s in level:
                 kids = w.children(s, L)
                 if kids:
@@ -54,11 +68,11 @@ def test_children_fertility_parity() -> None:
 
 
 def test_half_period_embedding() -> None:
-    for N in (4, 8, 16):
+    for N in (2, 4, 8, 16):
         L = 2 * N
         mask = (1 << N) - 1
         level = [(w.alternating(N), w.alternating(N))]
-        for _ in range(5):
+        while level:  # the whole tree T_N
             for u, v in level:
                 big = ((u << N) | u, (v << N) | v)
                 kids = w.children(big, L)

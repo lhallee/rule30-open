@@ -10,6 +10,7 @@ W_(e-2))(t); for odd y, W_(-1) = W_(-2) = 0 and W_0 = 1...1. The state after wor
 * `brute_counts`: the number of odd y modulo 2^n with Phi^L(y) = y modulo 2^n, by applying Phi (an independent check).
 * `branch_tree`: the size of the tree of walks from the branch state (P, P), P = 0101..., and its depth; finite for
   L = 2, ..., 2^k_max (computed), which is the conjecture for those L.
+* `fertility_counts`: the inner nodes of that tree, those with |v| odd, and the violations of the parity of Lemma 3.
 
     python -m computations.light_return_words --k-max 6
 """
@@ -100,10 +101,36 @@ def branch_tree(L: int, limit: int = 10**7) -> tuple[int, int] | None:
 
 
 def rain_states(L: int) -> set[State]:
-    """The states of the rain walks: (A, not A) with A alternating."""
+    """The four states the rain walks pass through after the start: (1...1, A) and (A, not A), A alternating."""
     full = (1 << L) - 1
     P = alternating(L)
-    return {(P, P ^ full), (P ^ full, P)}
+    return {(full, P), (full, P ^ full), (P, P ^ full), (P ^ full, P)}
+
+
+def fertility_counts(L: int) -> tuple[int, int, int]:
+    """Over the whole tree from (P, P): (inner nodes, inner nodes (u, v) with |v| odd, nodes violating Lemma 3).
+
+    Lemma 3: at an inner node with |v| odd exactly one child has children; with |v| even both or neither do.
+    """
+    P = alternating(L)
+    level = [(P, P)]
+    inner = odd = bad = 0
+    while level:
+        nxt: list[State] = []
+        for state in level:
+            kids = children(state, L)
+            if not kids:
+                continue
+            inner += 1
+            has = [bool(children(c, L)) for c in kids]
+            if bin(state[1]).count("1") % 2:
+                odd += 1
+                bad += sum(has) != 1
+            else:
+                bad += has[0] != has[1]
+            nxt.extend(kids)
+        level = nxt
+    return inner, odd, bad
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -112,7 +139,9 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     for k in tqdm(range(1, args.k_max + 1), file=sys.stderr):
         L = 1 << k
-        print(f"L = {L:3d}: tree from (P, P): (nodes, depth) = {branch_tree(L)}")
+        inner, odd, bad = fertility_counts(L)
+        print(f"L = {L:3d}: tree from (P, P): (nodes, depth) = {branch_tree(L)}; inner nodes {inner}, "
+              f"with |v| odd {odd}, violations of Lemma 3 {bad}")
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ the rain states.
 * `dead_square_weight`: the weight of the input after the state (u, u), u alternating (the dead branch of period 4).
 * `non_antiperiodic_columns`: reachable columns of least period 2^j > 1 that are not complemented by a shift of 2^(j-1).
 
-    python -m computations.edge_periodic_full     # L = 2, 4, 8: about 5 s
+    python -m computations.edge_periodic_full     # L = 2, 4, 8, 16, 32: under a second
 """
 
 from __future__ import annotations

@@ -41,5 +41,7 @@ def test_dead_square_weight() -> None:
 
 def test_non_antiperiodic_column() -> None:
     bad = ef.non_antiperiodic_columns(8)
-    assert int("00010101", 2) in bad or int("10101000", 2) in bad
+    x = int("00010101", 2)  # bit t is time t: read from t = 0 this is 10101000
+    assert x in bad
+    assert ef.least_period(x, 8) == 8 and bin(x).count("1") == 3
     assert ef.non_antiperiodic_columns(4) == []

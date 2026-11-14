@@ -3,6 +3,7 @@ module
 public import Rule30Open.Foundations.Evolve
 public import Rule30Open.Foundations.Official
 public import Rule30Open.Foundations.RightHalf
+public import Rule30Open.Foundations.RowWhiteDensity
 public import Rule30Open.Seeds.SeedExtensions
 public import Rule30Open.Columns.AdjacentColumns
 public import Rule30Open.Columns.LongRuns
@@ -159,6 +160,8 @@ public import Rule30Open.PeriodTwo.WedgeSmall
 public import Rule30Open.PeriodTwo.WedgeLadder
 public import Rule30Open.PeriodTwo.WedgeLadderQ01
 public import Rule30Open.PeriodTwo.ChannelLanguage
+public import Rule30Open.PeriodTwo.HeldSimilarity
+public import Rule30Open.PeriodTwo.HeldClasses
 public import Rule30Open.Diagonals.LeftMemory
 public import Rule30Open.Diagonals.SettledRuns
 public import Rule30Open.Diagonals.SettledSlope
@@ -169,12 +172,15 @@ public import Rule30Open.Diagonals.DrivenSkeleton
 public import Rule30Open.Diagonals.RunTransfer
 public import Rule30Open.Diagonals.DoublingGaps
 public import Rule30Open.Diagonals.SkeletonTree
+public import Rule30Open.Diagonals.EternalSkeleton
 public import Rule30Open.Frames.SeedPast
 public import Rule30Open.Frames.SeedPastPeriods
 public import Rule30Open.Frames.SeedPastRing
 public import Rule30Open.Frames.SeedPastTable
 public import Rule30Open.Frames.StripeClasses
 public import Rule30Open.Frames.StripeClassCount
+public import Rule30Open.Frames.EdgePeriodFour
+public import Rule30Open.Frames.EdgeOddPeriods
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.Analogs.SymmetricAxes

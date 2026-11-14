@@ -75,6 +75,79 @@ theorem triple_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (n : 
   have := phi_le (f 0 (a + 1)) (f 0 (a + 2))
   omega
 
+/-! ### Two adjacent columns -/
+
+/-- The potential of the cells `a + 1 .. a + 5`, a table found by shortest paths. -/
+def tab : List Nat := [2, 2, 6, 6, 4, 4, 8, 8, 0, 0, 8, 0, 8, 8, 0, 8, 10, 10, 18, 10, 18, 18, 14, 14, 18, 18, 18, 18, 16, 12, 12, 12]
+
+/-- The bit `1` for a black cell. -/
+def bit (b : Bool) : Nat := if b then 1 else 0
+
+/-- The potential of five cells. -/
+def psi5 (b c d e g : Bool) : Nat :=
+  tab.getD (16 * bit b + 8 * bit c + 4 * bit d + 2 * bit e + bit g) 0
+
+theorem psi5_le (b c d e g : Bool) : psi5 b c d e g ≤ 18 := by
+  cases b <;> cases c <;> cases d <;> cases e <;> cases g <;> decide
+
+/-- **One step for a pair**: `psi(next) + 10 ≤ psi(now) + 18 (white cells of a, a + 1)`, whatever
+the cells `a - 1` and `a + 6` are. -/
+theorem pair_step (p0 p1 p2 p3 p4 p5 r : Bool) :
+    psi5 (rule p0 p1 p2) (rule p1 p2 p3) (rule p2 p3 p4) (rule p3 p4 p5) (rule p4 p5 r) + 10 ≤
+      psi5 p1 p2 p3 p4 p5 + 18 * (wh p0 + wh p1) := by
+  revert p0 p1 p2 p3 p4 p5 r
+  decide
+
+theorem nxt (f : Nat → Int → Bool) (hf : IsOrbit f) (n : Nat) (p q r s : Int)
+    (h1 : q = p + 1) (h2 : r = p + 2) (h3 : s = p + 1) :
+    f (n + 1) s = rule (f n p) (f n q) (f n r) := by
+  rw [hf n]
+  show rule (f n (s - 1)) (f n s) (f n (s + 1)) = _
+  have u : s - 1 = p := by omega
+  have v : s + 1 = r := by omega
+  have w : s = q := by omega
+  rw [u, v, w]
+
+/-- White cells of the columns `a, a + 1` at the times `0 .. n - 1`. -/
+def pairW (f : Nat → Int → Bool) (a : Int) : Nat → Nat
+  | 0 => 0
+  | n + 1 => pairW f a n + wh (f n a) + wh (f n (a + 1))
+
+/-- The potential of the row at time `n`. -/
+def pot (f : Nat → Int → Bool) (a : Int) (n : Nat) : Nat :=
+  psi5 (f n (a + 1)) (f n (a + 2)) (f n (a + 3)) (f n (a + 4)) (f n (a + 5))
+
+theorem pair_aux (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) :
+    ∀ n, 10 * n + pot f a n ≤ pot f a 0 + 18 * pairW f a n
+  | 0 => by simp [pairW]
+  | n + 1 => by
+    have ih := pair_aux f hf a n
+    have h := pair_step (f n a) (f n (a + 1)) (f n (a + 2)) (f n (a + 3)) (f n (a + 4))
+      (f n (a + 5)) (f n (a + 6))
+    have e1 := nxt f hf n a (a + 1) (a + 2) (a + 1) (by omega) (by omega) (by omega)
+    have e2 := nxt f hf n (a + 1) (a + 2) (a + 3) (a + 2) (by omega) (by omega) (by omega)
+    have e3 := nxt f hf n (a + 2) (a + 3) (a + 4) (a + 3) (by omega) (by omega) (by omega)
+    have e4 := nxt f hf n (a + 3) (a + 4) (a + 5) (a + 4) (by omega) (by omega) (by omega)
+    have e5 := nxt f hf n (a + 4) (a + 5) (a + 6) (a + 5) (by omega) (by omega) (by omega)
+    have hp : pot f a (n + 1) = psi5 (rule (f n a) (f n (a + 1)) (f n (a + 2)))
+        (rule (f n (a + 1)) (f n (a + 2)) (f n (a + 3)))
+        (rule (f n (a + 2)) (f n (a + 3)) (f n (a + 4)))
+        (rule (f n (a + 3)) (f n (a + 4)) (f n (a + 5)))
+        (rule (f n (a + 4)) (f n (a + 5)) (f n (a + 6))) := by
+      unfold pot; rw [e1, e2, e3, e4, e5]
+    have hq : pot f a n = psi5 (f n (a + 1)) (f n (a + 2)) (f n (a + 3)) (f n (a + 4))
+        (f n (a + 5)) := rfl
+    simp only [pairW]
+    omega
+
+/-- **Every two adjacent columns of every orbit**: `18 W ≥ 10 n - 18`, so the pair has lower white
+density at least `5/18`. -/
+theorem pair_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (n : Nat) :
+    10 * n ≤ 18 * pairW f a n + 18 := by
+  have h := pair_aux f hf a n
+  have : pot f a 0 ≤ 18 := psi5_le _ _ _ _ _
+  omega
+
 /-! ### Sharpness -/
 
 /-- The row `(10)^∞`: black at the even cells. -/

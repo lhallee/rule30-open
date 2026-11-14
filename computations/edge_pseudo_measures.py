@@ -44,6 +44,13 @@ def left_edge_bound(J: int, k: int, colour: int, stationary: bool = True) -> flo
 
 def left_edge_profile(J: int, k: int, colour: int, stationary: bool = True) -> np.ndarray:
     """mu_d[R_d = colour] for an optimal range-k pseudo-measure on diagonals 0..J-1; shape (J,)."""
+    W = words(k + 2)  # shape (2^(k+2), k+2)
+    x = left_edge_solution(J, k, colour, stationary)  # shape (J, 2^(k+2))
+    return (x * (W[:, 2] == colour)).sum(axis=1)  # shape (J,)
+
+
+def left_edge_solution(J: int, k: int, colour: int, stationary: bool = True, white_end: bool = False) -> np.ndarray:
+    """An optimal range-k pseudo-measure on diagonals 0..J-1 as an array; shape (J, 2^(k+2))."""
     W = words(k + 2)  # shape (2^(k+2), k+2); column j is position d-2+j
     nw = W.shape[0]
     nvar = J * nw
@@ -56,6 +63,8 @@ def left_edge_profile(J: int, k: int, colour: int, stationary: bool = True) -> n
         bad = np.zeros(nw, dtype=bool)  # shape (2^(k+2),)
         bad |= (W[:, pos < 0] != 0).any(axis=1)
         bad |= (W[:, pos == 0] != 1).any(axis=1)
+        if white_end and d == J - 1:
+            bad[1:] = True
         for i in np.nonzero(bad)[0]:
             hi[d * nw + i] = 0.0
         rows.append({d * nw + i: 1.0 for i in range(nw)})
@@ -93,8 +102,7 @@ def left_edge_profile(J: int, k: int, colour: int, stationary: bool = True) -> n
         cost[d * nw: (d + 1) * nw] = (W[:, 2] == colour)
     res = linprog(cost, A_eq=A.tocsr(), b_eq=np.array(rhs), bounds=list(zip(lo, hi)), method="highs")
     assert res.status == 0, res.message
-    x = res.x.reshape(J, nw)  # shape (J, 2^(k+2))
-    return (x * (W[:, 2] == colour)).sum(axis=1)  # shape (J,)
+    return res.x.reshape(J, nw)  # shape (J, 2^(k+2))
 
 
 def ordinary_white_bound(k: int) -> float:
@@ -118,10 +126,10 @@ def ordinary_white_bound(k: int) -> float:
 
 
 def check_pair_potential() -> Fraction:
-    """Exact check of 2[y black] + psi(b,c) <= 3[a white] + psi(a,b) over all 5-cell windows; returns 2/5."""
+    """Exact check of 2[a XOR (b OR c)] + psi(b,c) <= 3[a white] + psi(a,b) for all a, b, c; returns 2/5."""
     psi = {(0, 0): 0, (0, 1): 1, (1, 0): 2, (1, 1): 2}
-    for u, v, a, b, c in product((0, 1), repeat=5):
-        y = u ^ (v | a)  # image cell above a
+    for a, b, c in product((0, 1), repeat=3):
+        y = a ^ (b | c)  # image cell above b
         assert 2 * y + psi[(b, c)] <= 3 * (1 - a) + psi[(a, b)]
     return Fraction(2, 5)
 
@@ -133,3 +141,75 @@ if __name__ == "__main__":
         for k in (1, 2, 3, 4):
             vals = [left_edge_bound(J, k, colour) for J in (4, 8, 16, 24, 32)]
             print("left edge colour", colour, "k", k, [round(v, 4) for v in vals], flush=True)
+
+
+def white_end_feasible(J: int, k: int) -> bool:
+    """Whether some range-k pseudo-measure on diagonals 0..J-1 has mu_{J-1} equal to the all-white word."""
+    try:
+        left_edge_solution(J, k, 1, white_end=True)
+    except AssertionError:
+        return False
+    return True
+
+
+def cycle_rows(n: int) -> list[tuple[int, ...]]:
+    """The rows R[0..n-1] on the final cycle of the left-edge orbit of the single black cell, truncated to n diagonals."""
+    row = (1,) + (0,) * (n - 1)
+    seen: dict[tuple[int, ...], int] = {}
+    orbit: list[tuple[int, ...]] = []
+    while row not in seen:
+        seen[row] = len(orbit)
+        orbit.append(row)
+        ext = (0, 0) + row
+        row = tuple(ext[j] ^ (ext[j + 1] | ext[j + 2]) for j in range(n))
+    return orbit[seen[row]:]
+
+
+def empirical_pseudo_measure(n: int, J: int, k: int) -> list[list[Fraction]]:
+    """The empirical range-k pseudo-measure of the final cycle on diagonals 0..J-1; needs J + k - 1 <= n."""
+    assert J + k - 1 <= n
+    cyc = cycle_rows(n)
+    W = list(product((0, 1), repeat=k + 2))
+    pos = {w: i for i, w in enumerate(W)}
+    mu = [[Fraction(0)] * len(W) for _ in range(J)]
+    for row in cyc:
+        ext = (0, 0) + row
+        for d in range(J):
+            mu[d][pos[tuple(ext[d: d + k + 2])]] += Fraction(1, len(cyc))
+    return mu
+
+
+def verify_pseudo_measure(mu: list[list[Fraction]], k: int, white_end: bool = False) -> bool:
+    """Exact check of boundary, shift, stationarity, nonnegativity, normalization (and optionally a white last word)."""
+    W = [tuple(w) for w in product((0, 1), repeat=k + 2)]
+    J = len(mu)
+    for d in range(J):
+        if any(v < 0 for v in mu[d]) or sum(mu[d]) != 1:
+            return False
+        for v, w in zip(mu[d], W):
+            if v != 0 and (any(w[j] for j in range(k + 2) if d - 2 + j < 0) or (d <= 1 and w[2 - d] != 1)):
+                return False
+        new: dict[tuple[int, ...], Fraction] = {}
+        old: dict[tuple[int, ...], Fraction] = {}
+        for v, w in zip(mu[d], W):
+            img = tuple(w[j - 2] ^ (w[j - 1] | w[j]) for j in range(2, k + 2))
+            new[img] = new.get(img, Fraction(0)) + v
+            old[w[2:]] = old.get(w[2:], Fraction(0)) + v
+        if {x: y for x, y in new.items() if y} != {x: y for x, y in old.items() if y}:
+            return False
+    for d in range(J - 1):
+        a: dict[tuple[int, ...], Fraction] = {}
+        b: dict[tuple[int, ...], Fraction] = {}
+        for v, w in zip(mu[d], W):
+            a[w[1:]] = a.get(w[1:], Fraction(0)) + v
+        for v, w in zip(mu[d + 1], W):
+            b[w[:-1]] = b.get(w[:-1], Fraction(0)) + v
+        if {x: y for x, y in a.items() if y} != {x: y for x, y in b.items() if y}:
+            return False
+    return mu[J - 1][0] == 1 or not white_end
+
+
+def black_mass(mu: list[list[Fraction]], k: int) -> Fraction:
+    """Total of mu_d[R_d = 1] over d; exact."""
+    W = list(product((0, 1), repeat=k + 2))
+    return sum((v for row in mu for v, w in zip(row, W) if w[2] == 1), Fraction(0))
