@@ -76,5 +76,6 @@ $2^d$ from time $2^d - 1$ (`Rule30FiniteDiagonals.Ld_uniform_period`), and in it
 reading of every nonzero finite configuration has the 2-adic odometer as orbit closure
 (`Rule30Equivalents.Odometer`). Neither has eternal orbits in the left frame, pure periodicity, the backward
 uniqueness, or the absence of a past for the single cell; a search of both parts of the kit for "eternal",
-"odometer" and "omega" finds only the right-edge odometer and the omega-limit forms of Problem 1
-(`Rule30Equivalents.Genericity`).
+"odometer" and "omega" finds only the right-edge odometer, the omega-limit forms of Problem 1
+(`Rule30Equivalents.Genericity`), and the rain rows of `Rule30EdgeStaircases` (`rain_row_eternal`), an edge patch at
+the right edge that alternates for ever.
