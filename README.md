@@ -71,7 +71,8 @@ cells meets the kit's left-half statement for one ([the left-half statements](fi
 
 Where it stops: `Q01` and `Q01Right`, entry into the traps, and attraction into the period-four family are each open,
 and in every computation the cells they depend on behave like fair coins. The source-energy hypothesis of the kit's
-main branch, which gives Problem 2, would also give Problem 1, on paper ([source energy](findings/structure/source-energy-dyadic.md)).
+main branch, which gives Problem 2, would also give Problem 1, on paper ([source
+energy](findings/structure/source-energy-dyadic.md)).
 
 ### Problem 2: does each color occur equally often?
 
@@ -110,8 +111,8 @@ Proved in Lean:
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
   cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). Every periodic point of the
   right-edge map has a power-of-two least period, and by exact computation for periods not divisible by 128 the only
-  ones are 0 and the rain pair $\pm 1/3$ with its shifts ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md), [edge periodic
-  points](findings/frames/edge-periodic-points.md)).
+  ones are 0 and the rain pair $\pm 1/3$ with its shifts ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md),
+  [edge periodic points](findings/frames/edge-periodic-points.md)).
 - **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
   with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
   1 and the first rung of Problem 3 are the same statements for the transform

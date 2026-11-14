@@ -41,7 +41,7 @@ strong at every frequency $a / (2^k p)$ with $p = 1$ or $p$ an odd prime. So the
    `problem1_of_density_on_progressions` assumes; item 4 goes through the dyadic classes instead.
 7. **Exactly which odd moduli.** For odd $q > 1$ and $\gcd(a, q) = 1$ let
    $\eta_q(a) = \mathrm{ord}_q(2)^{-1} \sum_{j < \mathrm{ord}_q(2)} e(2^j a / q)$, the limit of $P_n(\theta)/n$ at
-   $\theta = a'/(2^k q)$ in lowest terms with $a' \equiv 2^k a \pmod q$. Proved:
+   $\theta = a'/(2^k q)$ in lowest terms with $a' \equiv a \pmod q$. Proved:
    (a) whether $\eta_q(a) = 0$ does not depend on $a$, so write $\eta_q = 0$;
    (b) the hypothesis forces $\hat z_M(\theta) = o(M)$ at $\theta = a'/(2^k q)$, for every sequence, if and only if
    $\eta_q \ne 0$;
@@ -133,6 +133,45 @@ all large $n$, which is $o(N n^2)$. The class fractions follow from the strong l
 $\sum_{r=0}^{8} \cos(2\pi r/9) = 0$ and $\sum_{m=0}^{2} \cos(2\pi (r_0 + 3m)/9) = 0$. $\square$ For $\delta = 1/2$ and
 $t < 2^{18}$ one sample has $E_{\mathrm{src}} / (N n^2) = 0.049$ and black fraction 0.251 on $t \equiv 0 \pmod 9$
 (`planted_nine`); the largest $|P_n(1/9)|$ for $n \le 200$ is 2.53.
+
+**Item 7.** Write $\zeta = e(1/q)$ and $H = \langle 2 \rangle \le (\mathbb{Z}/q)^\times$, so
+$\eta_q(a) = |H|^{-1} \sum_{h \in H} \zeta^{ah}$. The limit: from $j = k$ on, $2^j \theta \equiv 2^{j-k} a/q$, the orbit
+of $a/q$ is purely periodic of length $|H|$, and the first $k + 1$ terms do not affect the limit.
+
+(a) The automorphism $\zeta \mapsto \zeta^c$ of $\mathbb{Q}(\zeta)$, $\gcd(c, q) = 1$, sends $\eta_q(a)$ to
+$\eta_q(ac)$, and an automorphism sends only $0$ to $0$.
+
+(b) If $\eta_q \ne 0$, item 1 applies as in item 2. If $\eta_q = 0$, every prefix sum $P_m(\theta)$ has modulus at most
+$k + 1 + |H|$, since whole cycles sum to $0$; run the proof of item 6 with $m(t) = \delta\cos(2\pi t\theta)$: the
+expectation bound becomes $N(n + (k + 1 + |H|)^2)$, the concentration step is unchanged, and as $2\theta \notin
+\mathbb{Z}$ the strong law gives $\hat z_M(\theta)/M \to \delta/2$.
+
+(c) If every $\eta_d \ne 0$: each frequency $b/(2^k q)$ reduces to $b'/(2^{k'} d)$ with $d \mid q$, controlled by item 2
+($d = 1$) or by (b); finite Fourier inversion as in item 3 gives every class. If $\eta_d = 0$ for some $d > 1$, $d \mid q$:
+plant $m(t) = \delta\cos(2\pi t/d)$ by (b) at $\theta = 1/d$; every $t \equiv 0 \pmod{2^k q}$ has $t \equiv 0 \pmod d$, so
+that class has black fraction $(1 - \delta)/2$ almost surely.
+
+(d) *Vanishing.* Let $p^2 \mid q$ and $K = \{x : x \equiv 1 \pmod{q/p}\} = \{1 + jq/p : 0 \le j < p\}$, a subgroup of
+order $p$ of $(\mathbb{Z}/q)^\times$, the kernel of reduction mod $q/p$. As $|H| = \mathrm{ord}_{q/p}(2) \cdot |H \cap K|$,
+the condition $2^{\mathrm{ord}_{q/p}(2)} \not\equiv 1 \pmod q$ says $H \cap K \ne 1$, so $K \le H$ ($K$ has prime order)
+and $H$ is a union of cosets $hK$. Each coset sums to
+$\sum_{j<p} \zeta^{ah(1 + jq/p)} = \zeta^{ah} \sum_{j<p} e(ahj/p) = 0$, as $p \nmid ah$.
+*Squarefree $q$.* For a prime $p$, $\zeta_p, \dots, \zeta_p^{p-1}$ is a basis of $\mathbb{Q}(\zeta_p)$. For
+$q = p_1 \cdots p_r$ distinct, $[\mathbb{Q}(\zeta_q) : \mathbb{Q}] = \prod (p_i - 1)$ and $\mathbb{Q}(\zeta_q)$ is
+spanned by the products of the fields $\mathbb{Q}(\zeta_{p_i})$, so the products of their bases, which by the Chinese
+remainder theorem are exactly the primitive $q$-th roots of unity, are a basis. $\eta_q(a)$ is $|H|^{-1}$ times a sum of
+distinct primitive $q$-th roots, hence not $0$.
+*Prime powers.* For $q = p^e$, $e \ge 2$, $(\mathbb{Z}/q)^\times$ is cyclic and $K$ is its only subgroup of order $p$.
+If $p \nmid |H|$ then $|H|$ divides $p - 1$, $H$ lies in the subgroup of order $p - 1$, which reduction mod $p$ maps
+injectively, and the residues $r_h = h \bmod p$, $h \in H$, are distinct. Over $L = \mathbb{Q}(\zeta_{q/p})$ the field
+$\mathbb{Q}(\zeta)$ has degree $p$ and basis $1, \zeta, \dots, \zeta^{p-1}$ ($\zeta^p = \zeta_{q/p}$), and
+$\zeta^{ah} = \zeta^{r} \cdot \zeta_{q/p}^{(ah - r)/p}$ with $r = ah \bmod p$ distinct for distinct $h$; so $\eta_q(a)$
+has a nonzero coordinate and is not $0$. If $p \mid |H|$ then $K \le H$ and $\eta_q = 0$. Finally $p \mid |H|$ iff
+$\mathrm{ord}_{p^e}(2) \ne \mathrm{ord}_p(2)$ iff $2^{\mathrm{ord}_p(2)} \not\equiv 1 \pmod{p^e}$; for $e = 2$ this is
+$2^{p-1} \not\equiv 1 \pmod{p^2}$.
+
+(e) Squarefree $q$ has only squarefree divisors, so (c) applies. If $p^2 \mid q$ with $p$ not a Wieferich prime,
+$\eta_{p^2} = 0$ and (c) fails at $d = p^2$. $\square$
 
 ## What the inequality does not see
 
