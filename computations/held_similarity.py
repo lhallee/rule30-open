@@ -12,6 +12,9 @@ Write H(U) = (U >> 1) xor (U or (U << 1)), the held map of `held_shift`, on 2-ad
 - `inverse_branch` and `ifs_point`: the two inverse branches of H (fix u_0) are similarities of ratio 1/2, and the
   point of K with itinerary beta is the limit of G_(beta_0) o ... o G_(beta_(n-1))(0) with
   G_b(W) = H_b^(-1)(H_1^(-1)(W)), correct modulo 4^n: the analog of Bernstein's series, with nonaffine maps.
+- `survivors_below` and `survivors_with_bits`: how many integers below 2^N, or with exactly M bits, have H^t odd at
+  every odd t <= T. Below 2^N the count is 2^(N - ceil(T / 2)) for T < N; with exactly M bits it is
+  2^(M - 1 - ceil(T / 2)) for T <= M - 2, and at T = M - 1 it is 2^((M - 1) / 2) only for odd M.
 
     python -m computations.held_similarity --max-n 12      # the table of E^n(3) against 3 E^n(1), and the checks
 """
@@ -121,6 +124,11 @@ def survivors_below(N: int, T: int) -> int:
     return count
 
 
+def survivors_with_bits(M: int, T: int) -> int:
+    """How many integers with exactly M bits (2^(M-1) <= U < 2^M) have H^t(U) odd at every odd t <= T."""
+    return survivors_below(M, T) - survivors_below(M - 1, T)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-n", type=int, default=12)
@@ -142,6 +150,9 @@ def main() -> None:
     for T in range(1, 12):
         print("integers below 2^12 passing the odd steps up to", T, ":", survivors_below(12, T),
               "against 2^(12 - ceil(T / 2)) =", 1 << (12 - (T + 1) // 2))
+    for M in tqdm(range(2, 13), desc="bit lengths"):
+        print("integers with", M, "bits passing every odd step up to M - 2 :", survivors_with_bits(M, M - 2),
+              "; up to M - 1 :", survivors_with_bits(M, M - 1))
 
 
 if __name__ == "__main__":

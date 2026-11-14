@@ -1,5 +1,5 @@
 ---
-title: H^n is a bijective 2-adic similarity of ratio 2^n on each class modulo 2^n, as the 3x+1 map is, but affine on no residue class, so K is the attractor of two nonaffine similarities and the cycle equation and Bernstein's series have no closed form here
+title: H^n is a bijective 2-adic similarity of ratio 2^n on each class modulo 2^n, as the 3x+1 map is, but affine on no residue class, so K is the attractor of two nonaffine similarities and the cycle equation and Bernstein's series have no affine form here
 category: period-two
 problems: [1]
 status: paper
@@ -7,13 +7,15 @@ formalization: partial
 evidence: [computations/held_similarity.py]
 ---
 
-# H^n is a bijective 2-adic similarity of ratio 2^n on each class modulo 2^n, as the 3x+1 map is, but affine on no residue class, so K is the attractor of two nonaffine similarities and the cycle equation and Bernstein's series have no closed form here
+# H^n is a bijective 2-adic similarity of ratio 2^n on each class modulo 2^n, as the 3x+1 map is, but affine on no residue class, so K is the attractor of two nonaffine similarities and the cycle equation and Bernstein's series have no affine form here
 
 Let $H(U) = (U \gg 1) \oplus (U \lor (U \ll 1))$ be the held map of
 [HeldColumn](../../Rule30Open/PeriodTwo/HeldColumn.md) on the 2-adic integers (bit $j$ is cell $j$), $c_t(U)$ bit 0 of
 $H^t(U)$, and $K$ the set of $U$ with $c_t(U) = 1$ at every odd $t$ ([the shift model](shift-model.md)). Write
 $|x|_2 = 2^{-v(x)}$. The 3x+1 map $T$ has three properties on which the 2-adic theory of the Collatz problem rests
-(Lagarias 1985; Bernstein 1994; Bernstein and Lagarias 1996): the parity-vector map is an isometry conjugating $T$ to
+(J. C. Lagarias, "The 3x+1 problem and its generalizations", Amer. Math. Monthly 92 (1985); D. J. Bernstein,
+"A non-iterative 2-adic statement of the 3N+1 conjecture", Proc. Amer. Math. Soc. 121 (1994); D. J. Bernstein and
+J. C. Lagarias, "The 3x+1 conjugacy map", Canad. J. Math. 48 (1996)): the parity-vector map is an isometry conjugating $T$ to
 the shift, $T^n$ is a bijective affine map from each class modulo $2^n$ onto $\mathbb Z_2$, and the inverse branches
 $x \mapsto 2x$, $x \mapsto (2x - 1)/3$ are affine, which gives each periodic parity word a rational by the cycle equation
 and the inverse conjugacy as an explicit series. This entry proves that $H$ has the first property and the first half
@@ -38,7 +40,8 @@ of the second, exactly, and that the affinity fails on every class for every ite
    $\mathbb Q_2$ is on paper; the witnesses are also checked for $n \le 12$ and every class modulo $2^k$, $k \le 6$,
    by `affinity_defect`). For every $n \ge 1$, $k \ge 0$ and $a$, there are no $\alpha, c \in \mathbb Q_2$ with
    $H^n(U) = \alpha U + c$ for every $U \equiv a \pmod{2^k}$. Where $T^n$ has the formula $(3^m x + r)/2^n$ on a
-   class, $H^n$ has a similarity that is a polynomial over $\mathrm{GF}(2)$ in the bits, and no formula of degree one.
+   class, $H^n$ is a similarity whose bits are polynomials over $\mathrm{GF}(2)$ in the bits of $U$, and it agrees with no
+   map $U \mapsto \alpha U + c$ over $\mathbb Q_2$ on any class.
 4. **K is the attractor of two nonaffine similarities** (paper; `ifs_point` reproduces every residue of $K$ modulo
    $2^{12}$ with its itinerary). Let $G_b = H_b^{-1} \circ H_1^{-1}$ for $b \in \{0, 1\}$. Each $G_b$ is a bijective
    similarity of ratio $1/4$ from $\mathbb Z_2$ onto the class $\{u_0 = b,\ u_1 = 1 - b\}$ modulo 4 ($1 + 4\mathbb Z_2$
@@ -48,16 +51,19 @@ of the second, exactly, and that the affinity fails on every class for every ite
    So $K = G_0(K) \cup G_1(K)$ with disjoint pieces, $|\Phi(\beta) - \Phi(\beta')|_2 = 4^{-s}$ for $s$ the first index
    where $\beta$ and $\beta'$ differ, and the dimension $1/2$ of [the structure of K](k-structure.md) is
    $\log 2 / \log 4$. Neither $G_b$ is affine on any ball. For the 3x+1 map the same construction with the affine
-   branches gives Bernstein's series for the inverse conjugacy; here the branches are nonaffine on every cylinder, which
-   is the metric form of the dense forced bits of [the forced bits](../../negative-results/period-two/forced-bits-dense.md).
+   branches gives Bernstein's series for the inverse conjugacy; here the branches are nonaffine on every cylinder.
+   Heuristically, this is the metric counterpart of the dense polynomials of
+   [the forced bits](../../negative-results/period-two/forced-bits-dense.md); no implication between the two is proved.
 5. **What the cycle equation becomes** (paper). A periodic itinerary $w^\infty$ of length $n$ gives the unique fixed
    point of the contraction $G_w = G_{w_0} \circ \dots \circ G_{w_{n-1}}$ of ratio $4^{-n}$ (Banach). For $T$ the fixed
    point of the affine $T$-branch is the explicit rational $r/(2^k - 3^m)$; here the fixed point is rational by the
    domain argument of `inK_periodic_rational`, with a denominator dividing $2^q - 1$ for its spatial period $q$, and
    no formula for $q$ in terms of $w$ is known (the table of item 2 of [the shift model](shift-model.md) gives $q$ up
-   to 38,304 for $n = 12$). The Collatz cycle problem, hard for $T$ (Steiner; Simons and de Weger), is the easy part
-   here: no periodic point is an integer, since $H$ moves the last 1 of a finite $U$ up by one cell
-   (`inK_periodic_not_finite`), and for the same reason, on all of $\mathbb Z_2$, the column of an integer $U$ is eventually periodic
+   to 38,304 for $n = 12$). The Collatz cycle problem, hard for $T$ (R. P. Steiner 1977; J. Simons and B. de Weger, Acta
+   Arith. 117 (2005)), is the easy part here: no periodic point of $H^2$ in $K$ is an integer. For a positive integer,
+   $H$ moves the last 1 of a finite $U$ up by one cell (`inK_periodic_not_finite`); $0$ and $-1$ are not in $K$
+   ($c_1 = 0$), and for $U < -1$, $H(U)$ is a positive integer (item 6), so $H^2(U)$ would be a positive periodic point
+   in $K$. For the same reason, on all of $\mathbb Z_2$, the column of an integer $U$ is eventually periodic
    only for $U \in \{0, -1\}$ (item 6). The open part is the analog of a divergent trajectory, which the 2-adic theory of $T$ leaves open as well.
 6. **Lagarias's periodicity conjecture, both directions** (paper). For $T$ the conjecture is that $Q$ maps
    $\mathbb Q \cap \mathbb Z_2$ onto the eventually periodic sequences. For $H$ on all of $\mathbb Z_2$ the inclusion
@@ -82,7 +88,8 @@ $a$ modulo $2^n$ onto the class of $Q(a)$ modulo $2^n$ (an isometric bijection m
 radius), and $\sigma^n$ maps every class modulo $2^n$ bijectively onto $\mathbb Z_2$; conjugate by $Q$.
 
 **Item 3.** Three lemmas on nonnegative integers. Write $\mathrm{top}(x)$ for the highest set bit and $E(x) = x \oplus
-((x \ll 1) \lor (x \ll 2))$.
+((x \ll 1) \lor (x \ll 2))$, the kit's single-seed integer step `Rule30Equivalents.TFunction.Phi`; $E^n(1)$ is its row
+`Rule30Equivalents.IntegerRows.a n`.
 
 - *Scaling.* For $m \ge 1$, $H(x 2^m) = 2^{m-1} E(x)$: $(x 2^m) \gg 1 = x 2^{m-1}$ and
   $x 2^m \lor x 2^{m+1} = 2^{m-1}(2x \lor 4x)$. By induction $H^n(x 2^m) = 2^{m-n} E^n(x)$ for $m \ge n$.

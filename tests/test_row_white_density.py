@@ -7,7 +7,7 @@ from itertools import product
 
 import numpy as np
 
-from computations.row_white_density import (black_runs, chain_check, run_white_bound, single_cell_rows, step,
+from computations.row_white_density import (black_runs, chain_check, psi, telescope_gap, run_white_bound, single_cell_rows, step,
                                             triangle_area, triangle_counts)
 
 
@@ -57,10 +57,10 @@ def test_triangle_counts_and_inequalities() -> None:
         assert tc.B[t] == sum(seg) and tc.W[t] == len(seg) - sum(seg)
         cells = {i: rule30_cell(cells.get(i - 1, 0), cells.get(i, 0), cells.get(i + 1, 0)) for i in range(-t - 1, t + 2)}
     for s in range(1, n):
-        assert 3 * tc.W[s - 1] >= 2 * tc.B[s] - 9
+        assert 3 * tc.W[s - 1] + 6 >= 2 * tc.B[s]
     for m in range(1, n + 1):
         Wt, A = int(tc.W[:m].sum()), int(tc.B[:m].sum())
-        assert 5 * Wt >= 2 * m * m - 9 * m + 7
+        assert 5 * Wt >= 2 * (m - 1) * (m - 2)
         assert Wt <= int(tc.T[:max(m - 1, 0)].sum())
         assert A * (int(tc.M[:m].max()) + 3) >= 2 * m * m
 
@@ -73,3 +73,15 @@ def test_chain_classification() -> None:
     rows = single_cell_rows(60)  # (60, 121)
     for s in range(1, 60):
         assert chain_check(rows[s - 1], rows[s][1:-1])[2] == 0
+
+
+def test_potential_and_telescope() -> None:
+    for a, b, c in product((0, 1), repeat=3):
+        assert 2 * rule30_cell(a, b, c) + psi(b, c) <= 3 * (1 - a) + psi(a, b)
+    for L in range(3, 13):
+        for bits in product((0, 1), repeat=L):
+            assert telescope_gap(np.array(bits, dtype=np.uint8)) >= 0
+    # the period-five orbit: (11001) maps to its shift by two, two white cells per period
+    x = [1, 1, 0, 0, 1]
+    y = [rule30_cell(x[i - 1], x[i], x[(i + 1) % 5]) for i in range(5)]
+    assert y == x[2:] + x[:2] and x.count(0) == 2

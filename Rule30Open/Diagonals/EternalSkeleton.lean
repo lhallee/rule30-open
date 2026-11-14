@@ -271,15 +271,15 @@ theorem iter_shadowTime_succ (x : Nat → Bool) (t : Int) (d : Nat) :
   have c0 := shadowTime_cast t d
   have m0 : 2 ^ d * (t.natAbs + 1) = 2 ^ d * t.natAbs + 2 ^ d := Nat.mul_succ _ _
   have m1 : 2 ^ d * ((t + 1).natAbs + 1) = 2 ^ d * (t + 1).natAbs + 2 ^ d := Nat.mul_succ _ _
-  rcases Int.le_or_lt 0 t with ht | ht
-  · have ha : (t + 1).natAbs = t.natAbs + 1 := by omega
-    have m2 : 2 ^ d * (t + 1).natAbs = 2 ^ d * t.natAbs + 2 ^ d := by rw [ha]; exact Nat.mul_succ _ _
-    have e : shadowTime (t + 1) d = (shadowTime t d + 1) + 2 ^ d := by omega
-    rw [e, iter_periodic x d _ (by have := shadowTime_ge t d; omega)]
+  rcases Int.lt_or_le t 0 with ht | ht
   · have ha : t.natAbs = (t + 1).natAbs + 1 := by omega
     have m2 : 2 ^ d * t.natAbs = 2 ^ d * (t + 1).natAbs + 2 ^ d := by rw [ha]; exact Nat.mul_succ _ _
     have e : shadowTime t d + 1 = shadowTime (t + 1) d + 2 ^ d := by omega
     rw [e, iter_periodic x d _ (shadowTime_ge (t + 1) d)]
+  · have ha : (t + 1).natAbs = t.natAbs + 1 := by omega
+    have m2 : 2 ^ d * (t + 1).natAbs = 2 ^ d * t.natAbs + 2 ^ d := by rw [ha]; exact Nat.mul_succ _ _
+    have e : shadowTime (t + 1) d = (shadowTime t d + 1) + 2 ^ d := by omega
+    rw [e, iter_periodic x d _ (by have := shadowTime_ge t d; omega)]
 
 /-- The shadow of a row: diagonal `d` at time `t` is the periodic part of the row's diagonal `d`, read at `t`. -/
 def shadow (x : Nat → Bool) (t : Int) (d : Nat) : Bool := iter (shadowTime t d) x d

@@ -8,7 +8,7 @@ import random
 from computations.held_shift import forced_halves, held, itinerary
 from computations.held_similarity import (affinity_defect, boundaryless, boundaryless_power, held_power,
                                           ifs_point, inverse_branch, similarity_holds, survivors_below,
-                                          valuation)
+                                          survivors_with_bits, valuation)
 
 
 def test_boundaryless_is_held_far_from_zero() -> None:
@@ -78,3 +78,17 @@ def test_survivor_density_is_exact() -> None:
     for N in range(1, 10):
         for T in range(1, N):
             assert survivors_below(N, T) == 1 << (N - (T + 1) // 2)
+
+
+def test_survivors_with_exactly_m_bits() -> None:
+    # exact for T <= M - 2; at T = M - 1 the power of 2 holds only for odd M (the top bit is already 1)
+    def passes(U: int, T: int) -> bool:
+        return all(held_power(U, t, 1) & 1 for t in range(1, T + 1, 2))
+    for M in range(2, 11):
+        for T in range(1, M):
+            assert survivors_with_bits(M, T) == sum(passes(U, T) for U in range(1 << (M - 1), 1 << M))
+        for T in range(1, M - 1):
+            assert survivors_with_bits(M, T) == 1 << (M - 1 - (T + 1) // 2)
+        if M % 2 == 1:
+            assert survivors_with_bits(M, M - 1) == 1 << ((M - 1) // 2)
+    assert [survivors_with_bits(M, M - 1) for M in (4, 6, 8, 10)] == [1, 5, 5, 19]

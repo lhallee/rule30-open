@@ -22,7 +22,7 @@ $-t, \dots, t$, so $B(t) + W(t) = 2t + 1$.
 2. *(Consecutive rows of the single cell.)* $2B(s + 1) \le 3W(s) + 6$ for every $s \ge 0$.
 3. *(The triangle.)* The rows $0, \dots, n - 1$ ($n^2$ cells) have at least $2(n - 1)(n - 2)/5$ white cells. So the
    white cells have lower density at least $2/5$ in the triangle, and in every pair of consecutive rows $s, s + 1$ one
-   of the two is at least $(4s - 3)/(10s + 9)$ white.
+   of the two is at least $4s/(10s + 9)$ white.
 4. *(Sharpness.)* The row $(11001)^\infty$ is mapped by Rule 30 to its shift by two cells, so every row of its orbit is
    exactly $2/5$ white and every pair $x, y$ of consecutive rows has $2 B(y) = 3 W(x)$ per period. No inequality
    between the colors of finitely many consecutive rows that holds for every row gives a white density above $2/5$.
@@ -61,7 +61,8 @@ n^2 - 1$:
 $$2(n^2 - 1) \le 3 S(n - 1) + 2 \bigl(S(n) - W(0)\bigr) + 6(n - 1) \le 5 S(n) + 6(n - 1),$$
 so $5 S(n) \ge 2n^2 - 6n + 4 = 2(n - 1)(n - 2)$ (`triangle_white`). For the pair: if row $s$ is less than $\alpha$
 white and row $s + 1$ is less than $\alpha$ white, then $W(s) < \alpha(2s + 1)$ and $B(s + 1) > (1 - \alpha)(2s + 3)$,
-and part 2 gives $2(1 - \alpha)(2s + 3) < 3\alpha(2s + 1) + 6$, that is $\alpha > (4s - 3)/(10s + 9)$.
+and part 2 gives $2(1 - \alpha)(2s + 3) < 3\alpha(2s + 1) + 6$, that is $4s < \alpha(10s + 9)$. So one of the two rows
+is at least $4s/(10s + 9)$ white.
 
 **Part 4.** $(11001)^\infty \mapsto (00111)^\infty$, the same row shifted by two cells, cell by cell modulo 5
 (`period_five_shift`); each period has two white cells (`period_five_count`). Any inequality valid for every
@@ -75,12 +76,13 @@ period, as it is for the stripe $(100)^\infty \mapsto 1^\infty$.
   four words of the stripe $(100)^\infty$ (backward from the right, $x_{i-1} = 1 \oplus (x_i \lor x_{i+1})$ is 1 exactly
   after $00$), and $x$ has at least $\lfloor 2(m + 1)/3 \rfloor$ white cells on $[u - 1, v]$, with equality reached for
   every $m$ (`run_white_bound`, and the test that enumerates the preimages of $1^m$ for $m \le 10$).
-- On the single cell, the white fraction of the triangle is $0.5004$ to $0.5196$ at $n = 100, 300, 1000, 2000, 3000$
-  against the bound's $0.382$ to $0.399$, and the least slack of part 2 over $s < 3000$ is one cell
+- On the single cell, the white fraction of the triangle is $0.480$, $0.495$, $0.498$, $0.499$ and $0.499$ at $n = 100, 300, 1000, 2000, 3000$
+  against the bound's $0.388$ to $0.400$; the slack $3W(s) + 6 - 2B(s + 1)$ is 0 at $s = 0, 1, 2$ and at least 1 for $3 \le s < 2999$
   (`python -m computations.row_white_density --n 3000`).
-- Rule 90 has a white density tending to 1 in the triangle and Rule 30's black density is not covered here, so part 3
-  is consistent with the planner's remark that a black lower bound must use the OR: white cells pay for black cells
-  locally, black cells do not pay for white ones.
+- The asymmetry is the OR. Rule 90 has black density tending to 0 in its triangle ($3^k$ black cells in $4^k$), so a
+  lower bound for black cells has to use the OR, and part 1 is the place where Rule 30's OR acts: a black cell of $y$
+  over a black cell of $x$ needs $x_i = x_{i+1} = 0$. White cells pay for black cells locally; black cells do not pay
+  for white ones.
 
 ## Reproduce
 

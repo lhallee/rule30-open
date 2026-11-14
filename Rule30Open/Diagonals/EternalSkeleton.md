@@ -1,15 +1,15 @@
 ---
-title: In an eternal rule 30 history white left of a frame moving left, every left diagonal is purely periodic with period dividing 2^d, the past is a forward function of the present, and the single cell is not a row of any such history
+title: In an eternal rule 30 history white left of a frame moving left, every left diagonal is purely periodic with period dividing 2^d and the past is a forward function of the present; every row converges to exactly one such history, its shadow, and the single cell is a row of none
 category: diagonals
 problems: [2]
 status: proved
 lean: Rule30Open.Diagonals.EternalSkeleton
-headline: [eternal_periodic, eternal_past, eternal_agree, leftStep_injective_on_eternal, eternal_edge, seed_not_eternal]
+headline: [eternal_periodic, eternal_past, eternal_agree, shadow_eternal, shadow_unique_eternal, seed_not_eternal]
 kit: new
 kit_modules: [Rule30FiniteDiagonals]
 ---
 
-# In an eternal rule 30 history white left of a frame moving left, every left diagonal is purely periodic with period dividing 2^d, the past is a forward function of the present, and the single cell is not a row of any such history
+# In an eternal rule 30 history white left of a frame moving left, every left diagonal is purely periodic with period dividing 2^d and the past is a forward function of the present; every row converges to exactly one such history, its shadow, and the single cell is a row of none
 
 Read a row white left of a cell from that cell rightward, so that coordinate $d$ is left diagonal $d$. One step of
 rule 30, with the frame moved one cell left, is
@@ -32,6 +32,11 @@ of a frame that moves left one cell per step.
   the present, coordinate by coordinate.
 - `eternal_agree`, `eternal_unique_past`: two eternal orbits that agree at one time agree at every time.
   `leftStep_injective_on_eternal`: $\mathrm{leftStep}$ is injective on the set of rows of eternal orbits.
+- `shadow_eternal`, `shadow_forward`, `shadow_unique_eternal`: for every row $x$ (no condition on it), the *shadow*
+  $\sigma_t(x)_d = \bigl(\mathrm{leftStep}^{\tau}(x)\bigr)_d$, read at a forward time $\tau \ge 2^d - 1$ with
+  $\tau \equiv t \pmod{2^d}$ (`shadowTime`), is an eternal orbit; it agrees with the forward orbit of $x$ on diagonal
+  $d$ from time $2^d - 1$ on; and every eternal orbit that agrees with the forward orbit of $x$ on each diagonal from
+  some time on is the shadow (`shadow_unique`).
 - `eternal_edge`: if one row of an eternal orbit has a black cell at the frame, then at every time diagonals 0 and 1
   are black, diagonal 2 is white and diagonal 3 flips at every step.
 - `seed_no_preimage`, `seed_not_eternal`: the single black cell has no preimage under $\mathrm{leftStep}$ with a black
@@ -50,7 +55,13 @@ of a frame that moves left one cell per step.
    So $R_t$ is determined by $R_{t+1}$, and by induction in both directions one row determines the orbit. For two rows
    of eternal orbits with the same image, shift the second orbit in time so that the two rows sit at the same time and
    apply this.
-4. **The edge.** Coordinate 0 has period 1 (step 2 with $d = 0$), so a black frame cell is black at every time. Then
+4. **The shadow.** On the forward orbit of $x$, diagonal $d$ has period $2^d$ from time $2^d - 1$ (step 1 again), so
+   reading it at any forward time $\tau \ge 2^d - 1$ in the class of $t$ modulo $2^d$ gives one value, and for $i \le
+   d$ a time in the class of $t$ modulo $2^d$ is also one modulo $2^i$ (`iter_shadowTime`). So coordinates $d - 2$,
+   $d - 1$, $d$ at time $t$ and coordinate $d$ at time $t + 1$ can all be read at one forward time, where the step
+   holds: the shadow is eternal. If two eternal orbits agree with the forward orbit on diagonal $d$ from some time on,
+   they agree at time $t + 2^d k$ for large $k$, hence at $t$ by pure periodicity.
+5. **The edge.** Coordinate 0 has period 1 (step 2 with $d = 0$), so a black frame cell is black at every time. Then
    $R_{t+1}(1) = R_t(0) \lor R_t(1) = 1$, $R_{t+1}(2) = R_t(0) \oplus (R_t(1) \lor R_t(2)) = 1 \oplus 1 = 0$, and
    $R_{t+1}(3) = R_t(1) \oplus (R_t(2) \lor R_t(3)) = \lnot R_t(3)$. The single cell has $R(0) = 1$ and $R(1) = 0$,
    so it is no row of an eternal orbit, and $\mathrm{leftStep}(R)(1) = R(0) \lor R(1) = 1$ shows it has no preimage
@@ -59,15 +70,17 @@ of a frame that moves left one cell per step.
 ## What it means
 
 In the right-edge frame the single cell has exactly one past ([seed past](../../findings/frames/seed-past.md)); in the
-left-edge frame it has none, and its forward orbit is a transient that converges to the set of rows of eternal orbits.
-That set, its structure as a union of odometers, the unique eternal orbit each row converges to, and the exhaustive
-check that its first 22 diagonals form one cycle are in [the eternal shadow](../../findings/diagonals/eternal-shadow.md).
+left-edge frame it has none, and its forward orbit is a transient that converges to one eternal orbit, its shadow,
+whose diagonals are the periodic parts of the single cell's diagonals extended to all integer times. The set of rows
+of eternal orbits, its structure as a union of odometers, and the exhaustive check that its first 22 diagonals form
+one cycle are in [the eternal shadow](../../findings/diagonals/eternal-shadow.md).
 
 ## In Lean
 
 `Rule30Open/Diagonals/EternalSkeleton.lean`. The step is `leftStep`, its iterates `iter`, and the eternal orbits
 `Eternal R` with `R : Int → Nat → Bool`. Pure periodicity is `left_recurrence_uniform_period` applied to the shifted
-array; the remaining theorems are rewriting with `omega` on the integer times.
+array; the shadow reads diagonal `d` at time `t` at the forward time
+`shadowTime t d = t + 2^d (|t| + 1)`; the remaining theorems are rewriting with `omega` on the integer times.
 
 ## Relation to the kit
 
@@ -75,7 +88,7 @@ The kit proves eventual periodicity of the left diagonals of every configuration
 $2^d$ from time $2^d - 1$ (`Rule30FiniteDiagonals.Ld_uniform_period`), and in its equivalent forms that the right-edge
 reading of every nonzero finite configuration has the 2-adic odometer as orbit closure
 (`Rule30Equivalents.Odometer`). Neither has eternal orbits in the left frame, pure periodicity, the backward
-uniqueness, or the absence of a past for the single cell; a search of both parts of the kit for "eternal",
+uniqueness, the shadow, or the absence of a past for the single cell; a search of both parts of the kit for "eternal",
 "odometer" and "omega" finds only the right-edge odometer, the omega-limit forms of Problem 1
 (`Rule30Equivalents.Genericity`), and the rain rows of `Rule30EdgeStaircases` (`rain_row_eternal`), an edge patch at
 the right edge that alternates for ever.

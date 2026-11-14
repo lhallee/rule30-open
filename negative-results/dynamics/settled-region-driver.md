@@ -18,8 +18,8 @@ questions: does the difference of rows $T$ and $T + P$ obey a flux bound across 
 the sequences column 1 may take next to a periodic column separate blocks?
 
 **Outcome.** No, for a structural reason. The cells left of the center accept every driver, and their settled part
-remembers the driver only through one time shift relative to the single cell's skeleton; in every quadrant computed,
-that shift is already fixed by the driver's first 20 values. The eventual period and its onset are invisible there,
+remembers the driver only through one time shift relative to the single cell's skeleton (computed on a band of
+depths; a proof sketch below); in every trial, drivers sharing their first 20 values had the same shift. The eventual period and its onset are invisible there,
 and every constraint on them lives in the unsettled wedge next to the center, where the check of
 [LeftLatch](../../Rule30Open/Columns/LeftLatch.md) reads each diagonal one step after it leaves column 0. The flux
 across the center is exactly LeftLatch's check and shown conditions written for a difference, and the entropy of
@@ -69,14 +69,19 @@ left half, the *skeleton* $S$. Driven by other sequences, the quadrant's diagona
 | $10000000$ | yes | 54 | 1 |
 
 Here the onset age of diagonal $d$ is the time from its start $d$ to the first time from which it is periodic in the
-data, and the shift is the one $k$ with $D_d(t) = S_d(t + k)$ for all 31 diagonals $70, \ldots, 100$ at once (their
-period is 8, so $k$ is read mod 8). In this frame the single cell's diagonals first reach periods 2, 4, 8 and 16 at
+data, and the shift is the least $k$ with $D_d(t) = S_d(t + k)$ for all 30 diagonals $70, \ldots, 99$ at once (their periods
+divide 8, so $k$ is read mod 8). In this frame the single cell's diagonals first reach periods 2, 4, 8 and 16 at
 depths 3, 8, 29 and 400 (diagonals below 600, times below 40,000).
 
 So, on these ranges: the eventual periods do not depend on the driver, one time shift aligns the whole settled band
 with the skeleton, and onset ages under periodic drivers of periods 2 to 8 fall in the same range as under the true
 center column (9 to 54 against 47). Drivers that agree on their first 20 values and differ at random afterwards gave
-the same shift in every trial (48 drivers, 6 prefixes, `skeleton_shift` on depths 70 to 100).
+the same shift in every trial (8 drivers for each prefix length 20, 30, 34, 36, 40 and 60). The case the question asks
+about directly: the true center column up to time $T$ and a block repeated from $T$ on, for $T = 25, 30, 50, 100$ and
+the six blocks $10, 100, 110, 1101, 10110, 1011100$, gives on every diagonal below 120 the skeleton's eventual period
+and, on depths 70 to 99, shift 0. These diagonals do read the periodic tail (diagonal $d$ reads $c(0), \ldots, c(d)$),
+and their transients change, but their settled cycles on depths 70 to 99 are exactly those of the true center column: a hypothetical
+eventual period of any of these lengths from any of these onsets leaves the settled region as it is.
 
 *Why (a sketch, not a full proof).* DrivenSkeleton's step lemmas use only the diagonal recursion (the kit's
 `Ld_diagStep`, which needs no white side), so they apply to quadrants as written: if the eventual pairs
@@ -145,6 +150,6 @@ those transients, the same chaotic region that every Problem 1 route reaches.
 ## Reproduce
 
 ```bash
-python -m computations.settled_phase      # the table and the latch entropies (seconds)
+python -m computations.settled_phase      # the table, the prefix and grafted shifts, the first depths of each period and the latch entropies (seconds)
 python -m pytest tests/test_settled_phase.py
 ```

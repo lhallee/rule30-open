@@ -6,7 +6,7 @@ status: proved
 lean: Rule30Open.PeriodTwo.HeldSimilarity
 headline: [heldNat_not_affine, heldNat_repeat_split, edgeless_three_lt]
 kit: new
-kit_modules: [Rule30ZeroBoundary]
+kit_modules: [Rule30ZeroBoundary, Rule30Equivalents.TFunction, Rule30Equivalents.IntegerRows]
 ---
 
 # No iterate of the held map is affine on a residue class
@@ -60,5 +60,8 @@ not formalized.
 ## Relation to the kit
 
 The kit has the triangular form of the zero-boundary left half (`Rule30ZeroBoundary.zrow_aff`, `pivot`), which is the
-metric half of the comparison with the 3x+1 map, and its backward transducer `back`. It has no statement about
-affinity on classes; this module is new.
+metric half of the comparison with the 3x+1 map, and its backward transducer `back`. The map $E$ (`edgeless`) is the kit's
+single-seed integer step: `Rule30Equivalents.TFunction.Phi`, defined here a second time as `tPhi` in
+[LeftCutRank](../Complexity/LeftCutRank.md), and $E^n(1)$ is the kit's row `Rule30Equivalents.IntegerRows.a n`
+(1, 7, 25, 111, 401, OEIS A110240), the rows of rule 30 from one cell; `edgeless_top` is the left edge of its light
+cone. The kit has no statement about affinity of the held map on classes, so `heldNat_not_affine` is new.

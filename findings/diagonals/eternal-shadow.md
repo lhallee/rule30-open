@@ -48,9 +48,11 @@ Let $\Lambda = \bigcap_{k \ge 0} G^k(X)$ and $\Lambda_n$ the eventual image of $
    \mu(G^{-k} G^k X) = 1$, so it lives on $\Lambda$, where it is a mixture of the Haar measures of the orbit closures.
    A 1-Lipschitz map has topological entropy 0 (its Bowen balls do not shrink with time).
 
-## The shadow (paper)
+## The shadow (proved in Lean)
 
-**Every row $x \in X$ converges to exactly one eternal orbit.** Put
+**Every row $x \in X$ converges to exactly one eternal orbit** (`shadow_eternal`, `shadow_forward`,
+`shadow_unique_eternal` of [EternalSkeleton](../../Rule30Open/Diagonals/EternalSkeleton.md); the argument in the
+metric language of this entry follows). Put
 $S_t(d) = (G^{t + 2^d m} x)_d$ for $t \in \mathbb{Z}$ and any $m \ge 0$ with $t + 2^d m \ge 2^d - 1$. By the kit's
 uniform period (`Rule30FiniteDiagonals.Ld_uniform_period`; `Ld_leftStep` identifies its diagonals with $G$), coordinate
 $d$ of the forward orbit of $x$ has period $2^d$ from time $2^d - 1$, so $S_t(d)$ does not depend on $m$. Coordinate
