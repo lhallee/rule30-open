@@ -4,7 +4,7 @@ category: diagonals
 problems: [2]
 status: proved
 lean: Rule30Open.Diagonals.EternalSkeleton
-headline: [eternal_periodic, eternal_past, eternal_agree, shadow_eternal, shadow_unique_eternal, seed_not_eternal]
+headline: [EternalSkeleton.eternal_periodic, EternalSkeleton.eternal_past, EternalSkeleton.eternal_agree, EternalSkeleton.shadow_eternal, EternalSkeleton.shadow_unique_eternal, EternalSkeleton.seed_not_eternal]
 kit: new
 kit_modules: [Rule30FiniteDiagonals]
 ---

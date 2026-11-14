@@ -4,7 +4,7 @@ category: frames
 problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgeOddPeriods
-headline: [fixed_point_eq_zero, fixed_of_odd_period, odd_period_eq_zero, pow_two_period]
+headline: [Frames.EdgeOddPeriods.fixed_point_eq_zero, Frames.EdgeOddPeriods.fixed_of_odd_period, Frames.EdgeOddPeriods.odd_period_eq_zero, Frames.EdgeOddPeriods.pow_two_period]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases, Rule30Equivalents.TFunctionCycles]
 ---

@@ -4,7 +4,7 @@ category: frames
 problems: [1]
 status: proved
 lean: Rule30Open.Frames.LightReturnClassified
-headline: [white_or_rain_of_return, rain_rows_of_return, rain_of_return_mod, rain_of_return, frozen_T_eq]
+headline: [Frames.LightReturnClassified.white_or_rain_of_return, Frames.LightReturnClassified.rain_rows_of_return, Frames.LightReturnClassified.rain_of_return_mod, Frames.LightReturnClassified.rain_of_return, Frames.LightReturnClassified.frozen_T_eq]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---

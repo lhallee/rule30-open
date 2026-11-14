@@ -4,7 +4,7 @@ category: frames
 problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgePeriods
-headline: [period_iff, T_eq]
+headline: [Frames.EdgePeriods.period_iff, Frames.EdgePeriods.T_eq]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---

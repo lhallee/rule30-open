@@ -162,8 +162,19 @@ def check_lean_files(categories: list[Category]) -> list[str]:
 
 
 def declares(source: str, name: str) -> bool:
+    """Whether `source` declares `name`, directly or, for a dotted `P.q`, as `q` inside namespaces that spell `P`.
+
+    The dotted case is conservative: `q` must be declared and every dot-separated part of `P` must be a part of some
+    `namespace` line of the file.
+    """
     pattern = rf"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|def|structure|abbrev)\s+{re.escape(name)}\b"
-    return re.search(pattern, source, re.MULTILINE) is not None
+    if re.search(pattern, source, re.MULTILINE) is not None:
+        return True
+    prefix, _, last = name.rpartition(".")
+    if not prefix or not declares(source, last):
+        return False
+    parts = {part for line in re.findall(r"^\s*namespace\s+(\S+)", source, re.MULTILINE) for part in line.split(".")}
+    return all(part in parts for part in prefix.split("."))
 
 
 def check_entry(entry: Entry, categories: dict[str, Category]) -> list[str]:

@@ -4,7 +4,7 @@ category: frames
 problems: [1]
 status: proved
 lean: Rule30Open.Frames.EdgeTree
-headline: [rain_or_branch, next_of_rain, start]
+headline: [Frames.EdgeTree.rain_or_branch, Frames.EdgeTree.next_of_rain, Frames.EdgeTree.start]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---

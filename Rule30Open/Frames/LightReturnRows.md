@@ -4,7 +4,7 @@ category: frames
 problems: [3]
 status: proved
 lean: Rule30Open.Frames.LightReturnRows
-headline: [odd_return_white, pow_two_return, code_evolve]
+headline: [Frames.LightReturnRows.odd_return_white, Frames.LightReturnRows.pow_two_return, Frames.LightReturnRows.code_evolve]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---

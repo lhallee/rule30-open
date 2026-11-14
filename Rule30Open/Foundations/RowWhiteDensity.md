@@ -4,7 +4,7 @@ category: foundations
 problems: [2]
 status: proved
 lean: Rule30Open.Foundations.RowWhiteDensity
-headline: [two_black_le, row_pair, triangle_white, strip_white, pair_white, period_five_shift]
+headline: [RowWhiteDensity.two_black_le, RowWhiteDensity.row_pair, RowWhiteDensity.triangle_white, RowWhiteDensity.strip_white, RowWhiteDensity.pair_white, RowWhiteDensity.period_five_shift]
 kit: new
 kit_modules: [Rule30Jen]
 evidence: [computations/row_white_density.py, tests/test_row_white_density.py]

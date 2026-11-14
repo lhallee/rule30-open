@@ -4,7 +4,7 @@ category: frames
 problems: [1]
 status: proved
 lean: Rule30Open.Frames.EdgeTreeCheck
-headline: [dead_sound, period_32, rain_of_return_64]
+headline: [Frames.EdgeTreeCheck.dead_sound, Frames.EdgeTreeCheck.period_32, Frames.EdgeTreeCheck.rain_of_return_64]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---

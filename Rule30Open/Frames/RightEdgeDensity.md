@@ -4,7 +4,7 @@ category: frames
 problems: [2]
 status: proved
 lean: Rule30Open.Frames.RightEdgeDensity
-headline: [local_ineq, two_black_le, white_step, orbit_white, periodic_white]
+headline: [RightEdgeDensity.local_ineq, RightEdgeDensity.two_black_le, RightEdgeDensity.white_step, RightEdgeDensity.orbit_white, RightEdgeDensity.periodic_white]
 kit: new
 kit_modules: [Rule30RightPeriods]
 evidence: [computations/right_edge_density.py]

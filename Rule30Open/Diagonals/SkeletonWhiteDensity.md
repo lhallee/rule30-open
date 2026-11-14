@@ -4,7 +4,7 @@ category: diagonals
 problems: [2]
 status: proved
 lean: Rule30Open.Diagonals.SkeletonWhiteDensity
-headline: [local_ineq, two_black_le, white_step, orbit_white, eternal_white]
+headline: [SkeletonWhiteDensity.local_ineq, SkeletonWhiteDensity.two_black_le, SkeletonWhiteDensity.white_step, SkeletonWhiteDensity.orbit_white, SkeletonWhiteDensity.eternal_white]
 kit: new
 kit_modules: [Rule30FiniteDiagonals]
 evidence: [computations/skeleton_white_density.py, tests/test_skeleton_white_density.py]

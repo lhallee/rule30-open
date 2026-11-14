@@ -4,7 +4,7 @@ category: foundations
 problems: [2]
 status: proved
 lean: Rule30Open.Foundations.PairWhiteDensity
-headline: [triple_white, alt_triple, pair_white, pair_step]
+headline: [PairWhiteDensity.triple_white, PairWhiteDensity.alt_triple, PairWhiteDensity.pair_white, PairWhiteDensity.pair_step]
 kit: new
 kit_modules: [Rule30Jen]
 evidence: [computations/strip_cycle_mean.py, tests/test_strip_cycle_mean.py, computations/row_white_density.py]

@@ -4,7 +4,7 @@ category: frames
 problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgePeriodFour
-headline: [period_four_iff, dead_core]
+headline: [Frames.EdgePeriodFour.period_four_iff, Frames.EdgePeriodFour.dead_core]
 kit: refines
 kit_modules: [Rule30EdgeStaircases, Rule30FrozenRuler]
 ---

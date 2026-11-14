@@ -4,7 +4,7 @@ category: frames
 problems: [2]
 status: proved
 lean: Rule30Open.Frames.RightEdgeBlack
-headline: [doubling_black, strip_black, strip_white]
+headline: [RightEdgeBlack.doubling_black, RightEdgeBlack.strip_black, RightEdgeBlack.strip_white]
 kit: refines
 kit_modules: [Rule30RightPeriods, Rule30Diagonals]
 evidence: [computations/right_edge_density.py]
