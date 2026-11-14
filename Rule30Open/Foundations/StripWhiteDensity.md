@@ -4,7 +4,7 @@ category: foundations
 problems: [2]
 status: proved
 lean: Rule30Open.Foundations.StripWhiteDensity
-headline: [StripWhiteDensity.strip5_white, StripWhiteDensity.strip6_white, StripWhiteDensity.strip7_white, StripWhiteDensity.strip8_white, StripWhiteDensity.strip9_white]
+headline: [StripWhiteDensity.strip_white_ge5, StripWhiteDensity.strip5_white, StripWhiteDensity.strip6_white, StripWhiteDensity.strip7_white, StripWhiteDensity.strip8_white, StripWhiteDensity.strip9_white]
 kit: new
 kit_modules: [Rule30Jen]
 evidence: [computations/strip_cycle_mean.py, computations/strip_potentials.py, tests/test_strip_white_density.py]

@@ -3,7 +3,7 @@
 Every result in this repository, by category. `python scripts/catalog.py write` generates this page from the
 front matter of the entries; edit the entries, not this page.
 
-219 Lean modules with 1056 headline theorems, 78 findings (proved on paper,
+219 Lean modules with 1057 headline theorems, 78 findings (proved on paper,
 computed or conjectured) and 93 negative results. Prize problem 1 asks whether the center column
 is eventually periodic, 2 whether its density of black cells tends to 1/2, and 3 whether computing its cell `n`
 takes effort of order `n`.
@@ -120,7 +120,7 @@ The definitions every module uses, the bridge to the prize's official statements
 | [In every Rule 30 orbit three adjacent columns are at least 1/3 white, sharp at the fixed point (10)^infinity, and two adjacent columns at least 5/18 white; the sharp two-column constant lies in [5/18, 1/3] (1/3 attained by a period-12 orbit, computed)](Rule30Open/Foundations/PairWhiteDensity.md) | [`Foundations.PairWhiteDensity`](Rule30Open/Foundations/PairWhiteDensity.lean) | `PairWhiteDensity.triple_white`, `PairWhiteDensity.alt_triple`, `PairWhiteDensity.pair_white`, `PairWhiteDensity.pair_step` | 2 | not in the kit |
 | [Finite windows of a row](Rule30Open/Foundations/RightHalf.md) | [`Foundations.RightHalf`](Rule30Open/Foundations/RightHalf.lean) | `driveStep_cells`, `drive_cells`, `mem_allLists` | 1 | independent proof of a kit result |
 | [The single cell's triangle of rows 0 to n - 1 has at least 2(n - 1)(n - 2)/5 white cells, from 2B(s + 1) <= 3W(s) + 6 for consecutive rows, and no count valid for every row with bounded boundary terms gives more than 2/5](Rule30Open/Foundations/RowWhiteDensity.md) | [`Foundations.RowWhiteDensity`](Rule30Open/Foundations/RowWhiteDensity.lean) | `RowWhiteDensity.two_black_le`, `RowWhiteDensity.row_pair`, `RowWhiteDensity.triangle_white`, `RowWhiteDensity.strip_white`, `RowWhiteDensity.pair_white`, `RowWhiteDensity.period_five_shift` | 2 | not in the kit |
-| [In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white (computed)](Rule30Open/Foundations/StripWhiteDensity.md) | [`Foundations.StripWhiteDensity`](Rule30Open/Foundations/StripWhiteDensity.lean) | `StripWhiteDensity.strip5_white`, `StripWhiteDensity.strip6_white`, `StripWhiteDensity.strip7_white`, `StripWhiteDensity.strip8_white`, `StripWhiteDensity.strip9_white` | 2 | not in the kit |
+| [In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white (computed)](Rule30Open/Foundations/StripWhiteDensity.md) | [`Foundations.StripWhiteDensity`](Rule30Open/Foundations/StripWhiteDensity.lean) | `StripWhiteDensity.strip_white_ge5`, `StripWhiteDensity.strip5_white`, `StripWhiteDensity.strip6_white`, `StripWhiteDensity.strip7_white`, `StripWhiteDensity.strip8_white`, `StripWhiteDensity.strip9_white` | 2 | not in the kit |
 
 ## Seeds
 
