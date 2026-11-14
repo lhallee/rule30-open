@@ -29,7 +29,7 @@ c(t) = t mod 2.
 
     python -m computations.source_energy               # the entry's tables, n = 8 .. 18 (about 10 seconds)
     python -m computations.source_energy --bits 14     # a smaller run (a second)
-    python -m computations.source_energy --moduli 500  # the exact Gauss period test to q = 500 (a few seconds)
+    python -m computations.source_energy --moduli 500  # the exact Gauss period test to q = 500 (about 25 s)
 """
 
 from __future__ import annotations

@@ -14,6 +14,8 @@ columns `v`, `w` the next column `x` satisfies `x (i + 1) = x i xor (w i || v i)
 * `dead_sound`: **for every `L` and every code with `iter L c = c`, no pair of consecutive columns is dead.**
 * `period_32`: **a code with bit 0 black and `iter 32 c = c` is `rainA` or `rainB`**, from `EdgeTree.rain_or_branch`,
   `dead_sound` and a kernel evaluation of `dead` at the two branch states.
+* `rain_of_return_64`: **a row white right of a black cell `r` that returns after `L` steps moved `L` cells right,
+  with `L % 64 ≠ 0`, has the code `rainA` or `rainB` at `r`.**
 
 The natural-language argument is `EdgeTreeCheck.md`, beside this file.
 -/

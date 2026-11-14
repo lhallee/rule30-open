@@ -48,15 +48,17 @@ strong at every frequency $a / (2^k p)$ with $p = 1$ or $p$ an odd prime. So the
    (c) it forces density 1/2 on every class mod $2^k q$, for every sequence, if and only if $\eta_d \ne 0$ for every
    divisor $d > 1$ of $q$;
    (d) $\eta_q = 0$ if some prime $p$ with $p^2 \mid q$ has $2^{\mathrm{ord}_{q/p}(2)} \not\equiv 1 \pmod q$; $\eta_q \ne 0$
-   if $q$ is squarefree; for $q = p^e$ that condition is also necessary, so $\eta_{p^e} = 0$ exactly when $e \ge 2$ and
+   if $q$ is squarefree; for $q = p^e$ the vanishing condition is also necessary, so $\eta_{p^e} = 0$ exactly when $e \ge 2$ and
    $2^{\mathrm{ord}_p(2)} \not\equiv 1 \pmod{p^e}$, and $\eta_{p^2} = 0$ exactly when $p$ is not a Wieferich prime;
-   (e) hence for $q$ not divisible by the square of a Wieferich prime (1093 and 3511 are the known ones), the hypothesis
+   (e) hence for $q$ not divisible by the square of a Wieferich prime (1093 and 3511 are the only known ones, OEIS A001220), the hypothesis
    gives density 1/2 on every class mod $2^k q$ if and only if $q$ is squarefree.
    Computed by exact arithmetic modulo the cyclotomic polynomial (`vanishing_moduli`, every unit $a$): the condition of
    (d) is also necessary for every odd $q \le 500$; the odd $q \le 200$ with $\eta_q = 0$ are 9, 25, 27, 45, 49, 75, 81,
    99, 121, 125, 135, 147, 153, 169, 175, 189. The non-squarefree odd $q \le 200$ with $\eta_q \ne 0$ are 63, 117 and 171
    ($\mathrm{ord}_q(2) = \mathrm{ord}_{q/3}(2)$): at $1/63$ the Fourier coefficient is controlled, but the classes mod
-   63 are not, since $\eta_9 = 0$. That the condition of (d) is necessary for every odd $q$ is a conjecture.
+   63 are not, since $\eta_9 = 0$. Conjecture: the condition of (d) is necessary for every odd $q$. The squarefree and
+  coset arguments of (d) are the standard ones for sums of roots of unity; the literature on vanishing Gauss periods
+  and vanishing sums of roots of unity was not searched, and may settle the conjecture.
 
 On the center column, to $N = 2^{18}$, $E_{\mathrm{src}}(n)$ is within 4.3 percent of its mean over independent fair
 signs for every $9 \le n \le 18$ (within 0.3 percent at $n = 18$), so $E_{\mathrm{src}}(n) / (N n^2)$ falls like $1/n$
@@ -218,5 +220,6 @@ progression, which item 3 supplies only for moduli $2^k$ and $2^k p$; item 4 nee
 
 ```bash
 python -m computations.source_energy               # n = 8 .. 18: energies, class biases, Fourier coefficients (10 s)
+python -m computations.source_energy --moduli 500  # exact Gauss period test to q = 500 (about 25 s)
 python -m pytest tests/test_source_energy.py
 ```
