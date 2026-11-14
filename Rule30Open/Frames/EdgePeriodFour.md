@@ -1,5 +1,5 @@
 ---
-title: The only rows white to the right of their edge cell that come back after 4 steps moved 4 cells right are the white row and the rain rows
+title: An edge code with a black edge cell comes back after 4 steps only if it is one of the two rain codes
 category: frames
 problems: [3]
 status: proved
@@ -9,7 +9,7 @@ kit: refines
 kit_modules: [Rule30EdgeStaircases, Rule30FrozenRuler]
 ---
 
-# The only rows white to the right of their edge cell that come back after 4 steps moved 4 cells right are the white row and the rain rows
+# An edge code with a black edge cell comes back after 4 steps only if it is one of the two rain codes
 
 Read a row of Rule 30 that is white to the right of a black cell leftward from that cell: bit $k$ of its edge code $c$
 is the cell $k$ places to the left. One step moves the edge cell one place right and acts on the code by $T c(0) =
@@ -19,8 +19,10 @@ c(0)$, $T c(1) = c(1) \oplus c(0)$, $T c(k + 2) = c(k + 2) \oplus (c(k + 1) \lor
 **Theorem** (`period_four_iff`). For an edge code with $c(0) = 1$, $T^4 c = c$ if and only if $c$ is $\mathrm{rainA} =
 1010\dots$ (the 2-adic integer $-1/3$) or $\mathrm{rainB} = 11010\dots$ ($1/3$).
 
-So a row with a white right half that comes back after 4 steps moved 4 cells to the right is white or a translate of a
-rain row, and the rain rows come back after 2 steps already. The kit has the same statement for $T^2$
+On paper this gives the rows: by $\Phi(2z) = 2\Phi(z)$ the even codes reduce to odd ones, and by the edge-frame
+translation (item 2 (iii) of [edge periodic points](../../findings/frames/edge-periodic-points.md)) a row with a white
+right half that comes back after 4 steps moved 4 cells to the right is white or a translate of a rain row, and the rain
+rows come back after 2 steps already. The Lean theorem covers only the codes with $c(0) = 1$. The kit has the same statement for $T^2$
 (`Rule30EdgeStaircases.period_two_iff`), which this extends to period 4. Modulo 16 every odd code satisfies $T^4 c
 \equiv c$ (all 8 odd residues, against 8 of the 16 modulo 32; `tests/test_edge_periodic_points.py`), so the content is in the
 higher bits. [Edge periodic points](../../findings/frames/edge-periodic-points.md) extends it by computation to every period not divisible

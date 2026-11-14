@@ -19,7 +19,7 @@ eternal orbits (`Rule30Open.Diagonals.EternalSkeleton`).
 - `table`: for each n, the size of the limit set, the cycle lengths, the seed's cycle length, and whether the limit
   set is exactly the seed's cycle.
 
-    python -m computations.eternal_skeleton --nmax 22   # about 30 s
+    python -m computations.eternal_skeleton --nmax 22   # about 2 s
 """
 
 from __future__ import annotations
@@ -75,13 +75,15 @@ def seed_cycle(n: int) -> tuple[set[int], int]:
     """The single cell's eventual cycle in G_n (as a set of states) and the step at which it is first on it."""
     x = np.array([1], dtype=np.int64)  # (1,)
     orbit = [1]
-    for _ in range(4 * n + 64):  # every first-n prefix of the single cell is periodic from step 4n + 64 at the latest
+    seen: dict[int, int] = {1: 0}  # state -> first step it occurs
+    while True:  # the orbit of a map of a finite set is eventually periodic, so this ends
         x = left_step(x, n)
-        orbit.append(int(x[0]))
-    tail = orbit[-(1 << 6):]
-    cyc = set(tail)
-    first = next(i for i, v in enumerate(orbit) if v in cyc)
-    return cyc, first
+        v = int(x[0])
+        if v in seen:
+            first = seen[v]  # the orbit is on its cycle from this step on
+            return set(orbit[first:]), first
+        seen[v] = len(orbit)
+        orbit.append(v)
 
 
 @dataclass

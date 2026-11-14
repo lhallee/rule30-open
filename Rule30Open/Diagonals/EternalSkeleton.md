@@ -17,8 +17,10 @@ rule 30, with the frame moved one cell left, is
 $$\mathrm{leftStep}(R)_d = R_{d-2} \oplus (R_{d-1} \lor R_d), \qquad R_{-1} = R_{-2} = 0 .$$
 
 Coordinate $d$ of the image reads coordinates $d-2, d-1, d$ only, so the map does not increase the 2-adic distance
-$2^{-(\text{first difference})}$; unlike the right-edge map of [the seed's past](../../findings/frames/seed-past.md),
-it is not injective. An *eternal orbit* is a family of rows $R_t$, $t \in \mathbb{Z}$, with
+$2^{-(\text{first difference})}$. Unlike the right-edge map of [the seed's past](../../findings/frames/seed-past.md),
+it is not injective: $(1,0,1,1,0,0,\dots)$ and $(1,0,1,0,1,1,1,\dots)$ both map to $(1,1,0,1,0,1,0,0,\dots)$, as the
+formula shows coordinate by coordinate (coordinates from 7 on are $0 \oplus 0$ and $1 \oplus 1$). It is also not onto
+the rows with a black frame cell (`seed_no_preimage`). An *eternal orbit* is a family of rows $R_t$, $t \in \mathbb{Z}$, with
 $R_{t+1} = \mathrm{leftStep}(R_t)$ for every integer $t$: a rule 30 history defined at all times, each row white left
 of a frame that moves left one cell per step.
 
@@ -72,7 +74,8 @@ of a frame that moves left one cell per step.
 In the right-edge frame the single cell has exactly one past ([seed past](../../findings/frames/seed-past.md)); in the
 left-edge frame it has none, and its forward orbit is a transient that converges to one eternal orbit, its shadow,
 whose diagonals are the periodic parts of the single cell's diagonals extended to all integer times. The set of rows
-of eternal orbits, its structure as a union of odometers, and the exhaustive check that its first 22 diagonals form
+of eternal orbits with a black frame cell, its structure as a union of minimal sets, each a finite cycle or a 2-adic
+odometer, and the exhaustive check that its first 22 diagonals form
 one cycle are in [the eternal shadow](../../findings/diagonals/eternal-shadow.md).
 
 ## In Lean
@@ -91,4 +94,4 @@ reading of every nonzero finite configuration has the 2-adic odometer as orbit c
 uniqueness, the shadow, or the absence of a past for the single cell; a search of both parts of the kit for "eternal",
 "odometer" and "omega" finds only the right-edge odometer, the omega-limit forms of Problem 1
 (`Rule30Equivalents.Genericity`), and the rain rows of `Rule30EdgeStaircases` (`rain_row_eternal`), an edge patch at
-the right edge that alternates for ever.
+the right edge that alternates forever.

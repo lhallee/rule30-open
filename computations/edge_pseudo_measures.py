@@ -39,6 +39,11 @@ def index(bits: np.ndarray) -> np.ndarray:
 
 def left_edge_bound(J: int, k: int, colour: int, stationary: bool = True) -> float:
     """Minimum over range-k pseudo-measures on diagonals 0..J-1 of the expected number of cells of `colour`."""
+    return left_edge_profile(J, k, colour, stationary).sum()
+
+
+def left_edge_profile(J: int, k: int, colour: int, stationary: bool = True) -> np.ndarray:
+    """mu_d[R_d = colour] for an optimal range-k pseudo-measure on diagonals 0..J-1; shape (J,)."""
     W = words(k + 2)  # shape (2^(k+2), k+2); column j is position d-2+j
     nw = W.shape[0]
     nvar = J * nw
@@ -88,7 +93,8 @@ def left_edge_bound(J: int, k: int, colour: int, stationary: bool = True) -> flo
         cost[d * nw: (d + 1) * nw] = (W[:, 2] == colour)
     res = linprog(cost, A_eq=A.tocsr(), b_eq=np.array(rhs), bounds=list(zip(lo, hi)), method="highs")
     assert res.status == 0, res.message
-    return float(res.fun)
+    x = res.x.reshape(J, nw)  # shape (J, 2^(k+2))
+    return (x * (W[:, 2] == colour)).sum(axis=1)  # shape (J,)
 
 
 def ordinary_white_bound(k: int) -> float:

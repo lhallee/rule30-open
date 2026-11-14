@@ -21,7 +21,11 @@ satisfy the conjecture.
 infinite walks are the 2-adic points of period dividing $2^k$, shows for $k \le 6$ that only $\pm 1/3$ (with their
 multiples by powers of 2, and 0) are periodic, and computes the exact escape depth $T_k$: every odd seed $y \ne \pm
 1/3$ that agrees with one of them to exactly $m$ bits has a cycle longer than $2^k$ modulo $2^n$ for every $n \ge m +
-T_k + 2$, and this is sharp. For the seed 1, $m = 2$, so $J_k \le T_k + 2$.
+T_k + 2$, and this is sharp for every $m \ge 2$. For the seed 1, $m = 2$, so $J_k \le T_k + 2$. For finite seeds the
+small depths are in kit work after the pinned commit ([kit pull requests](../../literature/kit-pull-requests.md), #51,
+#54, #55): kit main's `Rule30UniversalStart.universal_start` gives the diagonal periods that bound $T_1, \dots, T_4$ for
+the seeds it covers, and the open PR #55 claims $T_5 = 14$ in the form "the clock reaches 64 by diagonal $m + 15$,
+sharp for the seed 47649". $T_6 = 103$ is new.
 
 **Outcome** (exact for $k \le 6$).
 
@@ -37,8 +41,8 @@ it is loose, and at $k = 6$ some seed stays in a cycle of length 64 for 103 leve
 pair, more than the period.
 
 **Where it stops.** The route needs $T_k = o(2^k)$, a statement about every seed at once. The table does not refute it
-asymptotically, since six values decide nothing about a limit; but nothing in the T-function structure pushes $T_k$
-below $2^k$, the computed ratio grows from $k = 4$ to $k = 6$, and a seed-uniform depth is blind to what separates the
+asymptotically, since six values decide nothing about a limit; but the computed ratio grows from $k = 4$ to $k = 6$
+(and, as a heuristic, nothing visible in the T-function structure pushes $T_k$ below $2^k$), and a seed-uniform depth is blind to what separates the
 single cell: at $k = 6$ the worst seed keeps seven times as many diagonals periodic as the single cell does. What
 separates the single cell is the light cone of a finite seed and the product term of the gate, as section 7 of the
 routes says; $T_k$ uses neither, beyond excluding the two periodic seeds. A version of the route that could still work

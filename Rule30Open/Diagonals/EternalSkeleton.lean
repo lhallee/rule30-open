@@ -8,8 +8,10 @@ public import Ruliology.CellularAutomata.Rule30FiniteDiagonals
 Read a row that is white left of a cell from that cell rightward: coordinate `d` is the left diagonal `d`. One step of
 rule 30 with the frame moved one cell left is the map `leftStep`,
 `leftStep(R)_d = R_{d-2} xor (R_{d-1} || R_d)` with `R_{-1} = R_{-2} = false`. Coordinate `d` of the image reads only
-coordinates `d - 2, d - 1, d`, so `leftStep` does not increase the 2-adic distance `2^-(first difference)`; it is not
-injective (the single cell has no preimage with a black edge cell, `seed_no_preimage`).
+coordinates `d - 2, d - 1, d`, so `leftStep` does not increase the 2-adic distance `2^-(first difference)`. It is not
+injective: `(1,0,1,1,0,0,...)` and `(1,0,1,0,1,1,1,...)` both map to `(1,1,0,1,0,1,0,0,...)` (checked by hand, not
+stated in Lean). It is not onto the rows with a black edge cell either: the single cell has no preimage with a black
+edge cell (`seed_no_preimage`).
 
 An *eternal* orbit is a family of rows `R t`, `t : Int`, with `R (t + 1) = leftStep (R t)` for every integer `t`: a
 rule-30 history defined for all times, every row white left of a frame moving left one cell per step.

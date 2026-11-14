@@ -1,13 +1,13 @@
 ---
-title: The eternal rows of rule 30 in the left-edge frame form a compact set on which the step is an isometry and every orbit closure is a finite cycle or a 2-adic odometer; every row white left of a black cell converges to exactly one eternal orbit, its shadow, and for the first 22 diagonals all rows share the single cell's cycle
+title: The eternal rows of rule 30 with a black frame cell in the left-edge frame form a compact set on which the step is an isometry and every orbit closure is a finite cycle or a 2-adic odometer; every row white left of a black cell converges to exactly one eternal orbit, its shadow, and for the first 22 diagonals all rows share the single cell's cycle
 category: diagonals
 problems: [2]
 status: paper
 formalization: partial
-evidence: [computations/eternal_skeleton.py]
+evidence: [computations/eternal_skeleton.py, tests/test_eternal_skeleton.py]
 ---
 
-# The eternal rows of rule 30 in the left-edge frame form a compact set on which the step is an isometry and every orbit closure is a finite cycle or a 2-adic odometer; every row white left of a black cell converges to exactly one eternal orbit, its shadow, and for the first 22 diagonals all rows share the single cell's cycle
+# The eternal rows of rule 30 with a black frame cell in the left-edge frame form a compact set on which the step is an isometry and every orbit closure is a finite cycle or a 2-adic odometer; every row white left of a black cell converges to exactly one eternal orbit, its shadow, and for the first 22 diagonals all rows share the single cell's cycle
 
 Read a row white left of a black cell from that cell rightward: coordinate $d$ is left diagonal $d$, and
 $X = \{R \in \{0,1\}^{\mathbb{N}} : R_0 = 1\}$ is the set of such rows. Rule 30 with the frame moved one cell left is
@@ -17,13 +17,17 @@ $\mathrm{dist}(R, R') = 2^{-\min\{d : R_d \ne R'_d\}}$, $G$ is 1-Lipschitz, sinc
 coordinates $d-2, d-1, d$. On the first $n$ coordinates $G$ is a map $G_n$ of the $2^{n-1}$ states with a black frame
 cell. In the right-edge frame the step is a bijective isometry and the single cell has one past and an odometer as
 orbit closure ([seed past](../frames/seed-past.md), the kit's `Rule30Equivalents.Odometer`). In the left-edge frame
-the step is not injective and the single cell has no past (`seed_not_eternal`); this entry says what replaces both.
+the step is not injective ($(1,0,1,1,0,0,\dots)$ and $(1,0,1,0,1,1,1,\dots)$ both map to $(1,1,0,1,0,1,0,0,\dots)$)
+and the single cell has no past (`seed_not_eternal`); this entry says what replaces both. Items 4 and 5 below are
+standard facts about isometries and 1-Lipschitz maps of compact metric spaces, applied to $\Lambda$.
 
 ## The limit set (paper, using the Lean lemmas of EternalSkeleton)
 
 Let $\Lambda = \bigcap_{k \ge 0} G^k(X)$ and $\Lambda_n$ the eventual image of $G_n$.
 
-1. **$\Lambda$ is the set of rows of eternal orbits.** A row of an eternal orbit in $X$ is in every $G^k(X)$. Conversely
+1. **$\Lambda$ is the set of rows of eternal orbits with a black frame cell.** (Eternal orbits with a white frame
+   cell, such as the all-white row, exist and lie outside $X$.) A row of an eternal orbit in $X$ is in every
+   $G^k(X)$: diagonal 0 is constant along an eternal orbit (`eternal_edge`), so every row of the orbit is in $X$. Conversely
    $G^k(X)$ is a decreasing sequence of nonempty compact sets, so for $R \in \Lambda$ the compact sets
    $G^{-1}(R) \cap G^k(X)$ are nonempty and decreasing, and a point of their intersection is a preimage of $R$ in
    $\Lambda$. Repeating gives a backward orbit in $\Lambda$, so $G(\Lambda) = \Lambda$.
@@ -65,16 +69,17 @@ $\mathrm{dist}(S_t, S'_t)$ is constant in $t$ by the isometry: $S = S'$.
 The **shadow** $\sigma(x) = S_0$, $\sigma(x)_d = (G^{2^d} x)_d$, is a 1-Lipschitz retraction of $X$ onto $\Lambda$ with
 $\sigma \circ G = G \circ \sigma$. The omega-limit set of $x$ is the orbit closure of $\sigma(x)$: a finite cycle or an
 odometer by item 4. On each diagonal the forward orbit of $x$ equals its shadow from the onset of that diagonal on,
-and the onset is the first time after which they agree for ever; so a statement about the settled region of $x$ is a
+and the onset is the first time after which they agree forever; so a statement about the settled region of $x$ is a
 statement about one point of $\Lambda$.
 
 **The eternal skeleton of the single cell** is the eternal orbit $S$ through $\sigma(\delta)$, $\delta = (1, 0, 0,
 \dots)$: diagonal $d$ of $S$ is the periodic part of the single cell's diagonal $d$, extended to all of $\mathbb{Z}$
 in its own phase. Its orbit closure $\Omega = \omega(\delta)$ is the odometer exactly when the single cell's left
-periods are unbounded, which Nersissian (2026, in [the literature](../../literature/rule-30.md)) states and the kit's
+periods are unbounded, which Nersissian (2026, arXiv:2609.25077, in [the literature](../../literature/rule-30.md)) states and the kit's
 main branch proves (`Rule30LeftUnbounded`, not in the pinned kit); unconditionally it is a minimal, equicontinuous,
-uniquely ergodic set. $\Omega$ holds uncountably many eternal orbits, $\psi(\alpha)$ for $\alpha \in \mathbb{Z}_2$,
-two of them time shifts of each other only when $\alpha - \beta \in \mathbb{Z}$; on each finite set of depths they
+uniquely ergodic set. When the left periods are unbounded (so on the strength of that citation, not of the pinned
+kit), $\Omega$ holds uncountably many eternal orbits, $\psi(\alpha)$ for $\alpha \in \mathbb{Z}_2$, two of them time
+shifts of each other exactly when $\alpha - \beta \in \mathbb{Z}$; on each finite set of depths they
 all agree with $S$ up to a time shift. $S$ is singled out in $\Omega$ only as the shadow of the single cell.
 
 ## How many eternal orbits (computed to 22 diagonals; beyond, from the skeleton tree)
@@ -88,17 +93,24 @@ shrinking, and its cycles:
 | cycles of $G_n$ on $\Lambda_n$ | one | one | one |
 
 **For $n \le 22$, $\Lambda_n$ is one cycle, the single cell's**: every row white left of a black cell ends, on its
-first 22 diagonals, in the single cell's cycle, and all eternal orbits agree on depths $0$ to $21$ up to a time shift.
+first 22 diagonals, in the single cell's cycle, and all eternal orbits with a black frame cell agree on depths $0$ to $21$ up to a time shift.
 The number of steps after which $G_n^k$ of every state lies in $\Lambda_n$ reproduces the largest onsets $M_j$ of
 [seed-uniform onsets](seed-uniform-onsets.md), $\max_{j < n} M_j$ (29 at $n = 22$), an independent check of both.
 
-Past this range the cycles of $\Lambda_n$ are the nodes at depth $n - 1$ of the tree of
-[SkeletonTree](../../Rule30Open/Diagonals/SkeletonTree.md): by [DrivenSkeleton](../../Rule30Open/Diagonals/DrivenSkeleton.md)
-every row settles to the single cell's pairs up to a time shift as long as each white diagonal doubles the period, and
-`branch_realized`, `branch_not_shift` give a second class behind the white diagonal 53,207, the first that does not
-double. So, by those modules, $\Lambda_n$ is one cycle for $n \le 53{,}208$ and has two cycles at $n = 53{,}209$;
-the eternal orbits with a black frame cell fall into at least two orbit closures, and into uncountably many if every
-branch of the tree meets infinitely many white diagonals whose complement class is not a time shift (not known).
+Past this range the following is an inference from stated results, not a proof. The cycles of $\Lambda_n$ correspond
+to the classes of settled skeletons up to a time shift: $\Lambda_n$ is the set of first-$n$ prefixes of shadows of
+rows in $X$, the shadow $\sigma(x)$ fixes the phases of the settled skeleton of $x$
+([skeleton tree](skeleton-tree.md)), and two shadows lie on one cycle of $G_n$ exactly when one common time shift
+carries all their first $n$ diagonals into each other. [DrivenSkeleton](../../Rule30Open/Diagonals/DrivenSkeleton.md)
+gives, by a paper induction, that every row settles to the single cell's pairs up to a common time shift as long as
+each white diagonal doubles the period, and reaches depth 53,207 only on the evidence of its computation of the white
+diagonals below depth 59,000; [SkeletonTree](../../Rule30Open/Diagonals/SkeletonTree.md) (`branch_realized`,
+`branch_not_shift`) and its computation that the complement class at 53,208 is not a rotation give a second class
+behind the white diagonal 53,207, the first that does not double. Inferred from these: $\Lambda_n$ is one cycle for
+$n \le 53{,}208$ and has exactly two cycles at $n = 53{,}209$. By the same inference the 8 branches of the
+[skeleton tree](skeleton-tree.md) to depth 250,000 (computed) put the eternal orbits with a black frame cell into at
+least 8 orbit closures, and into uncountably many if every branch of the tree meets infinitely many white diagonals
+whose complement class is not a time shift (not known).
 
 ## What this does and does not reach
 

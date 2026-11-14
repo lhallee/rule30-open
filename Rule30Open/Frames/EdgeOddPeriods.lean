@@ -50,7 +50,9 @@ theorem col_const_of_odd (f : Nat → Bool) (g : Bool) (L : Nat) (hL : L % 2 = 1
     have e : L = 2 * (L / 2) + 1 := by omega
     have := hper
     rw [e, hstep, even] at this
-    cases g <;> cases f 0 <;> simp_all
+    revert this
+    generalize f 0 = a
+    cases g <;> cases a <;> decide
   intro i
   induction i with
   | zero => rfl

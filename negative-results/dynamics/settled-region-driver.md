@@ -11,8 +11,8 @@ evidence: [computations/settled_phase.py]
 
 **Question.** Suppose the center column $c$ of a row with a leftmost black cell has period $P$ from time $T$. Far left,
 every left diagonal is eventually periodic with a power-of-two period and, by
-[DrivenSkeleton](../../Rule30Open/Diagonals/DrivenSkeleton.md), settles to the single cell's own diagonals up to a time
-shift. Near the center the pattern is driven with period $P$. Does the meeting of the two give an inequality between
+[DrivenSkeleton](../../Rule30Open/Diagonals/DrivenSkeleton.md), settles down to depth 53,207 to the single cell's own
+diagonals up to a time shift. Near the center the pattern is driven with period $P$. Does the meeting of the two give an inequality between
 $T$ and $P$ ($T \le f(P)$, or $P \ge f(T)$), or a condition on $P$ (odd, a power of two, a gcd)? Two neighboring
 questions: does the difference of rows $T$ and $T + P$ obey a flux bound across the center, and does an entropy of
 the sequences column 1 may take next to a periodic column separate blocks?
@@ -24,7 +24,7 @@ time shift, which a finite prefix of the driver fixes (on depths 70 to 99, the f
 below, but not the first 20 or 25). The eventual period and its onset are invisible there, and every constraint on them
 lives in the unsettled wedge next to the center, where the check of
 [LeftLatch](../../Rule30Open/Columns/LeftLatch.md) reads each diagonal one step after it leaves column 0. Past depth
-53,207 the settled part also keeps one bit at each white diagonal not followed by a doubling
+53,207 the settled part also keeps a choice of branch at each white diagonal not followed by a doubling
 ([SkeletonTree](../../Rule30Open/Diagonals/SkeletonTree.md)); this entry does not examine whether those bits can carry
 information about $T$ or $P$. The flux across the center is LeftLatch's check and shown condition written for a
 difference (the masked form of [compositional halves](compositional-halves.md)), and the entropy of column 1's latch
@@ -95,7 +95,7 @@ with the skeleton, and the largest onset age per driver is 9 to 54 under periodi
 continued by 4 random tails (times below 1,000). The groups whose shifts on depths 70 to 99 differ number 12 for
 $m = 20$, 2 for $m = 25$, 3 for $m = 29$, and 0 for $m = 30$ and $m = 40$. So a shared prefix of 20 or 25 values does
 not fix the shift (the test has a pair sharing $c(0), \ldots, c(23)$ with shifts 6 and 2), and $c(0), \ldots, c(29)$
-fixed it in every trial, as the sketch below predicts: the shift mod 8 is set at depth 29, which reads $c(0),
+fixed it in every trial, as the argument below predicts: the shift mod 8 is set at depth 29, which reads $c(0),
 \ldots, c(29)$. The case the question asks about directly: the true center column up to time $T$ and a block repeated from $T$ on, for $T = 25, 30, 50, 100$ and
 the six blocks $10, 100, 110, 1101, 10110, 1011100$, gives on every diagonal below 120 the skeleton's eventual period
 and, on depths 70 to 99, shift 0. These diagonals do read the periodic tail (diagonal $d$ reads $c(0), \ldots, c(d)$),
@@ -126,7 +126,7 @@ that a finite prefix of the driver fixes (the first 401 values for $w = 0$; on d
 driver of period 2 and the true center column give the same skeleton with a different shift. Deeper, the driver also
 picks a branch of [SkeletonTree](../../Rule30Open/Diagonals/SkeletonTree.md) at each white diagonal not followed by a
 doubling (53,207 and later), and from depth 87,867 the period of a diagonal depends on the branch
-([skeleton tree](../../findings/diagonals/skeleton-tree.md)); each such bit is again a function of a finite prefix of
+([skeleton tree](../../findings/diagonals/skeleton-tree.md)); each such choice is again a function of a finite prefix of
 the driver, but a late onset $T$ reaches those depths, and this entry leaves them open. What is left is the transient of each diagonal, the wedge between the onset line and column 0, and that is
 where the check acts. Constraints on $T$ and $P$ therefore have to come from the transients, which is the chaotic part
 that the [finite games](../../findings/columns/coverage.md) and LeftLatch's searches already explore block by block.

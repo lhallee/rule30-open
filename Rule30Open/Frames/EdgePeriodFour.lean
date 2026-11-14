@@ -10,8 +10,8 @@ Lean).
 
 * `period_four_iff`: **an edge code with bit `0` black satisfies `T⁴ c = c` exactly when it is `rainA = 1 0 1 0 …`
   (`-1/3`) or `rainB = 1 1 0 1 0 …` (`1/3`).** The kit's `Rule30EdgeStaircases.period_two_iff` is the same with `T²`.
-  So no row white to the right of its edge cell comes back after 4 steps moved 4 cells to the right, except the two
-  rain rows, which come back after 2.
+  On paper (even codes by `Φ(2z) = 2Φ(z)`, rows by the edge-frame translation) it follows that a row with a white
+  right half that comes back after 4 steps moved 4 cells to the right is white or a rain row, which comes back after 2.
 
 The proof follows the columns `b_k(i) = Tⁱ c k`, `i ∈ ℤ/4`. Write `Alt k` when column `k` alternates in `i`.
 * `alt_of_or`: if columns `k` and `k + 1` alternate and are complementary, column `k + 2` alternates (its input
