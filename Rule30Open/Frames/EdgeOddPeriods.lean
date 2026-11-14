@@ -16,6 +16,11 @@ The kit's edge map `Rule30FrozenRuler.T` is the 2-adic map `Φ(y) = y ⊕ (2y �
   column `i ↦ iter i c k` is constant: its two inputs below are constant, so it flips by a constant at every step, and
   `col_const_of_odd` applies.
 * `odd_period_eq_zero`: so `iter L c = c` with `L` odd forces `c` white.
+* `col_period_of_odd`: a sequence that flips by a `p`-periodic input at every step and returns after `p * q` steps,
+  `q` odd, has period `p`.
+* `pow_two_period`: **if `iter (2 ^ a * q) c = c` with `q` odd, then `iter (2 ^ a) c = c`**, so the least period of
+  every periodic point is a power of two. By strong induction on the bit, every column has period `2 ^ a`: its inputs
+  do, so over each block of `2 ^ a` steps it flips by one fixed parity, and `col_period_of_odd` applies.
 -/
 
 @[expose] public section

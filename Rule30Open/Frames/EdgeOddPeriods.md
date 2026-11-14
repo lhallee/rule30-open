@@ -1,15 +1,15 @@
 ---
-title: The right-edge map's only fixed point is 0, and a point that returns after an odd number of steps is fixed, so it is 0
+title: The right-edge map's only fixed point is 0, a point that returns after an odd number of steps is fixed, and every periodic point has a power-of-two least period
 category: frames
 problems: [1]
 status: proved
 lean: Rule30Open.Frames.EdgeOddPeriods
-headline: [fixed_point_eq_zero, fixed_of_odd_period, odd_period_eq_zero]
+headline: [fixed_point_eq_zero, fixed_of_odd_period, odd_period_eq_zero, pow_two_period]
 kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---
 
-# The right-edge map's only fixed point is 0, and a point that returns after an odd number of steps is fixed, so it is 0
+# The right-edge map's only fixed point is 0, a point that returns after an odd number of steps is fixed, and every periodic point has a power-of-two least period
 
 In the frame of its right edge, one step of Rule 30 acts on the edge code $c$ of a row by the kit's
 `Rule30FrozenRuler.T`, the 2-adic map $\Phi(y) = y \oplus (2y \lor 4y)$: bit $k$ of $\Phi(y)$ is
@@ -17,13 +17,15 @@ $y(k) \oplus (y(k-1) \lor y(k-2))$, with bits below 0 white. `Rule30FrozenRuler.
 kit treats the period-two points (`Rule30EdgeStaircases.period_two_iff`) and
 [EdgePeriodFour](EdgePeriodFour.md) the period-four points. The kit's `Rule30EdgeStaircases.no_fixed_point` shows that
 no code with bit 0 black is fixed. `fixed_point_eq_zero` is the same fact for every code, and the reduction of every
-odd period to period one is new.
+odd period to period one and of every period to its power-of-two part are new.
 
 ## Statement
 
 - `fixed_point_eq_zero`: if $T c = c$ then every bit of $c$ is white.
 - `fixed_of_odd_period`: if $\mathrm{iter}\ L\ c = c$ with $L$ odd, then $T c = c$.
 - `odd_period_eq_zero`: if $\mathrm{iter}\ L\ c = c$ with $L$ odd, then every bit of $c$ is white.
+- `pow_two_period`: if $\mathrm{iter}\ (2^a q)\ c = c$ with $q$ odd, then $\mathrm{iter}\ 2^a\ c = c$. So the least
+  period of every periodic point is a power of two.
 
 So no row that is white right of its edge cell, other than the white row, comes back after an odd number of steps
 moved the same number of cells to the right.
@@ -39,10 +41,13 @@ moved the same number of cells to the right.
    column $k$ flips by the constant $g = c(k-1) \lor c(k-2)$ (with $c(-1) = 0$) at every step. It returns at the odd
    time $L$, so by step 2 it is constant. Reading every column at time 1 gives $T c = c$, and step 1 gives $c = 0$.
 
-## What remains on paper
+4. **Powers of two** (`col_period_of_odd`, `pow_two_period`). Let $p = 2^a$. By strong induction on $k$, each
+   column $f(i) = \mathrm{iter}\ i\ c\ k$ has period $p$. Its input $g$ (columns $k - 1$ and $k - 2$, or white) has
+   period $p$ by induction, and $f(i+1) = f(i) \oplus g(i)$. Then $f(i + p) \oplus f(i)$ does not change with $i$, since
+   one step adds $g(i + p) \oplus g(i) = 0$. So $f(i + p) = f(i) \oplus s$ for a constant $s$, and
+   $f(pq) = f(0) \oplus s$ for odd $q$. Return at time $pq$ forces $s = 0$. Reading every column at time $p$ gives
+   $\mathrm{iter}\ p\ c = c$.
 
-[The light-return words](../../findings/frames/light-return-words.md) state a stronger form: the least period of every
-periodic point is a power of two. The proof is the same induction with "constant" replaced by "periodic with period
-$2^j$": a column whose inputs have period $2^j$ flips by a fixed parity over each block of $2^j$ steps, so its period
-divides $2^{j+1}$. Only the odd case is formalized here. It is what excludes odd periods, and with the power-of-two
-statement it gives the same conclusion for every period that is not a power of two.
+Together with `odd_period_eq_zero` this formalizes all of Lemma 1 of
+[the light-return words](../../findings/frames/light-return-words.md). The rest of that entry (the branch state, the
+fertility parity, the doubling embedding and the trees) is not formalized.
