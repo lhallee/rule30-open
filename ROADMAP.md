@@ -34,13 +34,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
 | 2 | Conservation laws | closed | none over four steps |
 | 2 | Bounds on runs | open | runs at most linear in their start time; slope 3/13 for black runs if the onset edge gains 2/3 per step (Lean) |
-| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and in every wide strip, 1/3 for three adjacent columns (sharp) and 5/18 for two; nothing for the center column alone or for black cells |
+| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and $(2J - 2)/(5J)$ in every strip of $J$ columns, 1/3 for three adjacent columns (sharp) and 5/18 for two; nothing for the center column alone or for black cells |
 | 2 | Statistics | no signal | the column passes every test tried |
 | 3 | An upper bound | proved in Lean | a one-tape machine of the kit's model computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps, so Problem 3 is the question whether the exponent 2 can fall to 1 |
 | 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
 | 3 | A space lower bound | open, as hard | space $O(\sqrt{n \log n})$ suffices; needing more than order $\sqrt{n}$ would give the kit's Problem 3 |
 | 3 | A shortcut | no signal | automata, recurrences and learned predictors find none |
-| 3 | Restricted models | open | no automaton below 131,070 states on the range searched; in models fed an arbitrary row, linear bounds that separate Rule 30 from the linear rules (Lean); not 2-automatic in two indices if the right-edge cycles grow superlinearly (Lean); the right-edge map's periodic points are 0 and rain for every period not divisible by 32 (Lean) |
+| 3 | Restricted models | open | no automaton below 131,070 states on the range searched; in models fed an arbitrary row, linear bounds that separate Rule 30 from the linear rules (Lean); not 2-automatic in two indices if the right-edge cycles grow superlinearly (Lean); the right-edge map's periodic points are 0 and the shifted rain pair for every period not divisible by 32 (Lean) |
 
 ## Problem 1: is the center column eventually periodic?
 
@@ -531,9 +531,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   bounded at every period $P \ge 5$ (larger $K$ not checked), while the single cell's period-16 words at depths 400 to
   53,200 (computed) keep at least 9 of every 48 cells black on three consecutive diagonals ([depth
   register](negative-results/diagonals/depth-register-density.md)). For telescoping certificates of range $k \le 6$ on
-  the left-edge frame, the best provable black count on diagonals $0..J-1$ levels off near 3.9 to 26.5 for $J$ up to 48
-  to 160 (computed, floating-point LP values), which suggests but does not prove that no fixed range proves a positive
-  black density: the dual pseudo-measures reproduce the true diagonals to a depth that grows with $k$ and then fade to
+  the left-edge frame, the best provable black count on diagonals $0..J-1$ levels off near 3.9 for $k = 1$ and at
+  least 26.49 for $k = 6$, for $J$ up to 48 to 160 (computed, floating-point LP values), which suggests but does not
+  prove that no fixed range proves a positive black density: the optimal pseudo-measures reproduce the true diagonals to a depth that grows with $k$ and then fade to
   white ([edge pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md)).
 - **Transfer between columns.** *Proved in Lean, weak.* Left permutivity bounds the black cells of column $i - 1$
   by those of columns $i$ (twice) and $i + 1$, and likewise by their white cells, so upper densities satisfy
@@ -615,11 +615,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   [EdgePeriodSixteen](Rule30Open/Frames/EdgePeriodSixteen.md)); in row language, a row white right of some cell that
   comes back moved at the speed of light after $L$ steps, 32 not dividing $L$, is white or one of the two rain rows
   ending at its rightmost black cell, with `evolve` ([LightReturnRows](Rule30Open/Frames/LightReturnRows.md),
-  [LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)). Up to periods not divisible by 128 it is exact
-  computation; for every period it is a conjecture. For every even $L$, every periodic point other than 0 and
-  $2^m(\pm 1/3)$ passes through one branch state $(P, P)$, up to rotation, so the classification at period $L$ is
-  equivalent to the finiteness of one tree $T_L$; the tree for $L/2$ embeds in it with two antiperiodic children on
-  each leaf (proved on paper), and $T_L$ is finite for $L \le 64$ with depths 0, 1, 3, 4, 14, 103 (computed)
+  [LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)). For periods divisible by 32 but not by 128 the
+  classification rests on the exact computation above. On paper, for every even $L$, every periodic point other than 0
+  and $2^m(\pm 1/3)$ passes through one branch state $(P, P)$, up to rotation, so the classification at period $L$ is
+  equivalent to the finiteness of one tree $T_L$, and the tree for $L/2$ embeds in it with two antiperiodic children
+  on each leaf; $T_L$ is finite for $L \le 64$ with depths 0, 1, 3, 4, 14, 103 (computed)
   ([light-return words](findings/frames/light-return-words.md)). Proving it for every $L = 2^k$ stays open: the full
   column graph has many live states (99 at $L = 4$, 13,875 at $L = 8$), so any proof must use the white right half
   ([edge periodic classification](negative-results/frames/edge-periodic-classification.md)).
@@ -856,7 +856,7 @@ In order of the assessment above.
      [LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)) are machine-checked, but their prose has had
      at most one review pass, and [edge pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md) rests on
      floating-point LP values.
-   - *Open questions from the density and right-edge results.* The sharp lower white density of two adjacent columns,
+   - *Open questions on density, the right edge and source energy.* The sharp lower white density of two adjacent columns,
      between 5/18 and 1/3 ([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)); the classification of the
      right-edge map's periodic points for periods divisible by 32 in Lean, and for every period at all, which is the
      finiteness of every tree $T_L$ ([light-return words](findings/frames/light-return-words.md)); a bound on the

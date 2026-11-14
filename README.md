@@ -76,8 +76,8 @@ energy](findings/structure/source-energy-dyadic.md)).
 
 ### Problem 2: does each color occur equally often?
 
-Proved in Lean: white cells have density at least 2/5 in the single cell's triangle, and every wide strip of
-columns of every orbit is at least $(2J - 2)/(5J)$ white ([RowWhiteDensity](Rule30Open/Foundations/RowWhiteDensity.md)).
+Proved in Lean: white cells have density at least 2/5 in the single cell's triangle, and every strip of $J$
+columns of every orbit has lower white density at least $(2J - 2)/(5J)$ ([RowWhiteDensity](Rule30Open/Foundations/RowWhiteDensity.md)).
 Three adjacent columns of every orbit are at least 1/3 white, sharp, and two at least 5/18
 ([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)); all of this is for white cells, and nothing follows
 for the center column alone or for black cells. Conditional bounds on runs: if the left diagonals settle by time $3j/2$

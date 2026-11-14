@@ -220,6 +220,6 @@ progression, which item 3 supplies only for moduli $2^k$ and $2^k p$; item 4 nee
 
 ```bash
 python -m computations.source_energy               # n = 8 .. 18: energies, class biases, Fourier coefficients (10 s)
-python -m computations.source_energy --moduli 500  # exact Gauss period test to q = 500 (about 25 s)
+python -m computations.source_energy --moduli 500  # exact Gauss period test to q = 500 (about 30 s)
 python -m pytest tests/test_source_energy.py
 ```
