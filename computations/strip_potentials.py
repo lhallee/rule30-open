@@ -15,6 +15,94 @@ import argparse
 from computations.strip_cycle_mean import potential
 
 
+GENERAL = r'''
+/-! ### Every width from 5 on -/
+
+/-- White cells of `x` on `a .. a + k - 1`. -/
+def rowW (x : Int → Bool) (a : Int) : Nat → Nat
+  | 0 => 0
+  | k + 1 => rowW x a k + wh (x (a + (k : Int)))
+
+/-- White cells of the columns `a .. a + J - 1` at the times `0 .. n - 1`. -/
+def stripW (f : Nat → Int → Bool) (a : Int) (J : Nat) : Nat → Nat
+  | 0 => 0
+  | n + 1 => stripW f a J n + rowW (f n) a J
+
+theorem rowW_add (x : Int → Bool) (a : Int) (J : Nat) :
+    ∀ K, rowW x a (J + K) = rowW x a J + rowW x (a + (J : Int)) K
+  | 0 => rfl
+  | K + 1 => by
+    have ih := rowW_add x a J K
+    have e : a + ((J + K : Nat) : Int) = a + (J : Int) + (K : Int) := by omega
+    show rowW x a (J + K) + wh (x (a + ((J + K : Nat) : Int))) = _
+    rw [ih, e]; simp only [rowW]; omega
+
+theorem stripW_add (f : Nat → Int → Bool) (a : Int) (J K : Nat) :
+    ∀ n, stripW f a (J + K) n = stripW f a J n + stripW f (a + (J : Int)) K n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_add f a J K n
+    simp only [stripW, ih, rowW_add]; omega
+
+theorem stripW_5 (f : Nat → Int → Bool) (a : Int) : ∀ n, stripW f a 5 n = W5 f a n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_5 f a n
+    simp only [stripW, W5, ih, rowW]
+    omega
+
+theorem stripW_6 (f : Nat → Int → Bool) (a : Int) : ∀ n, stripW f a 6 n = W6 f a n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_6 f a n
+    simp only [stripW, W6, ih, rowW]
+    omega
+
+theorem stripW_7 (f : Nat → Int → Bool) (a : Int) : ∀ n, stripW f a 7 n = W7 f a n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_7 f a n
+    simp only [stripW, W7, ih, rowW]
+    omega
+
+theorem stripW_8 (f : Nat → Int → Bool) (a : Int) : ∀ n, stripW f a 8 n = W8 f a n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_8 f a n
+    simp only [stripW, W8, ih, rowW]
+    omega
+
+theorem stripW_9 (f : Nat → Int → Bool) (a : Int) : ∀ n, stripW f a 9 n = W9 f a n
+  | 0 => rfl
+  | n + 1 => by
+    have ih := stripW_9 f a n
+    simp only [stripW, W9, ih, rowW]
+    omega
+
+/-- **Every strip of `J ≥ 5` adjacent columns of every orbit**: `5 W ≥ 2 J (n - 1)`. -/
+theorem strip_white_ge5 (f : Nat → Int → Bool) (hf : IsOrbit f) :
+    ∀ J, 5 ≤ J → ∀ (a : Int) (n : Nat), 2 * J * n ≤ 5 * stripW f a J n + 2 * J
+  | J, hJ, a, n => by
+    by_cases h10 : J < 10
+    · have : J = 5 ∨ J = 6 ∨ J = 7 ∨ J = 8 ∨ J = 9 := by omega
+      rcases this with rfl | rfl | rfl | rfl | rfl
+      · rw [stripW_5]; exact strip5_white f hf a n
+      · rw [stripW_6]; exact strip6_white f hf a n
+      · rw [stripW_7]; exact strip7_white f hf a n
+      · rw [stripW_8]; exact strip8_white f hf a n
+      · rw [stripW_9]; exact strip9_white f hf a n
+    · have h1 := strip_white_ge5 f hf (J - 5) (by omega) (a + ((5 : Nat) : Int)) n
+      have h2 := strip5_white f hf a n
+      have e : J = 5 + (J - 5) := by omega
+      have hs := stripW_add f a 5 (J - 5) n
+      rw [← e] at hs
+      rw [stripW_5] at hs
+      have m : 2 * J * n = 10 * n + 2 * (J - 5) * n := by
+        rw [e]; simp only [Nat.mul_add, Nat.add_mul]; omega
+      omega
+'''
+
+
 def table(J: int) -> list[int]:
     """The potential of width J at the cycle mean 2/5, indexed by the strip read as a binary number."""
     phi = potential(J, 0, 2, 5)
@@ -22,6 +110,7 @@ def table(J: int) -> list[int]:
 
 
 def _emit(Js: list[int]) -> str:
+    """The module text: a fixed preamble, then one block per width (table, step lemma, telescoping sum)."""
     out = ['''module
 
 public import Ruliology.CellularAutomata.Rule30Jen
@@ -134,6 +223,7 @@ theorem strip{J}_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (n 
   have : pot{J} f a 0 ≤ {C} := phi{J}_le _ {" ".join("_" for _ in range(J-1))}
   omega
 ''')
+    out.append(GENERAL)
     out.append('''
 end StripWhiteDensity
 end Rule30Open

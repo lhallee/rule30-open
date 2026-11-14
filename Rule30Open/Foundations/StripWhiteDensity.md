@@ -7,7 +7,7 @@ lean: Rule30Open.Foundations.StripWhiteDensity
 headline: [strip5_white, strip6_white, strip7_white, strip8_white, strip9_white]
 kit: new
 kit_modules: [Rule30Jen]
-evidence: [computations/strip_cycle_mean.py, tests/test_strip_white_density.py]
+evidence: [computations/strip_cycle_mean.py, computations/strip_potentials.py, tests/test_strip_white_density.py]
 ---
 
 # In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white
@@ -51,10 +51,12 @@ times $0, \dots, n - 1$ gives $2Jn + \varphi_J(s_n) \le \varphi_J(s_0) + 5W$ (`a
 
 The tables are the shortest-path potentials of the graph whose states are the strip's contents and whose edges are
 the steps for every value of the two outside cells, with edge weight $5 \cdot \text{whites} - 2J$
-(`strip_cycle_mean.potential(J, 0, 2, 5)`). They exist because the minimum cycle mean of white cells per cell is
+(`strip_cycle_mean.potential(J, 0, 2, 5)`; `computations/strip_potentials.py` prints them and writes the module). They exist because the minimum cycle mean of white cells per cell is
 exactly $2/5$ for $J = 5, 6, 7, 8, 9$ (`strip_cycle_mean.cycle_mean`).
 
 ## Reproduce
 
     lake build Rule30Open.Foundations.StripWhiteDensity      # about 35 s, most of it the 2^11 cases of width 9
+    python -m computations.strip_potentials --tables 5 6 7 8 9   # the potential tables
+    python -m computations.strip_potentials --emit-lean > Rule30Open/Foundations/StripWhiteDensity.lean
     python -m pytest tests/test_strip_white_density.py

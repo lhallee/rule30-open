@@ -41,3 +41,22 @@ def test_period_five_orbit_attains_two_fifths() -> None:
         for a in range(5):
             whites = sum(1 - r[a + j] for r in rows for j in range(J))
             assert whites == 2 * J * 10 // 5
+
+
+def test_lean_table_width_five_regenerates() -> None:
+    import re
+    from pathlib import Path
+
+    from computations.strip_potentials import table
+
+    text = (Path(__file__).resolve().parents[1] / "Rule30Open/Foundations/StripWhiteDensity.lean").read_text()
+    m = re.search(r"def tab5 : List Nat := \[([0-9, ]*)\]", text)
+    assert m is not None
+    lean_tab = [int(v) for v in m.group(1).split(",")]
+    tab = table(5)
+    assert tab == lean_tab
+    for cells in product((0, 1), repeat=7):
+        s = cells[1:6]
+        n = [rule(cells[i - 1], cells[i], cells[i + 1]) for i in range(1, 6)]
+        idx = lambda w: sum(b << (4 - i) for i, b in enumerate(w))  # noqa: E731
+        assert tab[idx(n)] + 10 <= tab[idx(s)] + 5 * (5 - sum(s))
