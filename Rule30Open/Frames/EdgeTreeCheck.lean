@@ -1,6 +1,7 @@
 module
 
 public import Rule30Open.Frames.EdgeTree
+public import Rule30Open.Frames.LightReturnClassified
 
 /-!
 # A checker for the branch tree, sound for every period, and the period-32 instance
@@ -99,7 +100,7 @@ theorem dead_sound (c : Nat → Bool) (L : Nat) (hp : iter L c = c) :
     ∀ n e, dead n (seg (col c e) L) (seg (col c (e + 1)) L) = true → False := by
   intro n
   induction n with
-  | zero => intro e h; exact absurd h (by decide)
+  | zero => intro e h; cases h
   | succ n ih =>
     intro e h
     have hg : orW (seg (col c (e + 1)) L) (seg (col c e) L) =
@@ -119,7 +120,7 @@ theorem dead_sound (c : Nat → Bool) (L : Nat) (hp : iter L c = c) :
     have hint := integ_seg (col c (e + 2)) _ step L
     simp only [dead] at h
     rw [hg, hpar0] at h
-    simp only [Bool.false_eq_true, if_false, Bool.and_eq_true] at h
+    simp only [Bool.false_eq_true, ite_false, Bool.and_eq_true] at h
     cases hx : col c (e + 2) 0
     · rw [hx] at hint
       rw [hint] at h
@@ -142,5 +143,27 @@ theorem period_32 (c : Nat → Bool) (h0 : c 0 = true) (hp : iter 32 c = c) :
     cases col c j 0
     · exact dead_false
     · exact dead_true
+
+theorem rain_of_return_64 (init : Int → Bool) (r : Int) (hr : ∀ p, r < p → init p = false)
+    (h0 : init r = true) (L : Nat) (hL : L % 64 ≠ 0)
+    (h : ∀ x, evolve init L (x + (L : Int)) = init x) :
+    LightReturnRows.codeAt init r = Rule30Open.Frames.EdgePeriodFour.rainA ∨
+      LightReturnRows.codeAt init r = Rule30Open.Frames.EdgePeriodFour.rainB := by
+  have fac : ∃ a q : Nat, a ≤ 5 ∧ q % 2 = 1 ∧ L = 2 ^ a * q := by
+    by_cases h5 : L % 32 = 0
+    · exact ⟨5, L / 32, by omega, by omega, by show L = 32 * (L / 32); omega⟩
+    · obtain ⟨a, q, ha, hq, e⟩ := LightReturnClassified.factor_of_mod L h5
+      exact ⟨a, q, by omega, hq, e⟩
+  obtain ⟨a, q, ha, hq, rfl⟩ := fac
+  have hp := LightReturnRows.pow_two_return init r hr a q hq h
+  have hi := LightReturnRows.iter_code_of_return init r hr (2 ^ a) hp
+  have e32 : 2 ^ a * 2 ^ (5 - a) = 32 := by
+    rw [← Nat.pow_add, Nat.add_sub_cancel' ha]
+  have h32 := LightReturnClassified.iter_mul_of (LightReturnRows.codeAt init r) (2 ^ a) hi (2 ^ (5 - a))
+  rw [e32] at h32
+  have hc0 : LightReturnRows.codeAt init r 0 = true := by
+    show init (r - ((0 : Nat) : Int)) = true
+    simpa using h0
+  exact period_32 _ hc0 h32
 
 end Rule30Open.Frames.EdgeTreeCheck
