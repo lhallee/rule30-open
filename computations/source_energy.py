@@ -29,6 +29,7 @@ c(t) = t mod 2.
 
     python -m computations.source_energy               # the entry's tables, n = 8 .. 18 (about 10 seconds)
     python -m computations.source_energy --bits 14     # a smaller run (a second)
+    python -m computations.source_energy --moduli 500  # the exact Gauss period test to q = 500 (a few seconds)
 """
 
 from __future__ import annotations
@@ -225,7 +226,9 @@ def vanishing_moduli(limit: int) -> list[int]:
     found = []
     for q in tqdm(range(3, limit + 1, 2), desc="q", file=sys.stderr):
         phi = cyclotomic(q)
-        values = {gauss_period_vanishes(q, a, phi) for a in range(1, q) if math.gcd(a, q) == 1}
+        values = {
+            gauss_period_vanishes(q, a, phi) for a in range(1, q) if math.gcd(a, q) == 1
+        }
         if len(values) != 1:
             raise ValueError(f"vanishing depends on a at q = {q}")
         if values.pop():
@@ -290,13 +293,28 @@ def main(argv: list[str] | None = None) -> int:
         f"  black fraction {planted.mean():.4f}  on t = 0 mod 9 {planted[::9].mean():.4f}"
         f"  max |P_n(1/9)| for n <= 200 {max(abs(lacunary_polynomial(m, Fraction(1, 9))) for m in range(2, 201)):.3f}"
     )
-    vanishing = vanishing_moduli(200)
-    print("\nodd q <= 200 whose Gauss period of <2> vanishes (exact, every unit a):")
+    limit = args.moduli
+    vanishing = vanishing_moduli(limit)
+    print(
+        f"\nodd q <= {limit} whose Gauss period of <2> vanishes (exact, every unit a):"
+    )
     print(vanishing)
-    print("agrees with the kernel criterion:", vanishing == [q for q in range(3, 201, 2) if kernel_criterion(q)])
-    print("all non-squarefree:", all(any(q % (p * p) == 0 for p in range(3, q, 2)) for q in vanishing))
-    print("non-squarefree odd q <= 200 not in the list:",
-          [q for q in range(3, 201, 2) if any(q % (p * p) == 0 for p in range(3, q, 2)) and q not in vanishing])
+    print(
+        "agrees with the kernel criterion:",
+        vanishing == [q for q in range(3, limit + 1, 2) if kernel_criterion(q)],
+    )
+    print(
+        "all non-squarefree:",
+        all(any(q % (p * p) == 0 for p in range(3, q, 2)) for q in vanishing),
+    )
+    print(
+        "non-squarefree odd q <= 200 not in the list:",
+        [
+            q
+            for q in range(3, limit + 1, 2)
+            if any(q % (p * p) == 0 for p in range(3, q, 2)) and q not in vanishing
+        ],
+    )
     return 0
 
 

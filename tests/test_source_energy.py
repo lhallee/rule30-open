@@ -184,3 +184,30 @@ def test_planted_nine() -> None:
     assert abs(np.mean(energies) / expected - 1) < 0.05
     cells = se.planted_nine(size, delta, 0)  # (N,)
     assert abs(cells[::9].mean() - (1 - delta) / 2) < 0.06
+
+
+def test_cyclotomic_and_gauss_periods() -> None:
+    """Phi_q against its degree and known cases; exact vanishing against floating point; the kernel criterion, the
+    squarefree and prime-power cases of the entry."""
+    assert se.cyclotomic(9) == [1, 0, 0, 1, 0, 0, 1]
+    assert se.cyclotomic(15) == [1, -1, 0, 1, -1, 1, 0, -1, 1]
+    for q in range(3, 80, 2):
+        phi_q = sum(1 for a in range(1, q) if math.gcd(a, q) == 1)
+        assert len(se.cyclotomic(q)) == phi_q + 1
+        for a in range(1, q):
+            if math.gcd(a, q) == 1:
+                value = sum(
+                    cmath.exp(2j * math.pi * a * pow(2, j, q) / q)
+                    for j in range(se.multiplicative_order(2, q))
+                )
+                assert se.gauss_period_vanishes(q, a) == (abs(value) < 1e-9)
+    vanishing = se.vanishing_moduli(200)
+    assert vanishing[:4] == [9, 25, 27, 45]
+    assert 63 not in vanishing and 117 not in vanishing and 171 not in vanishing
+    assert vanishing == [q for q in range(3, 201, 2) if se.kernel_criterion(q)]
+    squarefree = [
+        q for q in range(3, 201, 2) if all(q % (p * p) for p in range(3, q, 2))
+    ]
+    assert not set(squarefree) & set(vanishing)
+    for p in (3, 5, 7, 11, 13):
+        assert p * p in vanishing  # no Wieferich prime below 1093
