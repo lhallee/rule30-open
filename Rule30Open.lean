@@ -5,6 +5,7 @@ public import Rule30Open.Foundations.Official
 public import Rule30Open.Foundations.RightHalf
 public import Rule30Open.Foundations.RowWhiteDensity
 public import Rule30Open.Foundations.PairWhiteDensity
+public import Rule30Open.Foundations.StripWhiteDensity
 public import Rule30Open.Seeds.SeedExtensions
 public import Rule30Open.Columns.AdjacentColumns
 public import Rule30Open.Columns.LongRuns
@@ -188,6 +189,10 @@ public import Rule30Open.Frames.EdgePeriodSixteen
 public import Rule30Open.Frames.EdgePeriods
 public import Rule30Open.Frames.LightReturnRows
 public import Rule30Open.Frames.LightReturnClassified
+public import Rule30Open.Frames.EdgeTree
+public import Rule30Open.Frames.EdgeTreeCheck
+public import Rule30Open.Frames.RightEdgeDensity
+public import Rule30Open.Frames.RightEdgeBlack
 public import Rule30Open.Analogs.Rule210
 public import Rule30Open.Analogs.Rule150Descent
 public import Rule30Open.Analogs.SymmetricAxes

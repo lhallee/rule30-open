@@ -19,9 +19,9 @@ $a, \dots, a + J - 1$ at the times $0, \dots, n - 1$.
 
 1. *(Widths 5 to 9, in Lean.)* For $J = 5, 6, 7, 8, 9$: $2J n \le 5W + 2J$, that is $W \ge 2J(n - 1)/5$
    (`strip5_white` to `strip9_white`).
-2. *(Every width $J \ge 5$, on paper.)* $W \ge 2J(n - 1)/5$. Write $J = 5q + r$ with $0 \le r \le 4$ and split the strip
-   into $q - 1$ adjacent strips of width 5 and one of width $5 + r \in \{5, \dots, 9\}$. The white count is the sum of
-   theirs, and part 1 bounds each by $2J_i(n - 1)/5$ with $\sum J_i = J$.
+2. *(Every width $J \ge 5$, in Lean.)* $2Jn \le 5W + 2J$, that is $W \ge 2J(n - 1)/5$ (`strip_white_ge5`). By induction on
+   $J$: widths 5 to 9 are part 1, and a strip of width $J \ge 10$ is a strip of width 5 followed by one of width
+   $J - 5 \ge 5$, whose white counts add (`stripW_add`).
 3. *(Sharp.)* The orbit of $(11001)^\infty$ attains $2/5$ on every strip. Rule 30 maps the row to its shift by two cells
    (`RowWhiteDensity.period_five_shift`, in Lean), and $\gcd(2, 5) = 1$, so in 5 consecutive steps each column runs
    through all five phases and has exactly 2 white cells. A strip of $J$ columns then has exactly $2Jn/5$ white

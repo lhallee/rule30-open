@@ -5,7 +5,7 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 214 Lean modules with 1037
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 219 Lean modules with 1056
 headline theorems, 78 findings and 93 negative results.
 
 ## The problems
@@ -79,8 +79,15 @@ energy](findings/structure/source-energy-dyadic.md)).
 Proved in Lean: white cells have density at least 2/5 in the single cell's triangle, and every strip of $J$
 columns of every orbit has lower white density at least $(2J - 2)/(5J)$ ([RowWhiteDensity](Rule30Open/Foundations/RowWhiteDensity.md)).
 Three adjacent columns of every orbit are at least 1/3 white, sharp, and two at least 5/18
-([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)); all of this is for white cells, and nothing follows
-for the center column alone or for black cells. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
+([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)), and a strip of $J = 5$ to 9 adjacent columns of every
+orbit at least 2/5 white ([StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md)); on paper every strip of
+at least five columns is, and 2/5 is sharp, while the sharp constants for two and four columns are open, in
+$[5/18, 1/3]$ and $[11/28, 2/5]$. Over a period at least $(2J - 2)/5$ of the single cell's first $J$ right diagonals
+are white ([RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)), and the doubling diagonals force black density
+at least $(2 + e_N)/(2(N + 1))$ on the first $N + 1$, with $e_N$ the period exponent
+([RightEdgeBlack](Rule30Open/Frames/RightEdgeBlack.md)), so positive black density there reduces to linear growth of
+the period exponents, which is open. Apart from that reduction all of this is for white cells, and nothing follows for
+the center column alone or for black cells. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
 and their settled pairs alternate in antiphase a bounded number of times, black runs of the center column have slope
 at most 3/13 ([SettledSlope](Rule30Open/Diagonals/SettledSlope.md)), and the point where they start to repeat moves
 by a three-case law, so a gain of 2/3 diagonal per step gives that slope
@@ -117,8 +124,11 @@ Proved in Lean:
   right-edge map has a power-of-two least period, and by exact computation for periods not divisible by 128 the only
   ones are 0 and the rain pair $\pm 1/3$ with its shifts ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md),
   [edge periodic points](findings/frames/edge-periodic-points.md)). In Lean, with `evolve`, a row white right of some
-  cell that comes back moved at the speed of light after $L$ steps, 32 not dividing $L$, is white or one of the two
-  rain rows ([LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)).
+  cell that comes back moved at the speed of light after $L$ steps, 64 not dividing $L$, is white or one of the two
+  rain rows ([LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md) for 32 not dividing $L$, and
+  [EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md), whose branch-tree checker is proved sound for every period and
+  evaluated by the kernel at period 32, for 64). Every edge code with bit 0 black is a rain code or reaches a branch
+  state, in Lean with no periodicity assumed ([EdgeTree](Rule30Open/Frames/EdgeTree.md)).
 - **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
   with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
   1 and the first rung of Problem 3 are the same statements for the transform

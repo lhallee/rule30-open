@@ -91,14 +91,13 @@ theorem strip_white_ge5 (f : Nat → Int → Bool) (hf : IsOrbit f) :
       · rw [stripW_7]; exact strip7_white f hf a n
       · rw [stripW_8]; exact strip8_white f hf a n
       · rw [stripW_9]; exact strip9_white f hf a n
-    · have h1 := strip_white_ge5 f hf (J - 5) (by omega) (a + ((5 : Nat) : Int)) n
+    · obtain ⟨k, rfl⟩ : ∃ k, J = 5 + k := ⟨J - 5, by omega⟩
+      have h1 := strip_white_ge5 f hf k (by omega) (a + ((5 : Nat) : Int)) n
       have h2 := strip5_white f hf a n
-      have e : J = 5 + (J - 5) := by omega
-      have hs := stripW_add f a 5 (J - 5) n
-      rw [← e] at hs
+      have hs := stripW_add f a 5 k n
       rw [stripW_5] at hs
-      have m : 2 * J * n = 10 * n + 2 * (J - 5) * n := by
-        rw [e]; simp only [Nat.mul_add, Nat.add_mul]; omega
+      have m : 2 * (5 + k) * n = 10 * n + 2 * k * n := by
+        rw [Nat.mul_add, Nat.add_mul]
       omega
 '''
 
@@ -122,9 +121,9 @@ For `J = 5, 6, 7, 8, 9`, in every orbit of Rule 30 (any initial row), the strip 
 `a .. a + J - 1` has at least `(2 J n - C_J) / 5` white cells at the times `0 .. n - 1`
 (`stripJ_white`). The proof telescopes in time with a potential on the strip's own cells, a table
 found by shortest paths: `tabJ(next) + 2 J ≤ tabJ(now) + 5 (white cells of the strip)` for every
-value of the strip and of the two cells beside it (`stepJ`, by `decide`). Every width `J ≥ 5` is a sum
-of the widths 5 to 9, so every strip of at least five columns has lower white density at least
-`2/5`; the orbit of `(11001)^∞` attains `2/5` (`StripWhiteDensity.md`).
+value of the strip and of the two cells beside it (`stepJ`, by `decide`). Splitting off strips of
+width 5, every strip of `J ≥ 5` columns has `5 W ≥ 2 J (n - 1)` (`strip_white_ge5`), so lower white
+density at least `2/5`; the orbit of `(11001)^∞` attains `2/5` (`StripWhiteDensity.md`).
 
 The natural-language argument is `StripWhiteDensity.md`, beside this file.
 -/
