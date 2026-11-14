@@ -1,7 +1,7 @@
 ---
 title: Every edge code with bit 0 black is a rain code or passes through a branch state, where a column alternates and the next column equals it
 category: frames
-problems: [1]
+problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgeTree
 headline: [Frames.EdgeTree.rain_or_branch, Frames.EdgeTree.next_of_rain, Frames.EdgeTree.start]
@@ -43,10 +43,12 @@ state $(P, P)$, with $P = 0101\ldots$. The classification of the codes of period
 periodic walk of columns starts at that state. For $L \le 64$ that is the finite tree computed in that entry: 1,055
 nodes of depth 14 at $L = 32$, and 85,887 nodes of depth 103 at $L = 64$.
 
-Not in Lean here:
+Not in this module:
 - the encoding of columns of an $L$-periodic code as $L$-bit words;
 - a Boolean check that explores the tree from $(P, P)$;
 - its soundness;
 - the kernel-evaluated instances at 32 and 64.
 
-Through `rain_or_branch`, those pieces would give the classification for every return time not divisible by 64 or 128.
+The checker, its soundness and the instance at 32 are in [EdgeTreeCheck](EdgeTreeCheck.md), which gives the classification
+for every return time not divisible by 64. The instance at 64 is missing in Lean; it would give every return time not
+divisible by 128.

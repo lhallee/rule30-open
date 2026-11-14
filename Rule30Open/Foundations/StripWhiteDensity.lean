@@ -6,7 +6,7 @@ public import Ruliology.CellularAutomata.Rule30Jen
 # Strips of five to nine adjacent columns of every orbit are at least 2/5 white
 
 For `J = 5, 6, 7, 8, 9`, in every orbit of Rule 30 (any initial row), the strip of columns
-`a .. a + J - 1` has at least `(2 J n - C_J) / 5` white cells at the times `0 .. n - 1`
+`a .. a + J - 1` has at least `(2 J n - 2 J) / 5` white cells at the times `0 .. n - 1`
 (`stripJ_white`). The proof telescopes in time with a potential on the strip's own cells, a table
 found by shortest paths: `tabJ(next) + 2 J ≤ tabJ(now) + 5 (white cells of the strip)` for every
 value of the strip and of the two cells beside it (`stepJ`, by `decide`). Splitting off strips of

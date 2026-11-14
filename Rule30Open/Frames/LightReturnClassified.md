@@ -1,7 +1,7 @@
 ---
 title: A row white right of some cell that comes back moved at the speed of light after a number of steps not divisible by 32 is white or a rain row ending at its rightmost black cell
 category: frames
-problems: [1]
+problems: [3]
 status: proved
 lean: Rule30Open.Frames.LightReturnClassified
 headline: [Frames.LightReturnClassified.white_or_rain_of_return, Frames.LightReturnClassified.rain_rows_of_return, Frames.LightReturnClassified.rain_of_return_mod, Frames.LightReturnClassified.rain_of_return, Frames.LightReturnClassified.frozen_T_eq]
@@ -45,5 +45,5 @@ $r'$ (`rightmost_black`) and its code at $r'$ is `rainA` or `rainB`.
    $n$. If $s$ is black it is that cell; otherwise the row is white right of $s - 1$.
 
 When $a = 0$ the hypothesis of `rain_of_return` is impossible ([LightReturnRows](LightReturnRows.md),
-`odd_return_white`), and the theorem holds vacuously. Return times divisible by 32 are open here: they need the
-codes of period 32 and beyond, which no module classifies.
+`odd_return_white`), and the theorem holds vacuously. Return times divisible by 32 and not by 64 are covered by
+[EdgeTreeCheck](EdgeTreeCheck.md) (`rain_of_return_64`); return times divisible by 64 are open in Lean.

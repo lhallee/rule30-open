@@ -1,5 +1,5 @@
 ---
-title: In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white
+title: In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white (computed)
 category: foundations
 problems: [2]
 status: proved
@@ -10,7 +10,7 @@ kit_modules: [Rule30Jen]
 evidence: [computations/strip_cycle_mean.py, computations/strip_potentials.py, tests/test_strip_white_density.py]
 ---
 
-# In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white
+# In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white (computed)
 
 Let $x_0, x_1, \dots$ be any orbit of Rule 30, from any initial row. Write $W$ for the white cells of the columns
 $a, \dots, a + J - 1$ at the times $0, \dots, n - 1$.

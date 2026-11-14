@@ -1,7 +1,7 @@
 ---
-title: A checker for the branch tree of the right-edge map is sound for every period, and its kernel evaluation at period 32 classifies the codes of period 32 and the rows that return at the speed of light after a time not divisible by 64
+title: A checker for the branch tree of the right-edge map is sound for every period, and its kernel evaluation at period 32 classifies the codes of period 32 with a black edge cell and the rows that return at the speed of light after a time not divisible by 64
 category: frames
-problems: [1]
+problems: [3]
 status: proved
 lean: Rule30Open.Frames.EdgeTreeCheck
 headline: [Frames.EdgeTreeCheck.dead_sound, Frames.EdgeTreeCheck.period_32, Frames.EdgeTreeCheck.rain_of_return_64]
@@ -9,7 +9,7 @@ kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---
 
-# A checker for the branch tree of the right-edge map is sound for every period, and its kernel evaluation at period 32 classifies the codes of period 32 and the rows that return at the speed of light after a time not divisible by 64
+# A checker for the branch tree of the right-edge map is sound for every period, and its kernel evaluation at period 32 classifies the codes of period 32 with a black edge cell and the rows that return at the speed of light after a time not divisible by 64
 
 For an edge code $c$ (the kit's `Rule30FrozenRuler.T`, the 2-adic map $\Phi(y) = y \oplus (2y \lor 4y)$), column $e$
 is $\mathrm{col}\ c\ e\ i$, bit $e$ of $\mathrm{iter}\ i\ c$ ([EdgeTree](EdgeTree.md)). A column of an $L$-periodic
@@ -46,6 +46,7 @@ code is read as the list of its first $L$ values (`seg`).
 
 ## Limits
 
-Period 64 needs `dead 104` or more at lists of length 64: about 85,887 nodes, roughly 160 times the work of period 32.
-At the speed of the period-32 evaluation (seconds) that would take tens of minutes in the kernel, so it was not
+Period 64 needs fuel greater than the tree depth, 103, at lists of length 64: about 85,887 nodes, about 81 times the nodes of
+period 32 on lists twice as long, so by estimate (not measured) roughly 160 times the work. At the speed of the period-32
+evaluation (seconds) that would by estimate take tens of minutes in the kernel, so it was not
 attempted. Words as Nat bit masks, which the kernel accelerates, would be the way to try it.

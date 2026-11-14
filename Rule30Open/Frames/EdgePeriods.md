@@ -1,5 +1,5 @@
 ---
-title: For every period not divisible by 32, the only rows white to the right of their edge cell that come back moved at the speed of light are the white row and the rain rows, which need an even period
+title: For every period not divisible by 32, the only edge codes with a black edge cell that the right-edge map fixes are the two rain codes, and only for even periods
 category: frames
 problems: [3]
 status: proved
@@ -9,7 +9,7 @@ kit: refines
 kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases]
 ---
 
-# For every period not divisible by 32, the only rows white to the right of their edge cell that come back moved at the speed of light are the white row and the rain rows, which need an even period
+# For every period not divisible by 32, the only edge codes with a black edge cell that the right-edge map fixes are the two rain codes, and only for even periods
 
 On the kit's edge map `Rule30FrozenRuler.T` (one step of Rule 30 on the edge code of a row, read leftward from its edge
 cell; the 2-adic map $\Phi(y) = y \oplus (2y \lor 4y)$) and its iterate `Rule30FrozenRuler.iter`:
@@ -20,7 +20,7 @@ Then `iter L c = c` if and only if $a \ge 1$ and $c$ is $\mathrm{rainA} = 1010\d
 
 Every $L \ge 1$ not divisible by 32 has this form. So for odd $L$ no edge code with a black edge cell is fixed by
 `iter L`, and for even $L$ not divisible by 32 exactly the two rain codes are, which have least period exactly 2 ($T$
-swaps them). In terms of rows: a row white to the right of some cell that comes back after $L$ steps moved $L$ cells
+swaps them). In terms of rows, by [LightReturnClassified](LightReturnClassified.md): a row white to the right of some cell that comes back after $L$ steps moved $L$ cells
 to the right, $32 \nmid L$, is white or a translate of a rain row, and the rain rows only for even $L$.
 
 ## Argument
@@ -33,6 +33,8 @@ to the right, $32 \nmid L$, is white or a translate of a rain row, and the rain 
 - Conversely $T$ swaps rainA and rainB (`EdgePeriodFour.T_rainA`, `T_rainB`), so `iter 2` fixes them and so does
   `iter (2m)` (`iter_mul_of_period`).
 
-Core Lean only; `#print axioms period_iff` gives `propext` and `Quot.sound`. Periods divisible by 32 and not by 128 are
-covered only by the exact computation of [edge periodic points](../../findings/frames/edge-periodic-points.md); the
+For $L = 2$ this is the kit's `Rule30EdgeStaircases.period_two_iff`.
+
+Core Lean only; `#print axioms period_iff` gives `propext` and `Quot.sound`. Periods divisible by 32 and not by 64 are
+covered in Lean by [EdgeTreeCheck](EdgeTreeCheck.md) (`period_32`); periods divisible by 64 and not by 128 only by the exact computation of [edge periodic points](../../findings/frames/edge-periodic-points.md); the
 classification for every period is a conjecture ([the routes](../../negative-results/frames/edge-periodic-classification.md)).

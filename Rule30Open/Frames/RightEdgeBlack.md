@@ -43,9 +43,9 @@ $0, \dots, J$ at times $0, \dots, L - 1$ (`stripBlack`, `stripWhite`, sums over 
 ## What it means
 
 Combined with [RightEdgeDensity](RightEdgeDensity.md) (white density at least $(2J - 2)/(5J)$ on the first $J$ right
-diagonals over a period, any code), this gives a two-sided statement on the right-edge strip of the single cell.
-White is at least about $2/5$. Black is at least $(2 + e_N)/(2(N+1))$, which is positive in the limit exactly when
-$e_N \ge cN$. The kit's `per_bound` gives only $e_N \ge \log_2(N + 2) - 1$, so unconditionally the black bound tends
+diagonals over a period, for any orbit of codes that returns on its first $J$ bits), this gives a two-sided statement on the right-edge strip of the single cell.
+White is at least about $2/5$. Black is at least $(2 + e_N)/(2(N+1))$. This bound stays away from 0 exactly when
+$e_N \ge cN$ for some $c > 0$ and all large $N$; when $e_N$ grows sublinearly it says nothing about the true density. The kit's `per_bound` gives only $e_N \ge \log_2(N + 2) - 1$, so unconditionally the black bound tends
 to 0. `per_upper_half` ($e_N \le N/2 + O(\log^* N)$) caps it at about $1/4$. The non-doubling diagonals contribute
 nothing to the bound; controlling them is what a positive black density would need. In the computed range
 (`right_edge_density`, $N + 1 \le 22$) the strip is about half black: 2,867 of 5,632 cells at $N + 1 = 22$, against

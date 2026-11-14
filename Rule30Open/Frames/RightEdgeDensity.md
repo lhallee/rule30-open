@@ -15,7 +15,7 @@ evidence: [computations/right_edge_density.py]
 In the frame of the right edge a row is a code $y$: bit $e$ is the cell $e$ places left of the edge. One step of rule
 30 is $T(y)_e = y_e \oplus (y_{e-1} \lor y_{e-2})$ with $y_{-1} = y_{-2} = 0$ (`codeStep`, the same definition as the
 kit's `Rule30Equivalents.Odometer.G`). The single cell's code at time $t$ is $T^t(1)$, and bit $e$ of it is the right
-diagonal $R_e(t) = \mathrm{cell}(t, t - e)$, purely periodic with period $2^{e_e}$ (`Rule30RightPeriods`). Let
+diagonal $R_j(t) = \mathrm{cell}(t, t - j)$, purely periodic with period $2^{e_j}$ (`Rule30RightPeriods`). Let
 $W_J(y)$ be the number of white bits among $0, \dots, J - 1$, and $L_J = 2^{e_{J-1}}$ the period of the first $J$
 diagonals.
 
@@ -33,7 +33,7 @@ diagonals.
 - `periodic_white`: if the first $J$ bits return after $P$ steps, $5\sum_{i<P} W_J(f_i) \ge (2J - 2)P$. For the single
   cell with $P = L_J$: **over one period, at least $(2J - 2)/5$ of its first $J$ right diagonals are white on average.**
 
-**On paper, from the kit** (`Rule30RightPeriods.half_black`, `e_step`, `per_bound`):
+**Proved in Lean in [RightEdgeBlack](RightEdgeBlack.md)** (`strip_black`, `strip_white` at $J = N = J - 1$), from the kit's `Rule30RightPeriods.half_black`, `e_step`, `per_bound`:
 
 - **Black cells from the doublings.** Over one period $L_J$, the first $J$ right diagonals of the single cell hold at
   least $L_J (1 + e_{J-1}/2)$ black cells and at least $L_J\, e_{J-1}/2$ white cells. So the black density of the strip
@@ -92,7 +92,7 @@ Both strips are close to half black, against bounds of about $2/5$ white and $(2
 
 The kit proves `half_black` (every period of a doubling diagonal is half black) and the bounds on $e_j$; summing it
 over the doubling diagonals of a strip is a two-line corollary that neither the kit nor
-[right-edge cycles](../../findings/complexity/right-edge-cycles.md) states (a search for "half", "antiperiod" and
+[right-edge cycles](../../findings/complexity/right-edge-cycles.md) states; it is proved in [RightEdgeBlack](RightEdgeBlack.md) (a search for "half", "antiperiod" and
 "density" in both finds `half_black`, `antiperiod`, `leastExp_antiperiod` and their uses, not the strip count). The
 white bound and its Lean proof are new. The potential is [RowWhiteDensity](../Foundations/RowWhiteDensity.md)'s,
 applied along the code.
@@ -102,7 +102,7 @@ applied along the code.
 `Rule30Open/Frames/RightEdgeDensity.lean`, core Lean with no imports: the code step, the eight-case `decide` for the
 local inequality, and induction with `omega`. The bridge from codes to the single cell's diagonals is the kit's
 (`Rule30Equivalents.Odometer.row`, `TFunction.testBit_orbit`); it is not restated here, and the black-cell corollary
-is not formalized.
+is in [RightEdgeBlack](RightEdgeBlack.md).
 
 ## Reproduce
 
