@@ -1,5 +1,5 @@
 ---
-title: In every Rule 30 orbit three adjacent columns are at least 1/3 white, sharp at the fixed point (10)^infinity, and two adjacent columns at least 5/18 white, between the bound 5/18 and the 1/3 of periodic orbits
+title: In every Rule 30 orbit three adjacent columns are at least 1/3 white, sharp at the fixed point (10)^infinity, and two adjacent columns at least 5/18 white; the sharp two-column constant lies in [5/18, 1/3] (1/3 attained by a period-12 orbit, computed)
 category: foundations
 problems: [2]
 status: proved
@@ -10,7 +10,7 @@ kit_modules: [Rule30Jen]
 evidence: [computations/strip_cycle_mean.py, tests/test_strip_cycle_mean.py, computations/row_white_density.py]
 ---
 
-# In every Rule 30 orbit three adjacent columns are at least 1/3 white, sharp at the fixed point (10)^infinity, and two adjacent columns at least 5/18 white, between the bound 5/18 and the 1/3 of periodic orbits
+# In every Rule 30 orbit three adjacent columns are at least 1/3 white, sharp at the fixed point (10)^infinity, and two adjacent columns at least 5/18 white; the sharp two-column constant lies in [5/18, 1/3] (1/3 attained by a period-12 orbit, computed)
 
 Let $x_0, x_1, \dots$ be any orbit of Rule 30, from any initial row, and fix adjacent columns.
 
@@ -27,6 +27,17 @@ Both are in Lean. The sharp constant for two columns is open: it lies between $5
 No spatially periodic orbit of period at most 12 has two adjacent columns below $1/3$
 (`row_white_density.periodic_strip_min`), and the minimizing cycle that the method below finds for $5/18$ does not
 come from an orbit whose columns repeat with period 9 (`strip_cycle_mean.extends_right`).
+
+*Relation to RowWhiteDensity and ColumnTransfer.* [RowWhiteDensity](RowWhiteDensity.md) proves with the same
+telescoping in time that every strip of $J$ adjacent columns is at least $(2J - 2)/(5J)$ white (`strip_white`, $4/15$
+at $J = 3$) and that two adjacent columns satisfy $W_a(n) + W_{a+1}(n) + W_{a+1}(n + 1) \ge n$ (its own `pair_white`,
+in a different namespace, which gives white density at least $1/4$ for the pair). Part 1 improves $4/15$ to the sharp
+$1/3$ and part 2 improves $1/4$ to $5/18$; RowWhiteDensity's bounds remain the general form for $J \ge 4$ and a
+two-column count of a different shape. The triple potential $\varphi$ is new here, and the two-column potential $\psi$
+comes from the cycle-mean graph below. The same fixed point, read as $(01)^\infty$, appears in RowWhiteDensity.
+[ColumnTransfer](../Columns/ColumnTransfer.md) bounds black counts of a column by white counts of its neighbors; its
+`transfer_right_white` rearranges to the same three-term count as RowWhiteDensity's `pair_white`, not to the
+bounds here.
 
 *Meaning.* A pair or triple of columns containing the center column has white density at least $5/18$ or $1/3$ in every
 orbit, so in the single cell's orbit. The center column alone has no such bound from any argument valid for every
@@ -64,8 +75,8 @@ free in the graph but constrained in an orbit, so the mean only bounds the densi
 (`python -m computations.strip_cycle_mean`, about 10 s; the test checks the Lean table against the 128 cases and the
 Bellman-Ford potential.) For three columns the bound is already sharp with $k = 0$. For two columns it stops at $5/18$
 to $k = 8$, and its minimizing cycle at $k = 4$ (9 steps, 5 white cells in 18) does not extend to the right with
-period 9. So closing the gap to $1/3$ needs a model that constrains the right input, not a wider window of this
-one.
+period 9. No window up to $k = 8$ closes the gap to $1/3$ (computed); this suggests (heuristic) that closing it needs
+a model that constrains the right input.
 
 ## Reproduce
 

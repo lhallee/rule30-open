@@ -9,9 +9,13 @@ In every orbit of Rule 30 (any initial row), any three adjacent columns `a, a + 
 least `n - 1` white cells among their `3 n` cells at the times `0 .. n - 1` (`triple_white`). The
 proof telescopes in time: with the potential `phi(q, r) = 0` if the cells `a + 1, a + 2` are both
 white and `1` otherwise, every step satisfies
-`phi(next) + 1 ≤ phi(now) + (white cells of the strip now)` (`triple_step`, 32 cases, whatever the
+`phi(next) + 1 ≤ phi(now) + (white cells of the strip now)` (`triple_step`, 16 cases, whatever the
 cells outside the strip are). The constant is sharp: the row `(10)^∞` is a fixed point
 (`alt_fixed`), and its strip `1 0 1` is white exactly once per step (`alt_triple`).
+
+Two adjacent columns `a, a + 1` have `W` white cells at the times `0 .. n - 1` with
+`10 n ≤ 18 W + 18` (`pair_white`), so lower white density at least `5/18`, from a potential on the
+five cells `a + 1 .. a + 5` (`psi5`, `pair_step`, 128 cases).
 
 The natural-language argument is `PairWhiteDensity.md`, beside this file.
 -/
@@ -91,7 +95,7 @@ theorem psi5_le (b c d e g : Bool) : psi5 b c d e g ≤ 18 := by
   cases b <;> cases c <;> cases d <;> cases e <;> cases g <;> decide
 
 /-- **One step for a pair**: `psi(next) + 10 ≤ psi(now) + 18 (white cells of a, a + 1)`, whatever
-the cells `a - 1` and `a + 6` are. -/
+the cell `a + 6` is (cell `a` enters only through its white count). -/
 theorem pair_step (p0 p1 p2 p3 p4 p5 r : Bool) :
     psi5 (rule p0 p1 p2) (rule p1 p2 p3) (rule p2 p3 p4) (rule p3 p4 p5) (rule p4 p5 r) + 10 ≤
       psi5 p1 p2 p3 p4 p5 + 18 * (wh p0 + wh p1) := by

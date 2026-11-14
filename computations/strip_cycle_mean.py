@@ -11,7 +11,7 @@ permutivity makes the left input truly free; the right input is an over-approxim
   phi(next) - phi(now) <= whites * den - J * num on every edge when num/den is at most the cycle mean.
 - `extends_right`: whether two given time-periodic columns extend to an orbit to their right with the same period.
 
-    python -m computations.strip_cycle_mean      # J = 2 to kr = 8 and J = 3 to kr = 7, about 1 min
+    python -m computations.strip_cycle_mean      # J = 2 to kr = 8 and J = 3 to kr = 7, about 10 s
 """
 
 from __future__ import annotations
