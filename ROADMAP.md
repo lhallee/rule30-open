@@ -25,7 +25,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
-| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean); the map's iterates are 2-adic similarities on residue classes but affine on none, so the 3x+1 tools do not apply (Lean) |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean); the map's iterates are 2-adic similarities on residue classes but affine on none, so the affine tools of the 3x+1 problem do not apply (Lean, with the 2-adic step on paper) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 21 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
@@ -297,11 +297,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   steps for $A \le 26$, with no law like Condrey's $A + 2$ ([the carry-over](findings/period-two/condrey-carryover.md),
   [where it stops](negative-results/period-two/condrey-mechanism.md)).
   Read as a 3x+1 map, the $n$th iterate $H^n$ of the held map sends each class modulo $2^n$ onto every residue,
-  multiplying 2-adic distances by exactly $2^n$ ([HeldClasses](Rule30Open/PeriodTwo/HeldClasses.md)), and the column map is an isometric conjugacy to the shift
-  (on paper, from triangularity), but no iterate of $H$ is affine on any residue class
-  ([HeldSimilarity](Rule30Open/PeriodTwo/HeldSimilarity.md)), both in Lean. So the affine tools of the 3x+1 problem
-  (the cycle equation, Bernstein's series, cycle bounds) have nothing to act on, and density arguments give only the
-  exact count $2^{N - \lceil T/2 \rceil}$ ([the 3x+1 technology](negative-results/period-two/collatz-technology.md),
+  multiplying 2-adic distances by exactly $2^n$ (Lean, with congruences in place of 2-adic distances,
+  [HeldClasses](Rule30Open/PeriodTwo/HeldClasses.md)), and the column map is an isometric conjugacy to the shift (on
+  paper, from triangularity), but no iterate of $H$ is affine on any residue class (Lean at three integer points of
+  each class, [HeldSimilarity](Rule30Open/PeriodTwo/HeldSimilarity.md); the one-line step to the 2-adic classes is on
+  paper). So the affine tools of the 3x+1 problem (the cycle equation, Bernstein's series, cycle bounds) have nothing
+  to act on, and density arguments give only the exact count $2^{N - \lceil T/2 \rceil}$ of the integers below
+  $2^N$ that pass the odd steps up to $T$ ([the 3x+1 technology](negative-results/period-two/collatz-technology.md),
   [held similarity](findings/period-two/held-similarity.md)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains, beside a second: every right half white on its
@@ -370,9 +372,6 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   Lean (12 is the least such period, by the kit's main branch), so measures invariant under the shift and the rule with
   positive entropy need not be uniform and a rigidity theorem needs an ergodicity hypothesis along that direction
   ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
-  The rows that come back after 12, 15 or 17 steps all have black cells arbitrarily far right, except the white row
-  and the rain rows, since the right-edge map has no periodic point of period not divisible by 128 but 0 and the rain
-  pair $\pm 1/3$ with its shifts ([edge periodic points](findings/frames/edge-periodic-points.md)).
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
   Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive far left of the
@@ -383,7 +382,10 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   test to lag 1,024, while Rule 180's light-like map, of the same structure, is not ergodic (Lean core,
   [LightLike180](Rule30Open/Analogs/LightLike180.md)), so a proof has to use the OR ([light-like
   mixing](findings/random-rows/lightlike-mixing.md), [the soft
-  routes](negative-results/random-rows/lightlike-soft-routes.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
+  routes](negative-results/random-rows/lightlike-soft-routes.md)). By exact computation, the rows that come back
+  after 12, 15 or 17 steps all have black cells arbitrarily far right, except the white row and the rain rows, since
+  the right-edge map has no periodic point of period not divisible by 128 but 0 and the rain pair $\pm 1/3$ with its
+  shifts ([edge periodic points](findings/frames/edge-periodic-points.md)). The cycle data of the right-edge map cannot decide Problem 2, nor Problem 1 if $L_t > t$ for every large $t$: a map
   with every cycle length of Rule 30's, differing from it on a set of small measure, reads any prescribed center column
   except at the times $t$ with $L_t \mid t$ ([diagonal freedom](negative-results/frames/diagonal-freedom.md)).
 - **Conservation laws.** *Closed.* Rule 30 conserves no density over four steps, at any window width (the kit;
@@ -551,7 +553,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   $k$-block operation is never a quasigroup in the staggered block encoding, so Moore's quasigroup theorems do not apply
   there, and its multiplication monoid is solvable for every $k$ (proved on paper; its units are the level-$k$ image of
   the kit's automaton group 2369). The simple divisors of the monoid do not track prediction cost: Rule 30 shares $C_2$
-  and $C_3$ with the linear Rule 150 and the P-complete Rule 110 on the computed range ($k \le 4$ and $k \le 5$), while
+  and $C_3$ with the linear Rule 150 and the P-complete Rule 110 on the computed range ($k \le 4$ for Rule 30, $k \le 5$ for the others), while
   Rule 90 has only $C_2$ for $k \le 5$ ([block algebra](negative-results/complexity/block-algebra-solvability.md)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$
   on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)), the column's series
