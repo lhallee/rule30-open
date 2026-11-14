@@ -9,11 +9,14 @@ import random
 from computations.block_algebra import (
     block_table,
     closure,
+    compose,
+    element_periods,
     group_order,
     idempotent_groups,
     is_solvable,
     large_rank_groups,
     left_translations,
+    period,
     phi_state,
     right_translations,
 )
@@ -92,3 +95,48 @@ def test_left_permutive_units_are_triangular() -> None:
     for k in (2, 3, 4):
         order = group_order(right_translations(block_table(30, k)))
         assert (2 ** (2**k - 1)) % order == 0
+
+
+def test_period_matches_powers() -> None:
+    """The period from cycle lengths against the period read off the sequence of powers s, s^2, ..."""
+    rng = random.Random(2)
+    for n in (1, 4, 8):
+        for _ in range(50):
+            s = tuple(rng.randrange(n) for _ in range(n))
+            powers = [s]
+            while powers[-1] not in powers[:-1]:
+                powers.append(compose(s, powers[-1]))
+            assert period(s) == len(powers) - 1 - powers.index(powers[-1])
+
+
+def test_monoid_sizes_and_units() -> None:
+    sizes = {(30, 2): 180, (30, 3): 7432, (110, 2): 236, (110, 3): 4580, (90, 3): 160, (150, 3): 712}
+    units = {(30, 2): 8, (30, 3): 128, (110, 2): 4, (110, 3): 1, (90, 3): 16, (150, 3): 32}
+    for (rule, k), size in sizes.items():
+        table = block_table(rule, k)  # (2^k, 2^k)
+        monoid = closure(right_translations(table) + left_translations(table))
+        assert len(monoid) == size
+        assert sum(1 for s in monoid if len(set(s)) == len(s)) == units[(rule, k)]
+
+
+def test_linear_group_orders() -> None:
+    expected = {90: {2: 2**2, 3: 2**4, 4: 2**5}, 150: {2: 2**3, 3: 2**5, 4: 2**6}, 45: {2: 2**3, 3: 2**7, 4: 2**13}}
+    for rule, orders in expected.items():
+        for k, order in orders.items():
+            assert group_order(right_translations(block_table(rule, k))) == order
+
+
+def test_simple_divisors_separate_rule90() -> None:
+    """C_3 divides the monoids of Rules 30, 110 and 150 (an element of period 3) and not that of Rule 90 (no period
+    divisible by 3), for k = 3, 4; Rule 90's groups at the idempotents of M_3 are 2-groups."""
+    for k in (3, 4):
+        for rule, has_three in ((30, True), (110, True), (150, True), (90, False)):
+            if rule == 30 and k == 4:
+                continue  # M_4 of Rule 30 has 856,080 elements; it is in the reproduce command
+            table = block_table(rule, k)  # (2^k, 2^k)
+            periods = element_periods(closure(right_translations(table) + left_translations(table)))
+            assert any(p % 3 == 0 for p in periods) == has_three
+            assert 2 in periods
+    table = block_table(90, 3)  # (8, 8)
+    groups = idempotent_groups(closure(right_translations(table) + left_translations(table)))
+    assert all(len(g) & (len(g) - 1) == 0 for g in groups.values())

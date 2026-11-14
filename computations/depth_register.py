@@ -12,14 +12,17 @@ diagonals A = W_{d-2}, B = W_{d-1}, C = W_d of an eternal orbit satisfy C(t+1) =
   with a minimizer.
 - `transplant`: the same window at a larger period, with the words' bits kept at their positions; `is_window` checks
   it.
+- `skeleton_weights` and `skeleton_window_min`: the weights of the single cell's settled words, aligned at period P,
+  from `settled_slope.stream`, and the least total weight of K consecutive ones over a range of depths.
 
-    python -m computations.depth_register          # the table of the entry, about 1 min
+    python -m computations.depth_register          # the tables of the entry, about 20 s
 """
 
 from __future__ import annotations
 
 import sys
 
+import numpy as np
 from tqdm.auto import tqdm
 
 
@@ -93,6 +96,23 @@ def transplant(ws: list[int], P: int) -> list[int]:
     return [w & ((1 << P) - 1) for w in ws]
 
 
+def skeleton_weights(depth: int, steps: int, P: int, progress: bool = True) -> np.ndarray:
+    """Weights of the single cell's diagonals 0..depth read over P aligned times at the end of `steps` steps; (depth+1,)."""
+    from computations.settled_slope import stream
+    from computations.settled_words import weight, words_from_tail
+    dg = stream(depth, steps, period=64, window=128, progress=progress)
+    if int(dg.onset.max()) > steps - 128:
+        raise ValueError("some diagonal has not settled before the window")
+    return weight(words_from_tail(dg.tail, P)).astype(np.int64)  # (depth+1,)
+
+
+def skeleton_window_min(wt: np.ndarray, K: int, lo: int) -> tuple[int, int]:
+    """Least total weight of K consecutive diagonals starting at depth >= lo, and the first depth of a minimizer."""
+    s = np.convolve(wt, np.ones(K, dtype=np.int64), "valid")[lo:]  # (n - K + 1 - lo,)
+    i = int(np.argmin(s))
+    return int(s[i]), i + lo
+
+
 def main() -> None:
     jobs = [(P, K) for K in (3, 4, 5, 6) for P in (6, 8, 10)] + [(6, 8), (8, 8)]
     print("| K | P | least weight of K consecutive words | density | minimizer, low bits |")
@@ -101,6 +121,12 @@ def main() -> None:
         w, ws = window_min(P, K)
         print(f"| {K} | {P} | {w} | {w / (K * P):.4f} | {', '.join(format(x, 'b') for x in ws)} |")
     print("identity checked on", weight_identity(8), "triples of period 8")
+    wt = skeleton_weights(53200, 82000, 16)  # the regimes of period 16 from depth 400 to 53,200
+    print("| K | single cell, least weight of K consecutive settled words, depths 400 to 53,200 | first depth | density |")
+    print("|---:|---:|---:|---:|")
+    for K in (1, 2, 3, 4, 6, 8):
+        w, d = skeleton_window_min(wt, K, 400)
+        print(f"| {K} | {w} | {d} | {w / (16 * K):.4f} |")
 
 
 if __name__ == "__main__":

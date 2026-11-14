@@ -4,7 +4,7 @@ category: foundations
 problems: [2]
 status: proved
 lean: Rule30Open.Foundations.RowWhiteDensity
-headline: [two_black_le, row_pair, triangle_white, period_five_shift]
+headline: [two_black_le, row_pair, triangle_white, strip_white, pair_white, period_five_shift]
 kit: new
 kit_modules: [Rule30Jen]
 evidence: [computations/row_white_density.py, tests/test_row_white_density.py]
@@ -35,6 +35,35 @@ is about white cells only. The matching statement for black cells is not local: 
 the all-white word, and no local count gives black cells a positive density (see [black density from row
 runs](../../negative-results/structure/black-density-from-row-runs.md), which reduces positive black density in the
 triangle to a bound on the black runs of the rows).
+
+## Vertical strips, for every orbit
+
+Write $W_{[a, a+J-1]}(t)$ for the white cells of the strip of columns $a, \dots, a + J - 1$ at time $t$, in any orbit
+$x_0, x_1 = F(x_0), \dots$ of Rule 30 (no hypothesis on the initial row), and $W_i(n)$ for the white cells of column $i$
+at the times $0, \dots, n - 1$.
+
+5. *(A strip, one step.)* For every row $x$ and every strip of $J$ cells, $2\,B(F(x)) \le 3\,W(x) + 2$ on that strip
+   (`strip_ineq`). The constant 2 is the least possible for every $J$ from 1 to 8 (exhaustion over the rows of $J + 2$
+   cells, `strip_slack`).
+6. *(A strip, summed.)* $3 W_{[a,a+J-1]}(t) + 2 W_{[a,a+J-1]}(t + 1) \ge 2J - 2$ for every $t$, so the strip has at
+   least $(2J - 2)n/5$ white cells at the times $0, \dots, n$ (`strip_white`): lower white density at least
+   $(2J - 2)/(5J)$, which is $4/15$ for the three columns $-1, 0, 1$ and tends to $2/5$.
+7. *(Two adjacent columns.)* If cells $a$ and $a + 1$ are black at time $t$, cell $a + 1$ is white at time $t + 1$
+   ($1 \oplus (1 \lor \cdot) = 0$, `pair_rule`). So $W_a(n) + W_{a+1}(n) + W_{a+1}(n + 1) \ge n$ (`pair_white`), and
+   the two columns have lower white density at least $1/4$, better than part 6's $1/5$ at $J = 2$.
+
+Parts 5 to 7 are in Lean. Proof of part 5: the telescoped count of part 1 with $n = J$ moves the white window one cell
+left; the two boundary terms are $3[x_{a-1} = 0] + \psi(x_{a-1}, x_a)$ and $3[x_{a+J-1} = 0] + \psi(x_{a+J-1}, x_{a+J})$,
+and $3[p = 0] + \psi(p, q)$ lies between 2 and 4 (`edge_bounds`), so they cost at most 2. Part 6 sums part 5 with
+$B = J - W$ as in part 3. [ColumnTransfer](../Columns/ColumnTransfer.md) bounds black counts of a column by those of its
+neighbors; it has no lower bound on white cells, and part 7 is not among its statements.
+
+On the spatially periodic orbits of period at most 12, the least white fraction of a strip is 0 for $J = 1$ (the fixed
+point $(01)^\infty$), $1/3$ for $J = 2$ and $J = 3$, and $2/5$ for $J = 4, 5, 6$ (`periodic_strip_min`), so parts 6
+and 7 are not sharp for small $J$.
+
+*What this does not give.* Nothing for the center column alone, since the fixed point $(01)^\infty$ has a column that
+is black at every time, and nothing for black cells, whose density no count valid for every orbit can bound below.
 
 ## Proof
 
@@ -87,5 +116,5 @@ period, as it is for the stripe $(100)^\infty \mapsto 1^\infty$.
 ## Reproduce
 
     lake build Rule30Open.Foundations.RowWhiteDensity
-    python -m computations.row_white_density --n 3000      # the triangle counts to row 3,000, about 2 s
+    python -m computations.row_white_density --n 3000      # the triangle counts and the strips, about 1 min
     python -m pytest tests/test_row_white_density.py

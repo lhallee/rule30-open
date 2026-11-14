@@ -14,12 +14,13 @@ follows D_d(t + 1) = D_(d-2)(t) xor (D_(d-1)(t) or D_d(t)). Diagonal d therefore
   where S is the single cell's own quadrant, or None.
 * `interface_identity_holds`: for two finite rows, at every step s where their center cells agree at s and s + 1, the
   difference of columns -1 equals the difference of columns 1 masked by the white steps of the center.
-* `prefix_shift_trials`, `grafted_shifts`, `first_period_depths`: the shift for drivers that share a prefix, for the
-  center column followed by a repeated block from time T, and the depths where the skeleton's periods first appear.
+* `prefix_shift_trials`, `grafted_shifts`, `first_period_depths`: whether drivers that share a prefix share a shift, the
+  shift for the center column followed by a repeated block from time T, and the depths where the skeleton's periods
+  first appear.
 * `latch_entropy`: the entropy of the sequences a with a(t) = 1 => a(t + 1) = not b(t mod P), from the product of the
   2x2 transfer matrices, and `latch_count` the number of such words by enumeration.
 
-    python -m computations.settled_phase            # the numbers of the entry (about a minute)
+    python -m computations.settled_phase            # the numbers of the entry (about 25 seconds)
 """
 
 from __future__ import annotations
@@ -178,45 +179,50 @@ def latch_count(block: str, length: int) -> int:
 
 
 def prefix_shift_trials(
-    prefixes: tuple[int, ...], trials: int, n: int, depth: int, seed: int = 5
-) -> dict[int, list[int | None]]:
-    """For each m, `trials` drivers that share a random prefix of length m and are random afterwards: the shift of
-    each one's quadrant (single cell's left part) against the skeleton on depths 70..min(depth, 100) - 1, mod 8."""
+    prefixes: tuple[int, ...], groups: int, trials: int, n: int, depth: int, seed: int = 12
+) -> dict[int, int]:
+    """For each m, `groups` random prefixes of length m, each continued by `trials` random tails: the number of groups
+    whose drivers do not all have the same shift (mod 8) against the skeleton on depths 70..min(depth, 100) - 1."""
     skeleton = quadrant_diagonals(seed_left(), center_column(n), depth)  # (depth, n)
     rng = np.random.default_rng(seed)
-    out: dict[int, list[int | None]] = {}
+    out: dict[int, int] = {}
     for m in tqdm(prefixes, file=sys.stderr):
-        base = rng.integers(0, 2, n).astype(np.uint8)  # (n,)
-        base[0] = 1
-        shifts: list[int | None] = []
-        for _ in range(trials):
-            driver = base.copy()  # (n,)
-            driver[m:] = rng.integers(0, 2, n - m)
-            diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
-            shifts.append(skeleton_shift(diagonals, skeleton, range(70, min(depth, 100)), 40, 8))
-        out[m] = shifts
+        split = 0
+        for _ in range(groups):
+            base = rng.integers(0, 2, n).astype(np.uint8)  # (n,)
+            base[0] = 1
+            shifts: set[int | None] = set()
+            for _ in range(trials):
+                driver = base.copy()  # (n,)
+                driver[m:] = rng.integers(0, 2, n - m)
+                diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
+                shifts.add(skeleton_shift(diagonals, skeleton, range(70, min(depth, 100)), 40, 8))
+            split += len(shifts) > 1
+        out[m] = split
     return out
 
 
 def grafted_shifts(
     onsets: tuple[int, ...], blocks: tuple[str, ...], n: int, depth: int
-) -> dict[int, list[tuple[int | None, bool]]]:
+) -> dict[int, list[tuple[int | None, bool, bool]]]:
     """For each onset T and block: the driver equal to the single cell's center column before T and to the block
-    repeated from T. Returns its quadrant's shift against the skeleton on depths 70..99 and whether every diagonal
-    below `depth` has the skeleton's eventual period."""
+    repeated from T. Returns its quadrant's shift against the skeleton on depths 70..99, whether every diagonal
+    below `depth` has the skeleton's eventual period, and whether some diagonal from T on differs from the skeleton's
+    (its transient changed)."""
     column = center_column(n)  # (n,)
     skeleton = quadrant_diagonals(seed_left(), column, depth)  # (depth, n)
     periods = [period_and_onset(skeleton[d], d) for d in range(depth)]
-    out: dict[int, list[tuple[int | None, bool]]] = {}
+    out: dict[int, list[tuple[int | None, bool, bool]]] = {}
     for onset in tqdm(onsets, file=sys.stderr):
-        row: list[tuple[int | None, bool]] = []
+        row: list[tuple[int | None, bool, bool]] = []
         for block in blocks:
             driver = column.copy()  # (n,)
             driver[onset:] = periodic_driver(block, n - onset, int(block[0]))
             diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
             found = [period_and_onset(diagonals[d], d) for d in range(depth)]
             same = all(f is not None and p is not None and f[0] == p[0] for f, p in zip(found, periods))
-            row.append((skeleton_shift(diagonals, skeleton, range(70, 100), 40, 16), same))
+            changed = not np.array_equal(diagonals[onset:], skeleton[onset:])
+            row.append((skeleton_shift(diagonals, skeleton, range(70, 100), 40, 16), same, changed))
         out[onset] = row
     return out
 
@@ -248,7 +254,7 @@ def main(argv: list[str] | None = None) -> None:
         drivers[block] = periodic_driver(block, n)
     seed_periods = [period_and_onset(skeleton[d], d) for d in range(depth)]
     print(f"single cell's left part, diagonals 0..{depth - 1}, times 0..{n - 1}")
-    print("driver       same periods  max onset age  shift on depths 70..100")
+    print("driver       same periods  max onset age  shift on depths 70..99")
     for name, driver in tqdm(drivers.items(), file=sys.stderr):
         diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
         found = [period_and_onset(diagonals[d], d) for d in range(depth)]
@@ -256,17 +262,21 @@ def main(argv: list[str] | None = None) -> None:
         age = max(f[1] - d for d, f in enumerate(found) if f is not None)
         shift = skeleton_shift(diagonals, skeleton, range(70, 100), 40, 16)
         print(f"{name:12s} {str(same):13s} {age:13d}  {shift}")
-    trials = prefix_shift_trials((20, 30, 34, 36, 40, 60), 8, 6000, depth)
-    print("shared prefix length: shifts of 8 drivers")
-    for m, shifts in trials.items():
-        print(f"  {m:3d} {shifts}")
-    print("the center column before T, a block repeated from T: (shift, same periods) for blocks", DRIVER_BLOCKS[:6])
+    groups, tails = 60, 4
+    trials = prefix_shift_trials((20, 25, 29, 30, 40), groups, tails, 1000, depth)
+    print(f"shared prefix length m: groups (of {groups}, {tails} random tails each) whose shifts on 70..99 differ")
+    for m, split in trials.items():
+        print(f"  {m:3d} {split}")
+    print("the center column before T, a block repeated from T: (shift, same periods, transient changed) for blocks",
+          DRIVER_BLOCKS[:6])
     for onset, row in grafted_shifts((25, 30, 50, 100), DRIVER_BLOCKS[:6], n, depth).items():
         print(f"  T = {onset:3d} {row}")
     print("first depth of each period (diagonals < 600, times < 40,000):", first_period_depths(40000, 600))
-    print("latch entropy per step: block, h, the bound log(2)/P (P >= 2)")
+    print("latch entropy per step: block, h, the lower bound of Lemma 3 (log(2)/P, log(2)/2 for P = 1, none for 0)")
     for block in ("0", "1", "10", "100", "110", "1101"):
-        print(f"  {block:6s} {latch_entropy(block):.6f} {math.log(2) / len(block):.6f}")
+        P = len(block)
+        bound = "-" if "1" not in block else f"{math.log(2) / max(P, 2):.6f}"
+        print(f"  {block:6s} {latch_entropy(block):.6f} {bound}")
 
 
 if __name__ == "__main__":

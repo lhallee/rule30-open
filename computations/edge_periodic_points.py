@@ -14,7 +14,7 @@ finite graph, those that reach a cycle).
   than +-1/3 that agrees with one of them to exactly m bits has Phi^L(y) != y modulo 2^n for every n >= m + T + 2.
 * `white_run`: J_k, the white cells just left of the single cell's right edge at time 2^k, by Python integers.
 
-    python -m computations.edge_periodic_points --k-max 6     # L = 2, ..., 64: about 3 s
+    python -m computations.edge_periodic_points --k-max 6     # L = 2, ..., 64: about 5 s
 """
 
 from __future__ import annotations
@@ -112,6 +112,15 @@ def periodic_points(L: int, bits: int) -> list[int]:
 
 def escape_depth(L: int) -> int:
     """The most edges of a walk that starts at a non-live successor of a live state and stays in the graph."""
+    return max(escape_depth_by_level(L).values())
+
+
+def escape_depth_by_level(L: int) -> dict[int, int]:
+    """The escape depth from the non-live successors of the live states, keyed by the first level j <= 3 of the state.
+
+    Level 0 is the start and level 1 holds the two rain states of level 1. If both remaining live states first occur at
+    level 2, the walks of +-1/3 pass through both of them at every level from 2 on, so the value for j = 2 is the
+    escape depth after a separation at every level m = j + 1 >= 3, and the value for j = 1 is that for m = 2."""
     order, edges = state_graph(L)
     live = live_states(order, edges)
     dead = [s for s in order if s not in live]
@@ -130,7 +139,18 @@ def escape_depth(L: int) -> int:
                     stack.append((nxt[i], 0))
             else:
                 depth[s] = max((1 + depth[x] for x in nxt), default=0)
-    return max(depth[x] for s in live for x in edges[s] if x not in live)
+    level: dict[State, int] = {start_state(L): 0}
+    frontier = [start_state(L)]
+    for j in range(1, 4):
+        frontier = [x for s in frontier for x in edges[s] if x in live]
+        for x in frontier:
+            level.setdefault(x, j)
+    out: dict[int, int] = {}
+    for s in live:
+        for x in edges[s]:
+            if x not in live:
+                out[level[s]] = max(out.get(level[s], -1), depth[x])
+    return out
 
 
 def rain(n: int) -> tuple[int, int]:
@@ -162,12 +182,14 @@ def main() -> None:
         order, edges = state_graph(L)
         live = live_states(order, edges)
         points = periodic_points(L, bits)
-        T = escape_depth(L)
+        by_level = escape_depth_by_level(L)
+        T = max(by_level.values())
         J = white_run(k) if k <= 10 else -1
         tqdm.write(
             f"L = {L:3d}: reachable {len(order):7d}, live {len(live)}, periodic odd points {len(points)}"
             f" (= +-1/3: {points == sorted(rain(bits))}), escape depth T = {T}, J_k = {J}, T + 2 = {T + 2}"
         )
+        tqdm.write(f"         escape depth by level j of the live state left (m = j + 1): {dict(sorted(by_level.items()))}")
 
 
 if __name__ == "__main__":

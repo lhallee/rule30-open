@@ -84,3 +84,27 @@ def test_period_four_is_free_modulo_16() -> None:
     # every odd residue modulo 16 has Phi^4(y) = y there, and only half of those modulo 32 do
     assert len(fixed_residues(4, 4)) == 8
     assert len(fixed_residues(4, 5)) == 8
+
+
+def _trailing_zeros(d: np.ndarray, cap: int) -> np.ndarray:
+    """2-adic valuation of each entry of d, capped at cap (0 maps to cap). d: shape (M,), int64."""
+    low = d & -d  # shape (M,)
+    tz = np.where(low == 0, cap, np.log2(np.maximum(low, 1)).astype(np.int64))  # shape (M,)
+    return np.minimum(tz, cap)
+
+
+def test_escape_depth_period_32_without_the_graph() -> None:
+    # L = 32 by brute force over all odd residues modulo 2^19, no column graph: max over the residues other than
+    # +-1/3 of (largest n with Phi^32(y) = y mod 2^n) - m(y) is T_5 + 1 = 15
+    L, N = 32, 19
+    mask = (1 << N) - 1
+    y0 = np.arange(1, 1 << N, 2, dtype=np.int64)  # shape (2^(N-1),)
+    y = y0.copy()
+    for _ in range(L):
+        y = (y ^ ((y << 1) | (y << 2))) & mask
+    top = _trailing_zeros((y ^ y0) & mask, N)  # shape (2^(N-1),)
+    rains = ep.rain(N)
+    m = np.maximum(*[_trailing_zeros((y0 ^ r) & mask, N) for r in rains])  # shape (2^(N-1),)
+    other = m < N
+    assert int((top - m)[other].max()) == 15
+    assert ep.escape_depth(L) == 14

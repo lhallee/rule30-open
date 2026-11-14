@@ -11,10 +11,14 @@ light-cone triangle.
 - `psi`, `telescope_gap`: the potential of a pair of adjacent cells and the slack of the telescoped count
   3 (white cells of x on [a - 1, a + n - 2]) + psi(x_(a-1), x_a) - 2 (black cells of step x on [a, a + n - 1]) -
   psi(x_(a+n-1), x_(a+n)), which `Rule30Open.Foundations.RowWhiteDensity.telescope` proves nonnegative.
+- `strip_slack`: the largest 2 B(y on a strip of J cells) - 3 W(x on the same cells) over every row, by exhaustion
+  (it is 2 for every J, the constant of `RowWhiteDensity.strip_ineq`).
+- `periodic_strip_min`: the least white fraction of a strip of J adjacent columns over the cycle of a spatially
+  periodic orbit, over every row of period at most P.
 - `chain_check`: the classification of every maximal white run of a row into a continuation (the row above is white
   from one cell left to one cell right of it) or a newborn run (the row above is 1^k 0 1, 1^(k+1) 0 or 1^(k+2) there).
 
-    python -m computations.row_white_density --n 3000      # the triangle counts to row 3,000, about 20 s
+    python -m computations.row_white_density --n 3000      # the triangle counts to row 3,000 and the strips, about 1 min
 """
 
 from __future__ import annotations
@@ -70,6 +74,37 @@ def telescope_gap(row: np.ndarray) -> int:
     L = len(row)
     whites = int((row[:L - 2] == 0).sum())  # cells j for the image cells j + 1, j = 0..L-3
     return 3 * whites + psi(int(row[0]), int(row[1])) - 2 * int(y.sum()) - psi(int(row[L - 2]), int(row[L - 1]))
+
+
+def strip_slack(J: int) -> int:
+    """max over rows x of 2 (black cells of step x on J cells) - 3 (white cells of x on those J cells)."""
+    best = -10 ** 9
+    for v in range(1 << (J + 2)):
+        x = np.array([(v >> k) & 1 for k in range(J + 2)], dtype=np.uint8)  # (J + 2,)
+        y = step(x)  # (J,) over x[1..J]
+        best = max(best, 2 * int(y.sum()) - 3 * int((x[1:J + 1] == 0).sum()))
+    return best
+
+
+def periodic_strip_min(J: int, P_max: int) -> tuple[float, str, int]:
+    """The least white fraction of columns a..a+J-1 over the time cycle of a row of period P <= P_max, with a
+    minimizing row and a."""
+    best: tuple[float, str, int] = (2.0, "", 0)
+    for P in range(1, P_max + 1):
+        for v in range(1 << P):
+            x = tuple((v >> k) & 1 for k in range(P))
+            seen: dict[tuple[int, ...], int] = {}
+            seq: list[tuple[int, ...]] = []
+            while x not in seen:
+                seen[x] = len(seq)
+                seq.append(x)
+                x = tuple(x[i - 1] ^ (x[i] | x[(i + 1) % P]) for i in range(P))
+            cyc = seq[seen[x]:]
+            for a in range(P):
+                w = sum(1 - r[(a + j) % P] for r in cyc for j in range(J)) / (J * len(cyc))
+                if w < best[0]:
+                    best = (w, "".join(map(str, cyc[0])), a)
+    return best
 
 
 def triangle_area(k: int) -> int:
@@ -157,6 +192,9 @@ def main() -> None:
                   f"sum T over runs of rows < n-1 {Tsum[t - 1]} >= white {Wt[t]}: {Tsum[t - 1] >= Wt[t]}, "
                   f"2n^2/(M+3) = {2 * m * m / (Mmax[t] + 3):.0f} <= black {A[t]}")
     print(f"least 3 W(s-1) + 6 - 2 B(s) over 1 <= s < n: {worst_pair}")
+    for J in (1, 2, 3, 4, 5, 6):
+        print(f"J={J}: strip slack {strip_slack(J)}, least periodic strip white fraction (P <= 12) "
+              f"{periodic_strip_min(J, 12)}")
     rows = single_cell_rows(min(n, 600))
     tot = [0, 0, 0]
     for s in range(1, rows.shape[0]):

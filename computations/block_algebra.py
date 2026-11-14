@@ -11,12 +11,13 @@ a -> a * b (one per b), `left_translations` the maps b -> a * b (one per a). The
 transformation monoid the two families generate; its group of units and the groups at its idempotents decide whether
 it is solvable in the sense of Krohn-Rhodes theory (every subgroup solvable).
 
-    python -m computations.block_algebra   # the table of the entry for Rules 30, 45, 90, 110 and 150 (about 30 s)
+    python -m computations.block_algebra   # the table of the entry for Rules 30, 45, 90, 110 and 150 (about 75 s)
 """
 
 from __future__ import annotations
 
 import argparse
+import math
 import sys
 from collections.abc import Iterable
 
@@ -183,6 +184,35 @@ def large_rank_groups(monoid: set[Perm], min_rank: int) -> dict[frozenset[int], 
     return out
 
 
+def period(s: Perm) -> int:
+    """The period of the cyclic semigroup s, s^2, ...: the least common multiple of the cycle lengths of s. A finite
+    monoid has an element of period divisible by a prime p exactly when one of its subgroups has order divisible by p,
+    so when every subgroup is solvable, C_p divides the monoid exactly when some element has period divisible by p."""
+    n = len(s)
+    visited = [False] * n  # (n,)
+    out = 1
+    for x in range(n):
+        y = x
+        for _ in range(n):  # after n steps every point is on a cycle
+            y = s[y]
+        if visited[y]:
+            continue
+        length, z = 0, y
+        while True:
+            visited[z] = True
+            z = s[z]
+            length += 1
+            if z == y:
+                break
+        out = out * length // math.gcd(out, length)
+    return out
+
+
+def element_periods(monoid: Iterable[Perm]) -> set[int]:
+    """The set of periods of the elements of a transformation monoid."""
+    return {period(s) for s in monoid}
+
+
 def max_nonunit_rank(table: np.ndarray) -> int:
     """The largest image size of a left translation b -> a * b that is not a bijection."""
     # table: (2^k, 2^k)
@@ -205,6 +235,8 @@ def main() -> None:
     parser.add_argument("--kmax", type=int, default=6, help="largest block size for the group orders")
     parser.add_argument("--monoid-kmax", type=int, default=3, help="largest block size for the full monoid")
     parser.add_argument("--large-k", type=int, default=5, help="largest block size for Rule 110's groups of rank >= 5")
+    parser.add_argument("--period-kmax", type=int, default=5, help="largest block size for the periods of Rules 90, 150")
+    parser.add_argument("--rule30-period-k", type=int, default=4, help="block size for the periods of Rule 30's monoid")
     args = parser.parse_args()
     for rule in (30, 45, 90, 150, 110):
         for k in range(2, args.kmax + 1):
@@ -220,13 +252,23 @@ def main() -> None:
             groups = idempotent_groups(monoid)
             orders = sorted({(len(x), len(g)) for x, g in groups.items()})
             print(f"rule {rule} k {k}: monoid {len(monoid)}, (rank, group order) at idempotents {orders}, "
-                  f"all solvable {all(is_solvable(g) for g in groups.values())}")
+                  f"all solvable {all(is_solvable(g) for g in groups.values())}, "
+                  f"units {sum(1 for s in monoid if len(set(s)) == len(s))}, periods {sorted(element_periods(monoid))}")
     for k in range(4, args.large_k + 1):
         table = block_table(110, k)  # (2^k, 2^k)
         monoid = closure(right_translations(table) + left_translations(table), progress=True)
         groups = large_rank_groups(monoid, 5)
         print(f"rule 110 k {k}: monoid {len(monoid)}, groups at idempotents of rank >= 5: "
-              f"{sorted({(len(x), len(g)) for x, g in groups.items()})}")
+              f"{sorted({(len(x), len(g)) for x, g in groups.items()})}, periods {sorted(element_periods(monoid))}")
+    for rule in (90, 150):
+        for k in range(4, args.period_kmax + 1):
+            table = block_table(rule, k)  # (2^k, 2^k)
+            monoid = closure(right_translations(table) + left_translations(table), progress=True)
+            print(f"rule {rule} k {k}: monoid {len(monoid)}, periods {sorted(element_periods(monoid))}")
+    if args.rule30_period_k >= 4:
+        table = block_table(30, args.rule30_period_k)  # (2^k, 2^k)
+        monoid = closure(right_translations(table) + left_translations(table), progress=True)
+        print(f"rule 30 k {args.rule30_period_k}: monoid {len(monoid)}, periods {sorted(element_periods(monoid))}")
 
 
 if __name__ == "__main__":

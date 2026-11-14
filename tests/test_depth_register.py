@@ -39,3 +39,25 @@ def test_transplanted_windows() -> None:
         for P in range(5, 41):
             assert is_window(transplant(ws, P), P)
     assert window_min(6, 6)[0] == 7 and window_min(8, 3)[0] == 2
+
+
+def test_skeleton_weights_against_direct_run() -> None:
+    # the single cell evolved cell by cell; weight of diagonal j over 16 aligned times late in the run
+    from computations.depth_register import skeleton_weights, skeleton_window_min
+    import numpy as np
+    depth, steps = 40, 400
+    wt = skeleton_weights(depth, steps, 16, progress=False)
+    width = 2 * steps + 3
+    x = np.zeros(width, dtype=np.uint8)  # (width,)
+    x[steps + 1] = 1
+    rows = [x]
+    for _ in range(steps - 1):
+        left = np.concatenate(([0], x[:-1]))  # (width,)
+        right = np.concatenate((x[1:], [0]))  # (width,)
+        x = left ^ (x | right)
+        rows.append(x)
+    for j in range(depth + 1):
+        cells = [int(rows[t][steps + 1 - t + j]) for t in range(steps - 128, steps - 112)]
+        assert sum(cells) == wt[j]
+    w, d = skeleton_window_min(wt, 3, 9)
+    assert w == min(int(wt[i] + wt[i + 1] + wt[i + 2]) for i in range(9, depth - 1)) and wt[d:d + 3].sum() == w

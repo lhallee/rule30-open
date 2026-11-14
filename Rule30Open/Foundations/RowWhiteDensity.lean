@@ -17,6 +17,12 @@ terms are exact: `2 B(s + 1) ≤ 3 W(s) + 6` (`row_pair`), where `B(t)` and `W(t
 white cells of row `t` on `-t .. t`. Summed over the rows, the triangle of rows `0 .. n - 1`
 (`n^2` cells) has at least `2 (n - 1)(n - 2) / 5` white cells (`triangle_white`).
 
+On a fixed strip of `J` columns the same telescoping gives `2 B ≤ 3 W + 2` for every row
+(`strip_ineq`), so every strip of `J` adjacent columns of every orbit has at least `(2 J - 2) n / 5`
+white cells at the times `0 .. n` (`strip_white`); for two adjacent columns, two black cells leave the
+right one white a step later (`pair_rule`), so `W_a(n) + W_(a+1)(n) + W_(a+1)(n + 1) ≥ n`
+(`pair_white`).
+
 The constant `2/5` is the best a local argument can give: the row `(11001)^∞` is mapped by Rule 30
 to a shift of itself (`period_five_shift`), so every row of its orbit is exactly `2/5` white.
 
@@ -183,6 +189,95 @@ theorem triangle_white (n : Nat) : 2 * (n - 1) * (n - 2) ≤ 5 * Wtot n := by
       rw [e2]
       have : 2 * (k + 1) * (k + 1 + 2) = 2 * (k + 1) * k + 6 * (k + 1) := by grind
       omega
+
+/-! ### Vertical strips, for every orbit -/
+
+theorem edge_bounds (p q : Bool) : 2 ≤ 3 * wh p + psi p q ∧ 3 * wh p + psi p q ≤ 4 := by
+  cases p <;> cases q <;> decide
+
+/-- **A fixed strip**: twice the black cells of the image on `[a, a + J - 1]` are at most three times
+the white cells of the row on the same cells, plus 2. -/
+theorem strip_ineq (x : Int → Bool) (a : Int) (J : Nat) :
+    2 * blacks (step x) a J ≤ 3 * whites x a J + 2 := by
+  have h := telescope x a J
+  have h1 := whites_append x (a - 1) 1 J
+  have e1 : a - 1 + ((1 : Nat) : Int) = a := by omega
+  rw [e1] at h1
+  have h2 : whites x (a - 1) (1 + J) = whites x (a - 1) J + wh (x (a - 1 + J)) := by
+    rw [Nat.add_comm]; rfl
+  have h3 : whites x (a - 1) 1 = wh (x (a - 1)) := by
+    have e : a - 1 + ((0 : Nat) : Int) = a - 1 := by omega
+    simp only [whites, e]; omega
+  have e2 : a - 1 + (J : Int) = a + J - 1 := by omega
+  rw [e2] at h2
+  have b1 := edge_bounds (x (a - 1)) (x a)
+  have b2 := edge_bounds (x (a + J - 1)) (x (a + J))
+  omega
+
+/-- **Two adjacent cells**: if cells `a` and `a + 1` are black, cell `a + 1` of the image is white. -/
+theorem pair_rule (x : Int → Bool) (a : Int) :
+    1 ≤ wh (x a) + wh (x (a + 1)) + wh (step x (a + 1)) := by
+  have e : a + 1 - 1 = a := by omega
+  simp only [step, e]
+  cases x a <;> cases x (a + 1) <;> cases x (a + 1 + 1) <;> decide
+
+/-- An orbit of Rule 30: any sequence of rows, each the image of the one before. -/
+def IsOrbit (f : Nat → Int → Bool) : Prop := ∀ t, f (t + 1) = step (f t)
+
+/-- White cells of the strip `[a, a + J - 1]` at the times `0 .. n - 1`. -/
+def stripW (f : Nat → Int → Bool) (a : Int) (J : Nat) : Nat → Nat
+  | 0 => 0
+  | n + 1 => stripW f a J n + whites (f n) a J
+
+/-- White cells of the strip at the times `1 .. n`. -/
+def stripW1 (f : Nat → Int → Bool) (a : Int) (J : Nat) : Nat → Nat
+  | 0 => 0
+  | n + 1 => stripW1 f a J n + whites (f (n + 1)) a J
+
+theorem stripW1_le (f : Nat → Int → Bool) (a : Int) (J : Nat) :
+    ∀ n, stripW1 f a J n ≤ stripW f a J (n + 1)
+  | 0 => Nat.zero_le _
+  | n + 1 => by
+    have := stripW1_le f a J n
+    simp only [stripW1, stripW] at *
+    omega
+
+theorem strip_aux (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (J : Nat) :
+    ∀ n, 2 * J * n ≤ 3 * stripW f a J n + 2 * stripW1 f a J n + 2 * n
+  | 0 => by simp [stripW, stripW1]
+  | n + 1 => by
+    have ih := strip_aux f hf a J n
+    have hs := strip_ineq (f n) a J
+    rw [← hf n] at hs
+    have hb := whites_add_blacks (f (n + 1)) a J
+    simp only [stripW, stripW1]
+    have : 2 * J * (n + 1) = 2 * J * n + 2 * J := by grind
+    omega
+
+/-- **Every vertical strip of every orbit**: the strip of `J` adjacent columns has at least
+`(2 J - 2) n / 5` white cells at the times `0 .. n`. -/
+theorem strip_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (J n : Nat) :
+    2 * J * n ≤ 5 * stripW f a J (n + 1) + 2 * n := by
+  have h := strip_aux f hf a J n
+  have h1 := stripW1_le f a J n
+  have h2 : stripW f a J n ≤ stripW f a J (n + 1) := by simp only [stripW]; omega
+  omega
+
+/-- White cells of column `i` at the times `0 .. n - 1`. -/
+def colW (f : Nat → Int → Bool) (i : Int) : Nat → Nat
+  | 0 => 0
+  | n + 1 => colW f i n + wh (f n i)
+
+/-- **Two adjacent columns of every orbit**: `W_a(n) + W_(a+1)(n) + W_(a+1)(n + 1) ≥ n`. -/
+theorem pair_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) :
+    ∀ n, n ≤ colW f a n + colW f (a + 1) n + colW f (a + 1) (n + 1)
+  | 0 => Nat.zero_le _
+  | n + 1 => by
+    have ih := pair_white f hf a n
+    have hp := pair_rule (f n) a
+    rw [← hf n] at hp
+    simp only [colW] at *
+    omega
 
 /-! ### Sharpness -/
 
