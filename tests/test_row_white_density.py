@@ -1,0 +1,75 @@
+"""row_white_density against preimages enumerated by brute force, a cell-by-cell run of the single cell, and the
+inequalities the entry proves."""
+
+from __future__ import annotations
+
+from itertools import product
+
+import numpy as np
+
+from computations.row_white_density import (black_runs, chain_check, run_white_bound, single_cell_rows, step,
+                                            triangle_area, triangle_counts)
+
+
+def rule30_cell(a: int, b: int, c: int) -> int:
+    return a ^ (b | c)
+
+
+def test_run_bound_every_row() -> None:
+    # every row of length <= 11: each black run of the image has floor(2 (m + 1) / 3) white cells over [u - 1, v]
+    for L in range(3, 12):
+        for bits in product((0, 1), repeat=L):
+            row = np.array(bits, dtype=np.uint8)  # (L,)
+            for whites, bound in run_white_bound(row):
+                assert whites >= bound
+
+
+def test_run_bound_is_least() -> None:
+    # the least, over every preimage of 1^m on m + 2 cells, of the white cells on its first m + 1 cells
+    for m in range(1, 11):
+        pre = [w for w in product((0, 1), repeat=m + 2)
+               if all(rule30_cell(w[i - 1], w[i], w[i + 1]) for i in range(1, m + 1))]
+        assert len(pre) == 4
+        assert min((m + 1) - sum(w[:m + 1]) for w in pre) == (2 * (m + 1)) // 3
+
+
+def test_step_and_runs() -> None:
+    row = np.array([0, 1, 0, 0, 1, 1, 0], dtype=np.uint8)
+    assert step(row).tolist() == [rule30_cell(*row[i:i + 3]) for i in range(5)]
+    assert black_runs(row) == [(1, 1), (4, 5)]
+
+
+def test_triangle_area() -> None:
+    for k in range(1, 30):
+        area, w = 0, k
+        while w > 0:
+            area, w = area + w, w - 2
+        assert triangle_area(k) == area <= (k + 1) ** 2 // 4
+
+
+def test_triangle_counts_and_inequalities() -> None:
+    n = 80
+    tc = triangle_counts(n, progress=False)
+    # a cell-by-cell run of the single cell
+    cells = {0: 1}
+    for t in range(n):
+        seg = [cells.get(i, 0) for i in range(-t, t + 1)]
+        assert tc.B[t] == sum(seg) and tc.W[t] == len(seg) - sum(seg)
+        cells = {i: rule30_cell(cells.get(i - 1, 0), cells.get(i, 0), cells.get(i + 1, 0)) for i in range(-t - 1, t + 2)}
+    for s in range(1, n):
+        assert 3 * tc.W[s - 1] >= 2 * tc.B[s] - 9
+    for m in range(1, n + 1):
+        Wt, A = int(tc.W[:m].sum()), int(tc.B[:m].sum())
+        assert 5 * Wt >= 2 * m * m - 9 * m + 7
+        assert Wt <= int(tc.T[:max(m - 1, 0)].sum())
+        assert A * (int(tc.M[:m].max()) + 3) >= 2 * m * m
+
+
+def test_chain_classification() -> None:
+    # every maximal white run strictly inside the image window is a continuation or newborn
+    for bits in product((0, 1), repeat=11):
+        above = np.array(bits, dtype=np.uint8)  # (11,)
+        assert chain_check(above, step(above))[2] == 0
+    rows = single_cell_rows(60)  # (60, 121)
+    for s in range(1, 60):
+        assert chain_check(rows[s - 1], rows[s][1:-1])[2] == 0
