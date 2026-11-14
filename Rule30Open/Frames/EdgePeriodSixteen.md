@@ -19,7 +19,9 @@ $= -1/3$, rainB $= 1/3$):
 
 With the reduction of [edge periodic points](../../findings/frames/edge-periodic-points.md) (item 2: a periodic point's
 cycle lengths are powers of two dividing its period, and $\Phi(2y) = 2\Phi(y)$), this gives in Lean-checked form, up to
-that paper reduction, the classification for every period $L$ with $32 \nmid L$: a row white to the right of some cell
+that paper reduction, the classification for every period $L$ with $32 \nmid L$ (the power-of-two step of the reduction
+is in Lean as [EdgeOddPeriods](EdgeOddPeriods.md)`.pow_two_period`; the passage between rows and codes by shifts with
+$c(0) = 0$ stays on paper): a row white to the right of some cell
 that comes back after $L$ steps moved $L$ cells right is white or a translate of a rain row.
 
 ## Argument

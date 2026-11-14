@@ -6,7 +6,7 @@ status: proved
 lean: Rule30Open.Frames.EdgeOddPeriods
 headline: [fixed_point_eq_zero, fixed_of_odd_period, odd_period_eq_zero, pow_two_period]
 kit: refines
-kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases, TFunctionCycles]
+kit_modules: [Rule30FrozenRuler, Rule30EdgeStaircases, Rule30Equivalents.TFunctionCycles]
 ---
 
 # The right-edge map's only fixed point is 0, a point that returns after an odd number of steps is fixed, and every periodic point has a power-of-two least period

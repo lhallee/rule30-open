@@ -47,10 +47,12 @@ def tab5 : List Nat := [0, 5, 5, 10, 5, 10, 10, 10, 5, 10, 10, 10, 10, 10, 10, 1
 /-- The potential of a strip of width 5. -/
 def phi5 (b0 b1 b2 b3 b4 : Bool) : Nat := tab5.getD (16 * bit b0 + 8 * bit b1 + 4 * bit b2 + 2 * bit b3 + 1 * bit b4) 0
 
+set_option maxRecDepth 100000 in
 theorem phi5_le (b0 b1 b2 b3 b4 : Bool) : phi5 b0 b1 b2 b3 b4 ≤ 10 := by
   revert b0 b1 b2 b3 b4
   decide
 
+set_option maxRecDepth 100000 in
 /-- **One step for width 5**, whatever the cells `l` and `r` beside the strip. -/
 theorem step5 (l b0 b1 b2 b3 b4 r : Bool) :
     phi5 (rule l b0 b1) (rule b0 b1 b2) (rule b1 b2 b3) (rule b2 b3 b4) (rule b3 b4 r) + 10 ≤ phi5 b0 b1 b2 b3 b4 + 5 * (wh b0 + wh b1 + wh b2 + wh b3 + wh b4) := by
@@ -116,10 +118,12 @@ def tab6 : List Nat := [0, 3, 5, 6, 5, 7, 12, 10, 3, 7, 9, 11, 11, 11, 9, 10, 5,
 /-- The potential of a strip of width 6. -/
 def phi6 (b0 b1 b2 b3 b4 b5 : Bool) : Nat := tab6.getD (32 * bit b0 + 16 * bit b1 + 8 * bit b2 + 4 * bit b3 + 2 * bit b4 + 1 * bit b5) 0
 
+set_option maxRecDepth 100000 in
 theorem phi6_le (b0 b1 b2 b3 b4 b5 : Bool) : phi6 b0 b1 b2 b3 b4 b5 ≤ 12 := by
   revert b0 b1 b2 b3 b4 b5
   decide
 
+set_option maxRecDepth 100000 in
 /-- **One step for width 6**, whatever the cells `l` and `r` beside the strip. -/
 theorem step6 (l b0 b1 b2 b3 b4 b5 r : Bool) :
     phi6 (rule l b0 b1) (rule b0 b1 b2) (rule b1 b2 b3) (rule b2 b3 b4) (rule b3 b4 b5) (rule b4 b5 r) + 12 ≤ phi6 b0 b1 b2 b3 b4 b5 + 5 * (wh b0 + wh b1 + wh b2 + wh b3 + wh b4 + wh b5) := by
@@ -190,10 +194,12 @@ def tab7 : List Nat := [0, 5, 5, 6, 5, 10, 14, 7, 5, 10, 9, 9, 13, 14, 10, 14, 5
 /-- The potential of a strip of width 7. -/
 def phi7 (b0 b1 b2 b3 b4 b5 b6 : Bool) : Nat := tab7.getD (64 * bit b0 + 32 * bit b1 + 16 * bit b2 + 8 * bit b3 + 4 * bit b4 + 2 * bit b5 + 1 * bit b6) 0
 
+set_option maxRecDepth 100000 in
 theorem phi7_le (b0 b1 b2 b3 b4 b5 b6 : Bool) : phi7 b0 b1 b2 b3 b4 b5 b6 ≤ 14 := by
   revert b0 b1 b2 b3 b4 b5 b6
   decide
 
+set_option maxRecDepth 100000 in
 /-- **One step for width 7**, whatever the cells `l` and `r` beside the strip. -/
 theorem step7 (l b0 b1 b2 b3 b4 b5 b6 r : Bool) :
     phi7 (rule l b0 b1) (rule b0 b1 b2) (rule b1 b2 b3) (rule b2 b3 b4) (rule b3 b4 b5) (rule b4 b5 b6) (rule b5 b6 r) + 14 ≤ phi7 b0 b1 b2 b3 b4 b5 b6 + 5 * (wh b0 + wh b1 + wh b2 + wh b3 + wh b4 + wh b5 + wh b6) := by
@@ -269,10 +275,12 @@ def tab8 : List Nat := [0, 5, 5, 9, 5, 10, 9, 9, 5, 10, 10, 13, 16, 16, 8, 13, 5
 /-- The potential of a strip of width 8. -/
 def phi8 (b0 b1 b2 b3 b4 b5 b6 b7 : Bool) : Nat := tab8.getD (128 * bit b0 + 64 * bit b1 + 32 * bit b2 + 16 * bit b3 + 8 * bit b4 + 4 * bit b5 + 2 * bit b6 + 1 * bit b7) 0
 
+set_option maxRecDepth 100000 in
 theorem phi8_le (b0 b1 b2 b3 b4 b5 b6 b7 : Bool) : phi8 b0 b1 b2 b3 b4 b5 b6 b7 ≤ 16 := by
   revert b0 b1 b2 b3 b4 b5 b6 b7
   decide
 
+set_option maxRecDepth 100000 in
 /-- **One step for width 8**, whatever the cells `l` and `r` beside the strip. -/
 theorem step8 (l b0 b1 b2 b3 b4 b5 b6 b7 r : Bool) :
     phi8 (rule l b0 b1) (rule b0 b1 b2) (rule b1 b2 b3) (rule b2 b3 b4) (rule b3 b4 b5) (rule b4 b5 b6) (rule b5 b6 b7) (rule b6 b7 r) + 16 ≤ phi8 b0 b1 b2 b3 b4 b5 b6 b7 + 5 * (wh b0 + wh b1 + wh b2 + wh b3 + wh b4 + wh b5 + wh b6 + wh b7) := by
@@ -353,10 +361,12 @@ def tab9 : List Nat := [0, 5, 5, 9, 5, 10, 15, 10, 5, 10, 10, 15, 17, 17, 10, 12
 /-- The potential of a strip of width 9. -/
 def phi9 (b0 b1 b2 b3 b4 b5 b6 b7 b8 : Bool) : Nat := tab9.getD (256 * bit b0 + 128 * bit b1 + 64 * bit b2 + 32 * bit b3 + 16 * bit b4 + 8 * bit b5 + 4 * bit b6 + 2 * bit b7 + 1 * bit b8) 0
 
+set_option maxRecDepth 100000 in
 theorem phi9_le (b0 b1 b2 b3 b4 b5 b6 b7 b8 : Bool) : phi9 b0 b1 b2 b3 b4 b5 b6 b7 b8 ≤ 18 := by
   revert b0 b1 b2 b3 b4 b5 b6 b7 b8
   decide
 
+set_option maxRecDepth 100000 in
 /-- **One step for width 9**, whatever the cells `l` and `r` beside the strip. -/
 theorem step9 (l b0 b1 b2 b3 b4 b5 b6 b7 b8 r : Bool) :
     phi9 (rule l b0 b1) (rule b0 b1 b2) (rule b1 b2 b3) (rule b2 b3 b4) (rule b3 b4 b5) (rule b4 b5 b6) (rule b5 b6 b7) (rule b6 b7 b8) (rule b7 b8 r) + 18 ≤ phi9 b0 b1 b2 b3 b4 b5 b6 b7 b8 + 5 * (wh b0 + wh b1 + wh b2 + wh b3 + wh b4 + wh b5 + wh b6 + wh b7 + wh b8) := by

@@ -530,12 +530,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   uniform in the period: for every $K \le 8$ there are windows of $K$ consecutive words that obey the step with weight
   bounded at every period $P \ge 5$ (larger $K$ not checked), while the single cell's period-16 words at depths 400 to
   53,200 (computed) keep at least 9 of every 48 cells black on three consecutive diagonals ([depth
-  register](negative-results/diagonals/depth-register-density.md)). Fixed-range telescoping certificates cannot prove
-  positive black density on the left-edge frame at the ranges computed: for range $k \le 6$ the best provable total on
-  diagonals $0..J-1$ stays bounded (about 3.9 to 26.5, floating-point LP values at the stated $J$), because their dual
-  pseudo-measures reproduce the true diagonals to a depth that grows with $k$ and then fade to white geometrically; a
-  density proof for black cells on the regular side must use nonlocal input ([edge
-  pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md)).
+  register](negative-results/diagonals/depth-register-density.md)). For telescoping certificates of range $k \le 6$ on
+  the left-edge frame, the best provable black count on diagonals $0..J-1$ levels off near 3.9 to 26.5 for $J$ up to 48
+  to 160 (computed, floating-point LP values), which suggests but does not prove that no fixed range proves a positive
+  black density: the dual pseudo-measures reproduce the true diagonals to a depth that grows with $k$ and then fade to
+  white ([edge pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md)).
 - **Transfer between columns.** *Proved in Lean, weak.* Left permutivity bounds the black cells of column $i - 1$
   by those of columns $i$ (twice) and $i + 1$, and likewise by their white cells, so upper densities satisfy
   $\bar d_{i-1} \le 2 \bar d_i + \bar d_{i+1}$, and rightward $\bar d_{i+1} \le \bar d_{i-1} + \bar d_i$

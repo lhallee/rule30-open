@@ -1,5 +1,5 @@
 ---
-title: Telescoping certificates of range k <= 6 on the left-edge frame: the best provable black count on diagonals 0..J-1 levels off near 3.9, 6.4, 8.7, 11.1, 24.2 and at least 26.49 for J up to 48 to 160 (computed, floating point), suggesting but not proving that no fixed range proves a positive black density; the optimal pseudo-measures reproduce the true diagonals to a depth that grows with k and then fade to white (ratio 0.618 for k = 1, rough fits 0.78 to 0.92 for k = 2..6)
+title: Telescoping certificates of range k <= 6 on the left-edge frame give a best provable black count on diagonals 0..J-1 that levels off near 3.9, 6.4, 8.7, 11.1, 24.2 and at least 26.49 for J up to 48 to 160 (computed, floating point), suggesting but not proving that no fixed range proves a positive black density; the optimal pseudo-measures reproduce the true diagonals to a depth that grows with k and then fade to white (ratio 0.618 for k = 1, rough fits 0.78 to 0.92 for k = 2..6)
 category: diagonals
 problems: [2]
 status: negative
@@ -7,7 +7,7 @@ kind: barrier
 evidence: [computations/edge_pseudo_measures.py]
 ---
 
-# Telescoping certificates of range k <= 6 on the left-edge frame: the best provable black count on diagonals 0..J-1 levels off near 3.9, 6.4, 8.7, 11.1, 24.2 and at least 26.49 for J up to 48 to 160 (computed, floating point), suggesting but not proving that no fixed range proves a positive black density; the optimal pseudo-measures reproduce the true diagonals to a depth that grows with k and then fade to white (ratio 0.618 for k = 1, rough fits 0.78 to 0.92 for k = 2..6)
+# Telescoping certificates of range k <= 6 on the left-edge frame give a best provable black count on diagonals 0..J-1 that levels off near 3.9, 6.4, 8.7, 11.1, 24.2 and at least 26.49 for J up to 48 to 160 (computed, floating point), suggesting but not proving that no fixed range proves a positive black density; the optimal pseudo-measures reproduce the true diagonals to a depth that grows with k and then fade to white (ratio 0.618 for k = 1, rough fits 0.78 to 0.92 for k = 2..6)
 
 **Question.** In the left-edge frame the row is $R = (R_0, R_1, \dots)$ with $R_0 = 1$ and
 $R'_d = R_{d-2} \oplus (R_{d-1} \lor R_d)$ ($R_{-1} = R_{-2} = 0$). The boundary rules out the white row, so a local
