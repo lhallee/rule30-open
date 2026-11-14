@@ -6,6 +6,7 @@ public import Rule30Open.Foundations.RightHalf
 public import Rule30Open.Foundations.RowWhiteDensity
 public import Rule30Open.Foundations.PairWhiteDensity
 public import Rule30Open.Foundations.StripWhiteDensity
+public import Rule30Open.Foundations.StripWhiteSharp
 public import Rule30Open.Seeds.SeedExtensions
 public import Rule30Open.Columns.AdjacentColumns
 public import Rule30Open.Columns.LongRuns

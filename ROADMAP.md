@@ -34,7 +34,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 2 | Invariant measures and random rows | closed | exact for random rows only |
 | 2 | Conservation laws | closed | none over four steps |
 | 2 | Bounds on runs | open | runs at most linear in their start time; slope 3/13 for black runs if the onset edge gains 2/3 per step (Lean) |
-| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and in every strip of at least five columns (sharp on paper), 1/3 for three adjacent columns (sharp) and 5/18 for two, $(2J - 2)/5$ of the first $J$ right diagonals over a period; nothing for the center column alone or for black cells |
+| 2 | Density in rows and strips | proved in Lean for white cells | white density at least 2/5 in the single cell's triangle and in every strip of at least five columns (sharp in Lean, [StripWhiteSharp](Rule30Open/Foundations/StripWhiteSharp.md)), 1/3 for three adjacent columns (sharp) and 5/18 for two, $(2J - 2)/5$ of the first $J$ right diagonals over a period; nothing for the center column alone or for black cells |
 | 2 | Statistics | no signal | the column passes every test tried |
 | 3 | An upper bound | proved in Lean | a one-tape machine of the kit's model computes $c(n)$ in $2n^2 + 2n \log_2 n + O(n)$ steps, so Problem 3 is the question whether the exponent 2 can fall to 1 |
 | 3 | A lower bound | closed with present methods | it amounts to an exponential lower bound for one explicit function |
@@ -521,7 +521,8 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   center column is at least 5/18 or 1/3 white for the single cell. In every orbit a strip of $J \ge 5$ adjacent
   columns has at least $2J(n - 1)/5$ white cells in its first $n$ rows (Lean,
   [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md), from widths 5 to 9 by splitting a wider strip),
-  and the orbit of $(11001)^\infty$ attains 2/5 (on paper, checked for $J \le 11$). The sharp
+  and the orbit of $(11001)^\infty$ attains 2/5 for every $J$ (Lean,
+  [StripWhiteSharp](Rule30Open/Foundations/StripWhiteSharp.md)). The sharp
   lower white densities of $J$ adjacent columns over all orbits are: $J = 1$: 0; $J = 2$: open, in $[5/18, 1/3]$;
   $J = 3$: 1/3; $J = 4$: open, in $[11/28, 2/5]$ (computed); $J \ge 5$: 2/5. So a block of at least five columns
   around the center column is at least 2/5 white for the single cell, and no argument valid for every orbit gives
@@ -874,7 +875,8 @@ In order of the assessment above.
      ([EdgePeriods](Rule30Open/Frames/EdgePeriods.md) and those it imports) and the LightReturn modules
      ([LightReturnRows](Rule30Open/Frames/LightReturnRows.md),
      [LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)),
-     [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md), [EdgeTree](Rule30Open/Frames/EdgeTree.md),
+     [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md),
+     [StripWhiteSharp](Rule30Open/Foundations/StripWhiteSharp.md), [EdgeTree](Rule30Open/Frames/EdgeTree.md),
      [EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md), [RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)
      and [RightEdgeBlack](Rule30Open/Frames/RightEdgeBlack.md) are machine-checked, but their prose has had
      at most one review pass, and [edge pseudo-measures](negative-results/diagonals/edge-pseudo-measures.md) rests on
@@ -882,7 +884,9 @@ In order of the assessment above.
    - *Open questions on density, the right edge and source energy.* The sharp lower white densities of two and four
      adjacent columns, in $[5/18, 1/3]$ and $[11/28, 2/5]$ ([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md),
      [StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md)); the classification of the
-     right-edge map's periodic points for periods divisible by 64 in Lean, and for every period at all, which is the
+     right-edge map's periodic points for periods divisible by 64 in Lean (a checker on 64-bit masks evaluated in
+     the kernel in about 26 s in a scratch run outside the repository; what is missing for period 64 is the soundness
+     proof for that encoding), and for every period at all, which is the
      finiteness of every tree $T_L$ ([light-return words](findings/frames/light-return-words.md)); a bound on the
      longest black run $M_n$ of the rows, which would give black cells positive density in the triangle ([black density
      from row runs](negative-results/structure/black-density-from-row-runs.md)); and a Lean proof that source energy

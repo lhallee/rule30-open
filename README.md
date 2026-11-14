@@ -5,7 +5,7 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 219 Lean modules with 1057
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 220 Lean modules with 1059
 headline theorems, 78 findings and 93 negative results.
 
 ## The problems
@@ -80,7 +80,8 @@ Proved in Lean: white cells have density at least 2/5 in the single cell's trian
 columns of every orbit has lower white density at least $(2J - 2)/(5J)$ ([RowWhiteDensity](Rule30Open/Foundations/RowWhiteDensity.md)).
 Three adjacent columns of every orbit are at least 1/3 white, sharp, and two at least 5/18
 ([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)), and every strip of at least five adjacent columns of
-every orbit at least 2/5 white ([StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md); sharp on paper), while the sharp constants for two and four columns are open, in
+every orbit at least 2/5 white ([StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md); sharp in Lean,
+[StripWhiteSharp](Rule30Open/Foundations/StripWhiteSharp.md)), while the sharp constants for two and four columns are open, in
 $[5/18, 1/3]$ and $[11/28, 2/5]$ (the bound 11/28 computed). Over a period at least $(2J - 2)/5$ of the single cell's first $J$ right diagonals
 are white on average ([RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)), and the doubling diagonals force black density
 at least $(2 + e_N)/(2(N + 1))$ on the first $N + 1$ over their period, with $e_N$ the period exponent
