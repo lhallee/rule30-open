@@ -27,6 +27,6 @@ This repository works on the three Rule 30 Prize problems in the open. Read [REA
 - **Tests are fast and comprehensive.** `python -m pytest` runs on the machine, on a CPU, not in continuous
   integration, and the whole suite must take under a minute: test each computation on small cases, and leave the large
   runs to the reproduce commands of its entry. The suite took 38 to 49 seconds serially on an idle machine with 737 tests,
-  and 62 s under load with 819 tests; [tests/README.md](tests/README.md) lists the slowest tests and what is left to cut.
+  and 47 s with 824 tests; [tests/README.md](tests/README.md) lists the slowest tests and what is left to cut.
 - **Regenerate the catalog.** After editing any entry run `python scripts/catalog.py write`, then `check`.
 - **Write plainly.** No em dashes, American English, one term per concept.
