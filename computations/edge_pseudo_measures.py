@@ -6,14 +6,15 @@ the 2^(k+2) words of the row R on positions d-2, ..., d+k-1, with
   (shift)       mu_d and mu_{d+1} have the same marginal on positions d-1, ..., d+k-1,
   (stationary)  under mu_d, the image word R'[d..d+k-1] has the same law as R[d..d+k-1],
 where R'_j = R_{j-2} XOR (R_{j-1} OR R_j). The empirical measure of every periodic orbit is one. The minimum of
-sum_d mu_d[R_d = colour] over pseudo-measures equals, by linear programming duality, the best lower bound on the
-time-averaged number of cells of that colour on diagonals 0..J-1 that a telescoping certificate (a spatial potential
+sum_d mu_d[R_d = color] over pseudo-measures equals, by linear programming duality, the best lower bound on the
+time-averaged number of cells of that color on diagonals 0..J-1 that a telescoping certificate (a spatial potential
 on k+1 adjacent cells that may depend on d, plus a temporal potential on k adjacent cells) can prove.
 """
 from __future__ import annotations
 
 from fractions import Fraction
 from itertools import product
+import sys
 
 import numpy as np
 from scipy.optimize import linprog
@@ -37,19 +38,19 @@ def index(bits: np.ndarray) -> np.ndarray:
     return (bits * (1 << np.arange(n - 1, -1, -1))).sum(axis=1)  # shape (m,)
 
 
-def left_edge_bound(J: int, k: int, colour: int, stationary: bool = True) -> float:
-    """Minimum over range-k pseudo-measures on diagonals 0..J-1 of the expected number of cells of `colour`."""
-    return left_edge_profile(J, k, colour, stationary).sum()
+def left_edge_bound(J: int, k: int, color: int, stationary: bool = True) -> float:
+    """Minimum over range-k pseudo-measures on diagonals 0..J-1 of the expected number of cells of `color`."""
+    return left_edge_profile(J, k, color, stationary).sum()
 
 
-def left_edge_profile(J: int, k: int, colour: int, stationary: bool = True) -> np.ndarray:
-    """mu_d[R_d = colour] for an optimal range-k pseudo-measure on diagonals 0..J-1; shape (J,)."""
+def left_edge_profile(J: int, k: int, color: int, stationary: bool = True) -> np.ndarray:
+    """mu_d[R_d = color] for an optimal range-k pseudo-measure on diagonals 0..J-1; shape (J,)."""
     W = words(k + 2)  # shape (2^(k+2), k+2)
-    x = left_edge_solution(J, k, colour, stationary)  # shape (J, 2^(k+2))
-    return (x * (W[:, 2] == colour)).sum(axis=1)  # shape (J,)
+    x = left_edge_solution(J, k, color, stationary)  # shape (J, 2^(k+2))
+    return (x * (W[:, 2] == color)).sum(axis=1)  # shape (J,)
 
 
-def left_edge_solution(J: int, k: int, colour: int, stationary: bool = True, white_end: bool = False) -> np.ndarray:
+def left_edge_solution(J: int, k: int, color: int, stationary: bool = True, white_end: bool = False) -> np.ndarray:
     """An optimal range-k pseudo-measure on diagonals 0..J-1 as an array; shape (J, 2^(k+2))."""
     W = words(k + 2)  # shape (2^(k+2), k+2); column j is position d-2+j
     nw = W.shape[0]
@@ -99,7 +100,7 @@ def left_edge_solution(J: int, k: int, colour: int, stationary: bool = True, whi
                 A[t, j] = v
     cost = np.zeros(nvar)  # shape (nvar,)
     for d in range(J):
-        cost[d * nw: (d + 1) * nw] = (W[:, 2] == colour)
+        cost[d * nw: (d + 1) * nw] = (W[:, 2] == color)
     res = linprog(cost, A_eq=A.tocsr(), b_eq=np.array(rhs), bounds=list(zip(lo, hi)), method="highs")
     assert res.status == 0, res.message
     return res.x.reshape(J, nw)  # shape (J, 2^(k+2))
@@ -132,15 +133,6 @@ def check_pair_potential() -> Fraction:
         y = a ^ (b | c)  # image cell above b
         assert 2 * y + psi[(b, c)] <= 3 * (1 - a) + psi[(a, b)]
     return Fraction(2, 5)
-
-
-if __name__ == "__main__":
-    for k in range(1, 5):
-        print("ordinary frame, white in image row, k =", k, ":", round(ordinary_white_bound(k), 6))
-    for colour in (1, 0):
-        for k in (1, 2, 3, 4):
-            vals = [left_edge_bound(J, k, colour) for J in (4, 8, 16, 24, 32)]
-            print("left edge colour", colour, "k", k, [round(v, 4) for v in vals], flush=True)
 
 
 def white_end_feasible(J: int, k: int) -> bool:
@@ -213,3 +205,59 @@ def black_mass(mu: list[list[Fraction]], k: int) -> Fraction:
     """Total of mu_d[R_d = 1] over d; exact."""
     W = list(product((0, 1), repeat=k + 2))
     return sum((v for row in mu for v, w in zip(row, W) if w[2] == 1), Fraction(0))
+
+
+def cycle_density(J: int, n: int) -> np.ndarray:
+    """Black density of diagonals 0..J-1 on the final cycle of the single cell, truncated to n >= J diagonals; shape (J,)."""
+    cyc = np.array(cycle_rows(n))  # shape (period, n)
+    return cyc[:, :J].mean(axis=0)  # shape (J,)
+
+
+def matching_depth(J: int, k: int, prof: np.ndarray | None = None, tol: float = 1e-6) -> int:
+    """Last diagonal d such that the optimal black profile equals the single cell's cycle density on diagonals 0..d."""
+    if prof is None:
+        prof = left_edge_profile(J, k, 1)  # shape (J,)
+    true = cycle_density(J, J + k + 2)  # shape (J,)
+    bad = np.nonzero(np.abs(prof - true) > tol)[0]
+    return int(bad[0]) - 1 if len(bad) else J - 1
+
+
+def tail_ratio(J: int, k: int, prof: np.ndarray | None = None) -> float:
+    """Least-squares ratio of mu_d[R_d = 1] over diagonals where it lies in (1e-6, 0.03); a rough fit."""
+    if prof is None:
+        prof = left_edge_profile(J, k, 1)  # shape (J,)
+    d = np.nonzero((prof > 1e-6) & (prof < 0.03))[0]  # shape (m,)
+    if len(d) < 2:
+        return float("nan")
+    slope = np.polyfit(d, np.log(prof[d]), 1)[0]
+    return float(np.exp(slope))
+
+
+TABLE = [(1, 48), (2, 96), (3, 128), (4, 160), (5, 96), (5, 128), (5, 160), (6, 128)]
+
+
+def successive_ratios(J: int, k: int, ds: range) -> list[float]:
+    """mu_{d+1}[R = 1] / mu_d[R = 1] for d in ds, for the optimal black profile."""
+    prof = left_edge_profile(J, k, 1)  # shape (J,)
+    return [float(prof[d + 1] / prof[d]) for d in ds]
+
+
+def table_rows(rows: list[tuple[int, int]] = TABLE) -> list[tuple[int, int, float, int, float]]:
+    """(k, J, B_k(J), matching depth, tail ratio) for each table row; the large rows take up to about a minute each."""
+    out: list[tuple[int, int, float, int, float]] = []
+    for k, J in rows:
+        prof = left_edge_profile(J, k, 1)  # shape (J,)
+        out.append((k, J, float(prof.sum()), matching_depth(J, k, prof), tail_ratio(J, k, prof)))
+        print(out[-1], flush=True)
+    return out
+
+
+if __name__ == "__main__":
+    for k in range(1, 5):
+        print("ordinary frame, white in image row, k =", k, ":", round(ordinary_white_bound(k), 6))
+    for color in (1, 0):
+        for k in (1, 2, 3, 4):
+            vals = [left_edge_bound(J, k, color) for J in (4, 8, 16, 24, 32)]
+            print("left edge color", color, "k", k, [round(v, 4) for v in vals], flush=True)
+    if "--table" in sys.argv:
+        table_rows()

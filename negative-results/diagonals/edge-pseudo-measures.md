@@ -30,7 +30,7 @@ over *range-$k$ pseudo-measures*: probability vectors $\mu_d$ on the words of $R
 cells fixed, $\mu_d$ and $\mu_{d+1}$ agreeing on their overlap $[d-1, d+k)$, and the image word $R'[d, d+k)$ having
 the same law as $R[d, d+k)$ under $\mu_d$. The empirical measure of every periodic orbit is one, so
 $B_k(J)$ is a valid lower bound and is the best a range-$k$ certificate gives. $B_k(J)$ is nondecreasing in $J$
-(restrict a pseudo-measure to fewer diagonals). The same program with the white colour gives the white bound.
+(restrict a pseudo-measure to fewer diagonals). The same program with the white color gives the white bound.
 
 **Validation.** In the ordinary frame (one translation-invariant $\mu$, with stationarity) the program for white cells
 returns exactly $0.4$ for every $k$ from 1 to 5, the bound the pair potential proves; `check_pair_potential` re-verifies
