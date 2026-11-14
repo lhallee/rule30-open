@@ -25,7 +25,7 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 | 1 | Least period four through the right half's lock | lead | every right half of up to 20 cells enters the kit's family by computation, up to 14 cells in Lean; open for the rest |
 | 1 | Least period four through the left half | open | no left half of up to 80 cells meets the kit's `C3`; depth 88 in Lean |
 | 1 | Every period through the left half | open | one statement per block (`LeftLatch`); no left half of up to 37 to 100 cells meets it at the lock-free periods |
-| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean) |
+| 1 | Period two through the held column | open, hard | a map with the shape of a Collatz problem; every integer below $2^{63}$ fails; the condition is a full 2-shift (Lean), whose rational points are preperiodic when the tail is a stripe (the kit) and in every case tried; on the ether no window at the top of a defect bounds it, with or without the condition (Lean, in part); every right half of up to 20 cells enters the kit's gap trap, where the kit's open `Q01Gap` decides it, or the kit's ether family or a new lock of period seven, which exclude it outright (the lock in Lean); BWH alone implies the kit's `Q01`, and one left-only statement `Q01Right(W)` excludes period two with no entry hypothesis (Lean); the map's iterates are 2-adic similarities on residue classes but affine on none, so the 3x+1 tools do not apply (Lean) |
 | 1 | Least period three | open | $001$ through entry into one of four traps or into some trap, since entry into the kit's alone, or into one of any three, is false (Lean), $011$ through the left half |
 | 1 | 2-adic frames and exact reformulations | closed as tried | every form stops at a statement about the chaotic region |
 | 1 | Equal center columns and the left edge | open | the kit's open `EdgeObservable` (finite rows with equal center columns have equal left edges) gives Problem 1; the kit's stripe relation at time 0 or 1 has exactly $2^{A+B} + 3 \cdot 2^{A-1}$ classes on the box $[-A, B]$ and never mixes left parts, so a box has at most that many center columns (Lean); on every box of up to 21 cells it has exactly that many (computed), and that count on every box $[-A, A]$ would give Problem 1 |
@@ -204,8 +204,14 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   row, meets the check at each 1 with a cell right of the column that latches
   ([LeftLatch](Rule30Open/Columns/LeftLatch.md)). It reaches the periods 3, 5, 6, 7 and 9 that no window lock of up to
   20 cells reaches, and for each of their 91 blocks no left half of at most 37 to 100 cells meets it ([every
-  block](findings/columns/left-half-every-block.md)). *Assessment:* each statement is of the kind of period two and of
-  `C3`; past the half's length the readings fail at the rate of fair coins, so computation settles bounded cases only,
+  block](findings/columns/left-half-every-block.md)). Down to depth 53,207, by
+  [DrivenSkeleton](Rule30Open/Diagonals/DrivenSkeleton.md), the settled left region keeps of the center column only one
+  time shift, fixed by a finite prefix, so an inequality between the onset $T$ and the period $P$, or a condition on
+  $P$, cannot come from that region; constraints have to come from the transients next to the center, which
+  `LeftLatch`'s check reads, or from the branch choices of [SkeletonTree](Rule30Open/Diagonals/SkeletonTree.md) past
+  depth 53,207, which are not examined ([the settled region and the
+  driver](negative-results/dynamics/settled-region-driver.md)). *Assessment:* each statement is of the kind of period
+  two and of `C3`; past the half's length the readings fail at the rate of fair coins, so computation settles bounded cases only,
   and only the black block is proved.
 - **Period two through the held column.** *Open, hard.* It reduces to an integer map with the shape of a Collatz problem
   ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)); every integer below $2^{52}$ fails ([left half
@@ -290,6 +296,13 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   a bound on how long a row of radius $A$ alternates would itself be the period-two theorem; the longest such run is 36
   steps for $A \le 26$, with no law like Condrey's $A + 2$ ([the carry-over](findings/period-two/condrey-carryover.md),
   [where it stops](negative-results/period-two/condrey-mechanism.md)).
+  Read as a 3x+1 map, the $n$th iterate $H^n$ of the held map sends each class modulo $2^n$ onto every residue,
+  multiplying 2-adic distances by exactly $2^n$ ([HeldClasses](Rule30Open/PeriodTwo/HeldClasses.md)), and the column map is an isometric conjugacy to the shift
+  (on paper, from triangularity), but no iterate of $H$ is affine on any residue class
+  ([HeldSimilarity](Rule30Open/PeriodTwo/HeldSimilarity.md)), both in Lean. So the affine tools of the 3x+1 problem
+  (the cycle equation, Bernstein's series, cycle bounds) have nothing to act on, and density arguments give only the
+  exact count $2^{N - \lceil T/2 \rceil}$ ([the 3x+1 technology](negative-results/period-two/collatz-technology.md),
+  [held similarity](findings/period-two/held-similarity.md)).
 - **Least period three.** *Open.* The kit reduces it to statements about the left half and closes the ether-and-wall
   route for period three. For $001$ its period-21 trap `t001` remains, beside a second: every right half white on its
   first 1,317 cells enters `t001`, whatever lies beyond ([HighThree](Rule30Open/Columns/HighThree.md)), and every half
@@ -357,6 +370,9 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   Lean (12 is the least such period, by the kit's main branch), so measures invariant under the shift and the rule with
   positive entropy need not be uniform and a rigidity theorem needs an ergodicity hypothesis along that direction
   ([LightLikeEntropy](Rule30Open/RandomRows/LightLikeEntropy.md)).
+  The rows that come back after 12, 15 or 17 steps all have black cells arbitrarily far right, except the white row
+  and the rain rows, since the right-edge map has no periodic point of period not divisible by 128 but 0 and the rain
+  pair $\pm 1/3$ with its shifts ([edge periodic points](findings/frames/edge-periodic-points.md)).
   With it the alternative holds: a measure invariant under the shift and the rule and ergodic for the light-like map
   is uniform or of zero entropy, and the entropy of a cell given the cells to its right can only grow rightward, so
   Problem 1 holds if one limit point of the single cell's averages keeps that entropy positive far left of the
@@ -375,7 +391,11 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
 - **Bounds on runs.** *Open.* Runs of the center column are at most linear in their start time, so each color occurs
   at least about $\log n$ times before $n$ (the kit); a black-run slope of $3/5$ and $\log\log$ margins are in the
   kit's main branch since October 30, after the commit this repository is pinned at ([the kit's pull
-  requests](literature/kit-pull-requests.md#runs-of-the-center-column)). Numerically the longest runs are logarithmic.
+  requests](literature/kit-pull-requests.md#runs-of-the-center-column)). The kit main branch's hypothesis
+  `SourceEnergySmallO` gives, on paper, density 1/2 on every residue class mod $2^k$ and mod $2^k p$ ($p$ an odd
+  prime), and hence Problem 1 as well as Problem 2 ([source energy](findings/structure/source-energy-dyadic.md)). So
+  the source-energy route contains Problem 1: a proof of the hypothesis must exclude every eventual period. The
+  hypothesis alone does not give density 1/2 mod 9. Numerically the longest runs are logarithmic.
   Every configuration whose left half starts white has a left half that is a function of the center column alone, and
   over every possible center column the left half allows, from time $t \le 175$, a black run of at most 0.13t to 0.18t
   and a white run of at most 0.15t to 0.28t (exact maxima over all drivers); a proof of such slopes would cut the kit's
@@ -415,6 +435,14 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   [the skeleton tree](findings/diagonals/skeleton-tree.md)); so over all drivers the slope question is the single cell's
   question of when its left diagonals settle, taken over the branches of that tree, and the forced-word, diagonal and
   window-rank routes stop there ([driven run slopes](negative-results/diagonals/driven-run-slopes.md)).
+  In the left-edge frame, Lean ([EternalSkeleton](Rule30Open/Diagonals/EternalSkeleton.md)) proves that every eternal
+  Rule 30 history has purely periodic diagonals with period dividing $2^d$ and a past fixed by its present, that every
+  row converges to exactly one eternal orbit (its shadow), and that the single cell lies on no eternal orbit. On paper
+  ([eternal shadow](findings/diagonals/eternal-shadow.md)), the eternal rows with a black frame cell form a compact set
+  on which the step is an isometry whose orbit closures are finite cycles or the 2-adic odometer. An exhaustive
+  computation shows the first 22 diagonals form one cycle, the single cell's, and the skeleton-tree results suggest, as
+  an inference only, that a second cycle appears at 53,209 diagonals. The center column lies in the transient, so this
+  does not reach Problem 2 directly.
   In Lean, conditionally: if the left diagonals $8 \le j \le J$ repeat with period 16 from time $3j/2$, black runs
   starting at $a$ have length at most $3a/13 + 185$ and white blocks reach at most $a/3 + 34$ cells left, for $a$ up to
   about $3J/2$ ([settled runs](findings/diagonals/settled-runs.md), [SettledRuns](Rule30Open/Diagonals/SettledRuns.md)).
@@ -519,7 +547,12 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   threshold is out of reach. The claimed one-tape simulation in space $T^{2/5}$ (OpenAI's family 137, unrefereed) would
   lower the threshold to $n^{2/5}$ up to logarithms.
 - **A shortcut.** *No signal.* Automata, linear recurrences, learned predictors and exact structure searches find none
-  ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)).
+  ([the complexity category](CATALOG.md#complexity), [learned models](CATALOG.md#learned-models)). Rule 30's
+  $k$-block operation is never a quasigroup in the staggered block encoding, so Moore's quasigroup theorems do not apply
+  there, and its multiplication monoid is solvable for every $k$ (proved on paper; its units are the level-$k$ image of
+  the kit's automaton group 2369). The simple divisors of the monoid do not track prediction cost: Rule 30 shares $C_2$
+  and $C_3$ with the linear Rule 150 and the P-complete Rule 110 on the computed range ($k \le 4$ and $k \le 5$), while
+  Rule 90 has only $C_2$ for $k \le 5$ ([block algebra](negative-results/complexity/block-algebra-solvability.md)).
 - **Restricted models.** *Open.* No automaton with fewer than 131,070 states computes the column from the digits of $t$
   on the range searched ([automaton bounds](negative-results/complexity/automaton-lower-bounds.md)), the column's series
   satisfies no Mahler equation over GF(2)(x) of small size, the column as a 2-adic or real number is a root of no integer
@@ -536,6 +569,15 @@ each take an open hypothesis (mortality, an orbit separator, RW, or BWH with Sma
   argument without both the light cone and the product term ([the routes](negative-results/complexity/right-edge-cycle-routes.md));
   the transducers of the powers of the right-edge step
   grow at every squaring for $k \le 4$ ([automaton-group sections](negative-results/complexity/automaton-group-sections.md)).
+  Apart from 0 and the shifted rain pair $2^m(\pm 1/3)$, the right-edge map $\Phi(y) = y$ xor ($2y$ or $4y$) has no
+  2-adic periodic point of period not divisible by 128: a column-graph reduction plus an exact computation for
+  $L \le 64$, with period 4 in Lean ([EdgePeriodFour](Rule30Open/Frames/EdgePeriodFour.md), [edge periodic
+  points](findings/frames/edge-periodic-points.md)). Every periodic point has a power-of-two least period, and an odd
+  period forces the white row, in Lean on the kit's own map ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md)).
+  The escape depth from the rain pair is $T_k = 0, 1, 3, 4, 14, 103$ for $k \le 6$, so the seed-uniform bound
+  $J_k \le T_k + 2$ is loose from $k = 5$ on and is a dead end for $L_n / n$ ([seed-uniform escape
+  depth](negative-results/complexity/seed-uniform-escape-depth.md)). Whether the rain pair is the only periodic point
+  at every period is open (conjecture).
   In parity models the center is separated from the linear rules for every $t$, in Lean: a function of odd weight has
   Walsh coefficients 2 mod 4 and an XOR lift that is its own inverse over GF(2), so with the kit's top monomial $c_t$ has
   at least $2^{2t-1}$ nonzero Walsh coefficients and its XOR lift has GF(2) rank $2^{2t-1}$, where Rules 90 and 150 have
@@ -754,10 +796,14 @@ In order of the assessment above.
      sandwich](findings/complexity/unary-sandwich.md) with [PairReading](Rule30Open/Complexity/PairReading.md); and
      [LetterWords](Rule30Open/Complexity/LetterWords.md) with [the exponential
      width](negative-results/complexity/exponential-left-width.md) and [the rank
-     ceiling](negative-results/complexity/left-cut-rank-ceiling.md).
+     ceiling](negative-results/complexity/left-cut-rank-ceiling.md). The sources that [block
+     algebra](negative-results/complexity/block-algebra-solvability.md) cites, Moore (1997, 1998) and Barrington (1989)
+     and Barrington and Therien (1988), are not yet in the [literature](literature/complexity.md) and have not been
+     checked against the papers.
    - *The kit's main branch.* Kit main (commit 2fdb1bb, November 9) is far past the pin, with modules that bear on
      entries here: `Rule30BlackTimeGrowth` (black center cells grow at least like $\log_{8/5}$, from a white-run
-     erosion bound), `Rule30SourceEnergy` (Problem 2 from one autocorrelation estimate at power-of-two lags),
+     erosion bound), `Rule30SourceEnergy` (Problem 2 from one autocorrelation estimate at power-of-two lags; its
+     hypothesis also gives Problem 1, [source energy](findings/structure/source-energy-dyadic.md)),
      `Rule30BlackPhaseEscape` (`UBE`, the left half alone against every periodic word), `Rule30PeriodTwoWidth13`,
      `Rule30PeriodTwoMass`, `Rule30PeriodTwoLadder`, `Rule30PeriodTwoNoFloor`, `Rule30ConeCube`,
      `Rule30RightProfiles` and `Rule30ClosingLaw`. Next: read every module past the pin, fix the credits of the

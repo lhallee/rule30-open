@@ -103,6 +103,8 @@ def skeleton_weights(depth: int, steps: int, P: int, progress: bool = True) -> n
     dg = stream(depth, steps, period=64, window=128, progress=progress)
     if int(dg.onset.max()) > steps - 128:
         raise ValueError("some diagonal has not settled before the window")
+    if progress:
+        print(f"every onset of diagonals 0..{depth} is at most {int(dg.onset.max())}")
     return weight(words_from_tail(dg.tail, P)).astype(np.int64)  # (depth+1,)
 
 

@@ -182,16 +182,20 @@ def main() -> None:
     Wt = np.cumsum(tc.W)  # (n,)
     Tsum = np.cumsum(tc.T)  # (n,)
     Mmax = np.maximum.accumulate(tc.M)  # (n,)
-    worst_pair = min(int(3 * tc.W[s - 1] + 6 - 2 * tc.B[s]) for s in range(1, n))
+    slack = 3 * tc.W[:-1] + 6 - 2 * tc.B[1:]  # (n - 1,) slack of row_pair at s = 0..n-2
+    # M_n over the rows 0..n-2, checked at every n from 2 to the requested n
+    bound_ok = all(int(A[t]) * (int(Mmax[t - 1]) + 3) >= 2 * (t + 1) ** 2 for t in range(1, n))
     print(f"rows 0..{n - 1}")
     for t in sorted({t for t in (99, 299, 999, 1999, n - 1) if t < n}):
         if True:
             m = t + 1
             print(f"n={m}: black {A[t] / m**2:.5f}, white {Wt[t] / m**2:.5f}, white bound 2(n-1)(n-2)/5 = "
-                  f"{2 * (m - 1) * (m - 2) / 5 / m**2:.5f}, longest row black run {Mmax[t]}, "
+                  f"{2 * (m - 1) * (m - 2) / 5 / m**2:.5f}, longest black run of rows < n-1 {Mmax[t - 1]}, "
                   f"sum T over runs of rows < n-1 {Tsum[t - 1]} >= white {Wt[t]}: {Tsum[t - 1] >= Wt[t]}, "
-                  f"2n^2/(M+3) = {2 * m * m / (Mmax[t] + 3):.0f} <= black {A[t]}")
-    print(f"least 3 W(s-1) + 6 - 2 B(s) over 1 <= s < n: {worst_pair}")
+                  f"2n^2/(M+3) = {2 * m * m / (Mmax[t - 1] + 3):.0f} <= black {A[t]}")
+    print(f"A(n)(M_n + 3) >= 2n^2 for every 2 <= n <= {n}: {bound_ok}")
+    print(f"slack 3 W(s) + 6 - 2 B(s+1) is 0 at s = {[int(s) for s in np.flatnonzero(slack == 0)]}, "
+          f"least over 3 <= s <= {n - 2}: {int(slack[3:].min())}")
     for J in (1, 2, 3, 4, 5, 6):
         print(f"J={J}: strip slack {strip_slack(J)}, least periodic strip white fraction (P <= 12) "
               f"{periodic_strip_min(J, 12)}")

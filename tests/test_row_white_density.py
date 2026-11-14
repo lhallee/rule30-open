@@ -62,7 +62,8 @@ def test_triangle_counts_and_inequalities() -> None:
         Wt, A = int(tc.W[:m].sum()), int(tc.B[:m].sum())
         assert 5 * Wt >= 2 * (m - 1) * (m - 2)
         assert Wt <= int(tc.T[:max(m - 1, 0)].sum())
-        assert A * (int(tc.M[:m].max()) + 3) >= 2 * m * m
+        if m >= 2:  # M_n is the longest black run of the rows 0..n-2
+            assert A * (int(tc.M[:m - 1].max()) + 3) >= 2 * m * m
 
 
 def test_chain_classification() -> None:

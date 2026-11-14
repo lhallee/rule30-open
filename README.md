@@ -43,7 +43,8 @@ Proved in Lean:
   ([WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)), and one statement about finite left halves,
   `Q01Right(W)`, excludes period two whatever the right half does
   ([ChannelLanguage](Rule30Open/PeriodTwo/ChannelLanguage.md)). Period two also reduces to one integer map
-  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)).
+  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)), whose iterates are affine on no residue class, so the tools of
+  the 3x+1 problem do not apply ([HeldSimilarity](Rule30Open/PeriodTwo/HeldSimilarity.md)).
 - **Period four.** No finite row whose right half has at most 14 cells has a center repeating a word of period four,
   and no left half within depth 88 keeps the kit's left-half pattern for one.
 - **Every period** comes down to one statement about the left half for each block
@@ -68,7 +69,8 @@ under each period-four word ([the absorption census](findings/columns/absorption
 cells meets the kit's left-half statement for one ([the left-half statements](findings/columns/left-half-c3.md)).
 
 Where it stops: `Q01` and `Q01Right`, entry into the traps, and attraction into the period-four family are each open,
-and in every computation the cells they depend on behave like fair coins.
+and in every computation the cells they depend on behave like fair coins. The kit's source-energy hypothesis for
+Problem 2 would also give Problem 1, on paper ([source energy](findings/structure/source-energy-dyadic.md)).
 
 ### Problem 2: does each color occur equally often?
 
@@ -105,7 +107,10 @@ Proved in Lean:
   ([ParityLift](Rule30Open/Complexity/ParityLift.md)); the fewest cells that fix it are at most
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
-  cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+  cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). Every periodic point of the
+  right-edge map has a power-of-two least period, and by computation to period 64 the only ones are 0 and the rain
+  pair $\pm 1/3$ with its shifts ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md), [edge periodic
+  points](findings/frames/edge-periodic-points.md)).
 - **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
   with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
   1 and the first rung of Problem 3 are the same statements for the transform

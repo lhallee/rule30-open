@@ -21,6 +21,9 @@ c(t) = t mod 2.
 * `cycle_average`: the limit of P_n(theta) / n for theta = a / q, the mean of e(2^j theta) over the eventual cycle
   of the doubling map; it is 1 for q a power of two, a nonzero Gauss period mean for q = 2^k p with p an odd prime, and
   0 for q = 9.
+* `gauss_period_vanishes`: whether eta_q(a) = 0, decided exactly by reduction modulo the cyclotomic polynomial.
+* `kernel_criterion`: some p^2 | q with 2^ord_(q/p)(2) != 1 mod q.
+* `vanishing_moduli`: the odd q <= limit with eta_q = 0 (all units a checked).
 * `planted_nine`: independent cells with P(black at t) = (1 - delta cos(2 pi t / 9)) / 2, a sequence that satisfies the
   kit's hypothesis almost surely and is biased on the classes mod 9.
 
@@ -150,6 +153,86 @@ def planted_nine(length: int, delta: float, seed: int) -> np.ndarray:
     return (rng.random(length) < (1 - mean) / 2).astype(np.uint8)  # (length,)
 
 
+def multiplicative_order(base: int, modulus: int) -> int:
+    """The least m >= 1 with base^m = 1 mod modulus (modulus odd, base coprime to it); 1 for modulus 1."""
+    if modulus == 1:
+        return 1
+    value, m = base % modulus, 1
+    while value != 1:
+        value, m = value * base % modulus, m + 1
+    return m
+
+
+def cyclotomic(q: int) -> list[int]:
+    """The integer coefficients of the cyclotomic polynomial Phi_q, lowest degree first, by exact division of
+    X^q - 1 by Phi_d for the proper divisors d of q."""
+    poly = [-1] + [0] * (q - 1) + [1]
+    for d in range(1, q):
+        if q % d == 0:
+            poly = poly_divide(poly, cyclotomic(d))
+    return poly
+
+
+def poly_divide(numerator: list[int], divisor: list[int]) -> list[int]:
+    """The exact quotient of integer polynomials (lowest degree first) by a monic divisor; raises if inexact."""
+    rest = numerator[:]
+    quotient = [0] * (len(rest) - len(divisor) + 1)
+    for i in range(len(quotient) - 1, -1, -1):
+        coefficient = rest[i + len(divisor) - 1]
+        quotient[i] = coefficient
+        for j, b in enumerate(divisor):
+            rest[i + j] -= coefficient * b
+    if any(rest):
+        raise ValueError("inexact division")
+    return quotient
+
+
+def poly_remainder(numerator: list[int], divisor: list[int]) -> list[int]:
+    """The remainder of an integer polynomial modulo a monic integer polynomial (lowest degree first)."""
+    rest = numerator[:]
+    degree = len(divisor) - 1
+    for i in range(len(rest) - 1, degree - 1, -1):
+        coefficient = rest[i]
+        if coefficient:
+            for j, b in enumerate(divisor):
+                rest[i - degree + j] -= coefficient * b
+    return rest[:degree]
+
+
+def gauss_period_vanishes(q: int, a: int, phi: list[int] | None = None) -> bool:
+    """Whether sum over h in <2> of zeta_q^(a h) is 0, for q odd > 1 and gcd(a, q) = 1, decided exactly: the
+    polynomial sum of X^(a 2^j mod q) over one period of j is 0 modulo Phi_q."""
+    phi = cyclotomic(q) if phi is None else phi
+    poly = [0] * q
+    for j in range(multiplicative_order(2, q)):
+        poly[a * pow(2, j, q) % q] += 1
+    return not any(poly_remainder(poly, phi))
+
+
+def kernel_criterion(q: int) -> bool:
+    """Some prime p has p^2 | q and 2^ord_(q/p)(2) != 1 mod q, i.e. <2> mod q contains the kernel of reduction
+    mod q/p: the sufficient condition for a vanishing period."""
+    for p in range(3, q + 1, 2):
+        if q % (p * p) == 0 and all(p % r for r in range(3, int(p**0.5) + 1, 2)):
+            if pow(2, multiplicative_order(2, q // p), q) != 1:
+                return True
+    return False
+
+
+def vanishing_moduli(limit: int) -> list[int]:
+    """The odd q in (1, limit] whose Gauss period of <2> vanishes, with every unit a checked exactly; raises if the
+    vanishing depends on a (it cannot: the periods for different a are Galois conjugates)."""
+    found = []
+    for q in tqdm(range(3, limit + 1, 2), desc="q", file=sys.stderr):
+        phi = cyclotomic(q)
+        values = {gauss_period_vanishes(q, a, phi) for a in range(1, q) if math.gcd(a, q) == 1}
+        if len(values) != 1:
+            raise ValueError(f"vanishing depends on a at q = {q}")
+        if values.pop():
+            found.append(q)
+    return found
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -207,6 +290,13 @@ def main(argv: list[str] | None = None) -> int:
         f"  black fraction {planted.mean():.4f}  on t = 0 mod 9 {planted[::9].mean():.4f}"
         f"  max |P_n(1/9)| for n <= 200 {max(abs(lacunary_polynomial(m, Fraction(1, 9))) for m in range(2, 201)):.3f}"
     )
+    vanishing = vanishing_moduli(200)
+    print("\nodd q <= 200 whose Gauss period of <2> vanishes (exact, every unit a):")
+    print(vanishing)
+    print("agrees with the kernel criterion:", vanishing == [q for q in range(3, 201, 2) if kernel_criterion(q)])
+    print("all non-squarefree:", all(any(q % (p * p) == 0 for p in range(3, q, 2)) for q in vanishing))
+    print("non-squarefree odd q <= 200 not in the list:",
+          [q for q in range(3, 201, 2) if any(q % (p * p) == 0 for p in range(3, q, 2)) and q not in vanishing])
     return 0
 
 
