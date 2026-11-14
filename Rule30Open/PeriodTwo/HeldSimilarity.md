@@ -53,7 +53,7 @@ not formalized.
 
 ## In Lean
 
-`edgeless` is $E$, `TopAt x p` says the last 1 of `x` is at bit `p`, and iterates are `Nat.repeat`, as in
+`edgeless` is $E$, `heldTopAt x p` says the last 1 of `x` is at bit `p`, and iterates are `Nat.repeat`, as in
 `heldNat_repeat` of [HeldColumn](HeldColumn.md). No `sorry`, no `native_decide`, and no axioms beyond `propext` and
 `Quot.sound`.
 

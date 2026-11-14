@@ -94,10 +94,10 @@ theorem heldNat_repeat_split : ∀ n (A y p q : Nat), A < 2 ^ p → p + 2 * n �
     · rw [e2, show p + (n + 1) = p + n + 1 by omega]; exact h4
 
 /-- `x` has its last 1 at bit `p`. -/
-def TopAt (x p : Nat) : Prop := x.testBit p = true ∧ ∀ i, p < i → x.testBit i = false
+def heldTopAt (x p : Nat) : Prop := x.testBit p = true ∧ ∀ i, p < i → x.testBit i = false
 
-theorem edgeless_top (x p : Nat) (h : TopAt x p) :
-    TopAt (edgeless x) (p + 2) ∧ (edgeless x).testBit (p + 1) = true := by
+theorem edgeless_top (x p : Nat) (h : heldTopAt x p) :
+    heldTopAt (edgeless x) (p + 2) ∧ (edgeless x).testBit (p + 1) = true := by
   obtain ⟨h1, h2⟩ := h
   unfold edgeless
   refine ⟨⟨?_, fun i hi => ?_⟩, ?_⟩
@@ -111,7 +111,7 @@ theorem edgeless_top (x p : Nat) (h : TopAt x p) :
       show p + 1 - 1 = p by omega, h1]
     simp
 
-theorem TopAt.lt {x p : Nat} (h : TopAt x p) : x < 2 ^ (p + 1) :=
+theorem heldTopAt.lt {x p : Nat} (h : heldTopAt x p) : x < 2 ^ (p + 1) :=
   Nat.lt_pow_two_of_testBit _ fun i hi => h.2 i (by omega)
 
 /-- A number whose bits `p + 1` and `p` are 1 is at least `3 * 2 ^ p`. -/
@@ -130,7 +130,7 @@ theorem three_le_of_testBit (x p : Nat) (h1 : x.testBit (p + 1) = true) (h0 : x.
   have h4 : 3 * 2 ^ p ≤ x / 2 ^ p * 2 ^ p := Nat.mul_le_mul_right _ h3
   omega
 
-theorem edgeless_repeat_top : ∀ n (x p : Nat), TopAt x p → TopAt (Nat.repeat edgeless n x) (p + 2 * n) := by
+theorem edgeless_repeat_top : ∀ n (x p : Nat), heldTopAt x p → heldTopAt (Nat.repeat edgeless n x) (p + 2 * n) := by
   intro n
   induction n with
   | zero => intro x p h; simpa [Nat.repeat] using h
@@ -142,9 +142,9 @@ theorem edgeless_repeat_top : ∀ n (x p : Nat), TopAt x p → TopAt (Nat.repeat
 theorem edgeless_three_lt (n : Nat) (hn : 1 ≤ n) :
     Nat.repeat edgeless n 3 < 3 * Nat.repeat edgeless n 1 := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
-  have t1 : TopAt 1 0 := ⟨by decide, fun i hi => by
+  have t1 : heldTopAt 1 0 := ⟨by decide, fun i hi => by
     rw [Nat.testBit_lt_two_pow]; exact Nat.lt_of_lt_of_le (by decide) (Nat.pow_le_pow_right (by omega) hi)⟩
-  have t3 : TopAt 3 1 := ⟨by decide, fun i hi => by
+  have t3 : heldTopAt 3 1 := ⟨by decide, fun i hi => by
     rw [Nat.testBit_lt_two_pow]; exact Nat.lt_of_lt_of_le (by decide) (Nat.pow_le_pow_right (by omega) hi)⟩
   have hm1 := edgeless_top _ _ (edgeless_repeat_top m 1 0 t1)
   have hlow := three_le_of_testBit (Nat.repeat edgeless (m + 1) 1) (0 + 2 * m + 1)
