@@ -30,7 +30,7 @@ after 153 at 14 cells and 413 at 20.
 ## Evidence
 
 The search ran in a C kernel that is not in this repository. The families' invariance
-is the Lean module above, and [tests/test_computations.py](../../tests/test_computations.py) checks both families and
+is the Lean module above, and [tests/test_rule30.py](../../tests/test_rule30.py) checks both families and
 their difference sets by direct evolution for $k \le 5$.
 
 ## What it means

@@ -63,7 +63,7 @@ seed: the union, over the values of column 1 at the white phases, of the greates
   (`lock_certificate.entry_time`), and of those that stay out into the kit's family within 4,000 steps
   (`absorption.absorb`).
 
-`tests/test_computations.py` checks the search, the word, the expected times and the decay against integer-row and
+`tests/test_coin_lock.py` checks the search, the word, the expected times and the decay against integer-row and
 bool-array evolution, and against simulated runs, and checks that among the 31 starts of the locking finding exactly
 the ones the certificate finding names stay out (start 4 under $0001$, 24 under $0011$, 8 and 18 under $0111$).
 

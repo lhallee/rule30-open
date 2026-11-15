@@ -30,7 +30,8 @@ The blocks are 4 of period 10, 8 of 11, 9 of 12, 8 of 13, 16 of 14 and 3 of 15.
 
 ## Statement
 
-For each entry of `APART_TRAPS` in [computations/lock_chain.py](../../computations/lock_chain.py), a refuted trap $C$
+For each entry of `APART_TRAPS` in [computations/lock_trap_lists.py](../../computations/lock_trap_lists.py), which
+[computations/lock_chain.py](../../computations/lock_chain.py) imports, a refuted trap $C$
 and the other trap $S$ of its block:
 
 1. **The other trap is closed** (`apart_<C>_closed`): $S$ passes `WTrap.closedCheck`.

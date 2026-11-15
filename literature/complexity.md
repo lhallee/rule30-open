@@ -153,15 +153,16 @@ any natural function in exponential time (see the barrier entry).
   *Here:* catalytic space is borrowed space that must be restored, so the result lowers the free space of a simulation
   only when the borrowed memory is available; it does not change the space ladder's $O(\sqrt{n \log n})$.
 - **Morrison Orozco et al. (2026).** *Computing faster with a full memory: catalytic algorithms break time-space lower
-  bounds.* [arXiv:2610.24377](https://arxiv.org/abs/2610.24377), October 2026; seen only in search results (arXiv is
-  outside this session's network), the text and the full author list were not read. By the abstract as quoted there,
-  with $O(\log n)$ free space and polynomial catalytic space, sorting and the discrete Fourier transform run in time
-  $n^{1 + o(1)}$ and matrix multiplication in time $n^{\omega + o(1)}$, below the time-space lower bounds of order
-  $n^2$ and $n^3$ that hold without catalytic space, in a model where the output is written in two passes; all known
-  time-space lower bounds hold with any constant number of output passes. Unrefereed. *Here:* the lower bounds it
-  passes are for functions with many output bits, proved by the branching-program method, and the result shows that
-  they depend on the model's memory; the center column has one output bit, no time-space tradeoff is known for it,
-  and Problem 3 asks for time alone ([the barrier](../negative-results/complexity/problem-three-barrier.md)).
+  bounds.* [arXiv:2610.24377](https://arxiv.org/abs/2610.24377), October 2026; seen only in search results (arXiv could
+  not be reached when this entry was checked on November 1, 2026), the text and the full author list were not read. By
+  the abstract as quoted there, with $O(\log n)$ free space and polynomial catalytic space, sorting and the discrete
+  Fourier transform run in time $n^{1 + o(1)}$ and matrix multiplication in time $n^{\omega + o(1)}$, below the
+  time-space lower bounds of order $n^2$ and $n^3$ that hold without catalytic space, in a model where the output is
+  written in two passes; all known time-space lower bounds hold with any constant number of output passes. Unrefereed.
+  *Here:* the lower bounds it passes are for functions with many output bits, proved by the branching-program method,
+  and the result shows that they depend on the model's memory; the center column has one output bit, no time-space
+  tradeoff is known for it, and Problem 3 asks for time alone ([the
+  barrier](../negative-results/complexity/problem-three-barrier.md)).
 - **Bhardwaj (2026).** *Unconditional separation between LL and CLL.*
   [arXiv:2610.15554](https://arxiv.org/abs/2610.15554) and ECCC TR26-252, October 14, 2026; seen only in search results,
   the text was not read. By the abstract as quoted there, a catalytic machine with $O(\log\log n)$ work space and

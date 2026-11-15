@@ -47,7 +47,7 @@ denominator ([`TwoAdic`](https://github.com/WolframInstitute/Rule30PrizeKit/blob
 ## Checks
 
 `psi` in [computations/frames.py](../../computations/frames.py) computes the first bits of $\Psi$;
-`tests/test_computations.py` checks that $\Psi(1)$ is the center column and that $\Psi$ keeps the first differing bit
+`tests/test_frames.py` checks that $\Psi(1)$ is the center column and that $\Psi$ keeps the first differing bit
 of 200 random pairs.
 
 The frame turned up no handle on Problem 1: rational rows do not map to preperiodic orbits even when their column is

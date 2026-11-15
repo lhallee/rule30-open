@@ -35,7 +35,7 @@ The kit's equivalent forms prove the formula in Lean as `center_duhamel`, from D
 ## Computation
 
 `duhamel_center` in [computations/algebra.py](../../computations/algebra.py) evaluates the right side and matches the
-center column for $t < 128$; `tests/test_computations.py` checks $t < 96$.
+center column for $t < 128$; `tests/test_algebra.py` checks $t < 96$.
 
 ## Use
 
