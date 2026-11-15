@@ -79,6 +79,7 @@ AXIOM_DECLARATION = re.compile(r"^\s*(?:private\s+|public\s+)?axiom\s", re.MULTI
 # A declaration at the start of a line, matched after a newline rather than at `^`: the literal `\n` lets the regex
 # engine skip ahead, five times faster over the 96 MB of Lean source than trying `^` at every character.
 DECLARATION = re.compile(r"\n\s*(?:@\[[^\]]*\]\s*)?(?:theorem|def|structure|abbrev)\s+([^\s(){}\[\]:]+)")
+NAMESPACE_LINE = re.compile(r"\n\s*namespace\s+(\S+)")
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 LIBRARY_IMPORT = re.compile(r"^public import (Rule30Open\.[\w.]+)$", re.MULTILINE)
 MARKDOWN_LINK = re.compile(r"\]\(([^)\s]+)\)")
@@ -119,9 +120,11 @@ class Entry:
 
 @dataclass(frozen=True, slots=True)
 class LeanModule:
-    """What `check` needs from one Lean source, read once: its declared names and the constructs it must not use."""
+    """What `check` needs from one Lean source, read once: its declared names, the dot-separated parts of its
+    `namespace` lines, and the constructs it must not use."""
 
     declared: frozenset[str]
+    namespace_parts: frozenset[str]
     forbidden: tuple[str, ...]
     declares_axiom: bool
 
@@ -223,6 +226,7 @@ def read_lean_module(path: Path) -> LeanModule:
     source = path.read_text(encoding="utf-8")
     return LeanModule(
         declared=frozenset(DECLARATION.findall("\n" + source)),
+        namespace_parts=frozenset(part for line in NAMESPACE_LINE.findall("\n" + source) for part in line.split(".")),
         forbidden=tuple(token for token in FORBIDDEN_LEAN if token in source),
         declares_axiom="axiom" in source and AXIOM_DECLARATION.search(source) is not None,
     )
@@ -278,6 +282,19 @@ def check_types(entry: Entry) -> list[str]:
     return errors
 
 
+def declares(module: LeanModule, name: str) -> bool:
+    """Whether `module` declares `name`, directly or, for a dotted `P.q`, as `q` inside namespaces that spell `P`.
+
+    The dotted case is conservative: `q` must be declared and every dot-separated part of `P` must be a part of some
+    `namespace` line of the file.
+    """
+    if name in module.declared:
+        return True
+    prefix, _, last = name.rpartition(".")
+    return bool(prefix) and last in module.declared and all(part in module.namespace_parts
+                                                            for part in prefix.split("."))
+
+
 def missing_field(entry: Entry, key: str) -> str:
     hints = {
         "title": "the claim, as the catalog will show it",
@@ -324,7 +341,7 @@ def check_entry(entry: Entry, root: Path, categories: dict[str, Category], modul
         module = modules.get(module_path)
         if module is not None:
             errors += [f"{entry.rel}: headline `{name}` is not declared in {module_path.name}" for name in headline
-                       if name not in module.declared]
+                       if not declares(module, name)]
         if entry.text("kit") not in KIT_RELATIONS:
             errors.append(f"{entry.rel}: `kit` is one of {', '.join(KIT_RELATIONS)}")
     else:

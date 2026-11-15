@@ -5,8 +5,8 @@ proved in Lean against the prize's official statements and comes with its argume
 computational finding comes with the code that reproduces it. And every approach that failed is written down with
 the reason it failed, so the next person can start where it stopped instead of repeating it.
 
-None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 201 Lean modules with 989
-headline theorems, 73 findings and 85 negative results.
+None of the three problems is solved here. [CATALOG.md](CATALOG.md) lists every result: 220 Lean modules with 1059
+headline theorems, 78 findings and 93 negative results.
 
 ## The problems
 
@@ -43,7 +43,9 @@ Proved in Lean:
   ([WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)), and one statement about finite left halves,
   `Q01Right(W)`, excludes period two whatever the right half does
   ([ChannelLanguage](Rule30Open/PeriodTwo/ChannelLanguage.md)). Period two also reduces to one integer map
-  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)).
+  ([HeldColumn](Rule30Open/PeriodTwo/HeldColumn.md)), whose iterates are affine on no residue class, so the affine
+  tools of the 3x+1 problem do not apply ([HeldSimilarity](Rule30Open/PeriodTwo/HeldSimilarity.md); Lean at integer
+  points, with a one-line step on paper to the 2-adic classes).
 - **Period four.** No finite row whose right half has at most 14 cells has a center repeating a word of period four,
   and no left half within depth 88 keeps the kit's left-half pattern for one.
 - **Every period** comes down to one statement about the left half for each block
@@ -68,11 +70,24 @@ under each period-four word ([the absorption census](findings/columns/absorption
 cells meets the kit's left-half statement for one ([the left-half statements](findings/columns/left-half-c3.md)).
 
 Where it stops: `Q01` and `Q01Right`, entry into the traps, and attraction into the period-four family are each open,
-and in every computation the cells they depend on behave like fair coins.
+and in every computation the cells they depend on behave like fair coins. The source-energy hypothesis of the kit's
+main branch, which gives Problem 2, would also give Problem 1, on paper ([source
+energy](findings/structure/source-energy-dyadic.md)).
 
 ### Problem 2: does each color occur equally often?
 
-Proved in Lean: no bound on the density. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
+Proved in Lean: white cells have density at least 2/5 in the single cell's triangle, and every strip of $J$
+columns of every orbit has lower white density at least $(2J - 2)/(5J)$ ([RowWhiteDensity](Rule30Open/Foundations/RowWhiteDensity.md)).
+Three adjacent columns of every orbit are at least 1/3 white, sharp, and two at least 5/18
+([PairWhiteDensity](Rule30Open/Foundations/PairWhiteDensity.md)), and every strip of at least five adjacent columns of
+every orbit at least 2/5 white ([StripWhiteDensity](Rule30Open/Foundations/StripWhiteDensity.md); sharp in Lean,
+[StripWhiteSharp](Rule30Open/Foundations/StripWhiteSharp.md)), while the sharp constants for two and four columns are open, in
+$[5/18, 1/3]$ and $[11/28, 2/5]$ (the bound 11/28 computed). Over a period at least $(2J - 2)/5$ of the single cell's first $J$ right diagonals
+are white on average ([RightEdgeDensity](Rule30Open/Frames/RightEdgeDensity.md)), and the doubling diagonals force black density
+at least $(2 + e_N)/(2(N + 1))$ on the first $N + 1$ over their period, with $e_N$ the period exponent
+([RightEdgeBlack](Rule30Open/Frames/RightEdgeBlack.md)), which stays positive exactly when the period exponents grow
+linearly, an open question. Apart from that black bound, which unconditionally tends to 0, all of this is for white cells, and
+nothing follows for the center column alone or for black density. Conditional bounds on runs: if the left diagonals settle by time $3j/2$
 and their settled pairs alternate in antiphase a bounded number of times, black runs of the center column have slope
 at most 3/13 ([SettledSlope](Rule30Open/Diagonals/SettledSlope.md)), and the point where they start to repeat moves
 by a three-case law, so a gain of 2/3 diagonal per step gives that slope
@@ -105,7 +120,15 @@ Proved in Lean:
   ([ParityLift](Rule30Open/Complexity/ParityLift.md)); the fewest cells that fix it are at most
   $t - 2\lfloor t/9 \rfloor + 2$ ([StripeGrowth](Rule30Open/Complexity/StripeGrowth.md)).
 - **Automaticity.** Rule 90's space-time diagram is 2-automatic in two indices, and Rule 30's is not if its right-edge
-  cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)).
+  cycles grow faster than linearly ([TwoIndex](Rule30Open/Complexity/TwoIndex.md)). Every periodic point of the
+  right-edge map has a power-of-two least period, and by exact computation for periods not divisible by 128 the only
+  ones are 0 and the rain pair $\pm 1/3$ with its shifts ([EdgeOddPeriods](Rule30Open/Frames/EdgeOddPeriods.md),
+  [edge periodic points](findings/frames/edge-periodic-points.md)). In Lean, with `evolve`, a row white right of some
+  cell that comes back moved at the speed of light after $L$ steps, 32 not dividing $L$, is white or one of the two
+  rain rows ([LightReturnClassified](Rule30Open/Frames/LightReturnClassified.md)), and a row white right of a black
+  cell that does so with 64 not dividing $L$ is a rain row ([EdgeTreeCheck](Rule30Open/Frames/EdgeTreeCheck.md), whose
+  branch-tree checker is proved sound for every period and evaluated by the kernel at period 32). Every edge code with bit 0 black is a rain code or reaches a branch
+  state, in Lean with no periodicity assumed ([EdgeTree](Rule30Open/Frames/EdgeTree.md)).
 - **A dual form.** The binomial transform over GF(2) exchanges a period $2^a$ from time $2^m$ of the center column
   with a period $2^m$ from $2^a$ of its transform, at the same least witness, and keeps eventual periodicity, so Problem
   1 and the first rung of Problem 3 are the same statements for the transform

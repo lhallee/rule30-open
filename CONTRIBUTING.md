@@ -142,13 +142,16 @@ is its path, `Rule30Open.<Directory>.<Name>`.
 
 ### Headline names
 
-`check` matches each headline name literally against the name after `theorem`, `def`, `structure`, or `abbrev` at the
-start of a line of the module, and `audit` looks up `Rule30Open.<name>`. A headline must therefore be declared with the
-name it is listed by, directly inside `namespace Rule30Open`. For a dotted name, declare it with the dotted name in full:
-[StripeClasses.lean](Rule30Open/Frames/StripeClasses.lean) declares `theorem StripeClasses.box_columns ...`, and its
-argument lists `StripeClasses.box_columns`. A theorem declared as `box_columns` inside a nested
-`namespace StripeClasses` would pass `check` under the name `box_columns` and fail `audit`, which would look for
-`Rule30Open.box_columns`.
+`audit` looks up `Rule30Open.<name>`, so list each headline by its full name below `Rule30Open`. `check` accepts a
+name in either of two forms. The first is the name after `theorem`, `def`, `structure`, or `abbrev` at the start of a
+line of the module, matched literally: [StripeClasses.lean](Rule30Open/Frames/StripeClasses.lean) declares
+`theorem StripeClasses.box_columns ...` inside `namespace Rule30Open`, and its argument lists
+`StripeClasses.box_columns`. The second is a dotted name `P.q` whose last part `q` is declared that way inside nested
+namespaces: [EdgeTree.lean](Rule30Open/Frames/EdgeTree.lean) declares `theorem start ...` inside
+`namespace Rule30Open.Frames.EdgeTree`, and its argument lists `Frames.EdgeTree.start`. For the second form `check`
+asks only that every part of `P` appear on some `namespace` line of the file, not that the namespaces nest in that
+order, so list the full path below `Rule30Open`: `start` alone would pass `check` and fail `audit`, which would look
+for `Rule30Open.start`.
 
 ### What a Lean file may not contain
 

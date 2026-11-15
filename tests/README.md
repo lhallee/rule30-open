@@ -128,12 +128,13 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-On Linux, with the `topology` and `sat` extras and a C compiler installed, `python -m pytest` collected 770 tests in
-one file per module and all of them passed, on November 14, 2026. The timings in this section were measured between
-November 1 and 9, 2026, when the tests of the computations were one file, `test_computations.py`. Serially on an idle
-machine with four cores the 737 tests of that suite took about 38 s of wall time. With the 647 tests it had before, on
-one core of a machine with four at a load average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations
-sum to 43 to 46 s, and collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for
+On Linux, with the `topology` and `sat` extras and a C compiler installed, `python -m pytest` collected 859 tests in
+one file per module and all of them passed, on November 14, 2026. The timings in this section were measured earlier,
+when the tests of the computations were one file, `test_computations.py`. With 824 tests, in an environment without
+`pysat` and `ripser`, where the 2 tests that need them were skipped, the suite took 47 s of wall time. Serially on an
+idle machine with four cores the 737 tests it had before took about 38 s of wall time. With 647 tests, on one core of a
+machine with four at a load average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations sum to 43 to
+46 s, and collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for
 `test_persistence.py` is about 0.9 s. The spread between runs is the machine's, which runs one fixed computation in
 anywhere from 0.47 to 1.1 s.
 

@@ -150,6 +150,38 @@ def test_headline_not_declared(tmp_path: Path) -> None:
     assert errors(root) == ["Rule30Open/Seeds/Seed.md: headline `seed` is not declared in Seed.lean"]
 
 
+def test_dotted_headline(tmp_path: Path) -> None:
+    """A dotted headline `P.q` is declared as `q` inside namespaces whose lines spell every part of `P`, on one
+    `namespace` line or nested over several; a part that no `namespace` line holds, or an undeclared `q`, is refused."""
+    root = repository(tmp_path)
+    module = root / "Rule30Open" / "Seeds" / "Seed.lean"
+    argument = root / "Rule30Open" / "Seeds" / "Seed.md"
+    argument.write_text(argument.read_text(encoding="utf-8").replace(
+        "[seed_main]", "[seed_main, Frames.Seed.inner, Frames.Seed.absent, Other.inner]"), encoding="utf-8")
+    module.write_text("module\n\ntheorem seed_main : True := trivial\n\nnamespace Rule30Open.Frames\nnamespace Seed\n\n"
+                      "theorem inner : True := trivial\n\nend Seed\nend Rule30Open.Frames\n", encoding="utf-8")
+    assert errors(root) == [
+        "Rule30Open/Seeds/Seed.md: headline `Frames.Seed.absent` is not declared in Seed.lean",
+        "Rule30Open/Seeds/Seed.md: headline `Other.inner` is not declared in Seed.lean",
+    ]
+
+
+def test_declares(tmp_path: Path) -> None:
+    """`declares` on a module read from source: a direct name, a name spelled with its namespace, and the refusals,
+    among them a dotted declaration asked for by its last part alone."""
+    path = tmp_path / "Module.lean"
+    path.write_text("module\n\n@[simp] theorem Top.direct : True := trivial\nnamespace A.B\ndef q : Nat := 0\nend A.B\n",
+                    encoding="utf-8")
+    module = catalog.read_lean_module(path)
+    assert catalog.declares(module, "Top.direct")
+    assert catalog.declares(module, "q")
+    assert catalog.declares(module, "A.B.q")
+    assert catalog.declares(module, "B.q")
+    assert not catalog.declares(module, "C.q")
+    assert not catalog.declares(module, "A.B.r")
+    assert not catalog.declares(module, "direct")
+
+
 def test_forbidden_lean(tmp_path: Path) -> None:
     root = repository(tmp_path)
     (root / "Rule30Open" / "Seeds" / "Seed.lean").write_text(
