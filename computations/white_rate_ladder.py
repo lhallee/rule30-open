@@ -21,9 +21,9 @@ x_(-1)(t) = 0, that is c(t) = c(t + 1) = 1. Without kicks the left half from tim
 from __future__ import annotations
 
 import argparse
-from itertools import product
-
 import numpy as np
+
+from itertools import product
 from tqdm.auto import tqdm
 
 
@@ -38,7 +38,7 @@ def zero_boundary_columns(T: int, progress: bool = False) -> tuple[np.ndarray, n
         y[t] = x & 1
         z[t] = (x >> 1) & 1
         x = (x >> 1) ^ (x | (x << 1))
-    return y, z
+    return y, z  # (T + 2,), (T + 2,)
 
 
 def kick_free_white(y: np.ndarray, T: int, checkpoints: tuple[int, ...] = ()) -> dict[int, int]:

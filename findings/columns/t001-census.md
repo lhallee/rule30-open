@@ -108,7 +108,7 @@ python -m computations.lock_chain --t001-coin
 ```
 
 The census takes about eight minutes; `--cells 8 --steps 300000` takes about four. `trap_entries` reads the trap from
-the kit's source, and `periodic_extent` measures the repeating region; tests/test_computations.py checks the white
+the kit's source, and `periodic_extent` measures the repeating region; tests/test_period_three.py checks the white
 half's entry steps against the kit, the trap's closure against rows stepped one at a time, one slow entry, and
 `constant_rate` against values computed by hand and against the exponential law. The table takes about six minutes;
 `test_cut_entries` checks `cut_entries` against halves stepped cell by cell and looked up among the cut states, and

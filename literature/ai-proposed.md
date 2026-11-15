@@ -114,24 +114,24 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
 
 - **Google DeepMind (2026).** [formal-conjectures](https://github.com/google-deepmind/formal-conjectures), the
   conjectures marked solved with a formal proof found by the methods of G. Tsoukalas et al., *Advancing Mathematics
-  Research with AI-Driven Formal Proof Search*, arXiv:2605.22763 (the paper's text was not read), the system reported
-  as AlphaProof Nexus, whose proofs are in
+  Research with AI-Driven Formal Proof Search*, arXiv:2605.22763 (the paper's text was not read), the system reported as
+  AlphaProof Nexus, whose proofs are in
   [alphaproof-nexus-results](https://github.com/google-deepmind/alphaproof-nexus-results); that repository's index
   groups them as additive combinatorics, algebraic geometry, graphs, optimization, quantum optics, Erdős problems, OEIS
   conjectures and the Stacks Project, and names no other problem on cellular automata. By the search record (the problem
-  page, erdosproblems.com, is outside this session's network), one of its nine Erdős problems is #125: the sums of a
-  number whose base-3 digits are 0 and 1 and a number whose base-4 digits are 0 and 1 have lower density zero, by
-  Diophantine approximation with the irrationality of $\log 4 / \log 3$. A density statement about digits, the kind
-  Problem 2 asks; it rests on two multiplicatively independent bases, a structure the center column is not known to
-  have. On October 29, 2026,
-  38 entries of the repository cite it: 36 conjectures from the OEIS, one Erdős problem and one from *Written on the
-  Wall II*. Two concern cellular automata: [A300997](https://oeis.org/A300997), on an automaton that redistributes mass,
-  and [A267581](https://oeis.org/A267581), the center column of the elementary rule 167 from a single black cell, whose
-  recurrence $a(n) = 2a(n - 1) + 1 - [\,n \mid 2^{n+1}]$ says that from time 2 on the column is black except at the
-  powers of two. *Here:* rule 167 is an elementary automaton whose center column is not eventually periodic and yet
-  2-automatic, so the analog of Problem 1 holds while that of Problem 3 fails: a finite automaton reads the cell at time
-  $n$ from the binary digits of $n$. For Rule 30 the kit proves that Problem 3 implies the column is not 2-automatic,
-  and no automaton with fewer than 131,070 states fits its first $2^{22}$ cells ([the automaton
+  page, erdosproblems.com, could not be reached when this entry was checked on October 30, 2026), one of its nine Erdős
+  problems is #125: the sums of a number whose base-3 digits are 0 and 1 and a number whose base-4 digits are 0 and 1
+  have lower density zero, by Diophantine approximation with the irrationality of $\log 4 / \log 3$. A density statement
+  about digits, the kind Problem 2 asks; it rests on two multiplicatively independent bases, a structure the center
+  column is not known to have. On October 29, 2026, 38 entries of the repository cite it: 36 conjectures from the OEIS,
+  one Erdős problem and one from *Written on the Wall II*. Two concern cellular automata:
+  [A300997](https://oeis.org/A300997), on an automaton that redistributes mass, and [A267581](https://oeis.org/A267581),
+  the center column of the elementary rule 167 from a single black cell, whose recurrence
+  $a(n) = 2a(n - 1) + 1 - [\,n \mid 2^{n+1}]$ says that from time 2 on the column is black except at the powers of two.
+  *Here:* rule 167 is an elementary automaton whose center column is not eventually periodic and yet 2-automatic, so the
+  analog of Problem 1 holds while that of Problem 3 fails: a finite automaton reads the cell at time $n$ from the binary
+  digits of $n$. For Rule 30 the kit proves that Problem 3 implies the column is not 2-automatic, and no automaton with
+  fewer than 131,070 states fits its first $2^{22}$ cells ([the automaton
   search](../negative-results/complexity/automaton-lower-bounds.md)); rule 167's column follows its nested pattern,
   which Rule 30 does not have. The same repository states Prize Problems 1 and 2 in Lean as open
   ([rule-30.md](rule-30.md#the-prize-and-its-formal-statements)).
@@ -162,14 +162,15 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
 ## Checked records, texts not read
 
 - **Chang (2026).** *Exploring Collatz Dynamics with Human-LLM Collaboration.* arXiv:2603.11066, several versions in
-  March 2026; the record was seen through a search, the text was not read, and two sites that summarize it are outside
-  this session's network. By the record, a sharpened structural reduction of the Collatz conjecture, written with an
-  LLM, that ends at an unproved condition it calls the Carry Independence Conjecture, with no cycle of period at most 13
-  checked by computer over 238,811 words. It does not claim a proof. *Here:* period two reduces to an integer map with
-  the shape of a Collatz problem ([HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)), but that map,
-  $H(U) = (U \gg 1) \oplus (U \lor (U \ll 1))$, is Rule 30 itself on the bits of $U$ and has no carries, so a condition
-  on the carries of $3n + 1$ has no counterpart there; the computer checks are of the kind of [the left-half
-  census](../findings/period-two/left-half-alone.md), where every integer below $2^{52}$ fails.
+  March 2026; the record was seen through a search, the text was not read, and two sites that summarize it could not be
+  reached when this entry was checked on October 30, 2026. By the record, a sharpened structural reduction of the
+  Collatz conjecture, written with an LLM, that ends at an unproved condition it calls the Carry Independence
+  Conjecture, with no cycle of period at most 13 checked by computer over 238,811 words. It does not claim a proof.
+  *Here:* period two reduces to an integer map with the shape of a Collatz problem
+  ([HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)), but that map, $H(U) = (U \gg 1) \oplus (U \lor (U \ll 1))$, is
+  Rule 30 itself on the bits of $U$ and has no carries, so a condition on the carries of $3n + 1$ has no counterpart
+  there; the computer checks are of the kind of [the left-half census](../findings/period-two/left-half-alone.md), where
+  every integer below $2^{52}$ fails.
 
 - **Georgiev, Gómez-Serrano, Tao and Wagner (2025).** *Mathematical exploration and discovery at scale.*
   arXiv:2511.02864; the record was seen through a search, the text was not read. Reports an LLM-guided evolutionary
@@ -207,11 +208,12 @@ numbers or 2-adic maps. The items below are the nearest ones, and the bearing of
   the axiom audit here, which refuses compiled evaluation.
 
 - **Lau (2026).** *Explicit positive lower density for the Collatz conjecture.* Hexagon preprint 2610.00249, version 2
-  of October 21, 2026 (hexagonmath.org, outside this session's network); the record and the abstract were seen through a
-  search, the text was not read. It credits AxiomProver with the mathematics and its Lean formalization. Claims that at
-  least $\lfloor N / 2^{2^{2^{163}}} \rfloor$ odd integers below $N$ reach 1 within $10.46 \log n$ steps, a quantitative
-  form of a positive-density theorem of L. Mazur. *Here:* the kit's `Q01_iff_integer` restates period two as a statement
-  about every natural number under the iterates of $G = F \circ F$, and [HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md)
-  asks the same of every $U > 0$; a positive density of starts that behave says nothing about each start, the gap of
-  [the random-row barrier](../negative-results/random-rows/almost-every-row.md). By computation here, every integer
-  below $2^{52}$ already breaks the condition of period two ([the left half alone](../findings/period-two/left-half-alone.md)).
+  of October 21, 2026 (hexagonmath.org could not be reached when this entry was checked on November 1, 2026); the record
+  and the abstract were seen through a search, the text was not read. It credits AxiomProver with the mathematics and
+  its Lean formalization. Claims that at least $\lfloor N / 2^{2^{2^{163}}} \rfloor$ odd integers below $N$ reach 1
+  within $10.46 \log n$ steps, a quantitative form of a positive-density theorem of L. Mazur. *Here:* the kit's
+  `Q01_iff_integer` restates period two as a statement about every natural number under the iterates of $G = F \circ F$,
+  and [HeldColumn](../Rule30Open/PeriodTwo/HeldColumn.md) asks the same of every $U > 0$; a positive density of starts
+  that behave says nothing about each start, the gap of [the random-row
+  barrier](../negative-results/random-rows/almost-every-row.md). By computation here, every integer below $2^{52}$
+  already breaks the condition of period two ([the left half alone](../findings/period-two/left-half-alone.md)).

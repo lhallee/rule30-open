@@ -51,10 +51,10 @@ def test_tape_layout() -> None:
         i += 1
     state, head = one_tape.State("init0"), 0
     while True:
-        result = one_tape.transition(state, tape.get(head, one_tape.BLANK))
-        if len(result) == 1:
+        action = one_tape.transition(state, tape.get(head, one_tape.BLANK))
+        if len(action) == 1:
             break
-        state, symbol, move = result
+        state, symbol, move = action
         tape[head] = symbol
         head += move
     ell = n.bit_length()

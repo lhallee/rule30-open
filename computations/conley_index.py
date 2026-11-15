@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import time
-
 import numpy as np
 
 from scipy.sparse import csr_matrix
@@ -78,7 +77,7 @@ def cyclic_components(source: np.ndarray, target: np.ndarray, nodes: int, transf
     graph = csr_matrix((np.ones(source.size, dtype=np.int8), (source, target)), shape=(nodes, nodes))
     _, label = connected_components(graph, directed=True, connection="strong")  # (nodes,)
     inside = label[source] == label[target]  # (e,)
-    out = []
+    out: list[np.ndarray] = []  # each (m, m)
     position = np.zeros(nodes, dtype=np.int64)  # (nodes,), a node's place in its component
     for component in np.unique(label[source[inside]]).tolist():
         members = np.flatnonzero(label == component)  # (m,)
@@ -87,13 +86,14 @@ def cyclic_components(source: np.ndarray, target: np.ndarray, nodes: int, transf
         adjacency = np.zeros((members.size, members.size), dtype=np.int64)  # (m, m)
         np.add.at(adjacency, (position[source[moves]], position[target[moves]]), 1)
         out.append(adjacency if transfer else (adjacency > 0).astype(np.int64))
-    return out
+    return out  # each (m, m), m the size of its component
 
 
 def component_indices(source: np.ndarray, target: np.ndarray, nodes: int,
                       transfer: bool = False) -> list[tuple[int, int]]:
     """(size, GF(2) index dimension) for each component that holds a cycle, of the relation or, with `transfer`, of the
     transfer matrix."""
+    # source, target: (e,)
     return [(int(a.shape[0]), index_dimension(a)) for a in cyclic_components(source, target, nodes, transfer)]
 
 
@@ -157,8 +157,8 @@ def main() -> None:
     args = parser.parse_args()
     start = time.time()
     radii = [int(r) for r in args.radii.split(",")] if args.radii else []
-    result = survey(args.max_period, [int(w) for w in args.widths.split(",")], radii, args.transfer)
-    for case, row in result.items():
+    cases = survey(args.max_period, [int(w) for w in args.widths.split(",")], radii, args.transfer)
+    for case, row in cases.items():
         print(f"{case}: {row['blocks']} blocks; no cycle {len(row['acyclic'])}; GF(2) index trivial "
               f"{len(row['trivial'])} {row['trivial']}; game excludes {len(row['excluded'])}, with index dimensions "
               f"{row['excluded_dims']}; a cyclic component of trivial index in {len(row['nilpotent_cycles'])}")

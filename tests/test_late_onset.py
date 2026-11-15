@@ -20,7 +20,7 @@ def test_runs_against_integer_rows() -> None:
         for c, column in enumerate(range(-margin, cells + margin)):
             values = late_onset.simulate_column(row, cells, column, steps)
             for k, target in enumerate(targets):
-                agree = [v == w for v, w in zip(values, target)]
+                agree = [v == w for v, w in zip(values, target, strict=True)]
                 for onset in range(max_onset):
                     length = next((i for i, ok in enumerate(agree[onset:]) if not ok), steps - onset)
                     want[k, onset, c] = max(want[k, onset, c], length)

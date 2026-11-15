@@ -47,14 +47,15 @@ import argparse
 import os
 import subprocess
 import sys
+import numpy as np
+
 from dataclasses import dataclass
 from fractions import Fraction
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.seed_onsets import _binary, ceil_three_halves, scalar_onsets, seed_vector, skeleton
 from computations.settled_slope import least_periods, stream, white_runs
+
 
 U64 = np.uint64
 
@@ -74,6 +75,7 @@ def jump_costs(tail: np.ndarray) -> np.ndarray:
 def driven_one_step(a: np.ndarray, b: np.ndarray, P: int) -> int:
     """The largest onset of the first driven diagonal over its two initial values and the P phases of the pair (a, b)
     (words of length P repeated from time 0), one time at a time: the independent check of `jump_costs`."""
+    # a, b: (P,)
     best = 0
     H = 4 * P
     for phi in range(P):
@@ -101,10 +103,11 @@ def driven_beam(a: np.ndarray, b: np.ndarray, k: int, width: int, P: int = 8) ->
     """Lower bounds on the onsets of driven diagonals 1 .. k behind the pair (a, b) repeated from time 0: a beam search
     that keeps, at each depth, the `width` distinct pairs of last diagonals with the latest pair onsets. Entry m - 1 is
     the latest onset of driven diagonal m found."""
+    # a, b: (P,)
     H = 8 * ((2 * k + 64) // 8)
     prev = np.resize(a, H)[None, :].astype(np.uint8)  # (1, H)
     cur = np.resize(b, H)[None, :].astype(np.uint8)  # (1, H)
-    Tcur = np.zeros(1, dtype=np.int64)  # (1,)
+    t_cur = np.zeros(1, dtype=np.int64)  # (1,)
     best = np.zeros(k, dtype=np.int64)  # (k,)
     for m in range(k):
         n = prev.shape[0]
@@ -116,13 +119,13 @@ def driven_beam(a: np.ndarray, b: np.ndarray, k: int, width: int, P: int = 8) ->
             new[:, t + 1] = A[:, t] ^ (Bm[:, t] | new[:, t])
         T = _onsets(new, P)  # (2n,)
         best[m] = T.max()
-        S = np.maximum(T, np.concatenate([Tcur, Tcur]))  # (2n,): pair onsets
+        S = np.maximum(T, np.concatenate([t_cur, t_cur]))  # (2n,): pair onsets
         key = S * (H + 1) + T  # (2n,)
         order = np.argsort(-key, kind="stable")[:4 * width]  # (·,)
         packed = np.packbits(np.concatenate([Bm[order], new[order]], axis=1), axis=1)  # (·, H / 4)
         _, first = np.unique(packed, axis=0, return_index=True)
         keep = order[np.sort(first)][:width]  # (≤ width,)
-        prev, cur, Tcur = Bm[keep], new[keep], T[keep]
+        prev, cur, t_cur = Bm[keep], new[keep], T[keep]
     assert best.max() <= H - P - 1, "horizon too short"
     return best  # (k,)
 
@@ -136,7 +139,7 @@ def driven_scan(depths: list[int], k: int, width: int, P: int = 8, progress: boo
     for r, n in enumerate(tqdm(depths, desc="driven beam", file=sys.stderr, mininterval=5, disable=not progress)):
         for phi in range(P):
             N[r] = np.maximum(N[r], driven_beam(tail[phi:phi + P, n - 1], tail[phi:phi + P, n], k, width, P))
-    return N
+    return N  # (len(depths), k)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -152,7 +155,8 @@ class States:
 
 def _bit(x: np.ndarray, q: int | np.ndarray) -> np.ndarray:
     """Bit q of each entry, as uint64 0 or 1."""
-    return (x >> U64(q) if isinstance(q, int) else x >> q.astype(U64)) & U64(1)
+    # x: (n,); q: (n,), or a Python int
+    return (x >> U64(q) if isinstance(q, int) else x >> q.astype(U64)) & U64(1)  # (n,)
 
 
 def step_states(s: States, c: int, h: int, P: int) -> tuple[States, np.ndarray, np.ndarray, np.ndarray]:
@@ -193,17 +197,18 @@ def step_states(s: States, c: int, h: int, P: int) -> tuple[States, np.ndarray, 
     keep &= mh
     win = ((B >> d) & keep) | (((C >> d) & keep) << U64(h))  # (n,)
     pw = ((B >> (d + U64(h))) & mP) | (((C >> (d + U64(h))) & mP) << U64(P))  # (n,)
-    return States(pw, win, age), delta, tau, valid
+    return States(pw, win, age), delta, tau, valid  # delta, tau, valid: (n,)
 
 
 def state_keys(s: States, h: int, P: int) -> np.ndarray:
     """One uint64 per state: pw in the high 2P bits, then the age, then the window (needs 2P + 2h + 5 <= 64)."""
     assert 2 * P + 2 * h + 5 <= 64
-    return (s.pw << U64(2 * h + 5)) | (s.age.astype(U64) << U64(2 * h)) | s.win
+    return (s.pw << U64(2 * h + 5)) | (s.age.astype(U64) << U64(2 * h)) | s.win  # (n,)
 
 
 def from_keys(key: np.ndarray, h: int, P: int) -> States:
     """The inverse of `state_keys`."""
+    # key: (n,)
     return States(key >> U64(2 * h + 5), key & U64((1 << (2 * h)) - 1),
                   ((key >> U64(2 * h)) & U64(31)).astype(np.int64))
 
@@ -321,6 +326,7 @@ def pair_graph(P: int, h: int) -> Graph:
 def _cycles(nxt: np.ndarray, w: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """For the functional graph v -> nxt[v] with weights w[v]: a node on the cycle each node reaches (its least
     index), and the weight sum and length of each node's cycle (indexed by that representative)."""
+    # nxt, w: (n,)
     n = len(nxt)
     jump = nxt.copy()  # (n,)
     steps = 1
@@ -339,7 +345,7 @@ def _cycles(nxt: np.ndarray, w: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.
     rep_of = rep[jump]  # (n,): least node of the cycle reached
     total = np.bincount(rep[on], weights=w[on], minlength=n).astype(np.int64)  # (n,)
     length = np.bincount(rep[on], minlength=n).astype(np.int64)  # (n,)
-    return rep_of, total, length
+    return rep_of, total, length  # (n,) each
 
 
 def max_cycle_mean(g: Graph, max_rounds: int = 200) -> tuple[Fraction, np.ndarray]:
@@ -375,12 +381,13 @@ def max_cycle_mean(g: Graph, max_rounds: int = 200) -> tuple[Fraction, np.ndarra
     while v != r:
         cycle.append(v)
         v = int(nxt[v])
-    return Fraction(int(total[r]), int(length[r])), np.array(cycle)
+    return Fraction(int(total[r]), int(length[r])), np.array(cycle)  # cycle: (k,), its k nodes in order
 
 
 def _bias(nxt: np.ndarray, w: np.ndarray, eta: np.ndarray, rep: np.ndarray) -> np.ndarray:
     """x with x(v) = w(v) - eta(v) + x(nxt v) for every node but the cycle representatives, where x = 0: the sum of
     w - eta along the path from v to its representative, by pointer doubling."""
+    # nxt, w, eta, rep: (n,)
     n = len(nxt)
     idx = np.arange(n)
     is_rep = idx == rep  # (n,)
@@ -416,6 +423,7 @@ def check_certificate(g: Graph, mean: Fraction, rounds: int = 100000) -> np.ndar
 
 def describe(g: Graph, cycle: np.ndarray, h: int, P: int) -> list[str]:
     """The states of a cycle as text: the pair word A | B at R (times R .. R + P - 1), the window, and the increment."""
+    # cycle: (k,), node indices
     s = from_keys(g.keys[cycle], h, P)
     out = []
     for i, v in enumerate(cycle):
@@ -486,7 +494,7 @@ def main() -> None:
                   f"largest U_j - ceil(3j/2) = {int((run.bound - ceil_three_halves(j)).max())}; "
                   f"largest number of states {run.states.max()}")
             cuts = [c for c in (0, 76, 100, 200, 400, 1000, 4000, 10000, 20000, 40000, 53207, 87867) if c < J] + [J]
-            for lo, hi in zip(cuts[:-1], cuts[1:]):
+            for lo, hi in zip(cuts[:-1], cuts[1:], strict=True):
                 print(f"   j in [{lo}, {hi}]: slope of U {(run.bound[hi] - run.bound[lo]) / (hi - lo):.4f}, "
                       f"largest V_j - ceil(3j/2) {int(ex[lo:hi + 1].max())}")
             if args.save:

@@ -11,6 +11,7 @@ from computations.settled_slope import alternations
 from computations.skeleton_tree import (SingleWords, accumulate, alternation, follow_tree, pair_next_int,
                                         white_run)
 
+
 STEPS, DEPTH, BASE = 768, 301, 512
 
 
@@ -75,7 +76,7 @@ def test_word_helpers() -> None:
                 if t >= 3 * P:
                     run.append(c)
                 c = ((a >> (t % P)) & 1) ^ (((b >> (t % P)) & 1) | c)
-            assert pair_next_int(a, b, P) == sum(bit << (t % P) for t, bit in zip(range(3 * P, 4 * P), run))
+            assert pair_next_int(a, b, P) == sum(bit << (t % P) for t, bit in zip(range(3 * P, 4 * P), run, strict=True))
             # white_run and alternation against the rows of four periods
             rows = np.array([[(a >> (t % P)) & 1, (b >> (t % P)) & 1] for t in range(4 * P)], dtype=np.uint8)  # (4P, 2)
             plain = max(len(x) for x in "".join(str(int(v)) for v in rows[:, 0]).split("1"))

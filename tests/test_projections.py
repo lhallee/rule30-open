@@ -4,7 +4,6 @@ column spectra, against direct runs of the rule, plain enumeration and closed fo
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import projections as pj
@@ -90,7 +89,7 @@ def test_diagram_patches_against_spacetime() -> None:
         diagram = spacetime(cells, times[-1] + h).astype(np.uint8)  # (steps + 1, 2 span)
         positions = lambda t: pj.lattice(-t, t - w + 1, 5, rng)  # noqa: E731
         for t, x, patches in pj.diagram_patches(row, origin, times, h, w, positions, progress=False):
-            for xi, p in zip(x, patches):
+            for xi, p in zip(x, patches, strict=True):
                 i = xi + origin - lo
                 assert np.array_equal(p, diagram[t:t + h, i:i + w].reshape(-1))
             pj.pattern_index(pj.codes_of(patches), support)

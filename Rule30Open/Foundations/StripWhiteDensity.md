@@ -7,7 +7,7 @@ lean: Rule30Open.Foundations.StripWhiteDensity
 headline: [StripWhiteDensity.strip_white_ge5, StripWhiteDensity.strip5_white, StripWhiteDensity.strip6_white, StripWhiteDensity.strip7_white, StripWhiteDensity.strip8_white, StripWhiteDensity.strip9_white]
 kit: new
 kit_modules: [Rule30Jen]
-evidence: [computations/strip_cycle_mean.py, computations/strip_potentials.py, tests/test_strip_white_density.py]
+evidence: [computations/strip_cycle_mean.py, computations/strip_potentials.py, tests/test_strip_potentials.py]
 ---
 
 # In every Rule 30 orbit every strip of J >= 5 adjacent columns has at least 2J(n - 1)/5 white cells in its first n rows, sharp at the orbit of (11001)^infinity; four columns are at least 11/28 white (computed)
@@ -59,4 +59,4 @@ exactly $2/5$ for $J = 5, 6, 7, 8, 9$ (`strip_cycle_mean.cycle_mean`).
     lake build Rule30Open.Foundations.StripWhiteDensity      # about 35 s, most of it the 2^11 cases of width 9
     python -m computations.strip_potentials --tables 5 6 7 8 9   # the potential tables
     python -m computations.strip_potentials --emit-lean > Rule30Open/Foundations/StripWhiteDensity.lean
-    python -m pytest tests/test_strip_white_density.py
+    python -m pytest tests/test_strip_potentials.py

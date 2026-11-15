@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import random
-from fractions import Fraction
 
-import numpy as np
+from fractions import Fraction
 
 from computations.held_shift import (attractors, ether_window, front_rate, greedy_rise, column_zero, cycle_class, defect_tops, degree_profile, domain,
                                      domain_integer, eventual_period, forced_halves, held, itinerary, kicked_step,

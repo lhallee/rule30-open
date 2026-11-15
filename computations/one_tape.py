@@ -17,10 +17,12 @@ which is at most 6 (n + 1)^2.
 from __future__ import annotations
 
 import argparse
+
 from dataclasses import dataclass
 from typing import Literal
 
 from computations.rule30 import center_column
+
 
 # Tape symbols: the kit's blank (0) and digits (1 for 0, 2 for 1), then row cells by color and mark.
 BLANK, D0, D1 = 0, 1, 2
@@ -96,11 +98,11 @@ def run(n: int, max_steps: int | None = None) -> tuple[bool, int]:
         i += 1
     state, head, steps = State("init0"), 0, 0
     while max_steps is None or steps < max_steps:
-        result = transition(state, tape.get(head, BLANK))
+        action = transition(state, tape.get(head, BLANK))
         steps += 1
-        if len(result) == 1:
-            return result[0], steps
-        state, symbol, move = result
+        if len(action) == 1:
+            return action[0], steps
+        state, symbol, move = action
         tape[head] = symbol
         head += move
     raise RuntimeError(f"no halt within {max_steps} steps on input {n}")

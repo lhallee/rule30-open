@@ -35,14 +35,15 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from collections import Counter, deque
-
 import numpy as np
+
+from collections import Counter, deque
 from tqdm.auto import tqdm
 
-from computations.ether_certificate import background
+from computations.defect_potential import background
 from computations.held_shift import cycle_class, forced_halves
 from computations.k_survivors import extend, held_rows
+
 
 Rat = tuple[int, int, int]  # (preperiod p, period q, cells 0 .. p + q - 1 as bits), p and q least
 U64 = np.uint64
@@ -232,15 +233,6 @@ def zoo_points(max_n: int, max_q: int, columns: int = 1024) -> set[Rat]:
     return out
 
 
-def periodic_orbit(x: Rat) -> list[Rat]:
-    """The orbit of the periodic point x of H^2."""
-    out, y = [x], h2(x)
-    while y != x:
-        out.append(y)
-        y = h2(y)
-    return out
-
-
 def landing(x: Rat, periodic: set[Rat]) -> tuple[Rat, int]:
     """The periodic point that the orbit of x under H^2 first meets, and the applications of H^2 it takes."""
     n = 0
@@ -313,12 +305,13 @@ def closure_levels(seeds: set[Rat], big_q: int, levels: int,
 def odd_steps_ok(x: np.ndarray) -> np.ndarray:
     """Whether each number of 64 cells (n,) keeps bit 0 of H^t odd at every odd t < 64 (bit 0 at step t reads the cells
     0 .. t only, so the numbers decide these steps): (n,) of bool."""
+    # x: (n,) uint64
     ok = np.ones(len(x), dtype=bool)  # (n,)
     for t in range(1, 64):
         x = (x >> ONE) ^ (x | (x << ONE))  # (n,)
         if t % 2 == 1:
             ok &= (x & ONE) == ONE
-    return ok
+    return ok  # (n,)
 
 
 def ring_transients(q: int) -> dict[tuple[int, int], int]:
@@ -358,7 +351,7 @@ def ring_transients(q: int) -> dict[tuple[int, int], int]:
             name = (least_cyclic_period(c, q), len(cycle))
             for y in cycle:
                 cls[y] = name
-    for c, d in zip(cur.tolist(), depth.tolist()):
+    for c, d in zip(cur.tolist(), depth.tolist(), strict=True):  # (2^q,) each
         out[cls[c]] = max(out.get(cls[c], 0), d)
     return out
 
@@ -390,7 +383,7 @@ def search_points(path: str, depth: int) -> tuple[set[Rat], Counter[int]]:
     run (0 a break of K, 1 a point of K, -1 undecided)."""
     out: set[Rat] = set()
     how: Counter[int] = Counter()
-    with open(path) as handle:
+    with open(path, encoding="utf-8") as handle:
         lines = handle.read().split("\n")
     for line in tqdm([s for s in lines if s.strip()], desc="hits", file=sys.stderr, leave=False):
         q, high, low = line.split()
@@ -414,6 +407,7 @@ def denominator(x: Rat) -> int:
 
 def bit_length64(x: np.ndarray) -> np.ndarray:
     """The bit length of each 64-bit word (...,), exactly, through two 32-bit halves converted to floats: (...,)."""
+    # x: (...,) uint64
     high = (x >> U64(32)).astype(np.float64)  # (...,)
     low = (x & U64(0xFFFFFFFF)).astype(np.float64)  # (...,)
     _, eh = np.frexp(high)  # (...,)
@@ -423,6 +417,7 @@ def bit_length64(x: np.ndarray) -> np.ndarray:
 
 def row_tops(d: np.ndarray, cells: int) -> np.ndarray:
     """The highest set cell below `cells` of each row (n, W) of words, -1 for none: (n,)."""
+    # d: (n, W) uint64
     n, words = d.shape
     d = d.copy()  # (n, W)
     for k in range(words):
@@ -439,7 +434,7 @@ def row_tops(d: np.ndarray, cells: int) -> np.ndarray:
 
 def ether_rows(a: int, o: int, words: int) -> np.ndarray:
     """The ether at (a, o) on 64 `words` cells as one row of words: (words,)."""
-    e = background(a, o, 64 * words)
+    e = background(a, o, 0, 64 * words)
     return np.array([(e >> (64 * k)) & mask(64) for k in range(words)], dtype=U64)  # (words,)
 
 
@@ -451,9 +446,9 @@ def descent(h: int, a: int, o: int, max_steps: int = 0) -> dict[str, object]:
     h + 2 max_steps < 64 W: cell j of H^t is right while j + t < 64 W, and the defect at step t lies below h + t."""
     steps = max_steps or 3 * h + 16
     words = (h + 2 * steps) // 64 + 1
-    x = np.array([background(a, o, 64) & ~mask(h)], dtype=U64)  # (1,)
+    x = np.array([background(a, o, 0, 64) & ~mask(h)], dtype=U64)  # (1,)
     x = extend(x, h, 0, h)  # (2^ceil(h / 2),): the leaves of the tree at h cells, the ether above
-    eth_head = background(a, o, h)
+    eth_head = background(a, o, 0, h)
     x = x[((x & U64(mask(h))) ^ U64(eth_head)) >> U64(h - 1) == ONE]  # (n,): the defect has exactly h cells
     leaves = len(x)
     rows = np.tile(ether_rows(a, o, words), (leaves, 1))  # (n, W)

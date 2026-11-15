@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
@@ -45,6 +44,7 @@ def free_counts(n: int) -> np.ndarray:
 def subcube_constant(table: np.ndarray, n: int) -> np.ndarray:
     """True for the subcubes on which the function with this truth table (bit i of the index is variable i) is
     constant. Axis k of the result is variable n - 1 - k, with digit 2 meaning free."""
+    # table: (2^n,)
     cube = table.astype(np.int8).reshape([2] * n)  # (2,)*n
     low, high = cube, cube.copy()
     for axis in range(n):
@@ -57,6 +57,7 @@ def subcube_constant(table: np.ndarray, n: int) -> np.ndarray:
 
 def sensitivity_counts(table: np.ndarray, n: int) -> np.ndarray:
     """For every row, the bit mask of the cells whose flip changes the function."""
+    # table: (2^n,)
     index = np.arange(1 << n, dtype=np.int64)  # (2^n,)
     mask = np.zeros(1 << n, dtype=np.int64)  # (2^n,)
     for i in range(n):
@@ -78,6 +79,7 @@ def sensitivity_profile(t: int) -> tuple[int, int, int]:
 
 def certificate_complexity(table: np.ndarray, n: int) -> int:
     """max over rows x of the least number of cells whose values at x make the function constant."""
+    # table: (2^n,)
     size = np.where(subcube_constant(table, n), n - free_counts(n), n + 1).astype(np.int8)  # (3,)*n
     for axis in range(n):  # a row's value is the least size over the constant subcubes that contain it
         free = np.take(size, 2, axis=axis)  # (3,)*(n-1)
@@ -91,6 +93,7 @@ def adversary_wins(table: np.ndarray, n: int, fixed: dict[int, int]) -> bool:
     """Whether an adversary that answers variable i with fixed[i] (and any other variable as it likes) forces every
     tree to read all n variables: the game over subcubes, where a subcube with one free variable is won when the
     function is not constant on it."""
+    # table: (2^n,)
     constant = subcube_constant(table, n)  # (3,)*n
     free = free_counts(n)  # (3,)*n
     alive = (free == 0) | ~constant  # (3,)*n
@@ -121,12 +124,14 @@ def fixed_answer_cells(t: int) -> dict[int, list[int]]:
 
 def evasive(table: np.ndarray, n: int) -> bool:
     """Whether every decision tree for this truth table reads all n variables on some row."""
+    # table: (2^n,)
     return adversary_wins(table, n, {})
 
 
 def one_step(table: np.ndarray, m: int) -> np.ndarray:
     """F o Phi for F on m cells y_0 .. y_{m-1}: the function of the m + 2 cells x_0 .. x_{m+1} with
     y_j = x_j xor (x_{j+1} or x_{j+2})."""
+    # table: (2^m,)
     index = np.arange(1 << (m + 2), dtype=np.int64)  # (2^(m+2),)
     cells = [(index >> i) & 1 for i in range(m + 2)]  # (m + 2) x (2^(m+2),)
     image = np.zeros(1 << (m + 2), dtype=np.int64)  # (2^(m+2),)

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations.restricted_models import (
@@ -29,8 +28,11 @@ def _strip_by_dict(rule: int, left: int, right: int, steps: int) -> list[int]:
     row = {j: int(j == 0) for j in range(-left, right + 1)}
     out = [1]
     for _ in range(steps):
-        get = lambda j: row.get(j, 0)
-        row = {j: (rule >> (4 * get(j - 1) + 2 * get(j) + get(j + 1))) & 1 for j in range(-left, right + 1)}
+
+        def get(j: int) -> int:
+            return row.get(j, 0)
+
+        row ={j: (rule >> (4 * get(j - 1) + 2 * get(j) + get(j + 1))) & 1 for j in range(-left, right + 1)}
         out.append(row[0])
     return out
 
@@ -63,14 +65,19 @@ def _min_by_choices(n: int) -> int:
     certificate is such a closure, so this is the minimum, found without integer programming."""
     x = spacetime_cone(30, n)  # (n + 1, 2n + 1)
     black = {(s, j - n) for s, j in np.argwhere(x).tolist() if abs(j - n) <= s}  # the cone's black cells
-    value = lambda s, j: int((s, j) in black)
+
+    def value(s: int, j: int) -> int:
+        return int((s, j) in black)
+
     choice_cells = [
         (s, j) for (s, j) in certificate_cells(n) if s >= 2 and value(s - 1, j) == 1 and value(s - 1, j + 1) == 1
     ]
     # the parents each cell of the cone puts in the closure, the cells at step 0 and outside the cone left out: the
     # xor-parent, then the black or-parent, or both or-parents when neither is black; at a choice cell the or-parent
     # is the choice's, read from `chosen` by the choice's index
-    inside = lambda s, j: s > 0 and abs(j) <= s
+    def inside(s: int, j: int) -> bool:
+        return s > 0 and abs(j) <= s
+
     index = {cell: i for i, cell in enumerate(choice_cells)}
     parents, chosen = {}, {}
     for s in range(1, n + 1):

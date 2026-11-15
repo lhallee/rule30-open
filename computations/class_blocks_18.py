@@ -30,6 +30,7 @@ from tqdm.auto import tqdm
 from computations import class_blocks as cb
 from computations import class_certificate as cc
 
+
 # Each block with the least width of the class test and of the plain game (0: not closed by the game at 16 cells), from
 # `class_blocks_wide --report` on the survey at 16 cells.
 BLOCKS: tuple[tuple[str, int, int], ...] = (

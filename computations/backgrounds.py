@@ -18,6 +18,7 @@ import numpy as np
 from itertools import product
 from tqdm.auto import tqdm
 
+from computations.cyclic_words import least_rotation
 from computations.frames import Bits, minimal, phi_rational, psi, to_int
 
 
@@ -37,14 +38,14 @@ def background_column(prefix: Bits, period: Bits, bits: int) -> np.ndarray:
 def periodic_columns(max_period: int, max_prefix: int, bits: int) -> list[tuple[Bits, Bits, int]]:
     """Every row with a period word up to `max_period` and a prefix up to `max_prefix` cells whose column is eventually
     periodic, as (prefix, period word, column period), each row once in its minimal form."""
-    rows = {}
+    rows: dict[tuple[tuple[int, ...], tuple[int, ...]], tuple[Bits, Bits]] = {}  # each minimal form once
     for p in range(1, max_period + 1):
         for word in product((0, 1), repeat=p):
             for length in range(max_prefix + 1):
                 for prefix in product((0, 1), repeat=length):
                     small = minimal(list(prefix), list(word))
                     rows[(tuple(small[0]), tuple(small[1]))] = small
-    found = []
+    found: list[tuple[Bits, Bits, int]] = []
     for prefix, period in tqdm(rows.values(), desc="rows", file=sys.stderr, mininterval=5):
         p = column_period(background_column(prefix, period, bits), 64)
         if p is not None:
@@ -72,7 +73,7 @@ def main() -> None:
     backgrounds: dict[str, set[int]] = {}
     for _, period, p in found:
         word = "".join(map(str, period))
-        backgrounds.setdefault(min(word[i:] + word[:i] for i in range(len(word))), set()).add(p)
+        backgrounds.setdefault(least_rotation(word), set()).add(p)
     for word, periods in sorted(backgrounds.items(), key=lambda item: (len(item[0]), item[0])):
         print(f"background {word}: column periods {sorted(periods)}")
     for prefix, period, p in found:

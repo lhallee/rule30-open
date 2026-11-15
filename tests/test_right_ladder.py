@@ -4,7 +4,6 @@ against the dynamic program, and the single cell as a member of every level."""
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations.right_ladder import (committed, first_change, free_decided, ladder_beam, ladder_exact, level_step,

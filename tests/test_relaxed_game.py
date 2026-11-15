@@ -6,14 +6,14 @@ from __future__ import annotations
 
 import itertools
 import random
-
 import numpy as np
+import pytest
 
+from computations import relaxed_game as rg
 from computations.driver_density import admissible_drivers, driver_dp
 from computations.rule30 import step as row_step
 from computations.run_mechanism import black_reach
 
-from computations import relaxed_game as rg
 
 def python_layers(T: int) -> list[dict[int, int]]:
     """Every left half reachable at t = 0 .. T with its largest payoff, uncut, over Python integers."""
@@ -86,7 +86,8 @@ def test_beam() -> None:
     wide = rg.beam(40, 100_000)  # wider than every layer: exact
     assert wide.best == E and sum(wide.play) == E[40]
     narrow = rg.beam(40, 5)
-    assert all(b <= e for b, e in zip(narrow.best, E)) and sum(narrow.play) == narrow.best[40]
+    # strict=False: the length of narrow.best is the count of lines the C program prints
+    assert all(b <= e for b, e in zip(narrow.best, E, strict=False)) and sum(narrow.play) == narrow.best[40]
     rg.play_rows(narrow.play)  # legal
     assert rg.values(100)[100] == 62  # E(100), quoted
 
@@ -176,11 +177,11 @@ def test_reduction_from_lambda_l() -> None:
                 x = rg.step(x, c[t])
         B, D = sum(c[:T]), sum(e[:T - 1])  # over c(0 .. T - 1)
         assert D <= B <= (D + T + 1) / 2 and sum(e) <= E[T]
-    M, Dmax = rg.lambda_values(40)
+    M, d_max = rg.lambda_values(40)
     assert M[:31] == [r.best for r in driver_dp(30)]
-    assert all(d <= e for d, e in zip(Dmax, E))
+    assert all(d <= e for d, e in zip(d_max, E, strict=False))  # D(0 .. 40) against E(0 .. 60): the first 41
     for n in range(2, 14):  # the most doubled black times over every admissible word c(0 .. n - 1)
-        assert Dmax[n - 1] == max(sum(w[t] & w[t + 1] for t in range(n - 1)) for w in admissible_drivers(n))
+        assert d_max[n - 1] == max(sum(w[t] & w[t + 1] for t in range(n - 1)) for w in admissible_drivers(n))
 
 
 def test_lemma_checks() -> None:
@@ -201,12 +202,8 @@ def test_checks_catch_a_wrong_rule() -> None:
     try:
         rg.rule_image = lambda row: [None] + [row[i - 1] ^ (row[i] | (1 - row[i + 1]))
                                              for i in range(1, len(row) - 1)] + [None]
-        try:
+        with pytest.raises(AssertionError):  # the erosion check must reject Rule 45
             rg.check_erosion(11)
-        except AssertionError:
-            pass
-        else:
-            raise AssertionError("the erosion check accepted Rule 45")
     finally:
         rg.rule_image = original
 
@@ -224,7 +221,7 @@ def direct_windows(play: list[int], lam: int, kmin: int, side: str) -> float:
 
 def test_covering_lemma() -> None:
     rng = random.Random(7)
-    for trial in range(200):
+    for _ in range(200):
         T = rng.randint(1, 150)
         p = rng.choice((0.5, 0.8, 0.95))
         word = [int(rng.random() < p) for _ in range(T)]
@@ -238,7 +235,7 @@ def test_covering_lemma() -> None:
             # the largest eps with CP: every run of k >= K has at least eps k - C zeros in its window
             zeros = [sum(1 for t in range(max(a - lam * k, 0), min(a + k + lam * k, T)) if word[t] == 0)
                      for a, k in long]
-            eps = min((z + C) / k for z, (_, k) in zip(zeros, long))
+            eps = min((z + C) / k for z, (_, k) in zip(zeros, long, strict=True))
             if eps <= 0:
                 continue
             Kp = rg.covering_constant(lam, eps, C, K)

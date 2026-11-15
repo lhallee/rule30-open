@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import itertools
-from math import comb
-
 import numpy as np
+
+from math import comb
 
 from computations import certificate_lower as cl
 from computations import min_certificate as mc
@@ -20,7 +20,7 @@ def plain_table(t: int) -> np.ndarray:
         while len(row) > 1:
             row = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, len(row) - 1)]  # (len - 2,)
         out[index] = row[0]
-    return out
+    return out  # (2^n,)
 
 
 def test_comb_derivative_is_binomial() -> None:
@@ -35,7 +35,7 @@ def test_comb_derivative_is_binomial() -> None:
             for index in range(1 << (2 * t + 1)):
                 total = 0
                 for flips in itertools.product((0, 1), repeat=len(cells)):
-                    total ^= int(table[index ^ sum(f << (c + t) for f, c in zip(flips, cells))])
+                    total ^= int(table[index ^ sum(f << (c + t) for f, c in zip(flips, cells, strict=True))])
                 values.add(total)
             assert values == {comb(t, j + 1) % 2} == cl.comb_derivative(t, j)
 
@@ -72,9 +72,9 @@ def test_window_lengths_and_bound() -> None:
             window = range(k, k + length)
             outside = [i for i in range(n) if i not in window and i != 0]
             screened = any(
-                len({int(table[base | sum(b << i for b, i in zip(inner, window))])
+                len({int(table[base | sum(b << i for b, i in zip(inner, window, strict=True))])
                      for inner in itertools.product((0, 1), repeat=length)}) == 1
-                for base in (sum(b << i for b, i in zip(bits, outside))
+                for base in (sum(b << i for b, i in zip(bits, outside, strict=True))
                              for bits in itertools.product((0, 1), repeat=len(outside))))
             if not screened:
                 found = length

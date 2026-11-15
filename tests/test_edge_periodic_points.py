@@ -87,10 +87,11 @@ def test_period_four_is_free_modulo_16() -> None:
 
 
 def _trailing_zeros(d: np.ndarray, cap: int) -> np.ndarray:
-    """2-adic valuation of each entry of d, capped at cap (0 maps to cap). d: shape (M,), int64."""
-    low = d & -d  # shape (M,)
-    tz = np.where(low == 0, cap, np.log2(np.maximum(low, 1)).astype(np.int64))  # shape (M,)
-    return np.minimum(tz, cap)
+    """2-adic valuation of each int64 entry of d, capped at cap (0 maps to cap)."""
+    # d: (M,)
+    low = d & -d  # (M,)
+    tz = np.where(low == 0, cap, np.log2(np.maximum(low, 1)).astype(np.int64))  # (M,)
+    return np.minimum(tz, cap)  # (M,)
 
 
 def test_escape_depth_period_32_without_the_graph() -> None:

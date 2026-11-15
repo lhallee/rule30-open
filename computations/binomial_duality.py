@@ -26,12 +26,13 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.algebra import moebius
 from computations.rule30 import center_column
+
 
 MULTIPLES = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 17, 21, 31)
 

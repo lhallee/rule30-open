@@ -32,14 +32,15 @@ from __future__ import annotations
 
 import argparse
 import math
+
 from collections.abc import Callable, Hashable
 from dataclasses import dataclass
 from typing import Literal
-
 from tqdm import tqdm
 
 from computations import one_tape
 from computations.rule30 import center_column
+
 
 Move = Literal[-1, 0, 1]
 State = Hashable
@@ -99,11 +100,11 @@ def run_kit(machine: KitMachine, n: int, max_steps: int | None = None) -> tuple[
     transition counts)."""
     tape, state, head, steps = binary_input(n), machine.start, 0, 0
     while max_steps is None or steps < max_steps:
-        result = machine.delta(state, tape.get(head, BLANK))
+        action = machine.delta(state, tape.get(head, BLANK))
         steps += 1
-        if len(result) == 1:
-            return bool(result[0]), steps
-        state, symbol, move = result
+        if len(action) == 1:
+            return bool(action[0]), steps
+        state, symbol, move = action
         tape[head] = symbol
         head += move
     raise RuntimeError(f"no halt within {max_steps} steps on input {n}")
@@ -134,7 +135,7 @@ def unary_part(symbol: Symbol) -> Symbol:
     return symbol[0] if isinstance(symbol, tuple) else symbol
 
 
-def u2b_step(state: tuple, symbol: Symbol) -> tuple[State, Symbol, Move]:
+def u2b_step(state: tuple[str | int, ...], symbol: Symbol) -> tuple[State, Symbol, Move]:
     """The table of u2b. States: ('scan', p, seen) walks right over the unary region, p the parity of the ones met so
     far and seen whether there was one; ('back', d) walks left to the blank before cell 0 with the digit d;
     ('slot', d) walks right over the cells that carry digits and writes d on the first that does not; ('back2',)
@@ -181,7 +182,7 @@ def u2b_step(state: tuple, symbol: Symbol) -> tuple[State, Symbol, Move]:
 B2U_START = ("dec",)
 
 
-def b2u_step(state: tuple, symbol: Symbol) -> tuple[State, Symbol, Move]:
+def b2u_step(state: tuple[str | int, ...], symbol: Symbol) -> tuple[State, Symbol, Move]:
     """The table of b2u. States: ('dec',) subtracts one (zeros become ones up to the lowest one, which becomes zero;
     the blank after the counter means it was zero); ('lsb',) walks left to the cell before the counter; ('pick',)
     takes the lowest digit and leaves a ONE; ('shift', d) carries each digit one cell right; ('ret',) walks left to the
@@ -303,10 +304,10 @@ def unary_of_kit(machine: KitMachine) -> UnaryTM:
             nxt, out, move = u2b_step(inner, symbol)
             return (("kit", machine.start) if nxt == NEXT else ("u2b", nxt)), out, move
         if tag == "kit":
-            result = machine.delta(inner, kit_symbol(symbol))
-            if len(result) == 1:
-                return ("halt", bool(result[0])), symbol, 0
-            nxt, out, move = result
+            action = machine.delta(inner, kit_symbol(symbol))
+            if len(action) == 1:
+                return ("halt", bool(action[0])), symbol, 0
+            nxt, out, move = action
             return ("kit", nxt), out, move
         return state, symbol, 0  # a halting state; `run_unary` never steps it, as `OneTapeGap.step` keeps it
 
@@ -324,7 +325,7 @@ def kit_of_unary(machine: UnaryTM) -> KitMachine:
             return symbol[1]
         return machine.one if symbol == ONE else machine.blank  # the digits are gone from the tape when it starts
 
-    def delta(state: State, symbol: Symbol) -> tuple:
+    def delta(state: State, symbol: Symbol) -> tuple[bool] | tuple[State, Symbol, Move]:
         tag, inner = state
         if tag == "b2u":
             nxt, out, move = b2u_step(inner, symbol)

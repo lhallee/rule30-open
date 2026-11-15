@@ -382,7 +382,7 @@ def test_white_gap() -> None:
                for word, phase, body in re.findall(r"def entries(\d{4})_(\d) : List \(Nat × Nat\) :=\s*\[([^\]]*)\]",
                                                    module("Columns/EmptyRight"))}
     gaps = {"0001": 316, "0011": 535, "0111": 310}
-    for word, gap in gaps.items():
+    for gap in gaps.values():
         assert f"p ≤ {gap} → x p = false" in module("Columns/WhiteGap")
     rng = np.random.default_rng(30)
     for (word, phase), pairs in entries.items():
@@ -412,11 +412,12 @@ def test_sparse_right() -> None:
     bounds = {"0001": 778, "0011": 1359, "0111": 623}
     for word, g in bounds.items():
         assert f"theorem sparse_{word} (φ : Nat) (x : Nat → Bool) (hx : AtMostTwo {g} x)" in source
-    data = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
-            for word, phase, body in re.findall(r"def cells(\d{4})_(\d) : List Nat := \[([^\]]*)\]", source)}
-    assert len(data) == 12
+    numbers_by_phase = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+                        for word, phase, body in re.findall(r"def cells(\d{4})_(\d) : List Nat := \[([^\]]*)\]",
+                                                            source)}
+    assert len(numbers_by_phase) == 12
     rng = np.random.default_rng(32)
-    for (word, phase), numbers in data.items():
+    for (word, phase), numbers in numbers_by_phase.items():
         g = bounds[word]
         assert len(numbers) == 30
         halves, listed = [], []
@@ -451,11 +452,12 @@ def test_ten_cells() -> None:
     bounds = {"0001": 562, "0011": 654, "0111": 371}
     for word, g in bounds.items():
         assert f"theorem ten_{word} (φ : Nat) (x : Nat → Bool) (hx : ∀ p, 10 < p → p ≤ {g} → x p = false)" in source
-    data = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
-            for word, phase, body in re.findall(r"def halves(\d{4})_(\d) : List Nat := \[([^\]]*)\]", source)}
-    assert len(data) == 12
+    numbers_by_phase = {(word, int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+                        for word, phase, body in re.findall(r"def halves(\d{4})_(\d) : List Nat := \[([^\]]*)\]",
+                                                            source)}
+    assert len(numbers_by_phase) == 12
     rng = np.random.default_rng(44)
-    for (word, phase), numbers in data.items():
+    for (word, phase), numbers in numbers_by_phase.items():
         g = bounds[word]
         assert len(numbers) == 8
         entries = [e for number in numbers for e in small_halves.decode(number, 128)]
@@ -479,9 +481,10 @@ def test_ether_prefix_data() -> None:
     from computations import absorption, ether_prefix
     wall = absorption.kit_wall()  # (4, 2^13)
     source = module("Columns/EtherPrefix")
-    data = {(word, int(j0), int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
-            for word, j0, phase, body in re.findall(r"def tails(\d{4})_(\d)_(\d) : List Nat := \[([^\]]*)\]", source)}
-    assert len(data) == 24
+    numbers_by_phase = {(word, int(j0), int(phase)): [int(n, 16) for n in re.findall(r"0x([0-9a-f]+)", body)]
+                        for word, j0, phase, body in re.findall(
+                            r"def tails(\d{4})_(\d)_(\d) : List Nat := \[([^\]]*)\]", source)}
+    assert len(numbers_by_phase) == 24
 
     def in_family(word: str, alignments: list[tuple[int, int]], row: int, phase: int, k: int) -> bool:
         return any((j0 + k) % 7 == 2 and wall[(phase + shift) % 4][(row >> k) & 0x1FFF]
@@ -489,7 +492,7 @@ def test_ether_prefix_data() -> None:
                    for j0, shift in alignments)
 
     rng = np.random.default_rng(34)
-    for (word, j0, phase), numbers in data.items():
+    for (word, j0, phase), numbers in numbers_by_phase.items():
         shift = dict(absorption.ALIGNMENTS[word])[j0]
         psi = (phase + shift) % 4
         assert len(numbers) == 16
@@ -634,7 +637,6 @@ def test_wall_segments_lean() -> None:
 def test_wall_sets_lean() -> None:
     """`WallSets`, read from its source: the wall is the four windows `0 1 *` and the zero cycle of the parity
     families is the one that `wall_segments` computes, with the set numbered by the windows' bits."""
-    import itertools
     from computations import wall_segments
     source = module("Columns/WallSets")
     def number(windows: frozenset) -> int:

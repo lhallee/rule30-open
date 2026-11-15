@@ -43,16 +43,18 @@ the largest head counts the true points for every p <= head, by the bit length o
 from __future__ import annotations
 
 import argparse
-import resource
 import sys
-from collections import Counter
-
 import numpy as np
+
+from collections import Counter
 from tqdm.auto import tqdm
 
-from computations.ether_certificate import background, eth
+from computations.cyclic_words import least_array_period
+from computations.defect_potential import background
+from computations.ether_certificate import eth
 from computations.ether_k_tree import ether_tail
 from computations.no_k_tails16 import column_after
+
 
 U64 = np.uint64
 ONE = U64(1)
@@ -65,24 +67,27 @@ WIDE = 4096  # cells of the background held for the exact run; a defect whose to
 def held_words(x: np.ndarray) -> np.ndarray:
     """One step of the held map on numbers of 64 cells, one per entry (n,); the top cell reads a 0 above it, so cell j
     of H^t is right while j + t < 64: (n,)."""
-    return (x >> ONE) ^ (x | (x << ONE))
+    # x: (n,) uint64
+    return (x >> ONE) ^ (x | (x << ONE))  # (n,)
 
 
 def held_rows(x: np.ndarray) -> np.ndarray:
     """One step of the held map on numbers of 64 W cells, word k the cells 64 k .. 64 k + 63 (n, W); the top cell reads
     a 0 above it: (n, W)."""
+    # x: (n, W) uint64
     up = x >> ONE  # (n, W)
     up[:, :-1] |= x[:, 1:] << U64(63)
     down = x << ONE  # (n, W)
     down[:, 1:] |= x[:, :-1] >> U64(63)
-    return up ^ (x | down)
+    return up ^ (x | down)  # (n, W)
 
 
 def bit0_after(x: np.ndarray, d: int) -> np.ndarray:
     """Bit 0 of H^d of each number of 64 cells (n,), for d < 64: (n,) of 0 and 1."""
+    # x: (n,) uint64
     for _ in range(d):
-        x = held_words(x)
-    return x & ONE
+        x = held_words(x)  # (n,)
+    return x & ONE  # (n,)
 
 
 def extend(x: np.ndarray, head: int, start: int, stop: int) -> np.ndarray:
@@ -90,6 +95,7 @@ def extend(x: np.ndarray, head: int, start: int, stop: int) -> np.ndarray:
     cells below `start` chosen, the cells start .. head - 1 at 0 and the ether from `head` on: both values at an even
     cell of the head, the value that keeps bit 0 of H^d odd at an odd cell d of the head, and the test of that bit at an
     odd cell d >= head: (m,)."""
+    # x: (n,) uint64
     for d in range(start, stop):
         if d < head and d % 2 == 0:
             x = np.concatenate([x, x | (ONE << U64(d))])  # (2 n,)
@@ -97,7 +103,7 @@ def extend(x: np.ndarray, head: int, start: int, stop: int) -> np.ndarray:
             x = x | ((bit0_after(x, d) ^ ONE) << U64(d))  # (n,): the value of cell d that keeps bit 0 odd
         elif d % 2 == 1:
             x = x[bit0_after(x, d) == ONE]  # (m,)
-    return x
+    return x  # (m,)
 
 
 def tree_survivors(head: int, a: int, o: int, steps: int = 63, chunk: int = 1 << 18) -> np.ndarray:
@@ -106,30 +112,31 @@ def tree_survivors(head: int, a: int, o: int, steps: int = 63, chunk: int = 1 <<
     tree is grown to a cell with at most `chunk` nodes and finished on groups of `chunk` / 2^(the rest / 2) nodes, so
     that no array holds more than about `chunk` numbers."""
     assert head <= 64 and steps < 64
-    x = np.array([background(a, o, 64) & ~((1 << head) - 1)], dtype=U64)  # (1,): no cell of the head chosen
+    x = np.array([background(a, o, 0, 64) & ~((1 << head) - 1)], dtype=U64)  # (1,): no cell of the head chosen
     split = 0
     while split < head and 2 ** ((split + 1) // 2) < chunk:
         split += 1
     x = extend(x, head, 0, split)  # (2^ceil(split / 2),)
     group = max(1, chunk >> ((head - split + 1) // 2))
     parts = [extend(x[i:i + group], head, split, steps + 1) for i in range(0, len(x), group)]
-    return np.sort(np.concatenate(parts))
+    return np.sort(np.concatenate(parts))  # (m,)
 
 
 def as_rows(values: list[int], words: int) -> np.ndarray:
     """Python integers as rows of 64-bit words, word k the cells 64 k .. 64 k + 63: (len(values), words)."""
     mask = (1 << 64) - 1
-    return np.array([[(v >> (64 * k)) & mask for k in range(words)] for v in values], dtype=U64).reshape(-1, words)
+    return np.array([[(v >> (64 * k)) & mask for k in range(words)] for v in values], dtype=U64).reshape(-1, words)  # (len(values), words)
 
 
 def wide_survivors(x: np.ndarray, a: int, o: int, cells: int = CELLS) -> tuple[np.ndarray, Counter[int]]:
     """The numbers of 64 cells x (n,), each a head and the ether at (a, o) above it, whose half passes every odd step
     below `cells`: (m,); and for the others how many first have bit 0 equal to 0 at each odd step."""
+    # x: (n,) uint64
     assert cells % 64 == 0
     words = cells // 64
     rows = np.empty((len(x), words), dtype=U64)  # (n, words)
     rows[:, 0] = x
-    tail = background(a, o, cells)
+    tail = background(a, o, 0, cells)
     rows[:, 1:] = as_rows([tail >> 64], words - 1)  # the ether above cell 63
     keep = np.arange(len(x))  # (n,): the index in x of each row
     broke: Counter[int] = Counter()
@@ -140,10 +147,10 @@ def wide_survivors(x: np.ndarray, a: int, o: int, cells: int = CELLS) -> tuple[n
             if not ok.all():
                 broke[t] += int((~ok).sum())
             rows, keep = rows[ok], keep[ok]
-    return x[keep], broke
+    return x[keep], broke  # (m,)
 
 
-BACK = [[background(a, o, WIDE) for o in range(7)] for a in range(4)]  # the ether of WIDE cells by phase and offset
+BACK = [[background(a, o, 0, WIDE) for o in range(7)] for a in range(4)]  # the ether of WIDE cells by phase, offset
 
 
 def dstep(d: int, phase: int, o: int) -> int:
@@ -198,18 +205,12 @@ def orbit_key(states: list[tuple[int, int]], o: int) -> tuple[int, int, int]:
     return o, phase, d
 
 
-def least_period(seq: list[int]) -> int:
-    """The least q > 0 with seq[i + q] = seq[i] cyclically (q divides len(seq))."""
-    n = len(seq)
-    return next(q for q in range(1, n + 1) if n % q == 0 and all(seq[i] == seq[(i + q) % n] for i in range(n)))
-
-
 def itinerary_period(states: list[tuple[int, int]], o: int) -> int:
     """The least period of the itinerary (bit 0 at the even steps) on the cycle `states`, which starts at a step that
     is a multiple of 4 (`cycle_states`)."""
     bits = [(d & 1) ^ int(eth(phase, o)) for phase, d in states]
     assert all(bits[1::2])  # the odd steps of a point of K
-    return least_period(bits[0::2])
+    return least_array_period(np.array(bits[0::2]))
 
 
 def preimage(d: int, a: int, o: int, c: int) -> int:
@@ -288,7 +289,7 @@ def classify(head: int, cells: int = CELLS, max_steps: int = MAX_STEPS,
         out["survive_wide"] += len(wide)
         for _, broke in parts:
             out["late_breaks"].update(broke)
-        eth_head = background(a, o, head)
+        eth_head = background(a, o, 0, head)
         for n in wide:
             d0 = (int(n) & low) ^ eth_head
             r = settle(d0, a, o, max_steps)
@@ -367,7 +368,7 @@ def tail7_closure(seeds: set[tuple[int, int, int]]) -> set[tuple[tuple[int, ...]
     out = set()
     for a, o, d in seeds:
         n = d.bit_length() + 7
-        u = d ^ background(a, o, n + 7)
+        u = d ^ background(a, o, 0, n + 7)
         out.add(periodic7([(u >> j) & 1 for j in range(n + 7)], n))
     todo = list(out)
     while todo:
@@ -450,16 +451,16 @@ def report(head: int, cells: int, max_steps: int) -> None:
     by_align = Counter((a, o) for a, o, _, _ in points)
     print("by alignment (a, o): " + ", ".join(f"{k}: {v}" for k, v in sorted(by_align.items())))
     orbits: Counter[tuple[int, int, int]] = Counter()
-    info: dict[tuple[int, int, int], tuple[int, int, int]] = {}
+    orbit_summary: dict[tuple[int, int, int], tuple[int, int, int]] = {}
     for a, o, d0, rr in points:
         states = cycle_states(d0, a, o, rr)
         key = orbit_key(states, o)
         orbits[key] += 1
-        info[key] = (rr["period"], itinerary_period(states, o), rr["cycle_top"])
+        orbit_summary[key] = (rr["period"], itinerary_period(states, o), rr["cycle_top"])
     print(f"{len(orbits)} periodic orbits reached (offset, phase, least defect: points; period, itinerary period, "
           f"top of the cycle):")
     for key, v in sorted(orbits.items()):
-        print(f"  {key}: {v}; {info[key]}")
+        print(f"  {key}: {v}; {orbit_summary[key]}")
     print(f"latest repeat at step {max((rr['step'] for *_, rr in points), default=0)}, highest top "
           f"{max((rr['top'] for *_, rr in points), default=-1)}")
     seeds = periodic_seeds(points)
@@ -482,6 +483,10 @@ def report(head: int, cells: int, max_steps: int) -> None:
     tails = tail7_closure(seeds)
     print(f"with any tail of period 7 the closure has {len(tails)} points, {sum(q <= 57 for _, q in tails)} of them "
           f"with a preperiod of at most 57 (the search of item 7 of the shift model finds 278 with denominator 127)")
+    try:
+        import resource
+    except ModuleNotFoundError as error:
+        raise RuntimeError("the peak memory is read with the resource module, which only Unix has") from error
     print(f"peak memory {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2 ** 20:.2f} GB")
 
 

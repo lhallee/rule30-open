@@ -12,26 +12,37 @@ in `negative-results/<category>/`, and `categories.yaml` lists the categories.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
 import tempfile
 import yaml
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 
 ROOT = Path(__file__).resolve().parent.parent
-LEAN_ROOT = ROOT / "Rule30Open"
-LIBRARY_FILE = ROOT / "Rule30Open.lean"
-CATALOG_FILE = ROOT / "CATALOG.md"
-CATEGORIES_FILE = ROOT / "categories.yaml"
-FINDINGS_ROOT = ROOT / "findings"
-NEGATIVE_ROOT = ROOT / "negative-results"
+LEAN_DIR = "Rule30Open"
+LIBRARY_FILE = "Rule30Open.lean"
+CATALOG_FILE = "CATALOG.md"
+CATEGORIES_FILE = "categories.yaml"
+FINDINGS_DIR = "findings"
+NEGATIVE_DIR = "negative-results"
+# The Markdown files outside the entries whose links `check` follows; .lake and other hidden directories stay out.
+DOCUMENT_GLOBS = ("*.md", "computations/*.md", "literature/*.md", "tests/*.md", "findings/README.md",
+                  "negative-results/README.md")
 NAMESPACE = "Rule30Open"
 
-STATUSES = {"lean": ("proved",), "finding": ("paper", "computed", "conjecture"), "negative": ("negative",)}
+Kind = Literal["lean", "finding", "negative"]
+STATUSES: dict[Kind, tuple[str, ...]] = {
+    "lean": ("proved",),
+    "finding": ("paper", "computed", "conjecture"),
+    "negative": ("negative",),
+}
 STATUS_LABELS = {
     "proved": "proved in Lean",
     "paper": "proved on paper",
@@ -50,17 +61,25 @@ NEGATIVE_KINDS = ("no-signal", "refuted", "dead-end", "barrier")
 FORMALIZATIONS = ("wanted", "partial", "kit", "not-applicable")
 FORMALIZATION_LABELS = {"wanted": "wanted", "partial": "partial", "kit": "proved in the kit",
                         "not-applicable": "not applicable"}
+PROBLEMS = (1, 2, 3)
 COMMON_FIELDS = ("title", "category", "problems", "status")
 # The fields each kind of entry may carry beyond COMMON_FIELDS. Git history records who wrote what, and when.
-ENTRY_FIELDS = {
+ENTRY_FIELDS: dict[Kind, tuple[str, ...]] = {
     "lean": ("lean", "headline", "kit", "kit_modules", "evidence"),
     "finding": ("formalization", "evidence"),
     "negative": ("kind", "evidence"),
 }
+TEXT_FIELDS = ("title", "category", "status", "lean", "kit", "formalization", "kind")
+LIST_FIELDS = ("headline", "kit_modules", "evidence")
+CATEGORY_FIELDS = ("id", "title", "summary")
 ALLOWED_AXIOMS = frozenset({"propext", "Classical.choice", "Quot.sound"})
 # What the prize's checker refuses, and the kernel bypass its replay exists to catch.
 FORBIDDEN_LEAN = ("sorry", "native_decide", "decide +native", "bv_decide", "skipKernelTC")
 AXIOM_DECLARATION = re.compile(r"^\s*(?:private\s+|public\s+)?axiom\s", re.MULTILINE)
+# A declaration at the start of a line, matched after a newline rather than at `^`: the literal `\n` lets the regex
+# engine skip ahead, five times faster over the 96 MB of Lean source than trying `^` at every character.
+DECLARATION = re.compile(r"\n\s*(?:@\[[^\]]*\]\s*)?(?:theorem|def|structure|abbrev)\s+([^\s(){}\[\]:]+)")
+NAMESPACE_LINE = re.compile(r"\n\s*namespace\s+(\S+)")
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 LIBRARY_IMPORT = re.compile(r"^public import (Rule30Open\.[\w.]+)$", re.MULTILINE)
 MARKDOWN_LINK = re.compile(r"\]\(([^)\s]+)\)")
@@ -80,164 +99,282 @@ class Category:
 
 @dataclass(frozen=True, slots=True)
 class Entry:
-    """One Markdown entry: its path, its kind (lean, finding or negative), its front matter and its body."""
+    """One Markdown entry: its path, its path from the repository root, its kind, its front matter and its body."""
 
     path: Path
-    kind: str
+    rel: str
+    kind: Kind
     meta: dict[str, object]
     body: str
 
-    @property
-    def rel(self) -> str:
-        return self.path.relative_to(ROOT).as_posix()
-
     def text(self, key: str) -> str:
-        value = self.meta.get(key)
-        return value if isinstance(value, str) else ""
+        value = self.meta.get(key, "")
+        assert isinstance(value, str), f"{self.rel}: `{key}` was not checked as text"
+        return value
 
     def names(self, key: str) -> list[str]:
         value = self.meta.get(key, [])
-        return [str(item) for item in value] if isinstance(value, list) else []
+        assert isinstance(value, list), f"{self.rel}: `{key}` was not checked as a list"
+        return [str(item) for item in value]
 
 
-def load_categories() -> list[Category]:
-    raw = yaml.safe_load(CATEGORIES_FILE.read_text(encoding="utf-8"))
-    return [Category(id=item["id"], title=item["title"], summary=item["summary"], lean=item.get("lean")) for item in raw]
+@dataclass(frozen=True, slots=True)
+class LeanModule:
+    """What `check` needs from one Lean source, read once: its declared names, the dot-separated parts of its
+    `namespace` lines, and the constructs it must not use."""
+
+    declared: frozenset[str]
+    namespace_parts: frozenset[str]
+    forbidden: tuple[str, ...]
+    declares_axiom: bool
 
 
-def read_entry(path: Path, kind: str) -> Entry:
+def posix_sorted(paths: Iterable[Path]) -> list[Path]:
+    """Paths in case-sensitive POSIX order, part by part, as `sorted` orders them on Linux, so the catalog comes out
+    the same on every platform (Windows paths compare without case)."""
+    return sorted(paths, key=lambda path: path.as_posix().split("/"))
+
+
+def relative(path: Path, root: Path) -> str:
+    return path.relative_to(root).as_posix()
+
+
+def load_categories(root: Path) -> tuple[list[Category], list[str]]:
+    """The categories in file order, or the errors that make `categories.yaml` unusable."""
+    try:
+        raw = yaml.safe_load((root / CATEGORIES_FILE).read_text(encoding="utf-8"))
+    except yaml.YAMLError as error:
+        return [], [f"{CATEGORIES_FILE}: not valid YAML{yaml_location(error, 1)}: {yaml_problem(error)}"]
+    if not isinstance(raw, list):
+        return [], [f"{CATEGORIES_FILE}: a list of categories, each starting `- id: <id>`"]
+
+    categories: list[Category] = []
+    errors: list[str] = []
+    for number, item in enumerate(raw, start=1):
+        if not isinstance(item, dict):
+            errors.append(f"{CATEGORIES_FILE}: category {number} is not a mapping; write `- id: <id>`, then `title:`, "
+                          "`summary:` and, if it has Lean modules, `lean:`")
+            continue
+        label = f"category {number} (`{item['id']}`)" if isinstance(item.get("id"), str) else f"category {number}"
+        missing = [key for key in CATEGORY_FIELDS if not isinstance(item.get(key), str)]
+        errors += [f"{CATEGORIES_FILE}: {label} has no `{key}` as text; add `{key}: ...`" for key in missing]
+        errors += [f"{CATEGORIES_FILE}: {label} has the unknown field `{key}`; the fields are id, title, summary, lean"
+                   for key in item if key not in (*CATEGORY_FIELDS, "lean")]
+        lean = item.get("lean")
+        if lean is not None and not isinstance(lean, str):
+            errors.append(f"{CATEGORIES_FILE}: {label}: `lean` is the name of a directory under {LEAN_DIR}/")
+        if not missing and (lean is None or isinstance(lean, str)):
+            categories.append(Category(id=item["id"], title=item["title"], summary=item["summary"], lean=lean))
+    ids = [category.id for category in categories]
+    errors += [f"{CATEGORIES_FILE}: the id `{id_}` appears {ids.count(id_)} times; give each category its own id"
+               for id_ in sorted(set(ids)) if ids.count(id_) > 1]
+    return categories, errors
+
+
+def yaml_location(error: yaml.YAMLError, first_line: int) -> str:
+    """` at line n` of the file for an error whose YAML text starts at line `first_line` of that file."""
+    if isinstance(error, yaml.MarkedYAMLError) and error.problem_mark is not None:
+        return f" at line {error.problem_mark.line + first_line}"
+    return ""
+
+
+def yaml_problem(error: yaml.YAMLError) -> str:
+    return error.problem if isinstance(error, yaml.MarkedYAMLError) and error.problem else str(error)
+
+
+def read_entry(path: Path, kind: Kind, root: Path) -> Entry | str:
+    """The entry at `path`, or the one-line error that says why its front matter cannot be read."""
+    rel = relative(path, root)
     text = path.read_text(encoding="utf-8")
     match = FRONT_MATTER.match(text)
     if match is None:
-        return Entry(path=path, kind=kind, meta={}, body=text)
-    meta = yaml.safe_load(match.group(1))
+        return (f"{rel}: no front matter; start the file with a line `---`, then the fields "
+                f"({', '.join((*COMMON_FIELDS, *ENTRY_FIELDS[kind]))}), then a line `---`")
+    try:
+        meta = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as error:
+        return (f"{rel}: the front matter is not valid YAML{yaml_location(error, 2)}: {yaml_problem(error)}; put a value "
+                "that holds `: ` or starts with a character such as `*`, `&`, `[` or `{` in quotes, as in "
+                "`title: \"A: B\"`")
     if not isinstance(meta, dict):
-        meta = {}
-    return Entry(path=path, kind=kind, meta={str(key): value for key, value in meta.items()}, body=text[match.end():])
+        return f"{rel}: the front matter is not a set of fields; write one `field: value` per line"
+    return Entry(path=path, rel=rel, kind=kind, meta={str(key): value for key, value in meta.items()},
+                 body=text[match.end():])
 
 
-def lean_modules() -> list[Path]:
-    return sorted(LEAN_ROOT.rglob("*.lean"))
+def collect_entries(root: Path, lean_arguments: list[Path]) -> tuple[list[Entry], list[str]]:
+    """Every entry in catalog order (Lean arguments, findings, negative results), and the entries that cannot be read."""
+    paths: list[tuple[Path, Kind]] = [(path, "lean") for path in lean_arguments]
+    for directory, kind in ((FINDINGS_DIR, "finding"), (NEGATIVE_DIR, "negative")):
+        paths += [(path, kind) for path in posix_sorted((root / directory).rglob("*.md")) if path.name != "README.md"]
+    entries: list[Entry] = []
+    errors: list[str] = []
+    for path, kind in paths:
+        entry = read_entry(path, kind, root)
+        if isinstance(entry, str):
+            errors.append(entry)
+        else:
+            entries.append(entry)
+    return entries, errors
 
 
-def collect_entries() -> list[Entry]:
-    entries = [read_entry(path, "lean") for path in sorted(LEAN_ROOT.rglob("*.md"))]
-    entries += [read_entry(path, "finding") for path in sorted(FINDINGS_ROOT.rglob("*.md")) if path.name != "README.md"]
-    entries += [read_entry(path, "negative") for path in sorted(NEGATIVE_ROOT.rglob("*.md")) if path.name != "README.md"]
-    return entries
+def module_name(path: Path, root: Path) -> str:
+    return ".".join((NAMESPACE, *path.relative_to(root / LEAN_DIR).with_suffix("").parts))
 
 
-def module_name(path: Path) -> str:
-    return ".".join((NAMESPACE, *path.relative_to(LEAN_ROOT).with_suffix("").parts))
+def read_lean_module(path: Path) -> LeanModule:
+    source = path.read_text(encoding="utf-8")
+    return LeanModule(
+        declared=frozenset(DECLARATION.findall("\n" + source)),
+        namespace_parts=frozenset(part for line in NAMESPACE_LINE.findall("\n" + source) for part in line.split(".")),
+        forbidden=tuple(token for token in FORBIDDEN_LEAN if token in source),
+        declares_axiom="axiom" in source and AXIOM_DECLARATION.search(source) is not None,
+    )
 
 
-def check_lean_files(categories: list[Category]) -> list[str]:
+def check_lean_files(root: Path, categories: list[Category], modules: dict[Path, LeanModule],
+                     arguments: list[Path]) -> list[str]:
     """Pairing of modules and arguments, placement by category, the library imports, and forbidden constructs."""
     errors: list[str] = []
+    lean_root = root / LEAN_DIR
     lean_dirs = {category.lean for category in categories if category.lean}
-    modules = lean_modules()
-    for path in modules:
-        rel = path.relative_to(ROOT).as_posix()
-        parts = path.relative_to(LEAN_ROOT).parts
+    argument_set = set(arguments)
+    for path, module in modules.items():
+        rel = relative(path, root)
+        parts = path.relative_to(lean_root).parts
         if len(parts) != 2 or parts[0] not in lean_dirs:
-            errors.append(f"{rel}: a module lives at Rule30Open/<category directory>/<Name>.lean")
-        if not path.with_suffix(".md").exists():
-            errors.append(f"{rel}: no argument; write {path.with_suffix('.md').relative_to(ROOT).as_posix()}")
-        source = path.read_text(encoding="utf-8")
-        for token in FORBIDDEN_LEAN:
-            if token in source:
-                errors.append(f"{rel}: contains `{token}`")
-        if AXIOM_DECLARATION.search(source):
+            errors.append(f"{rel}: a module lives at {LEAN_DIR}/<category directory>/<Name>.lean")
+        if path.with_suffix(".md") not in argument_set:
+            errors.append(f"{rel}: no argument; write {relative(path.with_suffix('.md'), root)}")
+        errors += [f"{rel}: contains `{token}`" for token in module.forbidden]
+        if module.declares_axiom:
             errors.append(f"{rel}: declares an axiom")
-    for path in sorted(LEAN_ROOT.rglob("*.md")):
-        if not path.with_suffix(".lean").exists():
-            errors.append(f"{path.relative_to(ROOT).as_posix()}: an argument without its Lean module")
-    imported = set(LIBRARY_IMPORT.findall(LIBRARY_FILE.read_text(encoding="utf-8")))
-    names = {module_name(path) for path in modules}
-    for name in sorted(names - imported):
-        errors.append(f"Rule30Open.lean: does not import {name}")
-    for name in sorted(imported - names):
-        errors.append(f"Rule30Open.lean: imports {name}, which does not exist")
+    errors += [f"{relative(path, root)}: an argument without its Lean module" for path in arguments
+               if path.with_suffix(".lean") not in modules]
+    imported = set(LIBRARY_IMPORT.findall((root / LIBRARY_FILE).read_text(encoding="utf-8")))
+    names = {module_name(path, root) for path in modules}
+    errors += [f"{LIBRARY_FILE}: does not import {name}" for name in sorted(names - imported)]
+    errors += [f"{LIBRARY_FILE}: imports {name}, which does not exist" for name in sorted(imported - names)]
     return errors
 
 
-def declares(source: str, name: str) -> bool:
-    """Whether `source` declares `name`, directly or, for a dotted `P.q`, as `q` inside namespaces that spell `P`.
+def check_types(entry: Entry) -> list[str]:
+    """Each known field has its type: text, a list of text, or `problems` as a list of distinct problem numbers."""
+    errors: list[str] = []
+    for key in TEXT_FIELDS:
+        if key in entry.meta and not isinstance(entry.meta[key], str):
+            errors.append(f"{entry.rel}: `{key}` is text; put its value in quotes, as in `{key}: \"...\"`")
+    for key in LIST_FIELDS:
+        value = entry.meta.get(key, [])
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            errors.append(f"{entry.rel}: `{key}` is a list of names in brackets, as in `{key}: [first, second]`, "
+                          "even for one name")
+    problems = entry.meta["problems"]
+    valid = isinstance(problems, list) and problems and all(
+        isinstance(problem, int) and not isinstance(problem, bool) and problem in PROBLEMS for problem in problems
+    )
+    if not valid:
+        errors.append(f"{entry.rel}: `problems` is a nonempty list drawn from 1, 2 and 3, as in `problems: [1, 3]`")
+    elif len(set(problems)) != len(problems):
+        repeated = sorted({problem for problem in problems if problems.count(problem) > 1})
+        errors.append(f"{entry.rel}: `problems` lists {', '.join(map(str, repeated))} more than once; list each "
+                      "problem once")
+    return errors
+
+
+def declares(module: LeanModule, name: str) -> bool:
+    """Whether `module` declares `name`, directly or, for a dotted `P.q`, as `q` inside namespaces that spell `P`.
 
     The dotted case is conservative: `q` must be declared and every dot-separated part of `P` must be a part of some
     `namespace` line of the file.
     """
-    pattern = rf"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|def|structure|abbrev)\s+{re.escape(name)}\b"
-    if re.search(pattern, source, re.MULTILINE) is not None:
+    if name in module.declared:
         return True
     prefix, _, last = name.rpartition(".")
-    if not prefix or not declares(source, last):
-        return False
-    parts = {part for line in re.findall(r"^\s*namespace\s+(\S+)", source, re.MULTILINE) for part in line.split(".")}
-    return all(part in parts for part in prefix.split("."))
+    return bool(prefix) and last in module.declared and all(part in module.namespace_parts
+                                                            for part in prefix.split("."))
 
 
-def check_entry(entry: Entry, categories: dict[str, Category]) -> list[str]:
+def missing_field(entry: Entry, key: str) -> str:
+    hints = {
+        "title": "the claim, as the catalog will show it",
+        "category": "one of the ids in categories.yaml",
+        "problems": "the prize problems it bears on, as in [1, 3]",
+        "status": f"one of {', '.join(STATUSES[entry.kind])}",
+    }
+    return f"{entry.rel}: missing `{key}`; add the line `{key}: ...` with {hints[key]}"
+
+
+def check_entry(entry: Entry, root: Path, categories: dict[str, Category], modules: dict[Path, LeanModule],
+                exists: dict[str, bool]) -> list[str]:
     """Front matter, placement and links of one entry."""
-    errors = [f"{entry.rel}: missing `{key}`" for key in COMMON_FIELDS if key not in entry.meta]
+    errors = [missing_field(entry, key) for key in COMMON_FIELDS if key not in entry.meta]
     if errors:
         return errors
     allowed = {*COMMON_FIELDS, *ENTRY_FIELDS[entry.kind]}
-    errors += [f"{entry.rel}: unknown field `{key}`" for key in entry.meta if key not in allowed]
+    errors += [f"{entry.rel}: unknown field `{key}`; the fields of this kind of entry are {', '.join(sorted(allowed))}"
+               for key in entry.meta if key not in allowed]
+    type_errors = check_types(entry)
+    if type_errors:
+        return errors + type_errors
 
     category = entry.text("category")
     if category not in categories:
-        errors.append(f"{entry.rel}: unknown category `{category}`")
+        errors.append(f"{entry.rel}: unknown category `{category}`; use one of the ids in {CATEGORIES_FILE}: "
+                      f"{', '.join(categories)}")
     if entry.text("status") not in STATUSES[entry.kind]:
         errors.append(f"{entry.rel}: status `{entry.text('status')}` is not one of {', '.join(STATUSES[entry.kind])}")
-    problems = entry.meta["problems"]
-    if not isinstance(problems, list) or not problems or not all(problem in (1, 2, 3) for problem in problems):
-        errors.append(f"{entry.rel}: `problems` is a nonempty list drawn from 1, 2 and 3")
     heading = f"# {entry.text('title')}"
     if not entry.body.lstrip().startswith(heading + "\n"):
         errors.append(f"{entry.rel}: the body starts with the heading `{heading}`")
 
     if entry.kind == "lean":
-        module = entry.path.with_suffix(".lean")
-        expected = module_name(module)
+        module_path = entry.path.with_suffix(".lean")
+        expected = module_name(module_path, root)
         if entry.text("lean") != expected:
             errors.append(f"{entry.rel}: `lean` is `{expected}`")
         if category in categories and categories[category].lean != entry.path.parent.name:
-            errors.append(f"{entry.rel}: category `{category}` keeps its modules in Rule30Open/{categories[category].lean}")
+            errors.append(f"{entry.rel}: category `{category}` keeps its modules in {LEAN_DIR}/{categories[category].lean}")
         headline = entry.names("headline")
         if not headline:
             errors.append(f"{entry.rel}: `headline` lists the module's main theorems")
-        source = module.read_text(encoding="utf-8") if module.exists() else ""
-        for name in headline:
-            if not declares(source, name):
-                errors.append(f"{entry.rel}: headline `{name}` is not declared in {module.name}")
+        module = modules.get(module_path)
+        if module is not None:
+            errors += [f"{entry.rel}: headline `{name}` is not declared in {module_path.name}" for name in headline
+                       if not declares(module, name)]
         if entry.text("kit") not in KIT_RELATIONS:
             errors.append(f"{entry.rel}: `kit` is one of {', '.join(KIT_RELATIONS)}")
     else:
-        root = FINDINGS_ROOT if entry.kind == "finding" else NEGATIVE_ROOT
-        if entry.path.parent != root / category:
-            errors.append(f"{entry.rel}: belongs in {(root / category).relative_to(ROOT).as_posix()}/")
+        directory = FINDINGS_DIR if entry.kind == "finding" else NEGATIVE_DIR
+        if category in categories and entry.path.parent != root / directory / category:
+            errors.append(f"{entry.rel}: belongs in {directory}/{category}/")
         if entry.kind == "finding" and entry.text("formalization") not in FORMALIZATIONS:
             errors.append(f"{entry.rel}: `formalization` is one of {', '.join(FORMALIZATIONS)}")
         if entry.kind == "negative" and entry.text("kind") not in NEGATIVE_KINDS:
             errors.append(f"{entry.rel}: `kind` is one of {', '.join(NEGATIVE_KINDS)}")
 
-    for evidence in entry.names("evidence"):
-        if not (ROOT / evidence).exists():
-            errors.append(f"{entry.rel}: evidence `{evidence}` does not exist")
-    errors += check_links(entry.path, entry.body)
+    errors += [f"{entry.rel}: evidence `{evidence}` does not exist" for evidence in entry.names("evidence")
+               if not path_exists(os.path.join(root, evidence), exists)]
+    errors += check_links(entry.path, entry.rel, entry.body, exists)
     return errors
 
 
-def check_links(path: Path, body: str) -> list[str]:
+def path_exists(path: str, exists: dict[str, bool]) -> bool:
+    """`os.path.exists` of the normalized path, asked of the file system once per path."""
+    key = os.path.normpath(path)
+    if key not in exists:
+        exists[key] = os.path.exists(key)
+    return exists[key]
+
+
+def check_links(path: Path, rel: str, body: str, exists: dict[str, bool]) -> list[str]:
     """Every relative link resolves to a file of the repository."""
-    errors = []
+    errors: list[str] = []
     for target in MARKDOWN_LINK.findall(body):
         if target.startswith(("http://", "https://", "#", "mailto:")):
             continue
-        resolved = (path.parent / target.split("#", 1)[0]).resolve()
-        if not resolved.exists():
-            errors.append(f"{path.relative_to(ROOT).as_posix()}: broken link `{target}`")
+        if not path_exists(os.path.join(path.parent, target.split("#", 1)[0]), exists):
+            errors.append(f"{rel}: broken link `{target}`")
     return errors
 
 
@@ -246,8 +383,9 @@ def link(entry: Entry) -> str:
 
 
 def problems_label(entry: Entry) -> str:
-    problems = entry.meta.get("problems", [])
-    return ", ".join(str(problem) for problem in problems) if isinstance(problems, list) else ""
+    problems = entry.meta["problems"]
+    assert isinstance(problems, list), f"{entry.rel}: `problems` was not checked as a list"
+    return ", ".join(str(problem) for problem in problems)
 
 
 def render_catalog(categories: list[Category], entries: list[Entry]) -> str:
@@ -290,7 +428,7 @@ def render_catalog(categories: list[Category], entries: list[Entry]) -> str:
                 theorems = ", ".join(f"`{name}`" for name in entry.names("headline"))
                 module = entry.text("lean").removeprefix(f"{NAMESPACE}.")
                 lines.append(
-                    f"| {link(entry)} | [`{module}`]({entry.path.with_suffix('.lean').relative_to(ROOT).as_posix()}) "
+                    f"| {link(entry)} | [`{module}`]({entry.rel.removesuffix('.md')}.lean) "
                     f"| {theorems} | {problems_label(entry)} | {KIT_LABELS[entry.text('kit')]} |"
                 )
         if findings:
@@ -335,27 +473,35 @@ def render_open_work(entries: list[Entry]) -> list[str]:
     return lines
 
 
-def validate() -> tuple[list[str], list[Category], list[Entry]]:
-    categories = load_categories()
+@dataclass(frozen=True, slots=True)
+class Validation:
+    """The outcome of `validate`: the errors, and the categories and entries to render when there are none."""
+
+    errors: list[str]
+    categories: list[Category]
+    entries: list[Entry]
+    module_count: int
+
+
+def validate(root: Path) -> Validation:
+    categories, errors = load_categories(root)
+    if errors:
+        return Validation(errors=errors, categories=categories, entries=[], module_count=0)
     by_id = {category.id: category for category in categories}
-    errors: list[str] = []
-    if len(by_id) != len(categories):
-        errors.append("categories.yaml: duplicate category ids")
-    entries = collect_entries()
-    errors += check_lean_files(categories)
+    lean_root = root / LEAN_DIR
+    modules = {path: read_lean_module(path) for path in posix_sorted(lean_root.rglob("*.lean"))}
+    arguments = posix_sorted(lean_root.rglob("*.md"))
+    entries, errors = collect_entries(root, arguments)
+    errors += check_lean_files(root, categories, modules, arguments)
+    exists: dict[str, bool] = {}
     for entry in entries:
-        errors += check_entry(entry, by_id)
-    # PUBLIC_README.md is the repository's README.md in the published projection.
-    documents = ["README.md", "PUBLIC_README.md", "CONTRIBUTING.md", "AGENTS.md", "ROADMAP.md", "computations/README.md"]
-    documents += [path.relative_to(ROOT).as_posix() for path in sorted((ROOT / "literature").glob("*.md"))]
-    for document in documents:
-        path = ROOT / document
-        if path.exists():
-            errors += check_links(path, path.read_text(encoding="utf-8"))
-    return errors, categories, entries
+        errors += check_entry(entry, root, by_id, modules, exists)
+    for path in posix_sorted({path for pattern in DOCUMENT_GLOBS for path in root.glob(pattern)}):
+        errors += check_links(path, relative(path, root), path.read_text(encoding="utf-8"), exists)
+    return Validation(errors=errors, categories=categories, entries=entries, module_count=len(modules))
 
 
-def audit(entries: list[Entry]) -> list[str]:
+def audit(root: Path, entries: list[Entry]) -> list[str]:
     """Run `#print axioms` on every headline theorem and refuse any axiom beyond the three the prize allows."""
     names = [f"{NAMESPACE}.{name}" for entry in entries if entry.kind == "lean" for name in entry.names("headline")]
     script = "import Rule30Open\n" + "".join(f"#print axioms {name}\n" for name in names)
@@ -363,7 +509,7 @@ def audit(entries: list[Entry]) -> list[str]:
         path = Path(directory) / "Audit.lean"
         path.write_text(script, encoding="utf-8")
         completed = subprocess.run(
-            ["lake", "env", "lean", str(path)], cwd=ROOT, capture_output=True, text=True, check=False
+            ["lake", "env", "lean", str(path)], cwd=root, capture_output=True, text=True, check=False
         )
     output = completed.stdout + completed.stderr
     if completed.returncode != 0:
@@ -380,24 +526,32 @@ def audit(entries: list[Entry]) -> list[str]:
     return errors
 
 
+def run(command: str, root: Path) -> list[str]:
+    """Run one command on the repository at `root` and return its errors."""
+    validation = validate(root)
+    if validation.errors:
+        return validation.errors
+    catalog_path = root / CATALOG_FILE
+    rendered = render_catalog(validation.categories, validation.entries)
+    if command == "write":
+        catalog_path.write_text(rendered, encoding="utf-8", newline="\n")
+        print(f"wrote {CATALOG_FILE} ({len(validation.entries)} entries)")
+        return []
+    if command == "check":
+        current = catalog_path.read_text(encoding="utf-8") if catalog_path.exists() else ""
+        if current != rendered:
+            return [f"{CATALOG_FILE} is out of date; run `python scripts/catalog.py write`"]
+        print(f"catalog current: {len(validation.entries)} entries, {validation.module_count} Lean modules, each with its "
+              "argument")
+        return []
+    assert command == "audit", command
+    return audit(root, validation.entries)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", choices=("check", "write", "audit"))
-    command = parser.parse_args().command
-
-    errors, categories, entries = validate()
-    if command == "write" and not errors:
-        CATALOG_FILE.write_text(render_catalog(categories, entries), encoding="utf-8", newline="\n")
-        print(f"wrote {CATALOG_FILE.relative_to(ROOT).as_posix()} ({len(entries)} entries)")
-    if command == "check" and not errors:
-        current = CATALOG_FILE.read_text(encoding="utf-8") if CATALOG_FILE.exists() else ""
-        if current != render_catalog(categories, entries):
-            errors.append("CATALOG.md is out of date; run `python scripts/catalog.py write`")
-        else:
-            print(f"catalog current: {len(entries)} entries, {len(lean_modules())} Lean modules, each with its argument")
-    if command == "audit" and not errors:
-        errors = audit(entries)
-
+    errors = run(parser.parse_args().command, ROOT)
     for error in errors:
         print(error, file=sys.stderr)
     sys.exit(1 if errors else 0)

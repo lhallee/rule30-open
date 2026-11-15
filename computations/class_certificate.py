@@ -31,10 +31,10 @@ import argparse
 import functools
 import math
 import sys
+import numpy as np
+
 from dataclasses import dataclass
 from graphlib import TopologicalSorter
-
-import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
@@ -64,7 +64,7 @@ def successors(block: str, width: int) -> np.ndarray:
     out = np.empty((2, nodes), dtype=np.int64)  # (2, P n)
     free = np.repeat(np.arange(2 * len(block)) % 2, 1 << width)  # (2 P n,), the free cell of each move
     out[free, source] = target
-    return out
+    return out  # (2, P n)
 
 
 def levels(block: str, width: int) -> list[np.ndarray]:
@@ -98,13 +98,14 @@ def levels(block: str, width: int) -> list[np.ndarray]:
             height[known] = 1 + np.maximum(height[succ[0, known]], height[succ[1, known]])
             pending &= ~known
         out.append(height)
-    return out
+    return out  # `width` arrays, (P 2^w,) for w = 1 .. width
 
 
 def final_labels(block: str, width: int, zero: np.ndarray) -> tuple[np.ndarray, int, int, int, int]:
     """On the nodes where `zero` (shape (P 2^width,)) holds, a set closed under moves: each node's code rank * base +
     label (-1 elsewhere), base, and the transient ranks, the moduli and the values packed as in `Certificate`. Raises
     ValueError when the left column is not a function of the cyclic class in some component that can hold a play."""
+    # zero: (P 2^width,)
     period, nodes = len(block), len(block) << width
     succ = successors(block, width)  # (2, P 2^width)
     members = np.flatnonzero(zero)  # (m,)
@@ -161,7 +162,7 @@ def final_labels(block: str, width: int, zero: np.ndarray) -> tuple[np.ndarray, 
     packed_mods = sum(d << (8 * r) for r, d in mods.items())
     keep = recurrent[label]  # (m,)
     values = sum(1 << int(i) for i in np.unique((rank * base + labels)[keep & (reading == 1)]).tolist())
-    return codes, base, transient, packed_mods, values
+    return codes, base, transient, packed_mods, values  # (P 2^width,), int, int, int, int
 
 
 def certificate(block: str, width: int) -> Certificate:
@@ -243,6 +244,7 @@ def trie(items: list[tuple[int, int]]) -> str:
 
 def phase_tries(table: np.ndarray, period: int, width: int) -> list[str]:
     """One trie per phase of the entries of `table` (shape (P 2^width,)) that are not -1."""
+    # table: (P 2^width,)
     out = []
     for phase in range(period):
         row = table[phase << width:(phase + 1) << width]  # (2^width,)

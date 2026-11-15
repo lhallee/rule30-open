@@ -18,9 +18,10 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import numpy as np
+
 from pathlib import Path
 
-import numpy as np
 
 BLOCK = "001"
 FREE_PHASE = 1
@@ -32,7 +33,7 @@ def step(w: np.ndarray, width: int, c: int, x: int) -> np.ndarray:
     """One step of windows of columns 1..width with the center c and column width + 1 equal to x."""
     # w: (n,) int64 -> (n,) int64
     mask = (1 << width) - 1
-    return (((w << 1) | c) ^ (w | (w >> 1) | (x << (width - 1)))) & mask
+    return (((w << 1) | c) ^ (w | (w >> 1) | (x << (width - 1)))) & mask  # (n,)
 
 
 def completes(s: int, b: int) -> bool:
@@ -77,13 +78,14 @@ def ranks(width: int) -> tuple[np.ndarray, np.ndarray]:
             add[p] = done[q][nxt[p][0][:, None], snext[p]] & done[q][nxt[p][1][:, None], snext[p]]
         add &= ~done
         if not add.any():
-            return good, rank
+            return good, rank  # (3, n, 8), (3, n, 8)
         k += 1
         rank[add] = k
 
 
 def tables(rank: np.ndarray) -> list[int]:
     """The 24 packed rank tables, entry 8p + s holding the rank of window w in bits 6w to 6w + 5."""
+    # rank: (3, n, 8)
     out = []
     for p in range(3):
         for s in range(8):

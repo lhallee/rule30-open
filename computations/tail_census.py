@@ -45,12 +45,13 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.held_shift import held, ring_cycle, ring_next
+
 
 U64 = np.uint64
 MASK64 = (1 << 64) - 1
@@ -184,9 +185,10 @@ def alignments(bg: Background) -> list[tuple[int, int]]:
 def window_cell(bits: list[np.ndarray], low: int, below: int, k: int) -> np.ndarray | int:
     """Cell k of every strip whose cells low .. low + len(bits) - 1 are `bits` (each (2^w,)), with `below` the cell
     low - 1 and the defect zero above the strip."""
+    # bits: (2^w,) each, w = len(bits)
     if low <= k < low + len(bits):
-        return bits[k - low]
-    return below if k == low - 1 else 0
+        return bits[k - low]  # (2^w,)
+    return below if k == low - 1 else 0  # (), one cell for every strip
 
 
 CLOSED: dict[tuple[Background, int], np.ndarray] = {}  # `closed_strips` by background and width, the last 64 kept
@@ -198,7 +200,7 @@ def closed_strips(bg: Background, width: int) -> np.ndarray:
     Indexed by (phase, (c + offset) mod L, strip): (P, L, 2^width). The last 64 sets of at most 2^22 entries are kept,
     read-only, for the calls that ask for them again."""
     if (bg, width) in CLOSED:
-        return CLOSED[bg, width]
+        return CLOSED[bg, width]  # (P, L, 2^w)
     alive = compute_closed_strips(bg, width)  # (P, L, 2^w)
     if alive.size <= 1 << 22:
         while len(CLOSED) >= 64:
@@ -235,7 +237,7 @@ def compute_closed_strips(bg: Background, width: int) -> np.ndarray:
             for below in (0, 1):
                 kept[a] &= np.take_along_axis(nxt, after[a, :, below], axis=1)
         if np.array_equal(kept, alive):
-            return alive
+            return alive  # (P, L, 2^w)
         alive = kept
 
 
@@ -245,11 +247,11 @@ def least_closed(bg: Background, max_width: int, budget: int = 1 << 27) -> tuple
     width = 0
     for width in range(1, max_width + 1):
         if bg.period * bg.length * (1 << width) > budget:
-            return width - 1, None
+            return width - 1, None  # None in place of the (P, L, 2^w) set
         closed = closed_strips(bg, width)
         if closed.any():
-            return width, closed
-    return width, None
+            return width, closed  # (P, L, 2^w)
+    return width, None  # None in place of the (P, L, 2^w) set
 
 
 def rising_sets(bg: Background, width: int) -> tuple[np.ndarray, np.ndarray]:
@@ -305,7 +307,7 @@ def rising_sets(bg: Background, width: int) -> tuple[np.ndarray, np.ndarray]:
             break
         bad = nxt
     growing = alive & ~bad
-    return alive.reshape(P, L, n), growing.reshape(P, L, n)
+    return alive.reshape(P, L, n), growing.reshape(P, L, n)  # (P, L, 2^w), (P, L, 2^w)
 
 
 def least_rising(bg: Background, max_width: int, budget: int = 1 << 26) -> tuple[int, np.ndarray | None]:
@@ -314,11 +316,11 @@ def least_rising(bg: Background, max_width: int, budget: int = 1 << 26) -> tuple
     width = 0
     for width in range(2, max_width + 1):
         if bg.period * bg.length * (1 << width) > budget:
-            return width - 1, None
+            return width - 1, None  # None in place of the (P, L, 2^w) set
         _, growing = rising_sets(bg, width)
         if growing.any():
-            return width, growing
-    return width, None
+            return width, growing  # (P, L, 2^w)
+    return width, None  # None in place of the (P, L, 2^w) set
 
 
 # ---- the census, defects held as rows of 64-cell words --------------------------------------------------------------
@@ -326,6 +328,7 @@ def least_rising(bg: Background, max_width: int, budget: int = 1 << 26) -> tuple
 
 def bit_length64(x: np.ndarray) -> np.ndarray:
     """The bit length of each 64-bit word, exactly, through two 32-bit halves converted to floats."""
+    # x: (...,) uint64
     high = (x >> U64(32)).astype(np.float64)  # (...,)
     low = (x & U64(0xFFFFFFFF)).astype(np.float64)  # (...,)
     _, eh = np.frexp(high)  # (...,)
@@ -349,23 +352,25 @@ def as_words(value: int, words: int) -> np.ndarray:
 
 def background_words(bg: Background, offset: int, words: int) -> np.ndarray:
     """The background cells 0 .. 64 (words + 1) - 1 at every phase: (P, words + 1)."""
-    return np.stack([as_words(bg.word(a, offset, 0, 64 * (words + 1)), words + 1) for a in range(bg.period)])
+    return np.stack([as_words(bg.word(a, offset, 0, 64 * (words + 1)), words + 1) for a in range(bg.period)])  # (P, words + 1)
 
 
 def step_words(D: np.ndarray, now: np.ndarray, nxt: np.ndarray) -> np.ndarray:
     """One step of every defect: `now` and `nxt` the background words at this step and the next, (words + 1,) each.
     Exact for a defect whose top is at most 64 words - 2."""
+    # now, nxt: (words + 1,) uint64
     words = D.shape[1]  # D: (n, words)
     x = D ^ now[:words]  # (n, words) the actual cells
     carry_up = np.concatenate([x[:, 1:], np.broadcast_to(now[words:], (len(x), 1))], axis=1)  # (n, words)
     up = (x >> U64(1)) | (carry_up << U64(63))  # (n, words) cell j + 1 at bit j
     carry_down = np.concatenate([np.zeros((len(x), 1), dtype=np.uint64), x[:, :-1]], axis=1)  # (n, words)
     down = (x << U64(1)) | (carry_down >> U64(63))  # (n, words) cell j - 1 at bit j; cell -1 is the held 0
-    return (up ^ (x | down)) ^ nxt[:words]
+    return (up ^ (x | down)) ^ nxt[:words]  # (n, words)
 
 
 def strip_at(D: np.ndarray, low: np.ndarray, width: int) -> np.ndarray:
     """The `width` <= 32 cells low .. low + width - 1 of each defect, for 0 <= low <= 64 words - width."""
+    # low: (n,) int64
     n = D.shape[0]  # D: (n, words)
     padded = np.concatenate([D, np.zeros((n, 1), dtype=np.uint64)], axis=1)  # (n, words + 1)
     i, b = low // 64, (low % 64).astype(np.uint64)  # (n,), (n,)
@@ -379,19 +384,20 @@ def closed_cell(D: np.ndarray, top: np.ndarray, phase: int, offset: int, closed:
     """For each defect, the least cell c with max(top, width - 1) <= c <= limit whose strip D(c - width + 1 .. c) is
     closed, or -1. A defect with such a c keeps its top at or below c from then on. Candidates above top + width are
     the zero strip, so c runs up to max(top, width - 1) + width + L."""
+    # D: (n, words) uint64; top: (n,); closed: (P, L, 2^w)
     P, L = closed.shape[0], closed.shape[1]
     base = np.maximum(top, width - 1)  # (n,)
     found = np.full(len(D), -1, dtype=np.int64)  # (n,)
     open_rows = closed[phase % P]  # (L, 2^w)
     if not open_rows.any():
-        return found
+        return found  # (n,)
     for extra in range(width + L):
         c = base + extra  # (n,)
         ok = c <= limit  # (n,)
         strip = strip_at(D, np.minimum(c, limit) - width + 1, width)  # (n,)
         ok &= open_rows[(c + offset) % L, strip]
         found = np.where(ok & (found < 0), c, found)
-    return found
+    return found  # (n,)
 
 
 def census(bg: Background, phase: int, offset: int, heads: np.ndarray, max_steps: int, closed: np.ndarray | None,
@@ -413,6 +419,7 @@ def census(bg: Background, phase: int, offset: int, heads: np.ndarray, max_steps
     cell), `repeat` (the step of a repeat, or -1), `period`, `broke` (the step that broke K, or -1), `grow` (the step
     the top passed the cells followed, or -1), `rise` (the step its top window entered `growing`, or -1) and `end`
     (the last step followed)."""
+    # heads: (n,) int64; closed: (P, L, 2^width) or None; growing: (P, L, 2^rise_width) or None
     n = len(heads)
     P = bg.period
     m = math.lcm(P, 2) if in_k else P
@@ -471,13 +478,14 @@ def census(bg: Background, phase: int, offset: int, heads: np.ndarray, max_steps
             break
         if t == next_snap:
             snap, snap_t, next_snap = D.copy(), t, 2 * t
-    return out
+    return out  # each (n,)
 
 
 def summarize(out: dict[str, np.ndarray], in_k: bool) -> dict[str, int]:
     """Counts of a census: without K, settled by a closed strip, by a repeat, growing top, open at the horizon;
     with K, broke K (before or after entering a closed strip), reached a periodic point of K, growing top in K, open in
     K at the horizon (with how many of those are inside a closed strip)."""
+    # out: (n,) per key
     strip, rep, grow, broke = out["strip"] >= 0, out["repeat"] >= 0, out["grow"] >= 0, out["broke"] >= 0
     rise = out["rise"] >= 0
     if not in_k:
@@ -530,6 +538,7 @@ def run_background(bg: Background, bits: int, max_steps: int, in_k: bool,
                    sets: tuple[int, np.ndarray | None, int, np.ndarray | None]) -> dict[str, int]:
     """The census of every head below 2^bits at every alignment of `bg`, summed, with `sets` the closed strips of
     `least_closed` and the growing windows of `least_rising`: (width, closed or None, width, growing or None)."""
+    # sets: (width, (P, L, 2^width) or None, rise_width, (P, L, 2^rise_width) or None)
     width, closed, rise_width, growing = sets
     total: dict[str, int] = {}
     heads = np.arange(1 << bits, dtype=np.int64)  # (2^bits,)
@@ -556,7 +565,7 @@ def k_survival(bg: Background, bits: int, steps: int) -> np.ndarray:
         broke = np.where(broke < 0, steps + 1, broke)  # (2^bits,)
         counts = np.bincount(broke, minlength=steps + 2)  # (steps + 2,) heads broken at each step
         alive += len(broke) - np.cumsum(counts)[:steps + 1]
-    return alive
+    return alive  # (steps + 1,)
 
 
 def front_pattern(tops: list[int], period: int, longest: int) -> tuple[int, int] | None:

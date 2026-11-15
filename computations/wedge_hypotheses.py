@@ -43,12 +43,13 @@ import itertools
 import os
 import subprocess
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.seed_onsets import _binary
+
 
 PHI: tuple[tuple[int, ...], ...] = ((0, 1, 3, 2), (3, 2, 1, 0), (3, 2, 0, 1), (3, 2, 1, 0))  # (4, 4): kit `phi`
 PINV: tuple[tuple[int, ...], ...] = tuple(tuple(PHI[a].index(y) for y in range(4)) for a in range(4))  # (4, 4)
@@ -293,7 +294,7 @@ def c_runs(n: int, hard_core: bool = False, cap: int | None = None, dump_from: i
     dump_from = cap + 1 if dump_from is None else dump_from
     split = min(n, 12)
     run = subprocess.run([str(_binary("wedge_hypotheses")), str(n), str(int(hard_core)), str(cap), str(dump_from),
-                          str(split)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True,
+                          str(split)], capture_output=True, text=True, check=True,
                          env={**os.environ, "OMP_NUM_THREADS": str(threads)})
     counts = np.zeros((2, cap + 1), dtype=np.int64)  # (2, cap + 1)
     rw = np.zeros((2, 3), dtype=np.int64)  # (2, 3)
@@ -375,7 +376,7 @@ def edge_census(n: int, c: int, hard_core: bool = False, progress: bool = False)
 
     dfs(0)
     bar.close()
-    return {"table": table}
+    return {"table": table}  # table: (4, 4, 4, 2)
 
 
 def flip_profile(n: int, trials: int = 2000, seed: int = 1) -> np.ndarray:
@@ -390,7 +391,7 @@ def flip_profile(n: int, trials: int = 2000, seed: int = 1) -> np.ndarray:
         f = e.copy()
         f[:, j] = 3 - f[:, j]
         out[j] = (kit_wedge(n, f) != base).any(axis=1).mean()
-    return out
+    return out  # (L,)
 
 
 def forgetting_depth(profile: np.ndarray) -> int:

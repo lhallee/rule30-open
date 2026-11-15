@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
@@ -67,6 +66,7 @@ def least_width(counts: np.ndarray, ell: int) -> int:
 
 def least_width_in_order(counts: np.ndarray, order: list[int]) -> int:
     """The largest count along one order of the variables."""
+    # counts: (2^ell,)
     mask, widest = 0, 1
     for variable in order:
         mask |= 1 << variable

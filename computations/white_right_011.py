@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 
+
 WORD = "011"
 DEPTH = 32768  # depths of Psi the kernel computes
 GAP = 16  # every window of GAP depths holds a black cell

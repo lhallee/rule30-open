@@ -31,6 +31,7 @@ def test_every_walk_is_rain_until_the_branch_state() -> None:
 
 
 def _descendants(state: w.State, L: int, depth: int) -> set[w.State]:
+    """The states reached from `state` in 1 to `depth` steps."""
     out: set[w.State] = set()
     level = [state]
     for _ in range(depth):

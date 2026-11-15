@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import itertools
 import random
-
 import numpy as np
 
 from computations import game, limit_windows as lw
@@ -72,12 +71,12 @@ def test_driven_rows_agree_where_good() -> None:
     good, bad = "0" * 10 + "1", "01"
     assert lw.is_good(good, moves) and not lw.is_good(bad, moves)
     seen = driven_first_cells(good, starts=40, periods=40, seed=1)
-    assert all(len(values) == 1 for ch, values in zip(good, seen) if ch == "0")
+    assert all(len(values) == 1 for ch, values in zip(good, seen, strict=True) if ch == "0")
     seen = driven_first_cells(bad, starts=40, periods=40, seed=2)
-    assert any(len(values) == 2 for ch, values in zip(bad, seen) if ch == "0")
+    assert any(len(values) == 2 for ch, values in zip(bad, seen, strict=True) if ch == "0")
     # the value that the limit windows give is the value that the rows show
     seen = driven_first_cells(good, starts=40, periods=40, seed=3)
-    for ch, members, values in zip(good, lw.limit_sets(good, moves), seen):
+    for ch, members, values in zip(good, lw.limit_sets(good, moves), seen, strict=True):
         if ch == "0":
             assert values == {int(members[0]) & 1}
 

@@ -51,16 +51,17 @@ import math
 import multiprocessing
 import sys
 import time
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass
-
-import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components, shortest_path
 from tqdm.auto import tqdm
 
 from computations.game import moves, necklaces
 from computations.reading_certificates import sample_readings, step
+
 
 Word = tuple[str, int]  # a forbidden word and the read position of its first reading, -1 for every position
 
@@ -333,7 +334,7 @@ def readings_of(block: str, width: int) -> np.ndarray:
     out = np.full(len(block) * n, -1, dtype=np.int64)  # (P n,)
     for p in white_phases(block):
         out[p * n:(p + 1) * n] = np.arange(n) & 1
-    return out
+    return out  # (P n,)
 
 
 def analyze(block: str, width: int) -> Analysis:
@@ -369,6 +370,7 @@ def analyze(block: str, width: int) -> Analysis:
 
     def mixed(key: np.ndarray) -> np.ndarray:
         """The components in which some key shows both readings."""
+        # key: (m',)
         order = np.lexsort((key, comp))  # (m',)
         c, kk, r = comp[order], key[order], reading[white][order]  # (m',) each
         new = np.r_[True, (c[1:] != c[:-1]) | (kk[1:] != kk[:-1])]  # (m',), the first node of each group
@@ -376,7 +378,7 @@ def analyze(block: str, width: int) -> Analysis:
         ones = np.bincount(group, weights=r)  # (groups,)
         count = np.bincount(group)  # (groups,)
         both = (ones > 0) & (ones < count)  # (groups,)
-        return np.unique(c[new][both])
+        return np.unique(c[new][both])  # (k,), the mixed components
 
     phase_bad = mixed(white // n)
     class_bad = mixed(level[white] % cyc[comp])
@@ -471,6 +473,7 @@ def tree_walks(fwd: csr_matrix, bwd: csr_matrix, v: int, reading: np.ndarray) ->
     """The shortest walks v -> x (forward tree) and x -> v (backward tree) inside a component: distances,
     predecessors, and for each node the number of readings and the two hashes of the readings of the walk v -> x
     (the nodes v .. before x) and of the walk x -> v (the nodes x .. before v), letter 1 for white, 2 for black."""
+    # reading: (N,)
     d_f, p_f = shortest_path(fwd, unweighted=True, indices=v, return_predecessors=True)  # (N,), (N,)
     d_b, p_b = shortest_path(bwd, unweighted=True, indices=v, return_predecessors=True)  # (N,), (N,)
     n = reading.size
@@ -495,12 +498,13 @@ def tree_walks(fwd: csr_matrix, bwd: csr_matrix, v: int, reading: np.ndarray) ->
         b_len[here] = b_len[nxt] + has[here]
         for i, m in enumerate(MODULI):
             b_hash[i, here] = (letter[here] * power[i, b_len[nxt]] * has[here] + b_hash[i, nxt]) % m
-    return d_f, p_f, d_b, p_b, f_len, f_hash, b_len, b_hash, letter, has
+    return d_f, p_f, d_b, p_b, f_len, f_hash, b_len, b_hash, letter, has  # (N,) each, but f_hash, b_hash (2, N)
 
 
 def walk_through(block: str, width: int, v: int, x: int, y: int, p_f: np.ndarray, p_b: np.ndarray,
                  reading: np.ndarray) -> tuple[list[int], str]:
     """The closed walk v .. x, y .. v along the trees, as its free inputs and its readings."""
+    # p_f: (N,), p_b: (N,), reading: (N,)
     period, n = len(block), 1 << width
     path = [x]
     while path[-1] != v:
@@ -511,7 +515,7 @@ def walk_through(block: str, width: int, v: int, x: int, y: int, p_f: np.ndarray
         tail.append(int(p_b[tail[-1]]))  # y .. v
     walk = path + tail
     free = []
-    for a, b in zip(walk[:-1], walk[1:]):
+    for a, b in zip(walk[:-1], walk[1:], strict=True):
         ph, w = divmod(a, n)
         x0 = int(step(np.array([w]), width, int(block[ph]), 0)[0]) + ((ph + 1) % period) * n
         free.append(0 if x0 == b else 1)

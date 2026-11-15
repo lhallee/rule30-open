@@ -31,13 +31,14 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from multiprocessing import Pool
-
 import numpy as np
+
+from multiprocessing import Pool
 from tqdm.auto import tqdm
 
 from computations.game import necklaces
 from computations.held_map import next_diagonal
+
 
 UNKNOWN = 2  # the latch state when cell 1 is not known
 
@@ -202,7 +203,7 @@ def survey(periods: list[int], budget: int, latch: bool = False,
             for period in periods for block in necklaces(period) if "1" in block]
     rows = []
     with Pool(workers) as pool:
-        for row in tqdm(pool.imap_unordered(survey_row, jobs), total=len(jobs), file=sys.stderr):
+        for row in tqdm(pool.imap_unordered(survey_row, jobs), total=len(jobs), desc="blocks", file=sys.stderr):
             block, support, worst, at, last, coins = row
             print(f"{block}: every left half of at most {support} cells fails; the latest at M + {worst} for M = "
                   f"{at}, and at M + {last} for M = {support}, against {coins:.1f} for fair coins", flush=True)

@@ -38,11 +38,12 @@ in the free bits u_0, .., u_(2s).
 from __future__ import annotations
 
 import argparse
+import numpy as np
+
 from collections import Counter
 from fractions import Fraction
-
-import numpy as np
 from tqdm.auto import tqdm
+
 
 ONE = np.uint64(1)
 
@@ -60,6 +61,7 @@ def kicked_step(U: int, boundary: int) -> int:
 
 def bit0_after(V: np.ndarray, steps: int) -> np.ndarray:
     """Bit 0 of H^steps(V) for each V, from the bits 0 .. steps of V, which are all that it reads."""
+    # V: (n,) uint64
     assert steps < 63, "the words hold 64 bits"
     W = V & np.uint64((1 << (steps + 1)) - 1)  # (n,)
     for s in range(steps):
@@ -157,13 +159,13 @@ def domain_integer(pre: list[int], per: list[int], bits: int) -> int:
     return sum(bit << j for j, bit in enumerate(seq[:bits]))
 
 
-def zoo(block: str, max_n: int) -> dict[int, Counter]:
+def zoo(block: str, max_n: int) -> dict[int, Counter[int]]:
     """For each n up to `max_n`, the count of periodic points by (spatial period) over the 2^(n w) words of the block's
     n w white readings, w the white phases per period."""
     white = block.count("0")
-    census: dict[int, Counter] = {}
+    census: dict[int, Counter[int]] = {}
     for n in tqdm(range(1, max_n + 1), desc="n", leave=False):
-        counts: Counter = Counter()
+        counts: Counter[int] = Counter()
         for word in range(1 << (n * white)):
             pre, per = domain(block, word, n)
             counts[len(per)] += 1
@@ -324,11 +326,17 @@ def front_rate(cycle: list[int], length: int, window: int, rounds: int) -> float
     bound cannot rule out a front. A stripe gives 0 and the vacuum gives 1."""
     period, cells = len(cycle), 1 << (window - 1)
     lost = period * length * cells
-    background = lambda a, j: (cycle[a % period] >> (j % length)) & 1
+
+    def background(a: int, j: int) -> int:
+        return (cycle[a % period] >> (j % length)) & 1
+
     src: list[int] = []
     dst: list[int] = []
     gain: list[int] = []
-    node = lambda a, b, m: (a * length + b) * cells + m
+
+    def node(a: int, b: int, m: int) -> int:
+        return (a * length + b) * cells + m
+
     for a in range(period):
         for b in range(length):
             for m in range(cells):
@@ -339,22 +347,29 @@ def front_rate(cycle: list[int], length: int, window: int, rounds: int) -> float
                 here = node(a, b, m)
                 if d[-1]:
                     below = sum(d[i] << i for i in range(window - 1))
-                    src.append(here); dst.append(node((a + 1) % period, (b + 1) % length, below)); gain.append(1)
+                    src.append(here)
+                    dst.append(node((a + 1) % period, (b + 1) % length, below))
+                    gain.append(1)
                     continue
                 for k in range(window - 1):
                     if d[k]:
                         known = window - 2 - k
                         base = sum(d[k + 1 + i] << i for i in range(known))
                         for free in range(1 << (window - 1 - known)):
-                            src.append(here); dst.append(node((a + 1) % period, (b - k) % length, base | free << known))
+                            src.append(here)
+                            dst.append(node((a + 1) % period, (b - k) % length, base | free << known))
                             gain.append(-k)
                         break
                 else:
-                    src.append(here); dst.append(lost + (a + 1) % period); gain.append(-(window - 1))
+                    src.append(here)
+                    dst.append(lost + (a + 1) % period)
+                    gain.append(-(window - 1))
     for a in range(period):
         for b in range(length):
             for m in range(cells):
-                src.append(lost + a); dst.append(node(a, b, m)); gain.append(0)
+                src.append(lost + a)
+                dst.append(node(a, b, m))
+                gain.append(0)
     source, target, weight = np.array(src), np.array(dst), np.array(gain)
     value = np.zeros(lost + period, dtype=np.int64)
     for _ in range(rounds):
@@ -399,9 +414,9 @@ def stripe_invariant(head_bits: int, stripe_a: bool) -> tuple[list[int], int]:
     return states, stuck
 
 
-def attractors(found: dict[Fraction, tuple[int, int]]) -> Counter:
+def attractors(found: dict[Fraction, tuple[int, int]]) -> Counter[tuple[int, int, int]]:
     """The ring attractors (`cycle_class`, without the transient) of the tails of the rational points `found`."""
-    census: Counter = Counter()
+    census: Counter[tuple[int, int, int]] = Counter()
     bits = 4 * 128
     for value, (p, q) in found.items():
         code = (value.numerator * pow(value.denominator, -1, 1 << bits)) & ((1 << bits) - 1)
@@ -478,30 +493,30 @@ def main() -> None:
             print(f"n = {n}: spatial periods (count) {sorted(counts.items())}", flush=True)
     if args.rational:
         found = rational_points(args.rational, args.steps)
-        periods: Counter = Counter()
-        orbit: Counter = Counter()
-        for value, (p, q) in tqdm(sorted(found.items()), desc="itineraries", leave=False):
+        periods: Counter[int] = Counter()
+        orbit: Counter[int | None] = Counter()
+        for value, (_, q) in tqdm(sorted(found.items()), desc="itineraries", leave=False):
             code = (value.numerator * pow(value.denominator, -1, 1 << (2 * args.steps + 40))) & (
                 (1 << (2 * args.steps + 40)) - 1)
-            result = eventual_period(itinerary(code, args.steps // 2), settle=5)
+            shape = eventual_period(itinerary(code, args.steps // 2), settle=5)  # (preperiod, period) or None
             periods[q] += 1
-            orbit[result[1] if result else None] += 1
+            orbit[shape[1] if shape else None] += 1
         print(f"{len(found)} rational points with p + 2q <= {args.rational}, each through step {args.steps}")
         print("spatial periods:", sorted(periods.items()))
         print("itinerary periods (None: not preperiodic):", sorted(orbit.items(), key=str))
     if args.hits:
-        with open(args.hits) as handle:
+        with open(args.hits, encoding="utf-8") as handle:
             found, failed = verified_hits(handle.read().splitlines(), args.depth)
-        census: Counter = Counter()
-        itineraries: Counter = Counter()
-        stripe_preperiods: Counter = Counter()
-        for value, (p, q) in tqdm(sorted(found.items()), desc="itineraries", leave=False):
+        census: Counter[int] = Counter()
+        itineraries: Counter[int | None] = Counter()
+        stripe_preperiods: Counter[int | None] = Counter()
+        for value, (_, _) in tqdm(sorted(found.items()), desc="itineraries", leave=False):
             code = (value.numerator * pow(value.denominator, -1, 1 << 1200)) & ((1 << 1200) - 1)
-            result = eventual_period(itinerary(code, 400), settle=5)
+            shape = eventual_period(itinerary(code, 400), settle=5)  # (preperiod, period) or None
             census[value.denominator] += 1
-            itineraries[result[1] if result else None] += 1
+            itineraries[shape[1] if shape else None] += 1
             if value.denominator == 3:
-                stripe_preperiods[result[0] if result else None] += 1
+                stripe_preperiods[shape[0] if shape else None] += 1
         print(f"{len(found)} rational points ({failed} hits failed the 1200-step check)")
         print("denominators:", sorted(census.items()))
         print("itinerary periods (None: not preperiodic):", sorted(itineraries.items(), key=str))

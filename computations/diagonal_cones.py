@@ -16,9 +16,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.rule30 import step
@@ -76,6 +76,7 @@ def onset_slope(s: Settling, from_depth: int) -> tuple[float, int, int]:
 
 def settled_violations(D: np.ndarray, first: int = 8, period: int = 16) -> int:
     """Number of diagonals j >= first with D_j(t + period) != D_j(t) for some t >= ceil(3 j / 2) (the Lean hypothesis)."""
+    # D: (depth, steps)
     bad = 0
     for j in range(first, D.shape[0]):
         t0 = (3 * j + 1) // 2
@@ -86,7 +87,8 @@ def settled_violations(D: np.ndarray, first: int = 8, period: int = 16) -> int:
 
 def _ceil_div(x: np.ndarray, d: int) -> np.ndarray:
     """ceil(x / d) for integer arrays and d > 0."""
-    return -((-x) // d)
+    # x: (...), any shape
+    return -((-x) // d)  # (...), the shape of x
 
 
 def alternating_window(a: int, run: int, tail_end: int, j: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -231,10 +233,10 @@ def strip_excluded(D: np.ndarray, a: int, run: int, k: int) -> bool:
         x = np.arange(left, right + 1)  # (width,)
         expected = ((-x) % 2 == 0).astype(np.uint8)  # (width,)
         depth = x + (a - s)  # (width,), depth of each cell below the row's left edge
-        outside = depth < 0
+        outside = depth < 0  # (width,)
         if np.any(expected[outside] != 0):
             return True
-        inside = (depth >= 0) & (depth < k)
+        inside = (depth >= 0) & (depth < k)  # (width,)
         if np.any(D[depth[inside], a - s] != expected[inside]):
             return True
     return False
@@ -242,6 +244,7 @@ def strip_excluded(D: np.ndarray, a: int, run: int, k: int) -> bool:
 
 def longest_open_strip(D: np.ndarray, a: int, k: int) -> int:
     """The longest black run from time a that no conflict with the true strip of depth k excludes."""
+    # D: (depth >= k, steps > a)
     low, high = 0, a + 1
     while high - low > 1:
         mid = (low + high) // 2

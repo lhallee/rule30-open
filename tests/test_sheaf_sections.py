@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import game, limit_windows as lw, sheaf_sections as ss
@@ -16,7 +15,8 @@ def test_linear_limit_against_elimination() -> None:
         n = 1 << width
         for period in range(1, 6):
             for block in game.necklaces(period):
-                for labels, basis in zip(ss.linear_limit(block, moves), ss.dense_linear_limit(block, moves)):
+                limits = zip(ss.linear_limit(block, moves), ss.dense_linear_limit(block, moves), strict=True)
+                for labels, basis in limits:
                     rows = ss.annihilator_rows(labels) if (labels >= 0).any() else np.zeros((0, n), np.uint8)
                     assert basis.shape[0] + rows.shape[0] == n
                     assert not ((basis.astype(np.int64) @ rows.T.astype(np.int64)) % 2).any()
@@ -45,7 +45,8 @@ def test_exact_limit_inside_linear_limit() -> None:
     moves = lw.window_moves(width)  # (2, n, 2)
     for block in ("0001", "011", "00000011", "0"):
         plays = reachable_by_plays(block, width, 12)
-        for reached, exact, labels in zip(plays, ss.exact_limit(block, moves), ss.linear_limit(block, moves)):
+        for reached, exact, labels in zip(plays, ss.exact_limit(block, moves), ss.linear_limit(block, moves),
+                                          strict=True):
             assert set(np.flatnonzero(exact).tolist()) == reached
             assert (labels[exact] < 0).all()
 
@@ -70,8 +71,9 @@ def test_tests_are_nested() -> None:
         for block in game.necklaces(period):
             flags = [ss.functional_good(block, moves), ss.linear_good(block, moves), ss.exact_good(block, narrow),
                      ss.exact_good(block, moves), ss.game_good(block, width)]
-            assert all(not a or b for a, b in zip(flags, flags[1:])), block
-            for key, flag in zip(excluded, flags):
+            # flags[1:] is one shorter: each flag is paired with the next
+            assert all(not a or b for a, b in zip(flags, flags[1:], strict=False)), block
+            for key, flag in zip(excluded, flags, strict=True):
                 excluded[key] += flag
     assert excluded["pointwise"] < excluded["exact"]
 

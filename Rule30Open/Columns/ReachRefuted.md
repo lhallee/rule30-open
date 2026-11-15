@@ -109,7 +109,7 @@ python -m computations.lock_chain --lean-back
 ```
 
 ```bash
-python -m pytest tests/test_computations.py -k "back_tables or predecessors or reach_wide_carried"
+python -m pytest tests/test_lock_chain.py tests/test_locks.py -k "back_tables or predecessors or reach_wide_carried"
 ```
 
 The sets of `REACH_REFUTED`, from the test of reach at 8 and 22 cells, in under a minute; the module builds in

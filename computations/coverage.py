@@ -20,16 +20,17 @@ import argparse
 import functools
 import re
 import sys
-from pathlib import Path
 
+from pathlib import Path
 from tqdm.auto import tqdm
 
 from computations import game, lock_chain
 
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def module_blocks() -> list[tuple[str, str]]:
     """Every block that a trap in Lean reduces to entry, each as its least rotation, with the module that holds the
     trap, once per trap, in the order of the modules; kept, so callers do not change the list."""
@@ -65,7 +66,7 @@ def module_blocks() -> list[tuple[str, str]]:
     return found
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def trap_blocks() -> dict[str, str]:
     """The blocks that a trap in Lean reduces to entry, each as its least rotation, with the first module that holds
     one; kept, so callers do not change the dict."""

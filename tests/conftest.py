@@ -1,6 +1,7 @@
 """Settings and fixtures shared by every test: one thread for the linear algebra libraries, the objects of the imports
-frozen out of the garbage collector's passes, and the center column stepped once for the tests of its long windows and
-the diagonals to depth 10,000 run once for the tests that quote them.
+frozen out of the garbage collector's passes, the center column stepped once for the tests of its long windows, the
+diagonals to depth 10,000 run once for the tests that quote them, and the core certificate of 0001 at width 16 for the
+tests of `lock_certificate` and `absorption`.
 
 The suite runs serially on one core. OpenBLAS starts a thread per core by default, and on a machine whose other cores
 are busy those threads wait on each other: `np.linalg.eigvals` of a 700 by 700 matrix takes about 8 s with four threads
@@ -13,11 +14,14 @@ from __future__ import annotations
 import gc
 import os
 import sys
-from typing import TYPE_CHECKING
-
 import pytest
 
+from typing import TYPE_CHECKING
+
+
 if TYPE_CHECKING:
+    import numpy as np
+
     from computations.settled_slope import Diagonals
 
 for _name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
@@ -25,9 +29,9 @@ for _name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
 if "numpy" in sys.modules:
     try:
         from threadpoolctl import threadpool_limits
-    except ImportError:
-        pass
-    else:
+    except ImportError:  # threadpoolctl is optional; without it the running pools keep their size
+        threadpool_limits = None
+    if threadpool_limits is not None:
         threadpool_limits(1)
 
 
@@ -63,3 +67,12 @@ def deep_diagonals() -> Diagonals:
     d = stream(10000, 15600, progress=False)
     d.onset.flags.writeable = d.tail.flags.writeable = False
     return d
+
+
+@pytest.fixture(scope="module")
+def certificate() -> np.ndarray:
+    """The greatest invariant set of 0001 at width 16, seeded with the three-column core."""
+    from computations import lock_certificate
+    from references import CORE_0001
+    member, _ = lock_certificate.greatest_invariant_set("0001", CORE_0001, 16)  # (4, 2^16)
+    return member  # (4, 2^16)

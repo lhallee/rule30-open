@@ -60,7 +60,7 @@ the top coefficient is the parity of the rows with a white diagonal left of the 
 [computations/algebra.py](../../computations/algebra.py) evaluates the center cell on all $2^{2t+1}$ cone rows and
 takes the Moebius transform. It confirms degree $2t - 1$ and the single top monomial for $t \le 9$, with 30, 122, 346,
 1,360, 4,852, 23,094 and 79,192 monomials at $t = 3, \dots, 9$; code that is not in this repository extended the
-counts to $t = 14$ (87,887,332 monomials). `tests/test_computations.py` checks $t \le 8$.
+counts to $t = 14$ (87,887,332 monomials). `tests/test_algebra.py` checks $t \le 8$.
 
 ## What it does not say
 

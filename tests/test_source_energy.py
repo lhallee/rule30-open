@@ -7,9 +7,9 @@ from __future__ import annotations
 import cmath
 import itertools
 import math
-from fractions import Fraction
-
 import numpy as np
+
+from fractions import Fraction
 
 from computations import source_energy as se
 from computations.binomial_duality import binomial_transform

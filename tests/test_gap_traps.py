@@ -53,7 +53,7 @@ def test_greatest_trap_matches_naive() -> None:
     for block, words in (("011", ("000",)), ("001", ("111",)), ("0011", ("000",)), ("011", ("00", "010"))):
         good = greatest_trap(block, 6, words)  # (period, 2^6, sufs)
         naive = naive_trap(block, 6, words)
-        fast = {(p, w, s) for p, w, s in zip(*np.nonzero(good))}
+        fast = {(p, w, s) for p, w, s in zip(*np.nonzero(good), strict=True)}
         assert fast == naive
         sizes.append(len(fast))
     assert sizes == [552, 640, 736, 0]
@@ -65,7 +65,7 @@ def test_forced_entry_matches_naive() -> None:
     forced = forced_entry(good, block, width)
     keep = max(len(w) for w in words) - 1
     mask = (1 << keep) - 1
-    attractor = {(p, w, s) for p, w, s in zip(*np.nonzero(good))}
+    attractor = {(p, w, s) for p, w, s in zip(*np.nonzero(good), strict=True)}
     while True:
         new = set(attractor)
         for p in range(len(block)):
@@ -81,7 +81,7 @@ def test_forced_entry_matches_naive() -> None:
         if new == attractor:
             break
         attractor = new
-    assert {(p, w, s) for p, w, s in zip(*np.nonzero(forced))} == attractor and len(attractor) == 744
+    assert {(p, w, s) for p, w, s in zip(*np.nonzero(forced), strict=True)} == attractor and len(attractor) == 744
 
 
 def test_readings_and_learned_words_of_011() -> None:
@@ -113,7 +113,7 @@ def test_escape_readings_matches_naive() -> None:
     good = greatest_trap(block, width, words)
     forced = forced_entry(good, block, width)
     keep = 2
-    out = {(p, w, s) for p, w, s in zip(*np.nonzero(~forced))}
+    out = {(p, w, s) for p, w, s in zip(*np.nonzero(~forced), strict=True)}
 
     def nexts(p: int, w: int, s: int) -> list[tuple[int, int, int]]:
         s2 = ((s << 1) | (w & 1)) & ((1 << keep) - 1) if block[p] == "0" else s

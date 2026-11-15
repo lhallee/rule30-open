@@ -34,13 +34,14 @@ from __future__ import annotations
 
 import argparse
 import sys
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.run_mechanism import _shl1, _shr1
+
 
 # A state is a row of B (the left half, bit j - 1 of the multiword integer is cell -j), C (the center, 0 or 1) and R
 # (bit i - 1 is x_i, for i = 1 .. k). V is the count of the chosen color so far, F the free word (bit t is f(t)).
@@ -63,7 +64,7 @@ def level_step(B: np.ndarray, C: np.ndarray, R: np.ndarray, k: int, f: int) -> t
         Rn = (lft ^ (R | (full >> np.uint64(1)))) & mask  # (n,)
     else:
         Rn = R.copy()  # (n,), empty
-    return Bn, Cn, Rn
+    return Bn, Cn, Rn  # (n, W), (n,), (n,)
 
 
 def reduce_max(B: np.ndarray, C: np.ndarray, R: np.ndarray, V: np.ndarray,
@@ -77,7 +78,8 @@ def reduce_max(B: np.ndarray, C: np.ndarray, R: np.ndarray, V: np.ndarray,
     last = np.ones(len(sv), dtype=bool)  # (n,), the last copy of each state carries the largest count
     last[:-1] = sv[1:] != sv[:-1]
     keep = order[last]  # (m,)
-    return B[keep], C[keep], R[keep], V[keep], (F[keep] if F is not None else None)
+    # m distinct states: B (m, W); C, R, V (m,); F (m, Wf) or None
+    return B[keep], C[keep], R[keep], V[keep], (F[keep] if F is not None else None)  # (m, W), (m,) x 3, (m, Wf)
 
 
 def _start(T: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -88,6 +90,7 @@ def _start(T: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 def _expand(B: np.ndarray, C: np.ndarray, R: np.ndarray, V: np.ndarray, k: int, color: int, t: int,
             F: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray | None]:
     """Both successors of every state (free cell 0, then 1), with the count of c(t + 1) == color added."""
+    # B: (n, W); C, R: (n,) uint64; V: (n,) int32; F: (n, Wf) or None
     outs = [level_step(B, C, R, k, f) for f in (0, 1)]
     Bn = np.concatenate([o[0] for o in outs])  # (2n, W)
     Cn = np.concatenate([o[1] for o in outs])  # (2n,)
@@ -98,7 +101,7 @@ def _expand(B: np.ndarray, C: np.ndarray, R: np.ndarray, V: np.ndarray, k: int, 
         F1 = F.copy()  # (n, Wf)
         F1[:, t // 64] |= np.uint64(1) << np.uint64(t % 64)
         Fn = np.concatenate([F, F1])  # (2n, Wf)
-    return Bn, Cn, Rn, Vn, Fn
+    return Bn, Cn, Rn, Vn, Fn  # (2n, W), (2n,) x 3, (2n, Wf) or None
 
 
 @dataclass
@@ -150,7 +153,7 @@ def committed(B: np.ndarray, C: np.ndarray, R: np.ndarray, k: int, color: int) -
     for _ in range(k):
         Bw, Cw, Rw = level_step(Bw, Cw, Rw, k, 0)
         out += (Cw == np.uint64(color)).astype(np.int32)
-    return out
+    return out  # (n,)
 
 
 def ladder_beam(T: int, k: int, color: int, width: int, every: int = 50, seed: int = 0, lookahead: bool = True,
@@ -210,7 +213,7 @@ def simulate(k: int, free: np.ndarray) -> np.ndarray:
         new[:, 1:-1] = row[:, :-2] ^ (row[:, 1:-1] | row[:, 2:])
         row = new
         out[:, t + 1] = row[:, o]
-    return out
+    return out  # (m, T + 1)
 
 
 def single_cell_column(T: int, col: int) -> np.ndarray:
@@ -226,7 +229,7 @@ def single_cell_column(T: int, col: int) -> np.ndarray:
         new[1:-1] = row[:-2] ^ (row[1:-1] | row[2:])
         row = new
         out[t + 1] = row[o + col]
-    return out
+    return out  # (T + 1,)
 
 
 def single_cell_count(T: int, color: int) -> int:
@@ -326,7 +329,8 @@ def main() -> None:
                       f"ratio={res.best / (args.steps + 1):.4f} single={single_cell_count(args.steps, color)}",
                       flush=True)
                 print(f"  checkpoints {pts}", flush=True)
-                gains = [b - a for (_, a), (_, b) in zip(res.checkpoints, res.checkpoints[1:])]
+                # consecutive checkpoints: the shifted list is one shorter, and zip stops at its end
+                gains = [b - a for (_, a), (_, b) in zip(res.checkpoints, res.checkpoints[1:], strict=False)]
                 print(f"  gains per {args.every} steps: {gains}", flush=True)
                 print(f"  steady rate from t = {args.steps // 2}: {steady_rate(res.checkpoints, args.steps // 2):.4f}",
                       flush=True)
@@ -353,6 +357,7 @@ def main() -> None:
                       f"center by T; lag to the first change: {np.mean(lag == k + 1):.2f} exactly k + 1, median "
                       f"{np.median(lag):.0f}, 90th percentile {np.percentile(lag, 90):.0f}, largest {lag.max()}",
                       flush=True)
+
 
 if __name__ == "__main__":
     main()

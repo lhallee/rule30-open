@@ -9,14 +9,18 @@ where R'_j = R_{j-2} XOR (R_{j-1} OR R_j). The empirical measure of every period
 sum_d mu_d[R_d = color] over pseudo-measures equals, by linear programming duality, the best lower bound on the
 time-averaged number of cells of that color on diagonals 0..J-1 that a telescoping certificate (a spatial potential
 on k+1 adjacent cells that may depend on d, plus a temporal potential on k adjacent cells) can prove.
+
+    python computations/edge_pseudo_measures.py           # the ordinary and left-edge bounds for k = 1 .. 4
+    python computations/edge_pseudo_measures.py --table   # and the table of the entry, up to about a minute a row
 """
+
 from __future__ import annotations
+
+import sys
+import numpy as np
 
 from fractions import Fraction
 from itertools import product
-import sys
-
-import numpy as np
 from scipy.optimize import linprog
 from scipy.sparse import lil_matrix
 
@@ -28,12 +32,14 @@ def words(n: int) -> np.ndarray:
 
 def image(word: np.ndarray) -> np.ndarray:
     """Rule 30 image R'[2..] of rows R given on a window; word shape (m, n) -> (m, n-2)."""
-    a, b, c = word[:, :-2], word[:, 1:-1], word[:, 2:]
+    # word: (m, n)
+    a, b, c = word[:, :-2], word[:, 1:-1], word[:, 2:]  # (m, n-2) each
     return a ^ (b | c)  # shape (m, n-2)
 
 
 def index(bits: np.ndarray) -> np.ndarray:
     """Integer index of each row of a 0/1 array; shape (m, n) -> (m,)."""
+    # bits: (m, n)
     n = bits.shape[1]
     return (bits * (1 << np.arange(n - 1, -1, -1))).sum(axis=1)  # shape (m,)
 
@@ -101,7 +107,7 @@ def left_edge_solution(J: int, k: int, color: int, stationary: bool = True, whit
     cost = np.zeros(nvar)  # shape (nvar,)
     for d in range(J):
         cost[d * nw: (d + 1) * nw] = (W[:, 2] == color)
-    res = linprog(cost, A_eq=A.tocsr(), b_eq=np.array(rhs), bounds=list(zip(lo, hi)), method="highs")
+    res = linprog(cost, A_eq=A.tocsr(), b_eq=np.array(rhs), bounds=list(zip(lo, hi, strict=True)), method="highs")
     assert res.status == 0, res.message
     return res.x.reshape(J, nw)  # shape (J, 2^(k+2))
 
@@ -178,12 +184,12 @@ def verify_pseudo_measure(mu: list[list[Fraction]], k: int, white_end: bool = Fa
     for d in range(J):
         if any(v < 0 for v in mu[d]) or sum(mu[d]) != 1:
             return False
-        for v, w in zip(mu[d], W):
+        for v, w in zip(mu[d], W, strict=True):
             if v != 0 and (any(w[j] for j in range(k + 2) if d - 2 + j < 0) or (d <= 1 and w[2 - d] != 1)):
                 return False
         new: dict[tuple[int, ...], Fraction] = {}
         old: dict[tuple[int, ...], Fraction] = {}
-        for v, w in zip(mu[d], W):
+        for v, w in zip(mu[d], W, strict=True):
             img = tuple(w[j - 2] ^ (w[j - 1] | w[j]) for j in range(2, k + 2))
             new[img] = new.get(img, Fraction(0)) + v
             old[w[2:]] = old.get(w[2:], Fraction(0)) + v
@@ -192,9 +198,9 @@ def verify_pseudo_measure(mu: list[list[Fraction]], k: int, white_end: bool = Fa
     for d in range(J - 1):
         a: dict[tuple[int, ...], Fraction] = {}
         b: dict[tuple[int, ...], Fraction] = {}
-        for v, w in zip(mu[d], W):
+        for v, w in zip(mu[d], W, strict=True):
             a[w[1:]] = a.get(w[1:], Fraction(0)) + v
-        for v, w in zip(mu[d + 1], W):
+        for v, w in zip(mu[d + 1], W, strict=True):
             b[w[:-1]] = b.get(w[:-1], Fraction(0)) + v
         if {x: y for x, y in a.items() if y} != {x: y for x, y in b.items() if y}:
             return False
@@ -204,7 +210,7 @@ def verify_pseudo_measure(mu: list[list[Fraction]], k: int, white_end: bool = Fa
 def black_mass(mu: list[list[Fraction]], k: int) -> Fraction:
     """Total of mu_d[R_d = 1] over d; exact."""
     W = list(product((0, 1), repeat=k + 2))
-    return sum((v for row in mu for v, w in zip(row, W) if w[2] == 1), Fraction(0))
+    return sum((v for row in mu for v, w in zip(row, W, strict=True) if w[2] == 1), Fraction(0))
 
 
 def cycle_density(J: int, n: int) -> np.ndarray:
@@ -215,6 +221,7 @@ def cycle_density(J: int, n: int) -> np.ndarray:
 
 def matching_depth(J: int, k: int, prof: np.ndarray | None = None, tol: float = 1e-6) -> int:
     """Last diagonal d such that the optimal black profile equals the single cell's cycle density on diagonals 0..d."""
+    # prof: (J,) when given
     if prof is None:
         prof = left_edge_profile(J, k, 1)  # shape (J,)
     true = cycle_density(J, J + k + 2)  # shape (J,)
@@ -224,6 +231,7 @@ def matching_depth(J: int, k: int, prof: np.ndarray | None = None, tol: float = 
 
 def tail_ratio(J: int, k: int, prof: np.ndarray | None = None) -> float:
     """Least-squares ratio of mu_d[R_d = 1] over diagonals where it lies in (1e-6, 0.03); a rough fit."""
+    # prof: (J,) when given
     if prof is None:
         prof = left_edge_profile(J, k, 1)  # shape (J,)
     d = np.nonzero((prof > 1e-6) & (prof < 0.03))[0]  # shape (m,)
@@ -252,7 +260,8 @@ def table_rows(rows: list[tuple[int, int]] = TABLE) -> list[tuple[int, int, floa
     return out
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """The bounds of the entry, and the table with `--table`; the command line takes no other argument."""
     for k in range(1, 5):
         print("ordinary frame, white in image row, k =", k, ":", round(ordinary_white_bound(k), 6))
     for color in (1, 0):
@@ -261,3 +270,7 @@ if __name__ == "__main__":
             print("left edge color", color, "k", k, [round(v, 4) for v in vals], flush=True)
     if "--table" in sys.argv:
         table_rows()
+
+
+if __name__ == "__main__":
+    main()

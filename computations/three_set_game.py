@@ -40,14 +40,15 @@ import argparse
 import functools
 import sys
 import time
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
 
 from computations import absorption, gate_census
+
 
 WORD = "0101"
 COUNTS = 6  # d = 0 .. 4 and 5 for no black cell yet
@@ -74,7 +75,7 @@ def pull_table() -> np.ndarray:
         for byte in range(256):
             table[256 * black + byte] = sum(1 << d for d in range(COUNTS) if (byte >> after(d, black)) & 1)
     table.flags.writeable = False
-    return table
+    return table  # (512,)
 
 
 @functools.cache
@@ -82,7 +83,7 @@ def popcount_table() -> np.ndarray:
     """The number of set bits of each byte. Read-only."""
     table = np.array([b.bit_count() for b in range(256)], dtype=np.int64)  # (256,)
     table.flags.writeable = False
-    return table
+    return table  # (256,)
 
 
 def count(sets: np.ndarray) -> int:
@@ -118,7 +119,7 @@ def successors(width: int) -> np.ndarray:
     for lo in tqdm(blocks, desc=f"successors {width}", file=sys.stderr, leave=False, disable=len(blocks) < 8):
         hi = min(n, lo + CHUNK)
         succ[:, lo:hi] = gate_census.double_steps(np.arange(lo, hi, dtype=np.int64), width).T  # (4, block)
-    return succ
+    return succ  # (4, 2^width)
 
 
 def make_game(width: int) -> Game:
@@ -150,7 +151,7 @@ def reach(game: Game, target: np.ndarray, desc: str = "reach") -> tuple[np.ndarr
         while True:
             new = seen | pull(game, seen, every=False)  # (n,)
             if np.array_equal(new, seen):
-                return seen, sweeps
+                return seen, sweeps  # (n,), sweeps that added states
             seen, sweeps = new, sweeps + 1
             bar.update()
 
@@ -168,7 +169,7 @@ def forced_basin(game: Game, target: np.ndarray, desc: str = "basin") -> tuple[n
             new = basin | pull(game, basin, every=True)  # (n,)
             size = count(new)
             if size == total:
-                return basin, added
+                return basin, added  # (n,), one count per rank
             basin, added, total = new, added + [size - total], size
             bar.update()
 
@@ -176,6 +177,7 @@ def forced_basin(game: Game, target: np.ndarray, desc: str = "basin") -> tuple[n
 def ranks(game: Game, target: np.ndarray) -> np.ndarray:
     """The rank of every state in the forced basin of `target`, -1 outside it and at inconsistent states; for small
     widths."""
+    # target: (n,) uint8
     rank = np.full((1 << game.width, COUNTS), -1, dtype=np.int64)  # (n, 6)
     basin = target & game.cons  # (n,)
     sweep = 0
@@ -184,7 +186,7 @@ def ranks(game: Game, target: np.ndarray) -> np.ndarray:
         rank[bits & (rank < 0)] = sweep
         new = basin | pull(game, basin, every=True)  # (n,)
         if np.array_equal(new, basin):
-            return rank
+            return rank  # (n, 6)
         basin, sweep = new, sweep + 1
 
 
@@ -247,7 +249,7 @@ def family_under(width: int) -> np.ndarray:
     inside = np.zeros(1 << width, dtype=bool)  # (2^width,)
     for phase in (0, 2):  # the white steps of the drive
         depths, shifts, masks, patterns, offsets = absorption.family_terms(WORD, phase)  # (K,) each
-        for k, shift, mask, pattern, offset in zip(depths, shifts, masks, patterns, offsets):
+        for k, shift, mask, pattern, offset in zip(depths, shifts, masks, patterns, offsets, strict=True):
             if k + absorption.WALL_CELLS > width:
                 continue
             strip = ((low >> shift) & np.uint64((1 << absorption.WALL_CELLS) - 1)).astype(np.int64)  # (2^width,)
@@ -261,7 +263,7 @@ def lock_codes() -> np.ndarray:
     classes, _ = gate_census.seven_lock()
     codes = np.array(sorted(c for cls in classes for c in cls), dtype=np.int64)  # (195,)
     codes.flags.writeable = False
-    return codes
+    return codes  # (195,)
 
 
 def lock_over(width: int) -> np.ndarray:
@@ -269,7 +271,7 @@ def lock_over(width: int) -> np.ndarray:
     out = np.zeros(1 << width, dtype=np.uint8)  # (2^width,)
     if width <= LOCK_WIDTH:
         out[lock_codes() & ((1 << width) - 1)] = ALL
-    return out
+    return out  # (2^width,)
 
 
 def lock_under(width: int) -> np.ndarray:
@@ -342,6 +344,7 @@ def outside_graph(game: Game, outside: np.ndarray) -> tuple[np.ndarray, np.ndarr
 def residue(game: Game, basin: np.ndarray) -> tuple[list[Component], np.ndarray, np.ndarray]:
     """The components of the consistent states outside `basin` that hold a cycle, largest first; and, for every state
     outside the basin (window * 6 + count, increasing), the index of its component in that list or -1."""
+    # basin: (n,) uint8
     nodes, src, tgt = outside_graph(game, game.cons & ~basin)  # (m,), (e,), (e,)
     m = nodes.size
     graph = csr_matrix((np.ones(src.size, dtype=np.int8), (src, tgt)), shape=(m, m))
@@ -395,7 +398,7 @@ def periodic_rows(words: list[tuple[int, int]], cells: int) -> np.ndarray:
         value &= (1 << (nwords * 64)) - 1
         for k in range(nwords):
             rows[i, k] = np.uint64((value >> (64 * k)) & 0xFFFFFFFFFFFFFFFF)
-    return rows
+    return rows  # (h, nwords)
 
 
 @dataclass
@@ -485,6 +488,7 @@ def share(states: np.ndarray, sets: np.ndarray) -> float:
 def phase0_share(game: Game, sets: np.ndarray) -> float:
     """The share of (window, cell beyond) at a black step whose image, the first white step of a phase-0 half, is in
     `sets` with its starting count."""
+    # sets: (n,) uint8
     start = start_states(game.width)  # (n,)
     held = (start & sets) != 0  # (n,), each window's starting state is held
     total = 0

@@ -7,11 +7,13 @@ from itertools import product
 
 from computations.strip_cycle_mean import cycle_mean, extends_right, potential
 
+
 LEAN_TAB = [2, 2, 6, 6, 4, 4, 8, 8, 0, 0, 8, 0, 8, 8, 0, 8, 10, 10, 18, 10, 18, 18, 14, 14, 18, 18, 18, 18, 16, 12,
             12, 12]
 
 
 def rule(a: int, b: int, c: int) -> int:
+    """Rule 30 on a cell and its two neighbors, written out as the independent check."""
     return a ^ (b | c)
 
 

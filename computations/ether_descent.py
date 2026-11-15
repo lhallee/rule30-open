@@ -26,6 +26,7 @@ from tqdm.auto import tqdm
 
 from computations.ether_certificate import closed_at, closed_bits, step
 
+
 LOW = 12  # the heads below 2^LOW are those of `EtherCensus`
 
 

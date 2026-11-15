@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import itertools
 import math
-
 import numpy as np
 
 from computations import wild_ideas as w
 from computations.algebra import center_truth_table
-from computations.rule30 import center_column
+from computations.rule30 import center_column, pack_row
 
 
 def numpy_rank(matrix: np.ndarray) -> int:
@@ -34,12 +33,12 @@ def numpy_rank(matrix: np.ndarray) -> int:
 
 def poly_mul_mod(a: int, b: int, n: int) -> int:
     """Product of two GF(2) polynomials held as integers, modulo x^n."""
-    result = 0
+    product = 0
     while b:
         low = (b & -b).bit_length() - 1
-        result ^= a << low
+        product ^= a << low
         b &= b - 1
-    return result & ((1 << n) - 1)
+    return product & ((1 << n) - 1)
 
 
 def test_gf2_rank_matches_numpy() -> None:
@@ -47,13 +46,13 @@ def test_gf2_rank_matches_numpy() -> None:
     for shape in [(6, 9), (12, 12), (20, 7)]:
         matrix = rng.integers(0, 2, shape, dtype=np.uint8)  # shape
         matrix[1] = matrix[0] ^ matrix[2 % shape[0]]
-        rows = [w.bits_to_int(row) for row in matrix]
+        rows = [pack_row(row) for row in matrix]
         assert w.gf2_rank(rows) == numpy_rank(matrix)
 
 
 def test_frobenius_power_is_squaring() -> None:
     cells = center_column(40)  # (40,)
-    f = w.bits_to_int(cells)
+    f = pack_row(cells)
     square = poly_mul_mod(f, f, 64)
     assert w.frobenius_power(cells, 1, 64) == square
     assert w.frobenius_power(cells, 2, 64) == poly_mul_mod(square, square, 64)
@@ -61,7 +60,8 @@ def test_frobenius_power_is_squaring() -> None:
 
 def brute_force_nullity(cells: np.ndarray, k: int, n: int, degree: int) -> int:
     """Dimension of the Ore solution space by listing every coefficient vector."""
-    f = w.bits_to_int(cells[:n])
+    # cells: (>= n,)
+    f = pack_row(cells[:n])
     series = [1] + [f]
     for _ in range(k):
         series.append(poly_mul_mod(series[-1], series[-1], n))
@@ -96,7 +96,8 @@ def test_lll_reduces_and_keeps_lattice() -> None:
     reduced = w.lll(basis)
     # same lattice: determinant of the Gram matrix is unchanged
     def gram_det(rows: list[list[int]]) -> int:
-        g = np.array([[sum(a * b for a, b in zip(u, v)) for v in rows] for u in rows], dtype=object)  # (3, 3)
+        g = np.array([[sum(a * b for a, b in zip(u, v, strict=True)) for v in rows] for u in rows],
+                     dtype=object)  # (3, 3)
         return (
             g[0, 0] * (g[1, 1] * g[2, 2] - g[1, 2] * g[2, 1])
             - g[0, 1] * (g[1, 0] * g[2, 2] - g[1, 2] * g[2, 0])

@@ -26,16 +26,11 @@ import argparse
 import functools
 import sys
 import time
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations import absorption
-
-
-def is_white(block: str, phase: int, t: int) -> bool:
-    """Whether the center reads 0 at step t."""
-    return block[(t + phase) % len(block)] == "0"
 
 
 def readings(block: str, phase: int, half: int, steps: int) -> list[int]:
@@ -76,7 +71,7 @@ def step_windows(windows: np.ndarray, width: int, center: int, beyond: int) -> n
     return (((windows << 1) | center) & mask) ^ (windows | ((windows >> 1) | (beyond << (width - 1))))  # (n,)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def greatest_trap(block: str, width: int, words: tuple[str, ...]) -> np.ndarray:
     """good[phase, window, suffix]: the greatest set of states that one step keeps for both inputs without completing
     a forbidden word. The suffix holds the last L - 1 readings, newest in bit 0, where L is the longest word; states
@@ -112,11 +107,13 @@ def greatest_trap(block: str, width: int, words: tuple[str, ...]) -> np.ndarray:
 
 def forced_entry(good: np.ndarray, block: str, width: int) -> np.ndarray:
     """forced[phase, window, suffix]: every input sequence from the right leads from the state into the trap."""
-    return forced_layers(good, block, width)[0]
+    # good: (period, n, sufs), the greatest trap of `greatest_trap`
+    return forced_layers(good, block, width)[0]  # (period, n, sufs)
 
 
 def forced_layers(good: np.ndarray, block: str, width: int) -> tuple[np.ndarray, int]:
     """The states from which every input sequence leads into the trap, and the number of steps the slowest takes."""
+    # good: (period, n, sufs)
     period, n, sufs = good.shape
     windows = np.arange(n, dtype=np.int64)  # (n,)
     nxt = [[step_windows(windows, width, int(block[p]), x) for x in (0, 1)] for p in range(period)]
@@ -134,7 +131,7 @@ def forced_layers(good: np.ndarray, block: str, width: int) -> tuple[np.ndarray,
             both = forced[q][nxt[p][0][:, None], s_new] & forced[q][nxt[p][1][:, None], s_new]  # (n, sufs)
             new[p] |= both
         if np.array_equal(new, forced):
-            return forced, depth
+            return forced, depth  # (period, n, sufs), int
         forced = new
         depth += 1
 
@@ -144,6 +141,7 @@ def escape_readings(good: np.ndarray, forced: np.ndarray, block: str, width: int
     the greatest set of states outside `forced` in which every state has a successor. A path that never enters the
     trap stays in it, so if this set is {0} (or {1}) every half that never enters has constant readings from some step
     on, which masked Jen excludes."""
+    # good, forced: (period, n, sufs)
     period, n, sufs = good.shape
     windows = np.arange(n, dtype=np.int64)  # (n,)
     nxt = [[step_windows(windows, width, int(block[p]), x) for x in (0, 1)] for p in range(period)]

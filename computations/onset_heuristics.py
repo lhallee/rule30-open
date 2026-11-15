@@ -25,13 +25,15 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
+from computations.cyclic_words import least_array_period
 from computations.seed_onsets import scalar_onsets
 from computations.settled_slope import stream
+
 
 PERIOD = 64
 
@@ -62,7 +64,7 @@ def transient_density(D: np.ndarray, onset: np.ndarray, js: np.ndarray, start: n
     """The fraction of black cells of D_j on [start_j, T_j) for each j in js (nan if the interval is empty)."""
     # D: (n, steps); onset: (n,); js: (m,); start: (m,)
     out = np.full(len(js), np.nan)  # (m,)
-    for i, (j, s) in enumerate(zip(js, start)):
+    for i, (j, s) in enumerate(zip(js, start, strict=True)):
         if onset[j] > s:
             out[i] = D[j, s:onset[j]].mean()
     return out  # (m,)
@@ -110,19 +112,12 @@ def damage_run(v0: int, w0: int, depth: int, steps: int, window: int) -> tuple[n
     return last, tails[0], tails[1]  # (n,), (window, n), (window, n)
 
 
-def least_period(column: np.ndarray) -> int:
-    """The least p dividing the length with column(t + p) = column(t) cyclically."""
-    # column: (window,)
-    n = len(column)
-    return next(p for p in range(1, n + 1) if n % p == 0 and np.array_equal(column, np.roll(column, -p)))
-
-
 def diagonal_shift(tail: np.ndarray, single: np.ndarray, j: int) -> int:
     """The least h >= 0 with D_j(t) = S_j(t + h) on the last rows (both tails cover whole periods and end at the same
     time), or -1 if there is none."""
     # tail: (window, n); single: (window, n)
     s = single[:, j]  # (window,)
-    p = least_period(s)
+    p = least_array_period(s)
     return next((h for h in range(p) if np.array_equal(tail[:, j], np.roll(s, -h))), -1)
 
 
@@ -236,9 +231,9 @@ def main() -> None:
             if 2 * J <= depth:
                 print(f"  j <= {J}: T_2j - 2 T_j from {doubling_excess(T, J)[1]} to {doubling_excess(T, J)[0]} "
                       f"(at j = {doubling_excess(T, J)[2]})")
-        Kall = doubling_excess(T, depth // 2)[0]
-        print(f"with K = {Kall}: least (T_j + K) / j over 16 <= j <= 256 {base_ratio(T, Kall, 16, 256)}, "
-              f"over 16 <= j <= {depth // 2} {base_ratio(T, Kall, 16, depth // 2)}")
+        k_all = doubling_excess(T, depth // 2)[0]
+        print(f"with K = {k_all}: least (T_j + K) / j over 16 <= j <= 256 {base_ratio(T, k_all, 16, 256)}, "
+              f"over 16 <= j <= {depth // 2} {base_ratio(T, k_all, 16, depth // 2)}")
         for lo, hi in [(400, 53206), (87867, depth - 1)]:
             if hi <= depth:
                 for m in [1, 4, 16, 64, 256, 1024, 4096]:

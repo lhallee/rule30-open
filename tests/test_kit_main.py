@@ -4,11 +4,14 @@ quarter theorems against a search over every start, run and gap that their Lean 
 from __future__ import annotations
 
 import itertools
+
 from collections.abc import Callable
 
 from computations import game
+from computations.cyclic_words import least_rotation
 from computations.kit_main import (NEW_PADDED, PARAM_BLACK, grammar, lean_literals, new_blocks, padded, param_black,
                                    quarter, reset_mixture, run_pairs, white17)
+
 
 MAX = 16  # periods checked against generated words
 
@@ -32,7 +35,7 @@ def generated(pair_ok: Callable[[int, int], bool], max_period: int,
                 pairs = prefix + [(r, q)]
                 word = "".join("1" * a + "0" * b for a, b in pairs)
                 if whole_ok(pairs) and primitive(word):
-                    found.add(game.least_rotation(word))
+                    found.add(least_rotation(word))
                 extend(pairs, length + r + q)
     extend([], 0)
     return found
@@ -58,7 +61,7 @@ def test_grammar_against_generated() -> None:
 def test_long_white_families_against_generated() -> None:
     # Both families need 17 white cells, so up to period 21 a word has at most four 1s: every such word, by the
     # positions of its 1s, and every necklace up to MAX, where neither family has a word.
-    sparse = {game.least_rotation("".join("1" if i in ones else "0" for i in range(period)))
+    sparse = {least_rotation("".join("1" if i in ones else "0" for i in range(period)))
               for period in range(MAX + 1, 22) for k in range(1, period - 16)
               for ones in itertools.combinations(range(period), k)}
     sparse = {word for word in sparse if primitive(word)}
@@ -73,12 +76,12 @@ def test_padded_and_param_against_generated() -> None:
     words = set()
     for tail, bound in NEW_PADDED:
         words |= {"0" * q + tail for q in range(bound, MAX - len(tail) + 1)}
-    assert recognized(padded, MAX) == {game.least_rotation(w) for w in words if primitive(w)}
+    assert recognized(padded, MAX) == {least_rotation(w) for w in words if primitive(w)}
     assert padded("0" * 17 + "111") and not padded("0" * 16 + "111") and padded("0" * 17 + "11111")
     assert padded("0" * 7 + "1111") and not padded("0" * 6 + "1111") and not padded("0" * 18 + "11")
     words = {"1" * r + format(bits, f"0{length}b") for length, bits, r0 in PARAM_BLACK
              for r in range(r0, MAX - length + 1)}
-    assert recognized(param_black, MAX) == {game.least_rotation(w) for w in words if primitive(w)}
+    assert recognized(param_black, MAX) == {least_rotation(w) for w in words if primitive(w)}
 
 
 def brute_quarter(word: str) -> bool:

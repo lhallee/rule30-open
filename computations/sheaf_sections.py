@@ -27,8 +27,8 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
@@ -41,6 +41,7 @@ def step_components(moves: np.ndarray, col: int) -> tuple[np.ndarray, np.ndarray
     """The connected components of the graph of one step beside `col`, with the windows before the step on one side
     and the windows after it on the other. Returns the component of each window before (shape (n,)), of each window
     after (shape (n,), -1 for a window that no move reaches) and the number of components."""
+    # moves: (2, n, 2)
     n = moves.shape[1]
     source = np.concatenate([np.arange(n), np.arange(n)])  # (2n,)
     target = np.concatenate([moves[col, :, 0], moves[col, :, 1]]) + n  # (2n,), windows after at n .. 2n - 1
@@ -49,7 +50,7 @@ def step_components(moves: np.ndarray, col: int) -> tuple[np.ndarray, np.ndarray
     reached = np.zeros(n, dtype=bool)  # (n,)
     reached[target - n] = True
     after = np.where(reached, label[n:], -1)  # (n,)
-    return label[:n], after, int(count)
+    return label[:n], after, int(count)  # (n,), (n,)
 
 
 def classes(nodes: int, a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -71,12 +72,13 @@ def classes(nodes: int, a: np.ndarray, b: np.ndarray) -> np.ndarray:
 
 def canonical(labels: np.ndarray) -> np.ndarray:
     """The labels (shape (n,), -1 for no set) renumbered by first occurrence, so equal families compare equal."""
+    # labels: (n,)
     out = np.full(labels.shape, -1, dtype=np.int64)  # (n,)
-    keep = labels >= 0
-    _, first, inverse = np.unique(labels[keep], return_index=True, return_inverse=True)
+    keep = labels >= 0  # (n,)
+    _, first, inverse = np.unique(labels[keep], return_index=True, return_inverse=True)  # (sets,), (kept,)
     rank = np.argsort(np.argsort(first))  # (sets,) order of first occurrence
     out[keep] = rank[inverse]
-    return out
+    return out  # (n,)
 
 
 def linear_step(labels: np.ndarray, moves: np.ndarray, col: int,
@@ -87,6 +89,7 @@ def linear_step(labels: np.ndarray, moves: np.ndarray, col: int,
     annihilator at the move's start: it is constant on each component of the step, zero on the components that meet a
     window in no set, constant across the components that meet one set, and free on a window that no move reaches.
     `components` is `step_components(moves, col)` when the caller has it."""
+    # labels: (n,), moves: (2, n, 2), components: ((n,), (n,), count) or None
     n = moves.shape[1]
     before, after, count = step_components(moves, col) if components is None else components
     sets = int(labels.max()) + 1
@@ -101,7 +104,7 @@ def linear_step(labels: np.ndarray, moves: np.ndarray, col: int,
     new[alive] = cls[after[alive]]
     unreached = np.flatnonzero(~reached)  # (g,) windows with no move into them: each a set of its own
     new[unreached] = cls.max() + 1 + np.arange(unreached.size)
-    return canonical(new)
+    return canonical(new)  # (n,)
 
 
 LIMITS: dict[tuple[str, tuple[int, ...], str, bytes], list[np.ndarray]] = {}  # `linear_limit` by block and moves, the last 64 asked
@@ -111,6 +114,7 @@ def linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """The annihilator of the linear limit at each phase, as labels (shape (n,) each) of disjoint sets of windows: for
     each phase i, before the column reads block[i]. The annihilator grows period by period until the labels at phase
     0 repeat. Kept, read-only, for the 64 blocks and moves asked last, since each test of a block reads it."""
+    # moves: (2, n, 2)
     key = (block, moves.shape, moves.dtype.str, moves.tobytes())
     if key not in LIMITS:
         while len(LIMITS) >= 64:
@@ -119,11 +123,12 @@ def linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
         for labels in LIMITS[key]:
             labels.flags.writeable = False
     LIMITS[key] = LIMITS.pop(key)  # the latest asked last
-    return LIMITS[key]
+    return LIMITS[key]  # len(block) arrays, each (n,)
 
 
 def compute_linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """`linear_limit`, computed."""
+    # moves: (2, n, 2)
     n = moves.shape[1]
     components = [step_components(moves, col) for col in (0, 1)]  # the two graphs of one step, built once
     labels = np.full(n, -1, dtype=np.int64)  # (n,) the annihilator of all windows is zero
@@ -138,24 +143,26 @@ def compute_linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     for ch in block:
         out.append(labels)
         labels = linear_step(labels, moves, int(ch), components[int(ch)])
-    return out
+    return out  # len(block) arrays, each (n,)
 
 
 def exact_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """The windows that extend over every past at each phase, as boolean masks (shape (n,) each)."""
+    # moves: (2, n, 2)
     out = []
     for members in lw.limit_sets(block, moves):
         mask = np.zeros(moves.shape[1], dtype=bool)  # (n,)
         mask[members] = True
         out.append(mask)
-    return out
+    return out  # len(block) arrays, each (n,)
 
 
 def linear_good(block: str, moves: np.ndarray) -> bool:
     """Whether, at every 0 of the block, cell k + 1 is constant on the windows whose obstruction vanishes, those in no
     set of the annihilator. The strongest pointwise test the linearization gives."""
+    # moves: (2, n, 2)
     first = np.arange(moves.shape[1]) & 1  # (n,)
-    for ch, labels in zip(block, linear_limit(block, moves)):
+    for ch, labels in zip(block, linear_limit(block, moves), strict=True):
         if ch == "0":
             values = first[labels < 0]
             if values.size and values.min() != values.max():
@@ -166,8 +173,9 @@ def linear_good(block: str, moves: np.ndarray) -> bool:
 def functional_good(block: str, moves: np.ndarray) -> bool:
     """Whether, at every 0 of the block, cell k + 1 plus a constant lies in the annihilator of the linear limit: it is
     constant on every set and equal to the constant off the sets. Every linear section then reads one value."""
+    # moves: (2, n, 2)
     first = np.arange(moves.shape[1]) & 1  # (n,)
-    for ch, labels in zip(block, linear_limit(block, moves)):
+    for ch, labels in zip(block, linear_limit(block, moves), strict=True):
         if ch != "0":
             continue
         outside = first[labels < 0]
@@ -185,6 +193,7 @@ def functional_good(block: str, moves: np.ndarray) -> bool:
 
 def exact_good(block: str, moves: np.ndarray) -> bool:
     """`limit_windows.is_good`: cell k + 1 constant on the exact limit at every 0."""
+    # moves: (2, n, 2)
     return lw.is_good(block, moves)
 
 
@@ -197,34 +206,37 @@ def game_good(block: str, width: int) -> bool:
 
 def row_reduce(rows: np.ndarray) -> np.ndarray:
     """A basis (shape (r, n), uint8) of the span of `rows` (shape (m, n)) over GF(2), in reduced echelon form."""
+    # rows: (m, n)
     a = rows.copy() % 2  # (m, n)
     pivot_row = 0
     for column in range(a.shape[1]):
-        hits = np.flatnonzero(a[pivot_row:, column]) + pivot_row
+        hits = np.flatnonzero(a[pivot_row:, column]) + pivot_row  # (h,)
         if hits.size == 0:
             continue
         a[[pivot_row, hits[0]]] = a[[hits[0], pivot_row]]
-        others = np.flatnonzero(a[:, column])
+        others = np.flatnonzero(a[:, column])  # (o,)
         others = others[others != pivot_row]
         a[others] ^= a[pivot_row]
         pivot_row += 1
         if pivot_row == a.shape[0]:
             break
-    return a[:pivot_row].astype(np.uint8)
+    return a[:pivot_row].astype(np.uint8)  # (r, n)
 
 
 def kernel(matrix: np.ndarray) -> np.ndarray:
     """A basis (shape (d, m)) of the vectors x over GF(2) with x @ matrix = 0, for `matrix` of shape (m, n)."""
+    # matrix: (m, n)
     m = matrix.shape[0]
     joined = np.concatenate([matrix % 2, np.eye(m, dtype=np.uint8)], axis=1).astype(np.uint8)  # (m, n + m)
     reduced = row_reduce(joined)  # (r, n + m)
-    zero = ~reduced[:, : matrix.shape[1]].any(axis=1)
-    return reduced[zero, matrix.shape[1]:]
+    zero = ~reduced[:, : matrix.shape[1]].any(axis=1)  # (r,)
+    return reduced[zero, matrix.shape[1]:]  # (d, m)
 
 
 def dense_step(basis: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
     """{head(a) : a in GF(2)^moves, tail(a) in span(basis)} for one step beside `col`, by elimination: the moves'
     combinations whose tails a parity check of the span kills, carried to their heads."""
+    # basis: (r, n), moves: (2, n, 2)
     n = moves.shape[1]
     tails = np.concatenate([np.arange(n), np.arange(n)])  # (2n,)
     heads = np.concatenate([moves[col, :, 0], moves[col, :, 1]])  # (2n,)
@@ -235,12 +247,13 @@ def dense_step(basis: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
     checks = kernel(basis.T) if basis.size else np.eye(n, dtype=np.uint8)  # (c, n) parity checks of the span
     combos = kernel((tail_matrix.astype(np.int64) @ checks.T.astype(np.int64)) % 2)  # (d, 2n)
     image = (combos.astype(np.int64) @ head_matrix.astype(np.int64)) % 2  # (d, n)
-    return row_reduce(image) if image.size else np.zeros((0, n), dtype=np.uint8)
+    return row_reduce(image) if image.size else np.zeros((0, n), dtype=np.uint8)  # (r', n)
 
 
 def dense_linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """The linear limit at each phase as a basis (shape (r, n) each), by elimination: the image of all of GF(2)^n
     under the block read again and again, until it stops shrinking."""
+    # moves: (2, n, 2)
     n = moves.shape[1]
     basis = np.eye(n, dtype=np.uint8)  # (n, n)
     while True:
@@ -254,16 +267,17 @@ def dense_linear_limit(block: str, moves: np.ndarray) -> list[np.ndarray]:
     for ch in block:
         out.append(basis)
         basis = dense_step(basis, moves, int(ch))
-    return out
+    return out  # len(block) arrays, each (r, n)
 
 
 def annihilator_rows(labels: np.ndarray) -> np.ndarray:
     """The indicators (shape (s, n)) of the sets that `labels` (shape (n,)) names."""
+    # labels: (n,)
     sets = int(labels.max()) + 1
     rows = np.zeros((sets, labels.size), dtype=np.uint8)  # (s, n)
-    keep = labels >= 0
+    keep = labels >= 0  # (n,)
     rows[labels[keep], np.flatnonzero(keep)] = 1
-    return rows
+    return rows  # (s, n)
 
 
 # Surveys.
@@ -282,9 +296,10 @@ def survey(max_period: int, widths: list[int]) -> dict[tuple[int, int], dict[str
                               mininterval=5, leave=False):
                 flags = [functional_good(block, moves), linear_good(block, moves), exact_good(block, narrow),
                          exact_good(block, moves), game_good(block, width)]
-                assert all(not a or b for a, b in zip(flags, flags[1:])), (block, flags)
+                # flags[1:] is one shorter: each flag is paired with the next
+                assert all(not a or b for a, b in zip(flags, flags[1:], strict=False)), (block, flags)
                 counts["blocks"] += 1
-                for key, flag in zip(list(counts)[1:], flags):
+                for key, flag in zip(list(counts)[1:], flags, strict=True):
                     counts[key] += flag
             out[(width, period)] = counts
             print(f"width {width:2d} period {period:2d}: {counts}", flush=True)
@@ -297,7 +312,7 @@ def one_cell_short(block: str, width: int) -> bool:
     'the linear test at K is never stronger than the exact test at K - 1'."""
     moves, narrow = lw.window_moves(width), lw.window_moves(width - 1)  # (2, n, 2), (2, n / 2, 2)
     half = 1 << (width - 1)
-    for labels, exact in zip(linear_limit(block, moves), exact_limit(block, narrow)):
+    for labels, exact in zip(linear_limit(block, moves), exact_limit(block, narrow), strict=True):
         short = np.flatnonzero(exact)  # (s,) windows of width - 1 cells
         if (labels[short | half] >= 0).any():
             return False
@@ -312,7 +327,7 @@ def sizes(block: str, width: int) -> list[tuple[int, int, int, int]]:
     annihilator, and the largest set."""
     moves = lw.window_moves(width)  # (2, n, 2)
     rows = []
-    for exact, labels in zip(exact_limit(block, moves), linear_limit(block, moves)):
+    for exact, labels in zip(exact_limit(block, moves), linear_limit(block, moves), strict=True):
         counts = np.bincount(labels[labels >= 0]) if (labels >= 0).any() else np.zeros(1, dtype=np.int64)
         rows.append((int(exact.sum()), int((labels < 0).sum()), int((counts > 0).sum()), int(counts.max())))
     return rows

@@ -28,24 +28,16 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
 
 from computations.cone_screening import cone_table, variable_slices
-from computations.rule30 import center_column
+from computations.rule30 import center_column, pack_row
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # GF(2) linear algebra on Python integers
-
-
-def bits_to_int(bits: np.ndarray) -> int:
-    """The integer whose bit i is bits[i]."""
-    # bits: (n,)
-    packed = np.packbits(bits.astype(np.uint8), bitorder="little")  # (ceil(n / 8),)
-    return int.from_bytes(packed.tobytes(), "little")
 
 
 def insert(basis: dict[int, int], vector: int) -> bool:
@@ -77,7 +69,7 @@ def frobenius_power(cells: np.ndarray, i: int, n: int) -> int:
     spread = np.zeros(n, dtype=np.uint8)  # (n,)
     positions = np.nonzero(cells)[0] << i  # (black cells,)
     spread[positions[positions < n]] = 1
-    return bits_to_int(spread)
+    return pack_row(spread)
 
 
 def ore_profile(cells: np.ndarray, k: int, n: int, max_degree: int, progress: bool = False) -> np.ndarray:
@@ -143,13 +135,14 @@ def lll(basis: list[list[int]]) -> list[list[int]]:
     lam = [[0] * size for _ in range(size)]
     known = 0
 
+    # every row of a lattice basis has the same length, and `reduce` and `swap` keep it
     def dot(u: list[int], v: list[int]) -> int:
-        return sum(x * y for x, y in zip(u, v))
+        return sum(x * y for x, y in zip(u, v, strict=True))
 
     def reduce(k: int, l: int) -> None:
         if 2 * abs(lam[k][l]) > d[l + 1]:
             q = (2 * lam[k][l] + d[l + 1]) // (2 * d[l + 1])
-            b[k] = [x - q * y for x, y in zip(b[k], b[l])]
+            b[k] = [x - q * y for x, y in zip(b[k], b[l], strict=True)]
             lam[k][l] -= q * d[l + 1]
             for i in range(l):
                 lam[k][i] -= q * lam[l][i]
@@ -203,7 +196,8 @@ def log2_norm(vector: list[int]) -> float:
 
 def column_integer(cells: np.ndarray) -> int:
     """sum cells[n] 2^n: the first len(cells) bits of the 2-adic integer z, or 2^m r for the real r."""
-    return bits_to_int(cells)
+    # cells: (m,)
+    return pack_row(cells)
 
 
 def two_adic_lattice(z: int, degree: int, bits: int) -> list[list[int]]:
@@ -219,7 +213,8 @@ def two_adic_lattice(z: int, degree: int, bits: int) -> list[list[int]]:
 
 def reversed_integer(cells: np.ndarray) -> int:
     """2^m r truncated, for r = sum cells[n] 2^(-n-1) and m = len(cells): cell 0 is the leading bit."""
-    return bits_to_int(cells[::-1].copy())
+    # cells: (m,)
+    return pack_row(cells[::-1].copy())
 
 
 def real_lattice(numerator: int, degree: int, bits: int) -> list[list[int]]:
@@ -391,6 +386,7 @@ def left_cut_formula(left: int) -> int:
 
 def rank_profile(table: np.ndarray, t: int) -> list[int]:
     """cut_rank for every cut 1 .. 2t."""
+    # table: (2^(2t+1),)
     return [cut_rank(table, t, left) for left in range(1, 2 * t + 1)]
 
 

@@ -6,14 +6,16 @@ module."""
 from __future__ import annotations
 
 import functools
-from pathlib import Path
-
 import numpy as np
 
+from pathlib import Path
+
 from computations import k_survivors as ks
-from computations.ether_certificate import background, held
+from computations.defect_potential import background
 from computations.ether_k_tree import tree_leaves
+from computations.held_shift import held
 from computations.no_k_tails16 import break_run
+
 
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "EtherKTree32.lean"
 CELLS = 600  # cells of a whole half in the direct runs
@@ -27,7 +29,7 @@ def census24() -> dict[str, object]:
 
 def whole_half(a: int, o: int, d: int, cells: int = CELLS) -> int:
     """The half with defect d against the ether at (a, o), on the cells 0 .. cells - 1."""
-    return d ^ background(a, o, cells)
+    return d ^ background(a, o, 0, cells)
 
 
 def direct_break(u: int, steps: int, cells: int = CELLS) -> int:
@@ -64,7 +66,7 @@ def test_wide_filter_and_settle_against_direct_runs() -> None:
         assert sum(broke.values()) + len(wide) == len(surv)
         low = (1 << head) - 1
         for n in surv.tolist():
-            d0 = (n & low) ^ background(a, o, head)
+            d0 = (n & low) ^ background(a, o, 0, head)
             u = whole_half(a, o, d0)
             first = direct_break(u, 500)
             r = ks.settle(d0, a, o)
@@ -137,7 +139,7 @@ def test_counts_and_closure() -> None:
     assert len(tails) == 406 and sum(q <= 57 for _, q in tails) == 278
     ether = set()
     for a, o, d in closure:
-        u = d ^ background(a, o, d.bit_length() + 14)
+        u = d ^ background(a, o, 0, d.bit_length() + 14)
         ether.add(ks.periodic7([(u >> j) & 1 for j in range(d.bit_length() + 14)], d.bit_length()))
     assert ether <= tails
     words = {tuple(ks.tail_cell(x, j) for j in range(200, 207)) for x in tails}
@@ -147,7 +149,7 @@ def test_counts_and_closure() -> None:
 def test_lean_section_matches_module() -> None:
     """The census section of `EtherKTree32` is the one `lean_section32` prints, and the walk of `lean_roots` at one
     alignment, on heads of 12 cells, reaches the subtree roots that the tree of `ether_k_tree` passes through at cell 6."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     assert ks.lean_section32() in text
     roots = [n for _, n, _ in ks.lean_roots(1, 3, head=12)]
     leaves, _ = tree_leaves(12, 1, 3)

@@ -43,11 +43,12 @@ from __future__ import annotations
 import argparse
 import functools
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.held_shift import held, ring_cycle
+
 
 ETHER: list[int] = ring_cycle(0b1000000, 7)[1]  # the four ring states of the ether, bit j the ring cell j
 STRIP = 13  # the narrowest width with a closed strip
@@ -66,7 +67,7 @@ def background(phase: int, offset: int, low: int, cells: int) -> int:
     return _background(phase % 4, (low + offset) % 7, cells)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _background(phase: int, shift: int, cells: int) -> int:
     """`background` for a phase below 4 and low + offset below 7, which is all it depends on, computed once."""
     return sum(ether_cell(phase, shift + i) << i for i in range(cells))
@@ -86,6 +87,7 @@ def top(D: int) -> int:
 
 def bit_length64(x: np.ndarray) -> np.ndarray:
     """The bit length of each 64-bit word, exactly, through two 32-bit halves converted to floats."""
+    # x: (n,) uint64
     high = (x >> U64(32)).astype(np.float64)  # (n,)
     low = (x & U64(0xFFFFFFFF)).astype(np.float64)  # (n,)
     _, eh = np.frexp(high)  # (n,), the bit length of the high half
@@ -95,6 +97,7 @@ def bit_length64(x: np.ndarray) -> np.ndarray:
 
 def tops128(lo: np.ndarray, hi: np.ndarray) -> np.ndarray:
     """The top of each defect held as two words, cells 0..63 in `lo` and 64..127 in `hi`; -1 when it is zero."""
+    # lo, hi: (n,) uint64
     return np.where(hi != 0, 64 + bit_length64(hi), bit_length64(lo)) - 1  # (n,)
 
 
@@ -105,6 +108,7 @@ def words128(value: int) -> tuple[np.uint64, np.uint64]:
 
 def step128(lo: np.ndarray, hi: np.ndarray, phase: int, offset: int) -> tuple[np.ndarray, np.ndarray]:
     """One step of every defect held as two words, at ether phase `phase`: exact for a defect whose top is at most 126."""
+    # lo, hi: (n,) uint64
     b_lo, b_hi = words128(background(phase, offset, 0, 128))
     n_lo, n_hi = words128(background(phase + 1, offset, 0, 128))
     beyond = U64(ether_cell(phase, 128 + offset))
@@ -113,10 +117,10 @@ def step128(lo: np.ndarray, hi: np.ndarray, phase: int, offset: int) -> tuple[np
     up_hi = (x_hi >> U64(1)) | (beyond << U64(63))  # (n,)
     down_lo = x_lo << U64(1)  # (n,) cell j - 1 at bit j; cell -1 is the held 0
     down_hi = (x_hi << U64(1)) | (x_lo >> U64(63))  # (n,)
-    return (up_lo ^ (x_lo | down_lo)) ^ n_lo, (up_hi ^ (x_hi | down_hi)) ^ n_hi
+    return (up_lo ^ (x_lo | down_lo)) ^ n_lo, (up_hi ^ (x_hi | down_hi)) ^ n_hi  # (n,), (n,)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def closed_strips(width: int) -> np.ndarray:
     """The greatest set of strips D(c - width + 1 .. c), bit i the cell c - width + 1 + i, with D zero above c, that one
     step maps into the set at the next phase for both values of D(c - width) and that never makes cell c + 1 a defect.
@@ -124,7 +128,7 @@ def closed_strips(width: int) -> np.ndarray:
     array is read-only."""
     alive = greatest_strips(width)  # (4, 7, 2^w)
     alive.flags.writeable = False
-    return alive
+    return alive  # (4, 7, 2^w)
 
 
 def greatest_strips(width: int) -> np.ndarray:
@@ -136,11 +140,18 @@ def greatest_strips(width: int) -> np.ndarray:
     for a in range(4):
         for r in range(7):
             low = r + 7 * (width // 7 + 2) - width + 1  # a cell c = low + width - 1 with c = r mod 7, c - width >= 0
-            cell = lambda k: ether_cell(a, k)
+
+            def cell(k: int) -> int:
+                return ether_cell(a, k)
+
             if cell(low + width) == 0:  # the top rises above c exactly when D(c) = 1 under a background 0
                 alive[a, r] &= ((m >> (width - 1)) & 1) == 0
             for below in (0, 1):
-                d = lambda k: (m >> (k - low)) & 1 if low <= k < low + width else (below if k == low - 1 else 0)
+
+                def d(k: int) -> np.ndarray | int:
+                    """Cell k of every strip: (2^w,) inside the strip, the cell `below` under it, 0 above it."""
+                    return (m >> (k - low)) & 1 if low <= k < low + width else (below if k == low - 1 else 0)  # (2^w,)
+
                 new = np.zeros(n, dtype=np.int64)  # (2^w,)
                 for k in range(low, low + width):
                     xk, xb = cell(k) ^ d(k), cell(k - 1) ^ d(k - 1)
@@ -153,7 +164,7 @@ def greatest_strips(width: int) -> np.ndarray:
                 for below in (0, 1):
                     kept[a, r] &= alive[(a + 1) % 4, r][after[a, r, below]]
         if np.array_equal(kept, alive):
-            return alive
+            return alive  # (4, 7, 2^w)
         alive = kept
 
 
@@ -161,6 +172,7 @@ def strip_at(lo: np.ndarray, hi: np.ndarray, low: np.ndarray, width: int) -> np.
     """The `width` cells low .. low + width - 1 of each defect held as two words, for low in 0 .. 127 - width. The
     shifts are clamped with `np.minimum` and `np.maximum`, which on these short arrays take a fraction of the time of
     `np.clip`."""
+    # lo, hi: (n,) uint64; low: (n,) int64
     s_lo = np.minimum(np.maximum(low, 0), 63).astype(np.uint64)  # (n,) every shift below 64, where numpy is defined
     s_spill = (64 - np.minimum(np.maximum(low, 1), 63)).astype(np.uint64)  # (n,)
     s_hi = np.minimum(np.maximum(low - 64, 0), 63).astype(np.uint64)  # (n,)
@@ -172,6 +184,7 @@ def strip_at(lo: np.ndarray, hi: np.ndarray, low: np.ndarray, width: int) -> np.
 def closed_cell(lo: np.ndarray, hi: np.ndarray, phase: int, offset: int, closed: np.ndarray) -> np.ndarray:
     """For each defect, the least cell c >= max(top, STRIP - 1) with the strip D(c - STRIP + 1 .. c) closed, or -1.
     A defect with such a c keeps its top at or below c from then on."""
+    # lo, hi: (n,) uint64; closed: (4, 7, 2^STRIP)
     t = tops128(lo, hi)  # (n,)
     found = np.full(len(lo), -1, dtype=np.int64)  # (n,)
     for r in range(7):
@@ -183,7 +196,7 @@ def closed_cell(lo: np.ndarray, hi: np.ndarray, phase: int, offset: int, closed:
             cc = c + extra  # (n,)
             ok = (cc <= 126) & closed[phase % 4, r][strip_at(lo, hi, np.minimum(cc, 126) - STRIP + 1, STRIP)]
             found = np.where(ok & ((found < 0) | (cc < found)), cc, found)
-    return found
+    return found  # (n,)
 
 
 def census(head_bits: int, phase: int, offset: int, max_steps: int, closed: np.ndarray,
@@ -199,6 +212,7 @@ def census(head_bits: int, phase: int, offset: int, max_steps: int, closed: np.n
     (the larger of `top` and c, or `top` for a repeat); `settled`, that step or -1; `period`, the period of a repeat or
     0; `cell`, the cell c of a closed strip or -1; and `overflow`, a head whose top passed 120, for which nothing is
     claimed."""
+    # closed: (4, 7, 2^STRIP); heads: (n,) uint64 when given
     if heads is None:
         heads = np.arange(1 << head_bits, dtype=np.uint64)  # (n,)
     n = len(heads)
@@ -235,7 +249,7 @@ def census(head_bits: int, phase: int, offset: int, max_steps: int, closed: np.n
             next_snap *= 2
     out["top"][index] = best
     out["bound"][index] = -1
-    return out
+    return out  # each (n,)
 
 
 def local_entry(words: np.ndarray, phase: int, offset: int, closed: np.ndarray) -> np.ndarray:
@@ -245,9 +259,10 @@ def local_entry(words: np.ndarray, phase: int, offset: int, closed: np.ndarray) 
     cell c with c - STRIP + 1 >= t keeps the top at or below c whatever lies below. The run stops for a word once its
     top plus 7 falls below t, when no closed strip can lie in the exact cells any more. Returns the step of entry, or -1
     for a word that this does not settle. Words are 64-bit (n <= 64)."""
+    # words: (w,) uint64, w the words; closed: (4, 7, 2^STRIP); k counts the words still followed
     lo, hi = words.astype(np.uint64), np.zeros(len(words), dtype=np.uint64)  # (k,), (k,)
     index = np.arange(len(words))  # (k,)
-    out = np.full(len(words), -1, dtype=np.int64)  # (n,)
+    out = np.full(len(words), -1, dtype=np.int64)  # (w,)
     t = 0
     while len(index):
         if t:
@@ -260,7 +275,7 @@ def local_entry(words: np.ndarray, phase: int, offset: int, closed: np.ndarray) 
         keep = ~hit & (tops + 7 >= t)  # (k,)
         lo, hi, index = lo[keep], hi[keep], index[keep]
         t += 1
-    return out
+    return out  # (w,)
 
 
 def local_tree(first: int, depth: int, closed: np.ndarray) -> list[tuple[int, int, int]]:
@@ -268,6 +283,7 @@ def local_tree(first: int, depth: int, closed: np.ndarray) -> list[tuple[int, in
     cells agree with the ether is a shorter head), at all 28 alignments, and extend each word that is not settled by
     one unknown cell below, up to `depth` cells. Returns per word length (length, words tried, words not settled).
     A level with no word left would settle every head of at least that many cells, whatever lies below."""
+    # closed: (4, 7, 2^STRIP)
     rows = []
     level: list[tuple[int, int, np.ndarray]] = []
     for phase in range(4):
@@ -298,8 +314,13 @@ def front_graph(window: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
     cycle, length = ETHER, 7
     period, cells = 4, 1 << (window - 1)
     lost = period * length * cells
-    bg = lambda a, j: (cycle[a % period] >> (j % length)) & 1
-    node = lambda a, b, m: (a * length + b) * cells + m
+
+    def bg(a: int, j: int) -> int:
+        return (cycle[a % period] >> (j % length)) & 1
+
+    def node(a: int, b: int, m: int) -> int:
+        return (a * length + b) * cells + m
+
     src: list[int] = []
     dst: list[int] = []
     gain: list[int] = []
@@ -313,28 +334,36 @@ def front_graph(window: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
                 here = node(a, b, m)
                 if d[-1]:
                     below = sum(d[i] << i for i in range(window - 1))
-                    src.append(here); dst.append(node((a + 1) % period, (b + 1) % length, below)); gain.append(1)
+                    src.append(here)
+                    dst.append(node((a + 1) % period, (b + 1) % length, below))
+                    gain.append(1)
                     continue
                 for k in range(window - 1):
                     if d[k]:
                         known = window - 2 - k
                         base = sum(d[k + 1 + i] << i for i in range(known))
                         for free in range(1 << (window - 1 - known)):
-                            src.append(here); dst.append(node((a + 1) % period, (b - k) % length, base | free << known))
+                            src.append(here)
+                            dst.append(node((a + 1) % period, (b - k) % length, base | free << known))
                             gain.append(-k)
                         break
                 else:
-                    src.append(here); dst.append(lost + (a + 1) % period); gain.append(-(window - 1))
+                    src.append(here)
+                    dst.append(lost + (a + 1) % period)
+                    gain.append(-(window - 1))
     for a in range(period):
         for b in range(length):
             for m in range(cells):
-                src.append(lost + a); dst.append(node(a, b, m)); gain.append(0)
-    return np.array(src), np.array(dst), np.array(gain), lost + period
+                src.append(lost + a)
+                dst.append(node(a, b, m))
+                gain.append(0)
+    return np.array(src), np.array(dst), np.array(gain), lost + period  # (e,), (e,), (e,), e the edges
 
 
 def max_mean_gain(src: np.ndarray, dst: np.ndarray, gain: np.ndarray, nodes: int) -> tuple[float, list[int]]:
     """Karp's maximum mean cycle of the graph, exactly as a float of a ratio of integers, and the nodes of one cycle
     attaining it, found by following the predecessors of the best final node. -inf and [] for a graph without cycles."""
+    # src, dst, gain: (e,), e the edges
     n = nodes
     neg = np.iinfo(np.int64).min // 4
     value = np.full((n + 1, n), neg, dtype=np.int64)  # (n + 1, n) best gain of a walk of k edges ending at v
@@ -408,6 +437,7 @@ def realized_edges(window: int, head_bits: int, steps: int, rng: np.random.Gener
 def closed_cell_int(D: int, phase: int, offset: int, closed: np.ndarray) -> int:
     """`closed_cell` for one defect held as a Python integer of any width: the least cell c >= max(top, STRIP - 1)
     with the strip D(c - STRIP + 1 .. c) closed, or -1."""
+    # closed: (4, 7, 2^STRIP)
     base = max(top(D), STRIP - 1)
     for c in range(base, base + STRIP + 7):
         r = (c + offset) % 7
@@ -421,6 +451,7 @@ def random_heads(length: int, count: int, steps: int, seed: int,
     """For `count` random heads of `length` cells at random alignments, followed by Python integers until the defect
     enters a closed strip or for `steps` steps: (highest top minus `length`, the step of entry or -1, the cell of the
     strip minus `length` or 0, the top at the end minus `length`)."""
+    # closed: (4, 7, 2^STRIP)
     rng = np.random.default_rng(seed)
     out = []
     for _ in tqdm(range(count), desc=f"heads of {length}", file=sys.stderr, leave=False):
@@ -468,8 +499,11 @@ def main() -> None:
                 r = census(args.bits, phase, offset, args.steps, closed)
                 ok = r["settled"] >= 0
                 strip, repeat = ok & (r["cell"] >= 0), ok & (r["cell"] < 0)
-                tot["heads"] += len(ok); tot["settled"] += int(ok.sum()); tot["strip"] += int(strip.sum())
-                tot["repeat"] += int(repeat.sum()); tot["overflow"] += int(r["overflow"].sum())
+                tot["heads"] += len(ok)
+                tot["settled"] += int(ok.sum())
+                tot["strip"] += int(strip.sum())
+                tot["repeat"] += int(repeat.sum())
+                tot["overflow"] += int(r["overflow"].sum())
                 tot["top"] = max(tot["top"], int(r["top"].max()))
                 tot["bound"] = max(tot["bound"], int(r["bound"][ok].max()) if ok.any() else -1)
                 tot["last"] = max(tot["last"], int(r["settled"].max()))
@@ -500,7 +534,7 @@ def main() -> None:
     elif args.mode == "karp":
         src, dst, gain, nodes = front_graph(args.window)
         rate, cycle = max_mean_gain(src, dst, gain, nodes)
-        edge = {(int(a), int(b)): int(g) for a, b, g in zip(src, dst, gain)}
+        edge = {(int(a), int(b)): int(g) for a, b, g in zip(src, dst, gain, strict=True)}
         total = sum(edge[(cycle[i], cycle[(i + 1) % len(cycle)])] for i in range(len(cycle)))
         assert abs(total / len(cycle) - rate) < 1e-12, "the cycle does not attain the mean"
         print(f"window {args.window}: {nodes} nodes, {len(src)} edges, largest mean gain per step {rate:.6f}, "
@@ -508,7 +542,7 @@ def main() -> None:
     elif args.mode == "realized":
         src, dst, gain, nodes = front_graph(args.window)
         used = realized_edges(args.window, args.length, args.steps, np.random.default_rng(args.seed), args.count)
-        keep = np.array([(int(s), int(d)) in used for s, d in zip(src, dst)])  # (edges,)
+        keep = np.array([(int(s), int(d)) in used for s, d in zip(src, dst, strict=True)])  # (e,)
         rate, cycle = max_mean_gain(src[keep], dst[keep], gain[keep], nodes)
         print(f"window {args.window}: {int(keep.sum())} of {len(src)} edges realized; largest mean gain per step "
               f"on them {rate:.6f} over a cycle of {len(cycle)} steps")

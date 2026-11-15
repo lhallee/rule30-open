@@ -51,11 +51,11 @@ def step(rows: np.ndarray, rule: int) -> np.ndarray:
     right = np.zeros_like(rows)  # (width, lanes), cell x + 1
     right[:-1] = rows[1:]
     if rule == 30:
-        return left ^ (rows | right)
+        return left ^ (rows | right)  # (width, lanes)
     if rule == 90:
-        return left ^ right
+        return left ^ right  # (width, lanes)
     if rule == 150:
-        return left ^ rows ^ right
+        return left ^ rows ^ right  # (width, lanes)
     raise ValueError(f"rule {rule} is not 30, 90 or 150")
 
 
@@ -92,7 +92,7 @@ def survivors(cells: int, max_period: int, steps: int, rule: int, first_lane: in
             return [], longest, witness
         rows = step(rows, rule)
     found = []
-    for p, k, lane in zip(*np.nonzero(alive)):
+    for p, k, lane in zip(*np.nonzero(alive), strict=True):
         word = int(alive[p, k, lane])
         for bit in range(64):
             if (word >> bit) & 1:

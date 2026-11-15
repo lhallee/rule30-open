@@ -17,6 +17,7 @@ from computations.depth_register import skeleton_weights
 
 
 def left_step(row: list[int]) -> list[int]:
+    """leftStep on the first len(row) diagonals: R'_d = R_(d-2) xor (R_(d-1) or R_d), with R_(-1) = R_(-2) = 0."""
     s = [0, 0] + row
     return [s[d] ^ (s[d + 1] | s[d + 2]) for d in range(len(row))]
 
@@ -31,7 +32,9 @@ def step_slack(J: int) -> int:
 
 
 def skeleton_white(depth: int = 53200, steps: int = 82000, lo: int = 400) -> tuple[float, float]:
-    wt = skeleton_weights(depth, steps, 16)  # (depth+1,) black cells per period 16
+    """The white fraction of the single cell's settled words of period 16 at depths lo and beyond, and the least
+    5 W / ((2 J - 4) 16) over J = 3 .. depth + 1."""
+    wt =skeleton_weights(depth, steps, 16)  # (depth+1,) black cells per period 16
     whites = np.cumsum(16 - wt)  # (depth+1,) white cells of diagonals 0 .. J-1, J = 1 ..
     J = np.arange(1, depth + 2)  # (depth+1,)
     ratio = 5 * whites[2:] / ((2 * J[2:] - 4) * 16)  # (depth-1,)

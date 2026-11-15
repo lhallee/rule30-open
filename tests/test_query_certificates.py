@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import itertools
-from functools import lru_cache
-
 import numpy as np
+
+from functools import cache
 
 from computations import query_certificates as qc
 from computations.query_depth import exact_depth
@@ -28,6 +28,7 @@ def direct_table(t: int) -> np.ndarray:
 def brute_certificate(table: np.ndarray, n: int) -> int:
     """max over rows of the least |S| such that fixing the cells of S to the row makes the function constant, by
     grouping the rows on their values in S for every S."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     best = np.full(1 << n, n, dtype=np.int64)  # (2^n,)
     for subset in range(1 << n):
@@ -42,14 +43,15 @@ def brute_certificate(table: np.ndarray, n: int) -> int:
 def brute_fixed_answer(table: np.ndarray, n: int, variable: int, answer: int) -> bool:
     """The adversary game by plain recursion over partial assignments: the adversary must answer `variable` with
     `answer`, and wins when the function is not constant on the last free variable."""
+    # table: (2^n,)
 
-    @lru_cache(maxsize=None)
+    @cache
     def wins(partial: tuple[int | None, ...]) -> bool:
         free = [i for i, v in enumerate(partial) if v is None]
         values = set()
         for bits in itertools.product((0, 1), repeat=len(free)):
             full = list(partial)
-            for i, b in zip(free, bits):
+            for i, b in zip(free, bits, strict=True):
                 full[i] = b
             values.add(int(table[sum(b << i for i, b in enumerate(full))]))
         if len(values) == 1:
@@ -93,7 +95,7 @@ def test_certificate_complexity_quoted_values() -> None:
 
     values = [qc.certificate_complexity(cone_table(t), 2 * t + 1) for t in range(1, 6)]
     assert values == [3, 4, 6, 7, 10]
-    assert all(c <= 2 * t for t, c in zip(range(2, 6), values[1:]))
+    assert all(c <= 2 * t for t, c in zip(range(2, 6), values[1:], strict=True))
 
 
 def test_evasive_against_exact_depth() -> None:

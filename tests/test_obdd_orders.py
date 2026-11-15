@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import crossing_bounds, obdd_orders
@@ -12,12 +11,14 @@ from computations.rule30 import center_column
 
 def direct_count(cells: np.ndarray, ell: int, first: list[int]) -> int:
     """Distinct subfunctions by enumerating every assignment as a tuple."""
+    # cells: (2^ell,)
     rest = [i for i in range(ell) if i not in first]
     seen = set()
     for assignment in itertools.product([0, 1], repeat=len(first)):
         row = []
         for other in itertools.product([0, 1], repeat=len(rest)):
-            n = sum(bit << i for bit, i in zip(assignment, first)) + sum(bit << i for bit, i in zip(other, rest))
+            n = (sum(bit << i for bit, i in zip(assignment, first, strict=True))
+                 + sum(bit << i for bit, i in zip(other, rest, strict=True)))
             row.append(int(cells[n]))
         seen.add(tuple(row))
     return len(seen)

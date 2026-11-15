@@ -25,9 +25,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations import wedge_hypotheses as wh
@@ -51,7 +51,7 @@ def starts_from_column(col: np.ndarray) -> np.ndarray:
         nxt = cur[:, 1:] ^ (cur[:, :-1] | right[:, :-1])  # (B, K + 1 - i)
         right, cur = cur[:, :-1], nxt
         out[:, i] = cur[:, 0]
-    return out
+    return out  # (B, K + 1)
 
 
 def starts(n: int, c: int) -> np.ndarray:
@@ -66,8 +66,8 @@ def starts(n: int, c: int) -> np.ndarray:
     cells = starts_from_column(col)  # (2^f, m - 1)
     s = np.concatenate([cells, np.ones((cells.shape[0], 1), dtype=bool)], axis=1)  # (2^f, m)
     if c == 3:
-        s = s[s[:, m - 2]]
-    return s
+        s = s[s[:, m - 2]]  # (S, m): the S starts with cell -(m - 1) black
+    return s  # (S, m), S = 2^f for c = 2
 
 
 def simulate(s: np.ndarray, steps: int) -> np.ndarray:
@@ -85,7 +85,7 @@ def simulate(s: np.ndarray, steps: int) -> np.ndarray:
         row = leftn ^ (row | rightn)  # (B, W + 1)
         row[:, W] = False
         out[:, t + 1] = row[:, :W]
-    return out
+    return out  # (B, steps + 1, W)
 
 
 def first_white_even(h: np.ndarray) -> np.ndarray:
@@ -94,7 +94,7 @@ def first_white_even(h: np.ndarray) -> np.ndarray:
     col = h[:, ::2, 0]  # (B, T // 2 + 1)
     white = ~col
     first = np.where(white.any(axis=1), 2 * white.argmax(axis=1), h.shape[1])  # (B,)
-    return first
+    return first  # (B,)
 
 
 def endpoint(h: np.ndarray) -> np.ndarray:

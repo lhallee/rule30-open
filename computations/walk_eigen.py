@@ -46,12 +46,13 @@ import argparse
 import subprocess
 import sys
 import tempfile
+import numpy as np
+
 from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
+
 
 GAMMA = Fraction(5, 2)
 
@@ -262,9 +263,9 @@ def excess_graph(g: WalkGraph, gamma: Fraction, rounds: int = 100000) -> np.ndar
 
 
 def _binary(optimize: bool) -> Path:
-    """computations/walk_eigen.c, compiled once and kept for later processes (`seed_onsets.compiled`; without
+    """computations/walk_eigen.c, compiled once and kept for later processes (`c_programs.compiled`; without
     optimization for the small periods, where compiling takes longer than running)."""
-    from computations.seed_onsets import compiled
+    from computations.c_programs import compiled
     return compiled("walk_eigen", ("-O2" if optimize else "-O0", "-w"))
 
 
@@ -379,6 +380,7 @@ def _policy_cycles(nxt: np.ndarray, c: np.ndarray, ln: np.ndarray) -> tuple[np.n
                                                                                 np.ndarray]:
     """For the functional graph v -> nxt[v]: the least node of the cycle each node reaches, the cost and length sums
     of each cycle (indexed by that node), and which nodes lie on a cycle."""
+    # nxt, c, ln: (n,)
     n = len(nxt)
     jump = nxt.copy()  # (n,)
     k = 1
@@ -396,11 +398,12 @@ def _policy_cycles(nxt: np.ndarray, c: np.ndarray, ln: np.ndarray) -> tuple[np.n
         k *= 2
     tot_c = np.bincount(rep[on], weights=c[on], minlength=n)  # (n,)
     tot_l = np.bincount(rep[on], weights=ln[on], minlength=n)  # (n,)
-    return rep[jump], tot_c, tot_l, on
+    return rep[jump], tot_c, tot_l, on  # (n,) each
 
 
 def _policy_bias(nxt: np.ndarray, w: np.ndarray, rep: np.ndarray) -> np.ndarray:
     """x with x(v) = w(v) + x(nxt v) off the representatives and x = 0 on them, by pointer doubling."""
+    # nxt, w, rep: (n,)
     n = len(nxt)
     idx = np.arange(n)  # (n,)
     is_rep = idx == rep  # (n,)

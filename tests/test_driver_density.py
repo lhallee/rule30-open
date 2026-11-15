@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import random
-
 import numpy as np
 
 from computations.constrained_runs import constrained_states
@@ -57,10 +56,10 @@ def test_beam_against_dp() -> None:
     exact = [r.best for r in driver_dp(30)]
     assert [r.best for r in driver_dp(30, beam=10_000)] == exact
     narrow = list(driver_dp(30, beam=6, track=True))
-    assert all(r.best <= e for r, e in zip(narrow, exact))
+    assert all(r.best <= e for r, e in zip(narrow, exact, strict=True))
     assert admissible(narrow[-1].driver or []) and sum(narrow[-1].driver or []) == narrow[-1].best
     assert [r.best for r in chain_beam(30, 10_000, ["110", "11110"], min_len=3)] == exact
-    assert all(r.best <= e for r, e in zip(chain_beam(30, 6, ["110"], min_len=3), exact))
+    assert all(r.best <= e for r, e in zip(chain_beam(30, 6, ["110"], min_len=3), exact, strict=True))
 
 
 def test_single_cell_is_below() -> None:

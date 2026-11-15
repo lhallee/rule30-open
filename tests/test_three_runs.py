@@ -44,7 +44,7 @@ def test_ranks_match_naive() -> None:
         if not drop:
             break
         keep -= drop
-    assert keep == {(p, s, w) for p, w, s in zip(*np.nonzero(good))}
+    assert keep == {(p, s, w) for p, w, s in zip(*np.nonzero(good), strict=True)}
     layer, k = {st: 0 for st in keep}, 0
     while True:
         add = {st for st in states - layer.keys() if all(nx in layer for _, nx in moves[st])}

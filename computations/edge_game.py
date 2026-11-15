@@ -34,9 +34,9 @@ from __future__ import annotations
 import argparse
 import itertools
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from scipy.optimize import linprog
 from tqdm.auto import tqdm
 
@@ -81,31 +81,32 @@ def build_table(k: int) -> Table:
         X[:, i] = v >> (2 * i) & 1
         Y[:, i] = v >> (2 * i + 1) & 1
     left = s == 0
-    nxt = np.zeros((N, 2, 2), dtype=np.int32)
-    r = np.zeros((N, 2, 4), dtype=np.int8)
-    low = np.zeros((N, 2, 4), dtype=np.int32)
+    nxt = np.zeros((N, 2, 2), dtype=np.int32)  # (N, 2, 2)
+    r = np.zeros((N, 2, 4), dtype=np.int8)  # (N, 2, 4)
+    low = np.zeros((N, 2, 4), dtype=np.int32)  # (N, 2, 4)
     for c1 in range(2):
         for b in range(4):
             bx, by = b & 1, b >> 1
-            oldX = np.column_stack([np.full(N, c1, np.int8), s, X, np.full(N, bx, np.int8)])  # (N, k + 4): L - 2 .. L + k + 1
-            oldY = np.column_stack([np.full(N, c1, np.int8), s, Y, np.full(N, by, np.int8)])  # (N, k + 4)
-            newX = oldX[:, :-2] ^ (oldX[:, 1:-1] | oldX[:, 2:])  # (N, k + 2): cells L - 1 .. L + k
-            newY = oldY[:, :-2] ^ (oldY[:, 1:-1] | oldY[:, 2:])  # (N, k + 2)
-            diff = newX != newY  # (N, k + 2)
+            # (N, k + 4): L - 2 .. L + k + 1
+            X_old = np.column_stack([np.full(N, c1, np.int8), s, X, np.full(N, bx, np.int8)])
+            Y_old = np.column_stack([np.full(N, c1, np.int8), s, Y, np.full(N, by, np.int8)])  # (N, k + 4)
+            X_new = X_old[:, :-2] ^ (X_old[:, 1:-1] | X_old[:, 2:])  # (N, k + 2): cells L - 1 .. L + k
+            Y_new = Y_old[:, :-2] ^ (Y_old[:, 1:-1] | Y_old[:, 2:])  # (N, k + 2)
+            diff = X_new != Y_new  # (N, k + 2)
             any_ = diff.any(axis=1)
             f = np.where(any_, np.argmax(diff, axis=1), k + 2)  # (N,): first difference, index 0 is cell L - 1
             assert (f[left] == 0).all() and (f[~left] >= 1).all()
             rr = f - 1  # (N,): the retreat, k + 1 if none
             r[:, c1, b] = np.where(left, -1, rr)
-            del oldX, oldY
+            del X_old, Y_old
             if b == 0:
                 for c2 in range(2):  # left move: window L - 2 .. L + k - 1, shared cell c2
-                    code = c2 | newX[:, 0].astype(np.int32) << 1
+                    code = c2 | X_new[:, 0].astype(np.int32) << 1  # (N,)
                     for i in range(1, k + 1):
-                        code |= newX[:, i].astype(np.int32) << (2 * i) | newY[:, i].astype(np.int32) << (2 * i + 1)
+                        code |= X_new[:, i].astype(np.int32) << (2 * i) | Y_new[:, i].astype(np.int32) << (2 * i + 1)
                     nxt[:, c1, c2] = code
             lo = np.zeros(N, dtype=np.int32)  # (N,)
-            nX, nY = newX.astype(np.int32), newY.astype(np.int32)  # (N, k + 2)
+            nX, nY = X_new.astype(np.int32), Y_new.astype(np.int32)  # (N, k + 2)
             for rv in range(k + 1):  # window L + r - 1 .. L + r + k, known up to L + k
                 sel = rr == rv
                 code = nX[:, rv] | nX[:, rv + 1] << 1  # (N,): shared cell L + r - 1 (index r), X(L + r)
@@ -113,7 +114,7 @@ def build_table(k: int) -> Table:
                     code |= nX[:, rv + 1 + i] << (2 * i) | nY[:, rv + 1 + i] << (2 * i + 1)
                 lo[sel] = code[sel]
             sel = rr == k + 1
-            lo[sel] = newX[sel, k + 1]  # the shared cell L + k when the edge is placed at L + k + 1
+            lo[sel] = X_new[sel, k + 1]  # the shared cell L + k when the edge is placed at L + k + 1
             low[:, c1, b] = lo
     return Table(k, left, nxt, r, low)
 
@@ -241,7 +242,7 @@ def brute_force_value(k: int) -> tuple[float, int]:
         count += 1
         P = np.zeros((N, N))
         c = np.zeros(N)
-        for key, a in zip(keys, choice):
+        for key, a in zip(keys, choice, strict=True):
             g, nexts = acts[key][a]
             c[key[0]] += 0.5 * g
             for w in nexts:

@@ -19,10 +19,11 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from collections.abc import Iterable
-
 import numpy as np
+
+from collections.abc import Iterable
 from tqdm.auto import tqdm
+
 
 Perm = tuple[int, ...]
 

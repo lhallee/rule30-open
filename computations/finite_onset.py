@@ -24,14 +24,16 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.coupled import drive_column, eventual_period, psi, white_runs
 from computations.game import necklaces
 from computations.periodic_columns import initial_rows
+from computations.rule30 import pack_row
+
 
 U64 = np.uint64
 ALL = U64(0xFFFFFFFFFFFFFFFF)
@@ -66,19 +68,14 @@ def psi_slices(word: str, phase: int, cells: int, depth: int, first_lane: int = 
     for j in range(depth):
         out[j] = a[0]  # column -j - 1 at time 0
         a, b = a[1:] ^ (a[:-1] | b[:-1]), a[:-1]  # column -j - 2 from columns -j - 1 and -j
-    return out
+    return out  # (depth, lanes)
 
 
 def unpack(slices: np.ndarray, count: int) -> np.ndarray:
     """Bit slices (depth, lanes) as a boolean array (depth, count), column r being right half r."""
+    # slices: (depth, lanes)
     bits = np.unpackbits(np.ascontiguousarray(slices).view(np.uint8), axis=1, bitorder="little")  # (depth, 64 lanes)
-    return bits[:, :count].astype(bool)
-
-
-def as_int(rows: np.ndarray) -> int:
-    """One Psi row given as booleans by depth (depth 1 first) as an integer, bit j being depth j + 1."""
-    # rows: (depth,)
-    return int.from_bytes(np.packbits(rows, bitorder="little").tobytes(), "little")
+    return bits[:, :count].astype(bool)  # (depth, count)
 
 
 @dataclass
@@ -122,7 +119,7 @@ def classify(word: str, phase: int, cells: int, depth: int, max_period: int = 12
     last = np.where(rows.any(axis=0), depth - np.argmax(rows[::-1], axis=0), 0)  # (count,), the last black depth
     locked = []
     for r in np.flatnonzero(locked_mask):
-        start, p = eventual_period(as_int(rows[:, r]), depth, max_period)
+        start, p = eventual_period(pack_row(rows[:, r]), depth, max_period)
         locked.append((int(r), start, p))
     return Census(word=word, phase=phase, cells=cells, depth=depth, halves=count, locked=locked,
                   white_tail=[int(r) for r in np.flatnonzero(white)], aperiodic=int(aperiodic.sum()),

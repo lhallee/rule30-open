@@ -37,9 +37,9 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from fractions import Fraction
-
 import numpy as np
+
+from fractions import Fraction
 from tqdm.auto import tqdm
 
 from computations.rule30 import center_column

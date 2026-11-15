@@ -3,9 +3,9 @@ programs against every free word run through the right ladder's own simulation (
 
 from __future__ import annotations
 
-from itertools import product
-
 import numpy as np
+
+from itertools import product
 
 from computations import right_ladder as rl
 from computations import white_rate_ladder as wr

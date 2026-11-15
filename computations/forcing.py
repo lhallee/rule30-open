@@ -15,8 +15,8 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.wall_segments import in_set_family, necklaces
@@ -27,13 +27,14 @@ def step_set(configs: np.ndarray, cells: int, col: int) -> np.ndarray:
 
     `configs` has shape (s,): configurations of `cells` cells right of the column, bit j for cell k + 1 + j. The last
     cell only feeds the OR of the one before it, so the image has one cell fewer."""
+    # configs: (s,)
     mask = (1 << (cells - 1)) - 1
     left = ((configs << 1) | col) & mask  # (s,) bit j holds cell k + j, the column at bit 0
     middle = configs & mask  # (s,)
     right = (configs >> 1) & mask  # (s,)
     seen = np.zeros(1 << (cells - 1), dtype=bool)  # (2^(cells - 1),)
     seen[left ^ (middle | right)] = True
-    return np.flatnonzero(seen)
+    return np.flatnonzero(seen)  # (s',), the s' <= 2^(cells - 1) distinct images in increasing order
 
 
 def forcing_words(n: int) -> dict[str, int]:

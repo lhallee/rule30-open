@@ -10,6 +10,7 @@ import numpy as np
 
 from computations import absorption, forced_basin, lock_certificate
 
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -77,7 +78,7 @@ def test_lean_counts_and_checkpoints() -> None:
     """The counts and ranks of the width-14 theorems of the Lean module are those of the computation, and a
     checkpoint of `lean_wide` holds exactly the nodes of rank at most its round."""
     wall = absorption.kit_wall()  # (4, 2^13)
-    text = (ROOT / "Rule30Open" / "Columns" / "ForcedBasin.lean").read_text()
+    text = (ROOT / "Rule30Open" / "Columns" / "ForcedBasin.lean").read_text(encoding="utf-8")
     for word in ("0011", "0111"):
         rank = forced_basin.basin_ranks(word, 14, forced_basin.family_target(word, 14, wall))  # (4, n)
         found = re.search(rf"forcedBasin_{word}_14 :\s+Covers \w+ \w+ 14 (\d+) \(basin \w+ \w+ 14 \d+\)\s+"

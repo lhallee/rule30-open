@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import itertools
-from fractions import Fraction
 
-import numpy as np
+from fractions import Fraction
 
 from computations.light_line import (RULE30, RULE45, RULE120, RULE180, all_rows, back_solutions, constant_probability,
                                      exact, law_statistics, letter_law, level_transitive, light_lines, light_words,

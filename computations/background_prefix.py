@@ -34,14 +34,17 @@ from __future__ import annotations
 import argparse
 import functools
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
+from typing import TypedDict
 from tqdm.auto import tqdm
 
 from computations import absorption
 from computations import lock_chain as lc
+from computations.cyclic_words import least_period, least_rotation
 from computations.period_three import in_sorted
+
 
 MASK64 = (1 << 64) - 1
 # The walls of the trap modules, by module, and the distances each module carries them to.
@@ -68,7 +71,7 @@ class Background:
     period: int
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def background(name: str) -> Background:
     """The chain of the wall `name` of `lock_chain.NATURAL` and where it becomes periodic (`lock_chain.chain_cycle`)."""
     t = lc.tables(name)
@@ -100,8 +103,8 @@ def block_phase(bg: Background, x: int, label: int) -> tuple[str, int]:
     """The block (least rotation) that the background's column x repeats, and its phase at `label`: the column reads
     letter (phase + k) of the block at label + k."""
     column = bg_column(bg, x)
-    period = lc.least_period(column)
-    word = lc.necklace(column[:period])
+    period = least_period(column)
+    word = least_rotation(column[:period])
     phase = next(p for p in range(period) if all(column[(label + k) % bg.modulus] == word[(p + k) % period]
                                                   for k in range(bg.modulus)))
     return word, phase
@@ -112,13 +115,13 @@ def occurrences(bg: Background, word: str) -> list[int]:
     found = []
     for x in range(bg.start, bg.start + bg.period):
         column = bg_column(bg, x)
-        period = lc.least_period(column)
-        if period == len(word) and lc.necklace(column[:period]) == word:
+        period = least_period(column)
+        if period == len(word) and least_rotation(column[:period]) == word:
             found.append(x)
     return found
 
 
-def state_set(t: dict) -> set[tuple[int, int]]:
+def state_set(t: lc.TrapTables) -> set[tuple[int, int]]:
     """The states of a labelled trap as pairs of a phase of its block and a window, as entry compares them."""
     period = len(t["word"])
     return {(label % period, window) for label, window in t["states"]}
@@ -191,7 +194,7 @@ def family_fields(bg: Background) -> list[np.ndarray]:
     for label in range(bg.modulus):
         transient = sum(int(bg.columns[bg.start - 1 - j][label]) << j for j in range(bg.start))
         fields.append(np.array(sorted(transient | (w << bg.start) for w in wall.get(label, ())), dtype=np.uint64))
-    return fields
+    return fields  # M arrays, (k_L,) for label L
 
 
 def bits_at(rows: np.ndarray, offset: np.ndarray) -> np.ndarray:
@@ -223,7 +226,7 @@ def family_depth(bg: Background, x: int, rows: np.ndarray, label: int, ref: np.n
     D - start cells the background half beside x (`ref`, at `label`), then the field of `family_fields`. The first
     cell off the background lies in the field, so only the largest D whose field covers it, the one before, and D = x
     when start = 0 (the background's window is then a state of the wall) can hold."""
-    # rows: (n, words); ref: (r,) with r <= words
+    # rows: (n, words); ref: (r,) with r <= words; fields: (k_L,) for each label L, from `family_fields`
     n, r = rows.shape[0], ref.size
     differ = rows[:, :r] ^ ref  # (n, r)
     nonzero = differ != 0  # (n, r)
@@ -378,7 +381,43 @@ def refuted_blocks(module: str) -> set[str]:
     return found
 
 
-def walls_report() -> list[dict]:
+class WallRow(TypedDict):
+    """One row of `walls_report`."""
+
+    module: str
+    name: str
+    wall: str
+    distance: int
+    block: str
+    cells: int
+    start: int
+    period: int
+    modulus: int
+    inside: list[tuple[int, int]]
+
+
+class TruncationRow(TypedDict):
+    """One row of `truncation_summary`."""
+
+    block: str
+    cells: int
+    x: int
+    same: int
+    inside: int
+    halves: int
+    entered: int
+    zero: int
+    k0: int
+    latest: int
+    unclean: int
+    apart: int
+    apart_latest: int
+    depths: list[int]
+    open: int
+    base: int
+
+
+def walls_report() -> list[WallRow]:
     """For every trap of the wall modules: its module, name, distance, block, width, the wall's chain start and period,
     and `inside_counts`."""
     rows = []
@@ -397,7 +436,7 @@ def column_classes(bg: Background, distance: int, kmax: int) -> list[tuple[int, 
     """The columns of the background repeating the trap's block, up to the symmetries of the background: two columns
     whose halves of `kmax` + 64 cells are the same set of (phase, half) over the labels give the same truncations.
     Each class as (a column x, the number of other columns in it, the labels at which its half is in the trap)."""
-    classes: dict[frozenset, list[tuple[int, int]]] = {}
+    classes: dict[frozenset[tuple[int, int]], list[tuple[int, int]]] = {}
     for x, hits in inside_counts(bg, distance):
         key = frozenset((block_phase(bg, x, label)[1], half_bits(bg, x, label, kmax + 64))
                         for label in range(bg.modulus))
@@ -405,7 +444,7 @@ def column_classes(bg: Background, distance: int, kmax: int) -> list[tuple[int, 
     return [(members[0][0], len(members) - 1, members[0][1]) for members in classes.values()]
 
 
-def truncation_summary(bg: Background, distance: int, kmax: int, tail: int, steps: int) -> list[dict]:
+def truncation_summary(bg: Background, distance: int, kmax: int, tail: int, steps: int) -> list[TruncationRow]:
     """`truncation_entry` from every label beside one column of each class of `column_classes`, summed up: halves,
     entries into the trap (at step 0, and the least K from which every truncation is in it at step 0), the latest
     entry, entries after step 0 with column 1 off the background before, entries into an apart sibling and their
@@ -454,7 +493,7 @@ def lean_siblings(piece: int = 1 << 16) -> str:
     `ReachRefuted`), that they hold its states and that the sibling avoids them, and the refutation of entry
     (`not_absorption_fwd`)."""
     out = []
-    for module, lean, name, d, x, depth in tqdm(sibling_entries(), desc="siblings", file=sys.stderr, leave=False):
+    for module, lean, name, d, _, depth in tqdm(sibling_entries(), desc="siblings", file=sys.stderr, leave=False):
         bg = background(name)
         c, sib = lc.carried(name, d), lc.carried(name, depth)
         assert c["word"] == sib["word"] and lc.apart_closed(c, sib).all()

@@ -4,12 +4,13 @@ periodic point against the tail census, and the census section against the Lean 
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import ether_k_tree as ek
 from computations.ether_certificate import closed_bits, eth
+
 
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "EtherKTree.lean"
 CELLS = 200  # cells of a whole half in the direct runs
@@ -23,16 +24,17 @@ def ether_half(a: int, o: int, head: int, cells: int = CELLS) -> int:
 def held_rows(rows: np.ndarray) -> np.ndarray:
     """One step of the held map on each row of cells (0/1 bytes, (n, cells)), cell -1 held at 0; the top cell reads a 0
     above it, so cell j is right after t steps while j + t < cells: (n, cells)."""
-    up = np.zeros_like(rows)
+    # rows: (n, cells) of 0 and 1
+    up = np.zeros_like(rows)  # (n, cells)
     up[:, :-1] = rows[:, 1:]
-    down = np.zeros_like(rows)
+    down = np.zeros_like(rows)  # (n, cells)
     down[:, 1:] = rows[:, :-1]
-    return up ^ (rows | down)
+    return up ^ (rows | down)  # (n, cells)
 
 
 def as_rows(values: list[int], cells: int = CELLS) -> np.ndarray:
     """Integers as rows of cells, bit j the cell j: (len(values), cells)."""
-    return np.array([[(v >> j) & 1 for j in range(cells)] for v in values], dtype=np.uint8)
+    return np.array([[(v >> j) & 1 for j in range(cells)] for v in values], dtype=np.uint8)  # (len(values), cells)
 
 
 def test_tree_against_every_head() -> None:
@@ -91,6 +93,6 @@ def test_census_counts() -> None:
 
 def test_lean_section_matches_module() -> None:
     """The census section of the Lean module is the one `lean_section` prints."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in ek.lean_section().splitlines():
         assert line in text

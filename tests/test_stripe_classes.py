@@ -22,7 +22,7 @@ def test_class_count_and_all_pairs() -> None:
             lab = classes(A, B)
             assert len(set(lab)) == formula(A, B)
             pairs = classes_all_pairs(A, B)
-            assert len({(a, b) for a, b in zip(lab, pairs)}) == len(set(lab))  # the same partition
+            assert len({(a, b) for a, b in zip(lab, pairs, strict=True)}) == len(set(lab))  # the same partition
 
 
 def test_classes_are_fibers_of_rep() -> None:

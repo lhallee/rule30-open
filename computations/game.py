@@ -39,11 +39,13 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
 
-from computations.rule30 import distinct
+from computations.cyclic_words import least_rotation
+from computations.rule30 import distinct, pack_row
+
 
 # The words of the kit's strip-certificate table (`Rule30StripCertificateTable.certTable`) and of its three single strip
 # certificates (`Rule30StripCertificates.not_eventually_01111111`, `not_eventually_00000011` and
-# `not_eventually_000000000101`), each as its least rotation. tests/test_computations.py reads them from the kit.
+# `not_eventually_000000000101`), each as its least rotation. tests/test_game.py reads them from the kit.
 KIT_WORDS = (
     "01111111", "0000000011", "0011111111", "0111111111", "00000000001", "00000000011", "00111111111", "01011111111",
     "01111111111", "000000000001", "000000000011", "000111111111", "001111111111", "010111111111", "011111111111",
@@ -114,7 +116,7 @@ def game_graph(pattern: str, width: int) -> tuple[np.ndarray, np.ndarray, np.nda
     return source, target, label, recurrent, column  # (2 p n,), (2 p n,), (p n,), (components,), (p n,)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def bad_pairs(pattern: str, width: int) -> int:
     """The (component, phase) pairs at which a component that can hold a play shows the left column taking both
     values. Zero means the game excludes the block at this width. Kept for the games asked again, which `least_width`
@@ -143,6 +145,7 @@ def jen_open(pattern: str, width: int) -> list[int]:
         moves = (label[source] == component) & (label[target] == component)  # (2 p n,)
 
         def constant(values: np.ndarray, phases: np.ndarray) -> bool:
+            # values, phases: (e,), one entry per member node (e = m) or per move inside the component (e = k)
             seen = np.zeros((period, 2), dtype=bool)  # (p, 2)
             seen[phases, values] = True
             return not seen.all(axis=1).any()
@@ -192,6 +195,7 @@ def component_periods(pattern: str, width: int) -> list[tuple[int, int, bool, bo
             cycle = math.gcd(cycle, int(gap))
 
         def mixed(key: np.ndarray, size: int) -> bool:
+            # key: (m,), the phase or cyclic class of each member, below `size`
             seen = np.zeros((size, 2), dtype=bool)  # (size, 2)
             seen[key, column[members].astype(np.int64)] = True
             return bool(seen.all(axis=1).any())
@@ -256,8 +260,8 @@ def game_mask(pattern: str, width: int) -> dict[str, int | list[int]]:
     bits = max(1, int(rank.max()).bit_length())
     planes = (rank.reshape(len(pattern), -1)[:, :, None] >> np.arange(bits)) & 1  # (p, n, bits), rank bit i at [.., i]
     ranks = [
-        int.from_bytes(np.packbits(plane.astype(np.uint8).ravel(), bitorder="little").tobytes(), "little")
-        for plane in planes  # plane: (n, bits), the rank of cells r at bits r bits .. r bits + bits - 1
+        pack_row(plane.ravel())  # plane: (n, bits), the rank of cells r at bits r bits .. r bits + bits - 1
+        for plane in planes
     ]
     return {"bits": bits, "ranks": ranks, "transient": transient, "values": values}
 
@@ -301,7 +305,7 @@ BLACK_RUN_BLOCKS = (("0", 18), ("00", 18), ("000", 18), ("0000", 18), ("0100", 1
                     ("0110", 27))
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def kit_blocks(max_period: int) -> dict[str, str]:
     """The primitive blocks of period up to `max_period` that the pinned kit excludes as the eventual period of the
     center column, each with the reason: a strip certificate (`KIT_WORDS`), every run of 1s lasting at least 9 steps
@@ -330,11 +334,6 @@ def kit_blocks(max_period: int) -> dict[str, str]:
     return found
 
 
-def least_rotation(word: str) -> str:
-    """The least rotation of `word`."""
-    return min(word[i:] + word[:i] for i in range(len(word)))
-
-
 def least_width(pattern: str, max_width: int = 14) -> int | None:
     """The least width at which the game excludes `pattern`, or None up to `max_width`."""
     return next((width for width in range(1, max_width + 1) if bad_pairs(pattern, width) == 0), None)
@@ -359,7 +358,7 @@ def excluded_blocks(max_period: int, widths: list[int], jen: bool = False, min_p
             found = list(progress(pool.imap(task, blocks, chunksize=8)))
     else:
         found = [task(pattern) for pattern in progress(blocks)]
-    return {pattern: width for pattern, width in zip(blocks, found) if width is not None}, len(blocks)
+    return {pattern: width for pattern, width in zip(blocks, found, strict=True) if width is not None}, len(blocks)
 
 
 def main() -> None:

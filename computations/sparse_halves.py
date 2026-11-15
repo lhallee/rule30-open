@@ -36,6 +36,7 @@ STEPS = 4000
 
 def entries(word: str, phase: int, halves: list[int], wall: np.ndarray) -> list[tuple[int, int]]:
     """The first step at which each half (bit j is column j + 1) is in the family, and the least depth at that step."""
+    # wall: (4, 2^13), the kit's wall states at each ether phase
     width = max(half.bit_length() for half in halves)
     rows = np.zeros((len(halves), (width + STEPS + 2) // 64 + 1), dtype=np.uint64)  # (n, words)
     for i, half in enumerate(halves):
@@ -51,11 +52,12 @@ def entries(word: str, phase: int, halves: list[int], wall: np.ndarray) -> list[
             t += 1
         depths[i] = absorption.family_depth(word, rows[i:i + 1, 0], (t + phase) % 4, wall)[0]
     assert (depths >= 0).all() and (depths < DEPTHS).all()
-    return list(zip(times.tolist(), depths.tolist()))
+    return list(zip(times.tolist(), depths.tolist(), strict=True))
 
 
 def certificates(word: str, phase: int, wall: np.ndarray) -> list[tuple[tuple[int, int], list[tuple[int, int]]]]:
     """For p1 = 1 .. FIRST: the entry (t, k) of the half {p1} and the entries of {p1, p2}, p2 = p1 + 1 .. t + k + 13."""
+    # wall: (4, 2^13)
     singles = entries(word, phase, [1 << (p1 - 1) for p1 in range(1, FIRST + 1)], wall)
     pairs, owner = [], []
     for p1, (t, k) in enumerate(singles, start=1):
@@ -64,7 +66,7 @@ def certificates(word: str, phase: int, wall: np.ndarray) -> list[tuple[tuple[in
             owner.append(p1)
     found = entries(word, phase, pairs, wall)
     certs = [(single, []) for single in singles]
-    for p1, entry in zip(owner, found):
+    for p1, entry in zip(owner, found, strict=True):
         certs[p1 - 1][1].append(entry)
     return certs
 
@@ -92,6 +94,7 @@ def decode(number: int, count: int) -> list[tuple[int, int]]:
 def lean_data(wall: np.ndarray) -> str:
     """The certificate section of `SparseRight.lean`: per word and phase, the numbers `cells<word>_<phase>`, one
     theorem per first black cell that the kernel checks, and their assembly `cells<word>_<phase>_ok`."""
+    # wall: (4, 2^13)
     blocks = []
     for word in tqdm(absorption.WORDS, desc="words", file=sys.stderr, leave=False):
         certs = [certificates(word, phase, wall) for phase in range(4)]

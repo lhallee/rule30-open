@@ -28,11 +28,12 @@ import argparse
 import math
 import sys
 import time
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.periodic_columns import initial_rows, step
+
 
 U64 = np.uint64
 ALL = U64(0xFFFFFFFFFFFFFFFF)
@@ -61,12 +62,13 @@ def column_history(cells: int, steps: int, margin: int, first_lane: int, lanes: 
     for t in range(steps):
         history[t] = rows[origin - margin:origin + cells + margin]
         rows = step(rows, 30)
-    return history
+    return history  # (steps, columns, lanes)
 
 
 def onset_runs(history: np.ndarray, target: list[int], max_onset: int, first_lane: int) -> np.ndarray:
     """For each onset T0 < max_onset and column, the longest run of agreement with the target from T0 over the rows of
     the slice, the white row left out. A run that reaches the last time of the history is censored there."""
+    # history: (steps, columns, lanes)
     steps, columns, lanes = history.shape
     want = np.array([ALL if bit else U64(0) for bit in target[:steps]], dtype=U64)  # (steps,)
     match = ~(history ^ want[:, None, None])  # (steps, columns, lanes)
@@ -82,7 +84,7 @@ def onset_runs(history: np.ndarray, target: list[int], max_onset: int, first_lan
             if not live.any():
                 break
             out[onset, live] = t - onset + 1
-    return out
+    return out  # (max_onset, columns)
 
 
 def runs_for_targets(cells: int, steps: int, max_onset: int, targets: list[list[int]], margin: int = 0,
@@ -98,7 +100,7 @@ def runs_for_targets(cells: int, steps: int, max_onset: int, targets: list[list[
             history &= U64((1 << (1 << cells)) - 1)  # keep each row once
         for k, target in enumerate(targets):
             best[k] = np.maximum(best[k], onset_runs(history, target, max_onset, first))
-    return best
+    return best  # (targets, max_onset, columns)
 
 
 def simulate_column(row: int, cells: int, column: int, steps: int) -> list[int]:
@@ -197,7 +199,8 @@ def report(cells: int, steps: int, max_onset: int, margin: int, controls: int) -
           f"column and onset of each bucket{' (some run reached the last step)' if censored else ''}")
     print("| target | " + " | ".join(f"$T_0 \\in [{a}, {b})$" for a, b in buckets) + " |")
     print("|---|" + "---|" * len(buckets))
-    for name, line in zip(names, best):
+    # strict=False: best also holds the rows of the random controls after the periodic ones, which are not printed here
+    for name, line in zip(names, best, strict=False):
         print(f"| {name} | " + " | ".join(str(int(v)) for v in line) + " |")
     print(f"| {len(names)} periodic targets, least to most | " + " | ".join(
         f"{int(best[:len(names), i].min())} to {int(best[:len(names), i].max())}" for i in range(len(buckets))) + " |")

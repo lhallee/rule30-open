@@ -6,6 +6,7 @@ from __future__ import annotations
 import numpy as np
 
 from computations import coupled, finite_onset
+from computations.rule30 import pack_row
 
 
 def center_column(left: int, width: int, center: int, right: int, cells: int, steps: int) -> list[int]:
@@ -44,7 +45,7 @@ def test_slices_match_big_integers() -> None:
                                       ("0010011", 5, 8, 100)):
         rows = finite_onset.unpack(finite_onset.psi_slices(word, phase, cells, depth), 1 << cells)  # (depth, 2^k)
         for right in range(1 << cells):
-            assert finite_onset.as_int(rows[:, right]) == coupled.psi(word, phase, right, depth)
+            assert pack_row(rows[:, right]) == coupled.psi(word, phase, right, depth)
 
 
 def test_best_left_half_against_whole_rows() -> None:
@@ -64,7 +65,7 @@ def test_best_left_half_against_whole_rows() -> None:
                         best, best_left = alive, left
                 blacks = [j + 1 for j in range(width, steps) if rows[j, right]]
                 assert best == (blacks[0] if blacks else steps)
-                assert best_left == finite_onset.as_int(rows[:width, right])
+                assert best_left == pack_row(rows[:width, right])
 
 
 def test_classify_statistics() -> None:

@@ -42,6 +42,6 @@ def test_cycle_is_a_pseudo_measure_and_bounds_hold() -> None:
 def test_monotone_in_depth_and_no_white_end() -> None:
     """Restricting a pseudo-measure to fewer diagonals keeps it feasible, and none ends on the white word."""
     vals = [left_edge_bound(J, 1, 1) for J in (4, 8, 12, 16)]
-    assert all(a <= b + 1e-9 for a, b in zip(vals, vals[1:]))
+    assert all(a <= b + 1e-9 for a, b in zip(vals, vals[1:], strict=False))
     assert abs(vals[0] - 2.5) < 1e-9
     assert not any(white_end_feasible(J, k) for J in (3, 5, 9) for k in (1, 2))

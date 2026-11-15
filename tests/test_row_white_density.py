@@ -3,15 +3,16 @@ inequalities the entry proves."""
 
 from __future__ import annotations
 
-from itertools import product
-
 import numpy as np
+
+from itertools import product
 
 from computations.row_white_density import (black_runs, chain_check, periodic_strip_min, psi, strip_slack, telescope_gap, run_white_bound, single_cell_rows, step,
                                             triangle_area, triangle_counts)
 
 
 def rule30_cell(a: int, b: int, c: int) -> int:
+    """Rule 30 on a cell and its two neighbors, written out as the independent check."""
     return a ^ (b | c)
 
 

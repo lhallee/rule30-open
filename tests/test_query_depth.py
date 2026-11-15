@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import itertools
-from functools import lru_cache
-
 import numpy as np
+
+from functools import cache
 
 from computations import query_depth as qd
 from computations.cone_screening import cone_table
@@ -22,7 +22,7 @@ def plain_center(cells: tuple[int, ...]) -> int:
 def tree_depth(f: dict[tuple[int, ...], int], n: int) -> int:
     """The least decision-tree depth of f by plain recursion over partial assignments (None = free)."""
 
-    @lru_cache(maxsize=None)
+    @cache
     def depth(partial: tuple[int | None, ...]) -> int:
         free = [i for i, v in enumerate(partial) if v is None]
         values = {f[tuple(int(b) for b in full)] for full in completions(partial, free)}
@@ -34,7 +34,7 @@ def tree_depth(f: dict[tuple[int, ...], int], n: int) -> int:
         out = []
         for bits in itertools.product((0, 1), repeat=len(free)):
             full = list(partial)
-            for i, b in zip(free, bits):
+            for i, b in zip(free, bits, strict=True):
                 full[i] = b
             out.append(tuple(full))
         return out
@@ -114,7 +114,7 @@ def test_evasive_recursion_against_exact_depth() -> None:
     used = 0
     for ks in itertools.combinations(range(n), 2):
         for bs in itertools.product((0, 1), repeat=2):
-            fixed = dict(zip(ks, bs))
+            fixed = dict(zip(ks, bs, strict=True))
             if qd.subcube_sums(t, fixed, 7)[0] != 0 or not qd.evasive(t, fixed, 2, 7):
                 continue
             keep = np.ones(1 << n, dtype=bool)  # (2^6,)

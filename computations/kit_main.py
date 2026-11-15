@@ -29,11 +29,13 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from pathlib import Path
 
+from pathlib import Path
 from tqdm.auto import tqdm
 
 from computations import coverage, game
+from computations.cyclic_words import least_rotation
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -146,7 +148,8 @@ def new_modules() -> list[str]:
     """The Lean modules here whose entry is marked `kit: new`, by name."""
     names = []
     for entry in sorted((ROOT / "Rule30Open").rglob("*.md")):
-        head = entry.read_text().split("---")[1] if entry.read_text().startswith("---") else ""
+        text = entry.read_text(encoding="utf-8")
+        head = text.split("---")[1] if text.startswith("---") else ""
         if re.search(r"^kit:\s*new\b", head, re.M) and entry.with_suffix(".lean").exists():
             names.append(entry.stem)
     return names
@@ -164,7 +167,7 @@ def lean_literals(text: str) -> set[str]:
     bare = pattern.sub(" ", text)
     found |= {bits for bits in re.findall(r"0b([01]+)\b", bare) if 2 <= len(bits) <= 21}
     found |= {word for word in re.findall(r'"([01]{2,21})"', text)}
-    return {game.least_rotation(word) for word in found}
+    return {least_rotation(word) for word in found}
 
 
 def repo_blocks() -> dict[str, set[str]]:
@@ -173,7 +176,7 @@ def repo_blocks() -> dict[str, set[str]]:
     modules = set(new_modules())
     for path in sorted((ROOT / "Rule30Open").rglob("*.lean")):
         if path.stem in modules:
-            for word in lean_literals(path.read_text()):
+            for word in lean_literals(path.read_text(encoding="utf-8")):
                 owners.setdefault(word, set()).add(path.stem)
     for word, module in coverage.module_blocks():
         if module in modules:

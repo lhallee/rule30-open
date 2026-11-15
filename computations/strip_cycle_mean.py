@@ -17,10 +17,10 @@ permutivity makes the left input truly free; the right input is an over-approxim
 from __future__ import annotations
 
 import itertools
+import numpy as np
+
 from collections import deque
 from fractions import Fraction
-
-import numpy as np
 from tqdm.auto import tqdm
 
 

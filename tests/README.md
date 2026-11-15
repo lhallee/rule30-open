@@ -5,6 +5,14 @@ one minute, serially, with no worker processes. Each computation in `computation
 independent check (a second implementation, a known sequence, a direct run with `step`, or a number its entry quotes),
 on small cases; the large runs belong to the reproduce commands of the entries.
 
+## Layout
+
+Each file `test_<module>.py` tests `computations/<module>.py`, and a test's own reference implementations (its own
+`center_column`, its own runs with `step`) stay in its file as independent checks. `references.py` holds the plain
+reference code that several test files import: the repository root, the core of 0001, the reader of packed Lean fields,
+the reader of the kit's ether lists and the least depth of the kit's family checked column by column. `conftest.py`
+holds the settings and the fixtures that several files share.
+
 ## How the suite stays fast
 
 - **One entry stands for a module.** The Lean kernel checks every trap table (`WTrap.check`), so a test need not rebuild
@@ -30,7 +38,9 @@ on small cases; the large runs belong to the reproduce commands of the entries.
   read-only arrays or tuples (a caller that may change a list gets its own copy), with a cap on count and bytes where
   the results are large (`locks.KEPT_BYTES`, `lock_chain.REACHED_BYTES`); the certificates of the coin finding are
   module-scoped fixtures, and `test_class_certificate.py` builds each certificate once and changes copies of it
-  (`dataclasses.replace`) in `test_rejects`. Two session fixtures in `conftest.py` serve several files: `center_rows`,
+  (`dataclasses.replace`) in `test_rejects`. A module fixture in `conftest.py`, `certificate`, the core certificate of
+  0001 at width 16, serves `test_lock_certificate.py` and `test_absorption.py`. Two session fixtures in `conftest.py`
+  serve several files: `center_rows`,
   the first 65,536 digits of the center column and the rows at 16,384, 32,768 and 49,152 steps, stepped one row at a
   time (for `test_long_window`, `test_wide_window` and the long window of `test_lean_statements.py`), and
   `deep_diagonals`, the stream of `settled_slope` to depth 10,000 over 15,600 steps (for `test_settled_slope.py`,
@@ -43,7 +53,7 @@ on small cases; the large runs belong to the reproduce commands of the entries.
   nodes that reach a locked one when the caller needs only the locked ones. `bit_game.phase_rounds` closes each round
   with `back_closure`, `coin_lock.entry_paths` relaxes only the windows whose successor changed after a first full sweep
   (the same distances and first values, in the same order of updates), `lock_chain.carried_block` reads a carried block
-  from the chain without building its trap, and `lock_chain.least_period` finds the first return of the word in its
+  from the chain without building its trap, and `cyclic_words.least_period` finds the first return of the word in its
   square. `rule30.distinct` (sort and compare neighbors) takes the place of `np.unique`, whose hash path is ten times
   slower on these arrays in numpy 2.5. `game.game_graph` takes its moves from `game.game_moves`, `lock_word.unreachable`
   and `gate_census.gap_states` are backward searches, and `game.necklaces` marks necklaces with integer rotations.
@@ -60,14 +70,15 @@ on small cases; the large runs belong to the reproduce commands of the entries.
   direct runs with `step` and the quoted counts still pass; `test_entry_paths_against_full_sweeps` checks `entry_paths`
   against the sweep over every window and `distinct` against `np.unique`, and `test_carried_blocks` checks
   `carried_block` against the block of `carried`.
-- **Compiled once.** `seed_onsets.compiled` keeps the compiled C searches in a folder of the temporary directory that
+- **Compiled once.** `c_programs.compiled` keeps the compiled C searches in a folder of the temporary directory that
   only the user can write, under a hash of the source, the compiler, the flags and the machine, so a later run reuses
-  them; `seed_onsets`, `query_adversary`, `query_evasive`, `doubling_gaps` and `walk_eigen` all compile through it;
+  them, and every module that compiles a C program on first use goes through it (the list is in
+  [computations/README.md](../computations/README.md#c-programs));
   `class_certificate.step` keeps the moves that `check` asks twice.
 - **Tests that run many rows at once.** The brute-force checks in the tests (`test_ring_orbits`, `test_ten_coin`,
   `test_natural_coin`, `test_cut_entries`, the direct runs of `test_ether_descent.py` and `test_run_mechanism.py`, and
   `driven_rows_many` for `test_core_persists_after_entry`, the rings of `test_space_time_periodic`, the right halves of
-  `test_small_right` and `test_game`, the independent count of `test_lock_avoid_growth`, the forward reach of
+  `test_small_halves` and `test_game`, the independent count of `test_lock_avoid_growth`, the forward reach of
   `test_locks`) step every state together as numpy arrays or integer rows, cut to the light cone, and stop at the first
   difference; `driven_rows_many` is itself checked against `right_half.driven_row` in `test_driven_spacetime`. The plain
   recursions of `test_gap_traps.py` and `test_three_runs.py` step each state's moves cell by cell once and reuse them.
@@ -80,7 +91,9 @@ on small cases; the large runs belong to the reproduce commands of the entries.
 - **No plugins that the suite does not use.** `pyproject.toml` switches off pytest plugins of the global environment
   (`addopts`), which took about 20 s to load.
 
-A test is never skipped, expected to fail or deselected to meet the limit.
+A test is never expected to fail or deselected to meet the limit, and a test is skipped only when an optional extra is
+missing: one test of `test_late_onset.py` without the `sat` extra, and the tests of `test_persistence.py` without the
+`topology` extra.
 
 ## What the reproduce commands cover
 
@@ -115,14 +128,15 @@ them (the command is in `computations/README.md`):
 
 ## Measured
 
-`python -m pytest -q -p no:cacheprovider --durations=60` collects 824 tests: 822 pass and 2 are skipped
-(`test_late_onset.py` needs `pysat` and `test_persistence.py` needs `ripser`, which this environment lacks). The
-suite took 47 s of wall time. With 737 tests, serially on an idle machine with four
-cores, the suite took about 38 s of wall time. With the 647 tests it had before, on one core of a machine with four at a load
-average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations sum to 43 to 46 s, and
-collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for `test_persistence.py` is
-about 0.9 s. The spread between runs is the machine's, which runs one fixed computation in anywhere from 0.47 to
-1.1 s.
+On Linux, with the `topology` and `sat` extras and a C compiler installed, `python -m pytest` collected 859 tests in
+one file per module and all of them passed, on November 14, 2026. The timings in this section were measured earlier,
+when the tests of the computations were one file, `test_computations.py`. With 824 tests, in an environment without
+`pysat` and `ripser`, where the 2 tests that need them were skipped, the suite took 47 s of wall time. Serially on an
+idle machine with four cores the 737 tests it had before took about 38 s of wall time. With 647 tests, on one core of a
+machine with four at a load average of 2 to 3, it took 45 to 49 s of wall time; the per-test durations sum to 43 to
+46 s, and collection and imports take the other 2 to 3 s, of which importing `ripser` and `sklearn` for
+`test_persistence.py` is about 0.9 s. The spread between runs is the machine's, which runs one fixed computation in
+anywhere from 0.47 to 1.1 s.
 
 The slowest tests, in seconds (call only, the least over two runs of that command): `test_reach_wide_carried` 1.0,
 `test_period_rate` 0.9, `test_trap_pairs` 0.8, `test_census_traps` 0.8, `test_lock_avoid_growth` 0.8,
@@ -146,7 +160,6 @@ a tenth of its time; and `long_window.simulate` on shifted rows in place of its 
 44 s would take smaller samples in the tests of 0.4 s and more, or running the suite on worker processes with
 pytest-xdist, which this file's rule of no worker processes excludes.
 
-The tests of other collaborators in this folder count toward the limit like the others; outside `test_computations.py`
-the files together take about 19 s, and no test there takes over 0.5 s apart from
-`test_class_blocks_wide.py::test_certificate_checks` (0.5 to 0.7 s), on some runs `test_no_k_tails.py` and
-`test_ether_descent.py` (about 0.5 s), and the setup of the shared fixture `deep_diagonals` (0.4 to 0.6 s).
+The tests of other collaborators in this folder count toward the limit like the others; among them no test takes over
+0.5 s apart from `test_class_blocks_wide.py::test_certificate_checks` (0.5 to 0.7 s), on some runs `test_no_k_tails.py`
+and `test_ether_descent.py` (about 0.5 s), and the setup of the shared fixture `deep_diagonals` (0.4 to 0.6 s).

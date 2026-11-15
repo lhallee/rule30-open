@@ -15,11 +15,12 @@ from __future__ import annotations
 import argparse
 import sys
 import textwrap
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations import class_certificate as cc
+
 
 # The blocks the class test closes at width 16 and nothing else does, each with the least width at which the class test
 # closes it (`class_survey.least_class_width`).

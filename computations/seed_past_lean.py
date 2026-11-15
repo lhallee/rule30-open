@@ -93,7 +93,7 @@ def lean_data(certs: list[Certificate]) -> str:
 
 def main() -> None:
     certs = certificates()
-    for high, low in zip(certs[1:], certs[:-1]):
+    for high, low in zip(certs[1:], certs[:-1], strict=True):
         assert link_ok(high, low), (high[0], low[0])
     for cert in certs:
         assert min_period_ok(cert) and preperiod_ok(cert), cert[0]

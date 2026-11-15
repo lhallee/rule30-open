@@ -35,9 +35,9 @@ import functools
 import itertools
 import math
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.held_map import next_diagonal
@@ -75,7 +75,7 @@ def effective(block: str) -> list[int]:
     return [int(block[t] == "1" and block[(t + 1) % period] == "1") for t in range(period)]
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _word_step(words: tuple[str, ...], history: int, reading: int) -> int | None:
     """The history after `reading`, or None if it completes a word. A history is the last readings, at most the
     longest word less one, as bits after a leading sentinel 1."""
@@ -87,7 +87,7 @@ def _word_step(words: tuple[str, ...], history: int, reading: int) -> int | None
     return int("1" + tail, 2)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def advance(cond: Condition, phase: int, history: int, value: int) -> int | None:
     """The state after column -1 reads `value` at a step of phase `phase`, or None if the condition fails there."""
     block = cond.block
@@ -278,7 +278,7 @@ def columns_from(cond: Condition, readings: tuple[int, ...], depth: int) -> list
     white = [p for p in range(period) if block[p] == "0"]
     boundary = effective(block)
     col, it = [], iter(readings)
-    for i in range(len(readings) // len(white)):
+    for _ in range(len(readings) // len(white)):
         for p in range(period):
             after = int(block[(p + 1) % period])
             col.append(1 - after if block[p] == "1" else next(it) ^ after)
@@ -396,7 +396,7 @@ def main() -> None:
         if args.forced:
             rows = forced_cells(cond, args.forced, args.forced // len(cond.block) + 2)
             fixed = [k + 1 for k, row in enumerate(rows) if row.strip("*")]
-            print(f"  fixed cells: " + " ".join(f"-{k}:{rows[k - 1]}" for k in fixed)
+            print("  fixed cells: " + " ".join(f"-{k}:{rows[k - 1]}" for k in fixed)
                   + f"; none in columns -{fixed[-1] + 1} to -{args.forced}")
         if args.periodic:
             for q, counts in periodic_survey(cond, args.periodic).items():

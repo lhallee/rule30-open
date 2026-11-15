@@ -42,15 +42,15 @@ def test_family_values_against_plain_run() -> None:
 def test_merges_and_misses() -> None:
     """At t = 9 the 2^9 left halves give 506 functions (`cone_screening`), and every merge is confirmed exactly; the
     family with at most one black cell separates the 2^7 prefixes of 7 cells, and the white right half alone does not."""
-    result = lc.scan(9, 9)
-    merged = lc.merged_classes(result)
-    assert result.count == 506
+    full_scan = lc.scan(9, 9)
+    merged = lc.merged_classes(full_scan)
+    assert full_scan.count == 506
     assert sum(len(c) - 1 for c in merged) == 512 - 506
     families = {"white": lc.completion_family(9, 7, 0), "one": lc.completion_family(9, 7, 1)}
-    result = lc.scan(9, 7, families)
-    assert result.count == 128
-    assert lc.misses(result, "one") == []
-    assert len(result.signatures["white"]) < 128 and lc.misses(result, "white")
+    family_scan = lc.scan(9, 7, families)
+    assert family_scan.count == 128
+    assert lc.misses(family_scan, "one") == []
+    assert len(family_scan.signatures["white"]) < 128 and lc.misses(family_scan, "white")
 
 
 def test_certificate_separates() -> None:

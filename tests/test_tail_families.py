@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import re
+
 from pathlib import Path
 
 from computations import limit_windows as lw
 from computations import tail_families as tf
+
 
 LEAN = Path(__file__).resolve().parent.parent / "Rule30Open" / "Columns" / "TailFamilies14.lean"
 

@@ -36,6 +36,7 @@ from computations import class_blocks_18 as c18
 from computations import class_blocks_split as cbs
 from computations import class_certificate as cc
 
+
 # Each block, in increasing size of its certificate, with the prefix of its modules and the widths of each module of
 # heights; the module after them holds the classes. The widths end at the block's width in `class_blocks_18.WIDTH`.
 SPLITS: dict[str, tuple[str, tuple[tuple[int, int], ...]]] = {

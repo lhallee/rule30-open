@@ -40,13 +40,14 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+import numpy as np
+
 from dataclasses import dataclass
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.settled_words import pair_next
+
 
 U64 = np.uint64
 
@@ -145,8 +146,8 @@ def scalar_gap(y: int, P: int, cap: int) -> int:
 
 
 def _binary(optimize: bool = True) -> Path:
-    """computations/doubling_gaps.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
-    from computations.seed_onsets import compiled
+    """computations/doubling_gaps.c, compiled once and kept for later processes (`c_programs.compiled`)."""
+    from computations.c_programs import compiled
     return compiled("doubling_gaps", ("-O2" if optimize else "-O0", "-w"))
 
 
@@ -162,7 +163,7 @@ def census_c(p: int, cap: int, progress: bool = True, optimize: bool = True) -> 
         h, g = line.split()
         ys[i], gap[i] = int(h, 16), int(g)
     order = np.argsort(ys)  # (n,) the classes in increasing order, as `anti_classes` gives them
-    return ys[order], gap[order]
+    return ys[order], gap[order]  # (n,), (n,)
 
 
 def orbit_gap(P: int, y: int, cap: int, progress: bool = False, optimize: bool = True) -> tuple[int, int]:
@@ -311,7 +312,7 @@ def _quiet_diagonals(steps: int, depth: int) -> np.ndarray:
     """`left_diagonals.diagonals` without its progress bar."""
     import os
     from computations import left_diagonals
-    with open(os.devnull, "w") as null:
+    with open(os.devnull, "w", encoding="utf-8") as null:
         old, sys.stderr = sys.stderr, null
         try:
             return left_diagonals.diagonals(steps, depth, 128)  # (depth, 128)
@@ -442,10 +443,10 @@ def _last_two(X: np.ndarray, n: int) -> tuple[np.ndarray, np.ndarray]:
     for _ in range(2, n + 1):
         m = min(a.shape[0] - 1, b.shape[0])
         a, b = b, a[1:m + 1] ^ (b[:m] | a[:m])  # (m, N)
-    return a, b
+    return a, b  # (L_a, N), (L_b, N): the L_a, L_b times where E_{n-1}, E_n are defined
 
 
-def _cycles(succ: dict[tuple[int, ...] | int, list]) -> list[int] | None:
+def _cycles(succ: dict[int, list[int]] | dict[tuple[int, ...], list[tuple[int, ...]]]) -> list[int] | None:
     """The cycle lengths of a graph in which every node has at most one successor (None if a node has two)."""
     if any(len(v) > 1 for v in succ.values()):
         return None
@@ -525,7 +526,7 @@ def _succ(src: np.ndarray, dst: np.ndarray) -> dict[int, list[int]]:
     """The successor lists of a graph given by its edges."""
     # src, dst: (e,)
     out: dict[int, list[int]] = {}
-    for u, v in zip(src.tolist(), dst.tolist()):
+    for u, v in zip(src.tolist(), dst.tolist(), strict=True):
         out.setdefault(u, []).append(v)
     return out
 

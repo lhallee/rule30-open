@@ -9,6 +9,7 @@ from computations.run_slope_routes import skeleton_from_table
 from computations.settled_slope import (Diagonals, alternations, black_slope, by_period, cost_offset, least_periods,
                                         pair_onset_bound, settling_offset, stream, white_runs)
 
+
 DEPTH, STEPS, PERIOD, WINDOW = 120, 400, 16, 128
 
 

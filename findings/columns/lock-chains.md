@@ -198,7 +198,7 @@ python -m computations.lock_chain --natural 2,3,5,6,7,9 --steps 20000   # item 1
 python -m computations.lock_chain --nine --steps 20000   # item 10, entry into each trap of period 9, about 5 min
 ```
 
-`tests/test_computations.py::test_lock_chain` checks `left_column` against a step of the rule, the chain of
+`tests/test_lock_chain.py::test_lock_chain` checks `left_column` against a step of the rule, the chain of
 $0\,1^9$ against the bottom components of the three families at period 10, the eight blocks of period 8, the ether,
 the wall and the trap `t001` against the kit's tables read from its source, the wall returns against an exact run
 from the wall, and `is_lock` against `locks.lock_info` and on the locks of $001$ and $001011$. The periods 8 to 40 of

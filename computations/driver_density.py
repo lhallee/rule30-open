@@ -39,15 +39,16 @@ import argparse
 import itertools
 import math
 import sys
+import numpy as np
+
 from collections import Counter
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.constrained_runs import constrained_states
 from computations.run_mechanism import black_reach, driven_step
+
 
 ONE = np.uint64(1)
 
@@ -82,7 +83,7 @@ def successors(X: np.ndarray, c: np.ndarray, V: np.ndarray, D: np.ndarray | None
         Db = D[~white].copy()  # (nb, Wd)
         Db[:, (t + 1) // 64] |= forced.astype(np.uint64) << np.uint64((t + 1) % 64)
         Dn = np.concatenate([Dw, D1, Db])  # (2 nw + nb, Wd)
-    return Xn, cn, Vn, Dn
+    return Xn, cn, Vn, Dn  # (2 nw + nb, W), (2 nw + nb,), (2 nw + nb, F), (2 nw + nb, Wd) or None
 
 
 def dedupe_max(X: np.ndarray, c: np.ndarray, V: np.ndarray, D: np.ndarray | None,
@@ -102,7 +103,7 @@ def dedupe_max(X: np.ndarray, c: np.ndarray, V: np.ndarray, D: np.ndarray | None
     last = np.append(first[1:], len(order)) - 1  # (m,)
     Vm = np.maximum.reduceat(V[order], first, axis=0)  # (m, F)
     Dm = D[order[last]] if D is not None else None
-    return Xs[first], cs[first], Vm, Dm
+    return Xs[first], cs[first], Vm, Dm  # (m, W), (m,), (m, F), (m, Wd) or None
 
 
 @dataclass
@@ -249,7 +250,7 @@ def lifetimes(steps: int, every: int, words: Sequence[str], horizon: int = 120,
 def _states_at(t: int) -> tuple[np.ndarray, np.ndarray]:
     for u, B, C in constrained_states(t):
         if u == t:
-            return B, C
+            return B, C  # (n, words), (n,)
     raise ValueError(t)
 
 
@@ -290,6 +291,7 @@ def reentry(w: str, t: int, gmax: int = 40, horizon: int = 120, cap: int = 1 << 
     l_w(t)), the least number of steps to a state that again follows w for at least half as long, by breadth-first
     search over admissible drivers (a layer above `cap` states raises). The reported gap is the least over the ends,
     so it is the cheapest re-entry. `states` are the reachable states at time t, if already computed."""
+    # states: ((n, words), (n,)) or None
     B, C = states if states is not None else _states_at(t)
     W = (t + horizon + gmax + 4) // 64 + 1
     X = np.zeros((len(C), W), dtype=np.uint64)  # (n, W)
@@ -339,7 +341,8 @@ def stretch_ends(X: np.ndarray, c: np.ndarray, w: str, min_len: int,
     # X: (n, W); c: (n,)
     p = len(w)
     letters = [int(a) for a in w]
-    src, outX, outc, outL, outV = [], [], [], [], []
+    # per stretch end found: the source row, the end state, its center, the length and the black cells
+    src, X_ends, c_ends, lengths, blacks = [], [], [], [], []
     for ph in range(p):
         idx = np.flatnonzero(c == letters[ph])  # (m,)
         Y = X[idx].copy()  # (m, W)
@@ -353,27 +356,28 @@ def stretch_ends(X: np.ndarray, c: np.ndarray, w: str, min_len: int,
                 forced = (ONE ^ (Y[:, 0] & ONE)).astype(np.uint8)  # (m,)
                 dead = forced != nxt  # (m,)
                 if s >= min_len and dead.any():
-                    src.append(idx[dead])
-                    outX.append(driven_step(Y[dead], 1))
-                    outc.append(forced[dead])
-                    outL.append(np.full(int(dead.sum()), s))
-                    outV.append(np.full(int(dead.sum()), black))
+                    src.append(idx[dead])  # (k,)
+                    X_ends.append(driven_step(Y[dead], 1))  # (k, W)
+                    c_ends.append(forced[dead])  # (k,)
+                    lengths.append(np.full(int(dead.sum()), s))  # (k,)
+                    blacks.append(np.full(int(dead.sum()), black))  # (k,)
                 idx, Y = idx[~dead], Y[~dead]
             Y = driven_step(Y, cur)
     if not src:
         return (np.zeros(0, np.int64), np.zeros((0, X.shape[1]), np.uint64), np.zeros(0, np.uint8),
-                np.zeros(0, np.int64), np.zeros(0, np.int64))
-    return (np.concatenate(src), np.concatenate(outX), np.concatenate(outc), np.concatenate(outL),
-            np.concatenate(outV))
+                np.zeros(0, np.int64), np.zeros(0, np.int64))  # (0,), (0, W), (0,), (0,), (0,)
+    # e stretch ends in all
+    return (np.concatenate(src), np.concatenate(X_ends), np.concatenate(c_ends), np.concatenate(lengths),
+            np.concatenate(blacks))  # (e,), (e, W), (e,), (e,), (e,)
 
 
 def _prune(X: np.ndarray, c: np.ndarray, V: np.ndarray, width: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     # X: (n, W); c: (n,); V: (n, F)
     if len(c) <= width:
-        return X, c, V
+        return X, c, V  # (n, W), (n,), (n, F)
     keep = np.argpartition(-V[:, 0], width - 1)[:width]  # (width,)
     keep.sort()
-    return X[keep], c[keep], V[keep]
+    return X[keep], c[keep], V[keep]  # (width, W), (width,), (width, F)
 
 
 def chain_beam(steps: int, width: int, words: Sequence[str], min_len: int = 8,
@@ -476,8 +480,8 @@ def _trailing_ones(y: np.ndarray) -> np.ndarray:
         if not live.any():
             break
         out += live
-        z = np.where(live, z >> ONE, np.uint64(0))
-    return out
+        z = np.where(live, z >> ONE, np.uint64(0))  # (n,)
+    return out  # (n,)
 
 
 def state_features(X: np.ndarray, c: np.ndarray, single: np.ndarray) -> np.ndarray:
@@ -671,7 +675,7 @@ def run_describe(args: argparse.Namespace) -> None:
 def run_potential(args: argparse.Namespace) -> None:
     for bound in [float(b) for b in args.bounds.split(",")]:
         r = fit_potential(args.fit, args.test, bound)
-        top = sorted(zip(np.abs(r.theta), FEATURE_NAMES, r.theta), reverse=True)[:6]
+        top = sorted(zip(np.abs(r.theta), FEATURE_NAMES, r.theta, strict=True), reverse=True)[:6]
         print(f"bound {bound}: rho {r.rho:.4f} on t < {args.fit} (constant {r.constant:.2f}), the same theta needs rho "
               f"{r.rho_test:.4f} on {args.fit} <= t < {args.test}; dual support {r.dual_edges} edges at t = "
               f"{r.dual_times[0]} .. {r.dual_times[1]}; largest weights "

@@ -1,16 +1,30 @@
-"""The cycle means and potentials behind Rule30Open.Foundations.StripWhiteDensity, and the period-five orbit that
-attains 2/5 on every strip."""
+"""The cycle means and potentials behind Rule30Open.Foundations.StripWhiteDensity, the period-five orbit that attains
+2/5 on every strip, and the width-five table of `strip_potentials` against the Lean module."""
 
 from __future__ import annotations
 
+import re
+
 from fractions import Fraction
 from itertools import product
+from pathlib import Path
 
 from computations.strip_cycle_mean import cycle_mean, potential
+from computations.strip_potentials import table
+
+
+LEAN_FILE = Path(__file__).resolve().parents[1] / "Rule30Open/Foundations/StripWhiteDensity.lean"
 
 
 def rule(a: int, b: int, c: int) -> int:
+    """Rule 30 on a cell and its two neighbors, written out as the independent check."""
     return a ^ (b | c)
+
+
+def strip_index(cells: list[int] | tuple[int, ...]) -> int:
+    """The strip read from the left as a binary number."""
+    J = len(cells)
+    return sum(b << (J - 1 - i) for i, b in enumerate(cells))
 
 
 def test_cycle_means() -> None:
@@ -27,8 +41,7 @@ def test_potential_step_width_five() -> None:
     for cells in product((0, 1), repeat=J + 2):
         s = cells[1:J + 1]
         n = [rule(cells[i - 1], cells[i], cells[i + 1]) for i in range(1, J + 1)]
-        idx = lambda w: sum(b << (J - 1 - i) for i, b in enumerate(w))  # noqa: E731
-        assert phi[idx(n)] + 2 * J <= phi[idx(s)] + 5 * (J - sum(s))
+        assert phi[strip_index(n)] + 2 * J <= phi[strip_index(s)] + 5 * (J - sum(s))
 
 
 def test_period_five_orbit_attains_two_fifths() -> None:
@@ -44,13 +57,7 @@ def test_period_five_orbit_attains_two_fifths() -> None:
 
 
 def test_lean_table_width_five_regenerates() -> None:
-    import re
-    from pathlib import Path
-
-    from computations.strip_potentials import table
-
-    text = (Path(__file__).resolve().parents[1] / "Rule30Open/Foundations/StripWhiteDensity.lean").read_text()
-    m = re.search(r"def tab5 : List Nat := \[([0-9, ]*)\]", text)
+    m = re.search(r"def tab5 : List Nat := \[([0-9, ]*)\]", LEAN_FILE.read_text(encoding="utf-8"))
     assert m is not None
     lean_tab = [int(v) for v in m.group(1).split(",")]
     tab = table(5)
@@ -58,5 +65,4 @@ def test_lean_table_width_five_regenerates() -> None:
     for cells in product((0, 1), repeat=7):
         s = cells[1:6]
         n = [rule(cells[i - 1], cells[i], cells[i + 1]) for i in range(1, 6)]
-        idx = lambda w: sum(b << (4 - i) for i, b in enumerate(w))  # noqa: E731
-        assert tab[idx(n)] + 10 <= tab[idx(s)] + 5 * (5 - sum(s))
+        assert tab[strip_index(n)] + 10 <= tab[strip_index(s)] + 5 * (5 - sum(s))

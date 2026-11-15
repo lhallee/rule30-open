@@ -27,9 +27,14 @@ import functools
 import sys
 import numpy as np
 
+from typing import TYPE_CHECKING
 from tqdm.auto import tqdm
 
 from computations.right_half import random_starts
+
+
+if TYPE_CHECKING:
+    from computations import lock_chain  # imported where it is used, after the modules it imports
 
 
 def spacetime(word: str, start: int, steps: int, width: int) -> np.ndarray:
@@ -201,7 +206,7 @@ def jen_sets(word: str, width: int) -> tuple[np.ndarray, ...]:
     out = tuple(greatest_invariant_set(word, seed, width)[0] for seed in jen_seeds(word))  # each (period, 2^W)
     for member in out:
         member.flags.writeable = False
-    return out
+    return out  # each (period, 2^W)
 
 
 def seed_mask(states: np.ndarray, condition: dict[int, int]) -> np.ndarray:
@@ -274,7 +279,7 @@ def forced_entry(word: str, member: np.ndarray) -> np.ndarray:
 CERTIFICATES = [("0001", 16), ("0011", 14), ("0111", 14)]
 
 
-def certificate_tables(word: str, width: int) -> dict:
+def certificate_tables(word: str, width: int) -> lock_chain.TrapTables:
     """The `jen` certificate of the word at this width as a labelled trap of `lock_chain.relabeled_tables`: the
     nonempty greatest invariant sets of the assignments of column 1 at the white phases, which must be exactly one."""
     from computations import lock_chain

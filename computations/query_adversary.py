@@ -32,20 +32,21 @@ import itertools
 import os
 import subprocess
 import sys
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 from tqdm.auto import tqdm
 
 from computations import query_depth as qd
 from computations.cone_screening import cone_table
 
+
 LOW = 9  # cells bit-sliced in the C program
 
 
 def _binary() -> Path:
-    """computations/query_adversary_sums.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
-    from computations.seed_onsets import compiled
+    """computations/query_adversary_sums.c, compiled once and kept for later processes (`c_programs.compiled`)."""
+    from computations.c_programs import compiled
     return compiled("query_adversary_sums", ("-O3", "-march=native", "-fopenmp", "-w"))
 
 
@@ -55,7 +56,7 @@ def kernel_sums(t: int, fixed: dict[int, int], threads: int = 1, split: int = 8,
     same sum with free variable k also fixed to b and the sign (-1)^{|y| - b} (0 for fixed k), as in
     `query_depth.subcube_sums`. Uses the C program for 2t > LOW and `subcube_sums` below. Results are kept for the
     arguments asked again, as read-only arrays."""
-    return _sums(t, tuple(sorted(fixed.items())), threads, split, progress)
+    return _sums(t, tuple(sorted(fixed.items())), threads, split, progress)  # (), (2t, 2)
 
 
 @functools.lru_cache(maxsize=256)
@@ -76,7 +77,7 @@ def _sums(t: int, fixed: tuple[tuple[int, int], ...], threads: int, split: int,
                 k, s0, s1 = (int(v) for v in line.split())
                 sums[k, 0], sums[k, 1] = s0, -s1
     sums.setflags(write=False)
-    return nu, sums
+    return nu, sums  # (), (2t, 2)
 
 
 def evasive(t: int, fixed: dict[int, int], level: int, threads: int = 1) -> bool:
@@ -126,6 +127,7 @@ def corner_restrictions(t: int, threads: int = 1,
 
 def restrict_table(table: np.ndarray, n: int, fixed: dict[int, int]) -> np.ndarray:
     """The truth table of a function on n variables with the variables of `fixed` fixed, on the others in order."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     sel = np.ones(1 << n, dtype=bool)  # (2^n,)
     for k, b in fixed.items():
@@ -134,11 +136,12 @@ def restrict_table(table: np.ndarray, n: int, fixed: dict[int, int]) -> np.ndarr
     packed = sum(((index >> k) & 1) << pos for pos, k in enumerate(free))  # (2^n,)
     out = np.zeros(1 << len(free), dtype=np.uint8)  # (2^(n - |fixed|),)
     out[packed[sel]] = table[sel]
-    return out
+    return out  # (2^(n - |fixed|),)
 
 
 def pair_weights(table: np.ndarray, n: int) -> np.ndarray:
     """W[i, j, a, b] = the number of 1-rows with x_i = a and x_j = b."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     bits = [(index >> i) & 1 for i in range(n)]  # n x (2^n,)
     weights = np.zeros((n, n, 2, 2), dtype=np.int64)  # (n, n, 2, 2)
@@ -148,13 +151,14 @@ def pair_weights(table: np.ndarray, n: int) -> np.ndarray:
             for a in (0, 1):
                 for b in (0, 1):
                     weights[i, j, a, b] = int((ones & (bits[i] == a) & (bits[j] == b)).sum())
-    return weights
+    return weights  # (n, n, 2, 2)
 
 
 def npn_equivalent(f: np.ndarray, g: np.ndarray, n: int) -> tuple[list[int], list[int], int] | None:
     """(perm, neg, out) with f(x) = g(y) xor out, y_{perm[i]} = x_i xor neg[i], or None: a backtracking search that
     matches the pair weights of each new variable with those of the ones placed, then checks the whole table."""
-    wg = pair_weights(g, n)
+    # f, g: (2^n,)
+    wg = pair_weights(g, n)  # (n, n, 2, 2)
     for out in (0, 1):
         ff = f ^ np.uint8(out)  # (2^n,)
         if int(ff.sum()) == int(g.sum()):
@@ -167,6 +171,7 @@ def npn_equivalent(f: np.ndarray, g: np.ndarray, n: int) -> tuple[list[int], lis
 def _place(f: np.ndarray, g: np.ndarray, n: int, wf: np.ndarray,
            wg: np.ndarray) -> tuple[list[int], list[int]] | None:
     """The backtracking of `npn_equivalent` for a fixed value negation: (perm, neg) with f(x) = g(y)."""
+    # f, g: (2^n,); wf, wg: (n, n, 2, 2)
     index = np.arange(1 << n)  # (2^n,)
     perm: list[int] = [0] * n
     neg: list[int] = [0] * n
@@ -219,6 +224,7 @@ def pair_gates(table: np.ndarray, n: int) -> list[tuple[int, int, tuple[int, ...
     """The pairs of variables (i, j) through which the function factors by a gate of two inputs: the four cofactors
     at (x_i, x_j) = 00, 01, 10, 11 are at most two distinct functions. Each pair comes with the class of each cofactor
     in that order: (0, 1, 1, 1) is an OR, (0, 1, 1, 0) an XOR."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     out = []
     for i, j in itertools.combinations(range(n), 2):
@@ -236,16 +242,17 @@ def pair_gates(table: np.ndarray, n: int) -> list[tuple[int, int, tuple[int, ...
 def reduced_table(t: int) -> np.ndarray:
     """G_t: c_t with x_{-t} and x_{t-1} white, on the cells x_{-t+1} .. x_{t-2}, x_t in order."""
     n = 2 * t + 1
-    return restrict_table(cone_table(t), n, {0: 0, n - 2: 0})
+    return restrict_table(cone_table(t), n, {0: 0, n - 2: 0})  # (2^(2t-1),)
 
 
 def anf(table: np.ndarray, n: int) -> np.ndarray:
     """The GF(2) normal form: entry S is the coefficient of the monomial of the variables in S (Moebius transform)."""
+    # table: (2^n,)
     coef = table.astype(np.uint8).copy()  # (2^n,)
     for i in range(n):
         view = coef.reshape(-1, 2, 1 << i)  # (2^(n-i-1), 2, 2^i)
         view[:, 1, :] ^= view[:, 0, :]
-    return coef
+    return coef  # (2^n,)
 
 
 def covering_pairs(t: int) -> int:

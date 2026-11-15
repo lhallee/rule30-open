@@ -30,12 +30,13 @@ import argparse
 import functools
 import sys
 import time
-from collections import deque
-
 import numpy as np
+
+from collections import deque
 from tqdm.auto import tqdm
 
 from computations import absorption
+
 
 GAP_WIDTH = 16
 LOCK_WIDTH = 32
@@ -69,7 +70,7 @@ def double_steps(windows: np.ndarray, width: int) -> np.ndarray:
     return np.stack(out, axis=1)  # (n, 4)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def gap_states(width: int = GAP_WIDTH) -> np.ndarray:
     """good[w, d]: from window w at a white step, d white steps after the last black cell of column 1 (d = 5: none
     yet), every later black cell of column 1 comes 3 or 5 white steps after the one before, whatever the input from
@@ -166,7 +167,7 @@ def phase_classes(windows: set[int], width: int, period: int) -> tuple[list[list
     return classes, "".join(word)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def seven_lock(steps: int = 8000) -> tuple[list[list[int]], str]:
     """The lock of period seven: the closure of the late windows of `LOCK_SEED`, split into its seven classes,
     rotated so that its column-1 word is `LOCK_WORD`."""
@@ -186,6 +187,7 @@ def census(cells: int, phase: int, steps: int, gap: np.ndarray, lock: list[list[
            wall: np.ndarray) -> dict[str, np.ndarray]:
     """For every right half below 2^cells: the first white step at which it enters the gap trap, the lock, or (checked
     only for the halves that enter neither) the kit's ether-and-wall family; -1 if not before `steps`."""
+    # gap: (2^16,), whether each window of 16 cells is in the gap trap; wall: (4, 2^13)
     lock_codes = np.array(sorted(c for cls in lock for c in cls), dtype=np.uint64)  # (195,)
     words = (cells + steps + 2) // 64 + 1
     rows = np.zeros((1 << cells, words), dtype=np.uint64)  # (2^cells, words)
@@ -212,7 +214,7 @@ def census(cells: int, phase: int, steps: int, gap: np.ndarray, lock: list[list[
         start[:, 0] = rest.astype(np.uint64)
         # absorption's phase p reads the word 0101 at (t + p) % 4, so its phase 1 is black at the even steps
         entry["family"][rest] = absorption.absorb("0101", start, 1 - phase, steps, wall, cells)
-    return entry
+    return entry  # (2^cells,) each
 
 
 def periodic_zone(half: int, phase: int, period: int, steps: int) -> int:

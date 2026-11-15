@@ -29,20 +29,19 @@ at level k of every ordered decision diagram that reads the row from left to rig
     python -m computations.left_cut --t 17 --lean                # the certificates of LeftCut
 """
 
-
 from __future__ import annotations
 
 import argparse
 import hashlib
 import itertools
 import sys
-from dataclasses import dataclass, field
-
 import numpy as np
 
+from dataclasses import dataclass, field
 from tqdm.auto import tqdm
 
 from computations import cone_screening as cs
+
 
 ONES = np.uint64(0xFFFF_FFFF_FFFF_FFFF)
 ZERO = np.uint64(0)
@@ -96,14 +95,15 @@ class Scan:
         return len(self.classes)
 
 
-def _digest(data: bytes) -> bytes:
-    return hashlib.blake2b(data, digest_size=16).digest()
+def _digest(packed_bits: bytes) -> bytes:
+    return hashlib.blake2b(packed_bits, digest_size=16).digest()
 
 
 def scan(t: int, k: int, families: dict[str, np.ndarray] | None = None, block_bits: int = 18,
          progress: bool = False) -> Scan:
     """Stream the 2^k prefixes of c_t in blocks of 2^b, b the number of prefix cells next to the cut that are
     bit-sliced (so that a block has about 2^block_bits rows), and group them by subfunction and by signature."""
+    # families: (m,) completions under each family name
     if not 1 <= k <= 2 * t:
         raise ValueError("need 1 <= k <= 2t")
     families = families or {}
@@ -113,7 +113,7 @@ def scan(t: int, k: int, families: dict[str, np.ndarray] | None = None, block_bi
     variables = packed_variables(free + b)  # (free + b) x (words,)
     sliced_prefix = variables[free:]  # b x (words,), prefix cells x_{-t+k-b} .. x_{-t+k-1}
     free_cells = variables[:free]  # free x (words,), cells x_{-t+k} .. x_t
-    result = Scan(t, k, {}, {name: {} for name in families})
+    scanned = Scan(t, k, {}, {name: {} for name in families})
     blocks = 1 << (k - b - 1)
     words = variables[0].shape[0]
     for high in tqdm(range(blocks), desc=f"t={t} k={k} blocks", file=sys.stderr, disable=not progress):
@@ -133,14 +133,14 @@ def scan(t: int, k: int, families: dict[str, np.ndarray] | None = None, block_bi
         for j in range(1 << b):
             prefix = scalar_prefix | (j << (k - b))
             for flip in (0, 1):
-                result.classes.setdefault(keys[j][flip], []).append(prefix | flip)
+                scanned.classes.setdefault(keys[j][flip], []).append(prefix | flip)
             for name, sig in sigs.items():
                 row_sig = sig[j]  # (ceil(m/8),)
                 m = families[name].shape[0]
                 comp = np.packbits(1 - np.unpackbits(row_sig, count=m))  # (ceil(m/8),)
-                result.signatures[name].setdefault(row_sig.tobytes(), []).append(prefix)
-                result.signatures[name].setdefault(comp.tobytes(), []).append(prefix | 1)
-    return result
+                scanned.signatures[name].setdefault(row_sig.tobytes(), []).append(prefix)
+                scanned.signatures[name].setdefault(comp.tobytes(), []).append(prefix | 1)
+    return scanned
 
 
 def subfunction(t: int, k: int, prefix: int) -> np.ndarray:
@@ -152,24 +152,24 @@ def subfunction(t: int, k: int, prefix: int) -> np.ndarray:
     return np.broadcast_to(center, (1 << free,)).astype(bool)  # (2^free,)
 
 
-def merged_classes(result: Scan) -> list[list[int]]:
+def merged_classes(scanned: Scan) -> list[list[int]]:
     """The classes of more than one prefix, each confirmed by comparing the subfunctions exactly."""
     out = []
-    for members in result.classes.values():
+    for members in scanned.classes.values():
         if len(members) > 1:
-            first = subfunction(result.t, result.k, members[0])  # (2^free,)
+            first = subfunction(scanned.t, scanned.k, members[0])  # (2^free,)
             for other in members[1:]:
-                if not np.array_equal(first, subfunction(result.t, result.k, other)):
+                if not np.array_equal(first, subfunction(scanned.t, scanned.k, other)):
                     raise AssertionError("digest collision")
             out.append(sorted(members))
     return sorted(out)
 
 
-def misses(result: Scan, name: str) -> list[tuple[int, int]]:
+def misses(scanned: Scan, name: str) -> list[tuple[int, int]]:
     """Pairs of prefixes with different subfunctions and the same values on the family `name`."""
-    cls = {p: key for key, members in result.classes.items() for p in members}
+    cls = {p: key for key, members in scanned.classes.items() for p in members}
     out = []
-    for members in result.signatures[name].values():
+    for members in scanned.signatures[name].values():
         for p, q in itertools.combinations(sorted(members), 2):
             if cls[p] != cls[q]:
                 out.append((p, q))
@@ -356,15 +356,15 @@ def main() -> None:
             print(f"    fixes {value}: {runs}")
         return
     fams = {f"black<={w}": completion_family(t, k, w) for w in range(args.black + 1)}
-    result = scan(t, k, fams, progress=True)
-    merged = merged_classes(result)
-    print(f"N_L({t}, {k}) = {result.count} of 2^{k} = {1 << k}; classes of more than one prefix: {len(merged)}")
+    scanned = scan(t, k, fams, progress=True)
+    merged = merged_classes(scanned)
+    print(f"N_L({t}, {k}) = {scanned.count} of 2^{k} = {1 << k}; classes of more than one prefix: {len(merged)}")
     if args.merges:
         for members in merged:
             print("   ", " ".join(word(p, k) for p in members))
     for name, fam in fams.items():
-        found = misses(result, name)
-        print(f"family {name} ({fam.shape[0]} completions): {len(result.signatures[name])} signatures, "
+        found = misses(scanned, name)
+        print(f"family {name} ({fam.shape[0]} completions): {len(scanned.signatures[name])} signatures, "
               f"{len(found)} pairs not separated")
         for p, q in found[:40]:
             print("   ", word(p, k), word(q, k))

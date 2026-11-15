@@ -13,7 +13,25 @@ summarizes the formal frontier of Problem 1, and agents add to the kit every day
 kit's commit 932cf8d; the kit's main branch has since gained 52 modules (27060a7, November 1), which exclude 133 blocks of
 period at most 21 that this repository's Lean already excludes and no block that it does not; its new period-two theorems
 each take an open hypothesis (mortality, an orbit separator, RW, or BWH with SmallRW; here BWH alone implies `Q01`)
-([kit pull requests](literature/kit-pull-requests.md)), and moving the pin there, after the build, the audit and the tests pass, is pending.
+([kit pull requests](literature/kit-pull-requests.md)). On November 14, 2026 the repository is still pinned at
+932cf8d; the pin moves to a newer kit commit only after the build, the audit and the tests pass against it (item 4 of
+[next steps](#next-steps)).
+
+[GLOSSARY.md](GLOSSARY.md) defines the terms this page uses without explanation, such as trap, lock, wall, the ether,
+`Q01` and BWH.
+
+## Problems, categories and open work
+
+Each prize problem is listed with the categories of [CATALOG.md](CATALOG.md) most of whose entries name it in their
+front matter, on November 14, 2026; Seeds and Foundations serve all three. The open work is split between the
+[open work](CATALOG.md#open-work) of the catalog, which lists the conjectures and the findings that want a Lean proof
+from their front matter, and the numbered items of [next steps](#next-steps) below.
+
+| Problem | Categories | Strongest results | Open work |
+|---|---|---|---|
+| 1: is the center column eventually periodic? | [Columns](CATALOG.md#columns), [Period two](CATALOG.md#period-two), [Frames and the seed's past](CATALOG.md#frames-and-the-seeds-past), [Sibling rules](CATALOG.md#sibling-rules), [Dynamics of the two halves](CATALOG.md#dynamics-of-the-two-halves), [Hidden structure](CATALOG.md#hidden-structure), [Seeds](CATALOG.md#seeds), [Foundations](CATALOG.md#foundations) | No two adjacent columns are eventually periodic and no column is eventually constant ([AdjacentColumns](Rule30Open/Columns/AdjacentColumns.md)); the finite game excludes 1,400 blocks of period at most 21, all in Lean ([period 21](findings/columns/game-blocks-21.md)); BWH alone implies the kit's `Q01` ([WedgeLadderQ01](Rule30Open/PeriodTwo/WedgeLadderQ01.md)), and `Q01Right(W)` excludes period two with no entry hypothesis ([ChannelLanguage](Rule30Open/PeriodTwo/ChannelLanguage.md)) | [Next steps](#next-steps) items 1 (period four), 2 (block exclusions), 3 (findings that want Lean), 5 (reading constraints and period two) and 6; the catalog's [open work](CATALOG.md#open-work) entries marked problem 1 |
+| 2: does each color occur with density 1/2? | [Diagonals](CATALOG.md#diagonals), [Random rows](CATALOG.md#random-rows), [Statistics](CATALOG.md#statistics), [Seeds](CATALOG.md#seeds), [Foundations](CATALOG.md#foundations) | Runs of the center column are at most linear in their start time (the kit); an onset edge that gains 2/3 per step would give black runs of slope 3/13 ([OnsetEdge](Rule30Open/Diagonals/OnsetEdge.md)); invariant measures are exact for random rows only ([the route](#problem-2-does-each-color-occur-with-density-12)) | [Next steps](#next-steps) item 5 (Problem 2); the catalog's [open work](CATALOG.md#open-work) entries marked problem 2 |
+| 3: does computing cell $n$ take effort of order $n$? | [Complexity](CATALOG.md#complexity), [Learned models](CATALOG.md#learned-models), [Hidden structure](CATALOG.md#hidden-structure), [Seeds](CATALOG.md#seeds), [Foundations](CATALOG.md#foundations) | A one-tape machine computes $c(n)$ within $6(n + 1)^2$ steps ([QuadraticTime](Rule30Open/Complexity/QuadraticTime.md)); space $O(\sqrt{n \log n})$ suffices ([space thresholds](findings/complexity/space-thresholds.md)); left-cut bounds for every $t$ ([LateSeedCut](Rule30Open/Complexity/LateSeedCut.md)); a lower bound amounts to an exponential lower bound for one explicit function ([the barrier](negative-results/complexity/problem-three-barrier.md)) | [Next steps](#next-steps) item 5 (Problem 3) and the independent checks of item 6; the catalog's [open work](CATALOG.md#open-work) entries marked problem 3 |
 
 ## At a glance
 
@@ -856,7 +874,7 @@ In order of the assessment above.
      allow; late completions of any shape give the single cell's eventual left edge at a shifted phase, so they add
      nothing to the late seeds, and every linear-algebra bound is capped by the letter language ([the exponential
      width](negative-results/complexity/exponential-left-width.md)).
-6. **Checks and attacks prepared for the next session.**
+6. **Independent checks owed, and prepared attacks.**
    - *Independent checks still owed.* These entries build, pass their tests and have their headline axioms audited,
      but no second reader has yet re-derived their paper parts and numbers, as was done for
      [BinomialDuality](Rule30Open/Complexity/BinomialDuality.md): [light-like

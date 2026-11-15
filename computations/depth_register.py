@@ -21,12 +21,13 @@ diagonals A = W_{d-2}, B = W_{d-1}, C = W_d of an eternal orbit satisfy C(t+1) =
 from __future__ import annotations
 
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 
 def bit(w: int, t: int) -> int:
+    """The cell of word w at time t."""
     return (w >> t) & 1
 
 
@@ -110,7 +111,8 @@ def skeleton_weights(depth: int, steps: int, P: int, progress: bool = True) -> n
 
 def skeleton_window_min(wt: np.ndarray, K: int, lo: int) -> tuple[int, int]:
     """Least total weight of K consecutive diagonals starting at depth >= lo, and the first depth of a minimizer."""
-    s = np.convolve(wt, np.ones(K, dtype=np.int64), "valid")[lo:]  # (n - K + 1 - lo,)
+    # wt: (n,)
+    s =np.convolve(wt, np.ones(K, dtype=np.int64), "valid")[lo:]  # (n - K + 1 - lo,)
     i = int(np.argmin(s))
     return int(s[i]), i + lo
 

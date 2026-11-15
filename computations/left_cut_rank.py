@@ -41,13 +41,13 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
 
 from computations.cone_screening import cone_table
 from computations.wild_ideas import gf2_rank, insert
+
 
 PATTERNS = [0xAAAA_AAAA_AAAA_AAAA, 0xCCCC_CCCC_CCCC_CCCC, 0xF0F0_F0F0_F0F0_F0F0, 0xFF00_FF00_FF00_FF00,
             0xFFFF_0000_FFFF_0000, 0xFFFF_FFFF_0000_0000]
@@ -73,6 +73,7 @@ def cut_matrix(table: np.ndarray, t: int, a: int) -> np.ndarray:
 
 def full_rank(t: int, a: int, table: np.ndarray | None = None) -> int:
     """rank(t, a) from the full truth table."""
+    # table: (2^(2t+1),), or None to build it
     if table is None:
         table = cone_table(t)  # (2^(2t+1),)
     return rows_rank(cut_matrix(table, t, a))
@@ -91,7 +92,7 @@ def packed_center(t: int, progress: bool = False) -> np.ndarray:
             return np.full(count, np.uint64(PATTERNS[bit]), dtype=np.uint64)  # (2^n / 64,)
         column = (words >> np.uint64(bit - 6)) & np.uint64(1)  # (2^n / 64,)
         column *= np.uint64(0xFFFF_FFFF_FFFF_FFFF)
-        return column
+        return column  # (2^n / 64,)
 
     row = [variable(n - 1 - i) for i in range(n)]  # n x (2^n / 64,), row[i] is x_{-t+i}
     del words
@@ -125,7 +126,7 @@ def reverse_bits(index: np.ndarray, width: int) -> np.ndarray:
     out = np.zeros_like(index)  # (m,)
     for i in range(width):
         out |= ((index >> np.uint64(i)) & np.uint64(1)) << np.uint64(width - 1 - i)
-    return out
+    return out  # (m,)
 
 
 def window_number(u: int, w: int, a: int, length: int) -> int:
@@ -151,7 +152,7 @@ def window_values(a: int, length: int, ts: list[int]) -> dict[int, np.ndarray]:
             done += 1
         top = ((x >> np.uint64(width - 1)) & np.uint64(1)).astype(np.uint8)  # (2^D,)
         out[t] = top.reshape(1 << length, 1 << a).T  # (2^a, 2^length), entry [u, w]
-    return out
+    return out  # t -> (2^a, 2^length)
 
 
 def window_rank(a: int, length: int, ts: list[int]) -> dict[int, int]:
@@ -219,7 +220,7 @@ def section_maps(a: int) -> list[np.ndarray]:
     for low in (0, 1, 2):
         x = 4 * u + low  # (2^a,)
         out.append(((x ^ ((2 * x) | (4 * x))) >> 2) & ((1 << a) - 1))  # (2^a,)
-    return out
+    return out  # 3 x (2^a,)
 
 
 def closure_dimension(a: int) -> int:
@@ -272,12 +273,13 @@ def anf(table: np.ndarray) -> np.ndarray:
     for i in range(n):
         view = out.reshape(-1, 2, 1 << i)  # (2^(n-i-1), 2, 2^i)
         view[:, 1, :] ^= view[:, 0, :]
-    return out
+    return out  # (2^n,)
 
 
 def stripe_coefficients(t: int, a: int, table: np.ndarray | None = None) -> dict[str, int]:
     """For the left monomials S (x_{-t} not in S) whose word x_{-t+1} .. x_{-t+a-1} has a prefix (10)^k 11: how many
     have coefficient function (of the right cells) zero, the constant 1, or anything else."""
+    # table: (2^(2t+1),), or None to build it
     if table is None:
         table = cone_table(t)  # (2^(2t+1),)
     coefficients = cut_matrix(anf(table), t, a)  # (2^a, 2^(2t+1-a)), entry [S, T]

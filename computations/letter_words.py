@@ -40,6 +40,7 @@ import subprocess
 
 from tqdm.auto import tqdm
 
+
 ALLOWED: dict[int, tuple[int, ...]] = {0: (0, 2, 3), 1: (1, 2, 3), 2: (1, 3), 3: (0, 2)}
 """The letters that may follow a letter (bit 0 the cell next to the cut, bit 1 the next one)."""
 
@@ -196,15 +197,15 @@ def rho(a: int) -> int:
     return 2 + (1 << a) // 3
 
 
-def ideal_classes(a: int, Tmax: int) -> list[int]:
+def ideal_classes(a: int, t_max: int) -> list[int]:
     """The number of classes of the a left cells under the words of exactly T letters with every letter allowed,
-    followed by the horizon, for T = 1 .. Tmax (stopping at 2^a): backward refinement by the three steps."""
+    followed by the horizon, for T = 1 .. t_max (stopping at 2^a): backward refinement by the three steps."""
     n = (a + 1) // 2 - 1
     mask = (1 << a) - 1
     images = [[nstep((e << a) | x) & mask for x in range(1 << a)] for e in (0, 1, 2)]  # (3, 2^a)
     lab = [nevo(x, n) & 1 for x in range(1 << a)]  # (2^a,)
     out = []
-    for _ in range(Tmax):
+    for _ in range(t_max):
         keys = [(lab[images[0][x]], lab[images[1][x]], lab[images[2][x]]) for x in range(1 << a)]
         index: dict[tuple[int, int, int], int] = {}
         lab = [index.setdefault(k, len(index)) for k in keys]
@@ -243,7 +244,7 @@ def edge_shift(x: int, J: int, s0: int, period: int = 8) -> int | None:
 
 def run_c(*args: object) -> dict[str, str] | list[str]:
     """Run computations/letter_words.c with the arguments; key-value output as a dict, other output as lines."""
-    from computations.seed_onsets import compiled
+    from computations.c_programs import compiled
     binary = compiled("letter_words", ("-O3", "-fopenmp", "-w", "-lm"))
     out = subprocess.run([str(binary), *map(str, args)], stdout=subprocess.PIPE, text=True, check=True).stdout
     lines = [line for line in out.strip().split("\n") if line]

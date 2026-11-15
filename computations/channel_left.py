@@ -29,9 +29,9 @@ import argparse
 import math
 import sys
 import time
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.channel_ladder import (
@@ -44,6 +44,7 @@ from computations.channel_ladder import (
 )
 from computations.constrained_left import effective
 from computations.held_map import next_diagonal
+
 
 # The kit's pattern P_w on column -1 at phases 0 to 3 (`colPattern`), '*' for the free reading.
 PATTERNS = {"0001": "0*01", "0011": "*001", "0111": "*001"}
@@ -166,7 +167,7 @@ def transfer(channel: Channel, pattern: str) -> tuple[np.ndarray, np.ndarray]:
             if after is not None:
                 sources.append(state)
                 targets.append(after)
-    return np.array(sources, dtype=np.int64), np.array(targets, dtype=np.int64)
+    return np.array(sources, dtype=np.int64), np.array(targets, dtype=np.int64)  # (k,), (k,)
 
 
 def entropy(channel: Channel | None, pattern: str) -> float:

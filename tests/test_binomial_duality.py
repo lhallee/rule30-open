@@ -4,9 +4,9 @@ of multiples, and the center column's numbers against the independent scans of r
 
 from __future__ import annotations
 
-from math import comb
-
 import numpy as np
+
+from math import comb
 
 from computations import binomial_duality as b
 from computations.index_spectrum import index_function, monomial_profile

@@ -54,13 +54,14 @@ def seed_pos(a: int, t: int, R: int, d: int) -> int:
     return 2 * (t - (a + 1) // 2 - R) - d
 
 
-def probe_list(a: int, t: int, Rmax: int) -> list[int]:
-    """The completions of the probes at t, as numbers: white, then the seeds (R, d) inside the cone (`lateProbes`)."""
+def probe_list(a: int, t: int, r_max: int) -> list[int]:
+    """The completions of the probes at t, as numbers: white, then the seeds (R, d) inside the cone (`lateProbes`),
+    R <= r_max (the module's Rmax)."""
     T1 = t - (a + 1) // 2
     out = [0]
-    for R in range(Rmax + 1):
+    for R in range(r_max + 1):
         for d in (0, 1):
-            if T1 >= R + d:
+            if R + d <= T1:
                 out.append(1 << seed_pos(a, t, R, d))
     return out
 
@@ -102,9 +103,9 @@ def refine_masks(cols: list[int], a: int) -> bool:
     return not masks
 
 
-def separates(a: int, t: int, Rmax: int) -> bool:
-    """Do the white and late-seed probes with R <= Rmax separate the 2^a settings at t (plain runs)?"""
-    return refine_masks([centers_plain(a, t, r) for r in probe_list(a, t, Rmax)], a)
+def separates(a: int, t: int, r_max: int) -> bool:
+    """Do the white and late-seed probes with R <= r_max separate the 2^a settings at t (plain runs)?"""
+    return refine_masks([centers_plain(a, t, r) for r in probe_list(a, t, r_max)], a)
 
 
 def separates_all_single(a: int, t: int) -> bool:
@@ -113,13 +114,13 @@ def separates_all_single(a: int, t: int) -> bool:
     return refine_masks(cols, a)
 
 
-def least_R(a: int, t: int, Rcap: int) -> int | None:
-    """The least Rmax <= Rcap whose probes separate at t, or None."""
+def least_R(a: int, t: int, r_cap: int) -> int | None:
+    """The least Rmax <= r_cap whose probes separate at t, or None."""
     T1 = t - (a + 1) // 2
     cols = [centers_plain(a, t, 0)]
-    for R in range(Rcap + 1):
+    for R in range(r_cap + 1):
         for d in (0, 1):
-            if T1 >= R + d:
+            if R + d <= T1:
                 cols.append(centers_plain(a, t, 1 << seed_pos(a, t, R, d)))
         if refine_masks(cols, a):
             return R
@@ -198,10 +199,11 @@ def late_col(a: int, t: int, r: int) -> int:
     return X % (1 << (1 << a))
 
 
-def late_check(a: int, t: int, Rmax: int) -> bool:
-    """`lateCheck`: the columns of the last m steps, from every value of the left cells after the white stretch."""
-    m = min(t, (a + 1) // 2 + Rmax + 1)
-    return refine_masks([late_col(a, m, nevo(r, t - m)) for r in probe_list(a, t, Rmax)], a)
+def late_check(a: int, t: int, r_max: int) -> bool:
+    """`lateCheck`: the columns of the last m steps, from every value of the left cells after the white stretch,
+    with the probes R <= r_max (the module's Rmax)."""
+    m = min(t, (a + 1) // 2 + r_max + 1)
+    return refine_masks([late_col(a, m, nevo(r, t - m)) for r in probe_list(a, t, r_max)], a)
 
 
 def lean_params(a: int, tmax: int) -> tuple[int, int, int, int, int]:

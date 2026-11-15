@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from computations.right_edge_density import T, seed_rows, step_slack, strip_counts
+from computations.right_edge_density import right_step, seed_rows, step_slack, strip_counts
 
 
 def test_codes_are_rule30_rows() -> None:
@@ -24,7 +24,7 @@ def test_codes_are_rule30_rows() -> None:
 
 def test_slack_and_bounds() -> None:
     assert [step_slack(J) for J in range(1, 10)] == [-2] * 9  # the Lean bound 3W + 2W' >= 2J - 2, attained
-    assert T(1, 4) == 0b111
+    assert right_step(1, 4) == 0b111
     for J, L, k, black, white in strip_counts(12):
         assert black + white == J * L
         assert 2 * black >= L * (2 + k) and 2 * white >= L * k  # doubling diagonals, half black each

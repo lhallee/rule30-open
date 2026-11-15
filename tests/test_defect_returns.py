@@ -6,12 +6,12 @@ vectors."""
 from __future__ import annotations
 
 import random
-
 import numpy as np
 
 from computations import defect_potential as dp
 from computations import defect_returns as dr
 from computations.held_shift import defect_tops
+
 
 CLOSED = dp.closed_strips(dp.STRIP)
 

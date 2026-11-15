@@ -18,11 +18,12 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
-from computations.game import bad_pairs, least_rotation
+from computations.cyclic_words import least_array_period, least_rotation
+from computations.game import bad_pairs
 
 
 def ring_step(states: np.ndarray, cells: int) -> np.ndarray:
@@ -42,7 +43,7 @@ def orbits(cells: int) -> list[np.ndarray]:
     for _ in range(cells + 1):
         power = power[power]  # 2^(M + 1) steps exceed every transient
     seen = np.zeros(size, dtype=bool)  # (2^M,)
-    found = []
+    found: list[np.ndarray] = []  # each (L,), L the length of its orbit
     for state in np.unique(power).tolist():
         if seen[state]:
             continue
@@ -53,14 +54,7 @@ def orbits(cells: int) -> list[np.ndarray]:
         for r in range(cells):
             seen[((states << r) | (states >> (cells - r))) & (size - 1)] = True
         found.append(states)
-    return found
-
-
-def least_period(column: np.ndarray) -> int:
-    """The least period of a cyclic sequence."""
-    # column: (L,)
-    return next(p for p in range(1, column.size + 1) if column.size % p == 0 and
-                np.array_equal(column, np.roll(column, p)))
+    return found  # each (L,)
 
 
 def witnessed(max_cells: int, max_block: int) -> tuple[dict[str, int], list[int]]:
@@ -68,14 +62,14 @@ def witnessed(max_cells: int, max_block: int) -> tuple[dict[str, int], list[int]
     while the column left of it breaks that period, each with the least ring that shows it, and the number of orbits
     up to rotation on each ring from 1 cell."""
     found: dict[str, int] = {}
-    counts = []
+    counts: list[int] = []
     for cells in tqdm(range(1, max_cells + 1), desc="rings", file=sys.stderr, mininterval=5):
         reps = orbits(cells)
         counts.append(len(reps))
         for states in reps:
             columns = (states[:, None] >> np.arange(cells)[None, :]) & 1  # (L, M), column x at index x
             for x in range(cells):
-                period = least_period(columns[:, x])
+                period = least_array_period(columns[:, x])
                 left = columns[:, (x - 1) % cells]  # (L,)
                 if period <= max_block and not np.array_equal(left, np.roll(left, period)):
                     block = least_rotation("".join(str(int(v)) for v in columns[:period, x]))

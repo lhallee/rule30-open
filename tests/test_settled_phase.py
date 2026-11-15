@@ -5,7 +5,6 @@ identity on random finite rows, and the latch entropy against enumeration and it
 from __future__ import annotations
 
 import math
-
 import numpy as np
 
 from computations import settled_phase as s
@@ -102,6 +101,7 @@ def test_shift_is_not_fixed_by_the_first_20_values_but_by_the_first_30() -> None
     skeleton = s.quadrant_diagonals(s.seed_left(), center_column(n), depth)  # (depth, n)
 
     def shift(driver: np.ndarray) -> int | None:
+        # driver: (n,)
         return s.skeleton_shift(s.quadrant_diagonals(s.seed_left(), driver, depth), skeleton, range(70, 100), 40, 8)
 
     rng = np.random.default_rng(1)

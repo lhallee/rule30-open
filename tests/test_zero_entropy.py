@@ -5,7 +5,6 @@ walks."""
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import game
