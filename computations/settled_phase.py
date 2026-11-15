@@ -29,11 +29,12 @@ import argparse
 import itertools
 import math
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.rule30 import center_column, step
+
 
 DRIVER_BLOCKS = ("10", "100", "110", "1101", "10110", "1011100", "10000000")
 
@@ -186,7 +187,7 @@ def prefix_shift_trials(
     skeleton = quadrant_diagonals(seed_left(), center_column(n), depth)  # (depth, n)
     rng = np.random.default_rng(seed)
     out: dict[int, int] = {}
-    for m in tqdm(prefixes, file=sys.stderr):
+    for m in tqdm(prefixes, desc="prefix lengths", file=sys.stderr):
         split = 0
         for _ in range(groups):
             base = rng.integers(0, 2, n).astype(np.uint8)  # (n,)
@@ -213,14 +214,14 @@ def grafted_shifts(
     skeleton = quadrant_diagonals(seed_left(), column, depth)  # (depth, n)
     periods = [period_and_onset(skeleton[d], d) for d in range(depth)]
     out: dict[int, list[tuple[int | None, bool, bool]]] = {}
-    for onset in tqdm(onsets, file=sys.stderr):
+    for onset in tqdm(onsets, desc="onsets", file=sys.stderr):
         row: list[tuple[int | None, bool, bool]] = []
         for block in blocks:
             driver = column.copy()  # (n,)
             driver[onset:] = periodic_driver(block, n - onset, int(block[0]))
             diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
             found = [period_and_onset(diagonals[d], d) for d in range(depth)]
-            same = all(f is not None and p is not None and f[0] == p[0] for f, p in zip(found, periods))
+            same = all(f is not None and p is not None and f[0] == p[0] for f, p in zip(found, periods, strict=True))
             changed = not np.array_equal(diagonals[onset:], skeleton[onset:])
             row.append((skeleton_shift(diagonals, skeleton, range(70, 100), 40, 16), same, changed))
         out[onset] = row
@@ -255,10 +256,10 @@ def main(argv: list[str] | None = None) -> None:
     seed_periods = [period_and_onset(skeleton[d], d) for d in range(depth)]
     print(f"single cell's left part, diagonals 0..{depth - 1}, times 0..{n - 1}")
     print("driver       same periods  max onset age  shift on depths 70..99")
-    for name, driver in tqdm(drivers.items(), file=sys.stderr):
+    for name, driver in tqdm(drivers.items(), desc="drivers", file=sys.stderr):
         diagonals = quadrant_diagonals(seed_left(), driver, depth)  # (depth, n)
         found = [period_and_onset(diagonals[d], d) for d in range(depth)]
-        same = all(f is not None and s is not None and f[0] == s[0] for f, s in zip(found, seed_periods))
+        same = all(f is not None and s is not None and f[0] == s[0] for f, s in zip(found, seed_periods, strict=True))
         age = max(f[1] - d for d, f in enumerate(found) if f is not None)
         shift = skeleton_shift(diagonals, skeleton, range(70, 100), 40, 16)
         print(f"{name:12s} {str(same):13s} {age:13d}  {shift}")

@@ -24,6 +24,7 @@ import sys
 
 from tqdm.auto import tqdm
 
+
 State = tuple[int, int]  # (b_(e-1), b_e): two L-bit words, bit t of a word is the column at time t
 
 

@@ -26,16 +26,17 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 
 def left_step(s: np.ndarray, n: int) -> np.ndarray:
-    """G_n on states s (shape (k,), int64, bit d is diagonal d); returns shape (k,)."""
+    """G_n on states s (int64, bit d is diagonal d)."""
+    # s: (k,)
     mask = (1 << n) - 1
-    return ((s << 2) ^ ((s << 1) | s)) & mask
+    return ((s << 2) ^ ((s << 1) | s)) & mask  # (k,)
 
 
 def limit_set(n: int) -> tuple[np.ndarray, int]:
@@ -45,13 +46,14 @@ def limit_set(n: int) -> tuple[np.ndarray, int]:
     while True:
         nxt = np.unique(left_step(cur, n))  # (m',) the image is a subset of cur, since bit 0 is kept
         if len(nxt) == len(cur):
-            return nxt, steps
+            return nxt, steps  # (m,)
         cur = nxt
         steps += 1
 
 
 def cycle_lengths(states: np.ndarray, n: int) -> list[int]:
-    """Cycle lengths of G_n on its limit set `states` (sorted, shape (m,)), which it permutes."""
+    """Cycle lengths of G_n on its limit set `states` (sorted), which it permutes."""
+    # states: (m,)
     nxt = np.searchsorted(states, left_step(states, n))  # (m,) index of the image of each state
     if not np.array_equal(states[nxt], left_step(states, n)):
         raise ValueError("not closed under the step")
@@ -88,6 +90,9 @@ def seed_cycle(n: int) -> tuple[set[int], int]:
 
 @dataclass
 class Level:
+    """One row of the table: the number n of diagonals, the size of the limit set, the steps to reach it, the cycle
+    lengths, the seed's cycle length and onset, and whether the limit set is the seed's cycle alone."""
+
     n: int
     size: int
     settle: int
@@ -98,6 +103,7 @@ class Level:
 
 
 def table(nmax: int, progress: bool = True) -> list[Level]:
+    """The levels n = 2 .. nmax."""
     rows: list[Level] = []
     for n in tqdm(range(2, nmax + 1), desc="levels", unit="n", file=sys.stderr, disable=not progress):
         states, settle = limit_set(n)

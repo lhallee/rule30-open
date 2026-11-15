@@ -15,6 +15,49 @@ import argparse
 from computations.strip_cycle_mean import potential
 
 
+PREAMBLE = '''module
+
+public import Ruliology.CellularAutomata.Rule30Jen
+
+/-!
+# Strips of five to nine adjacent columns of every orbit are at least 2/5 white
+
+For `J = 5, 6, 7, 8, 9`, in every orbit of Rule 30 (any initial row), the strip of columns
+`a .. a + J - 1` has at least `(2 J n - C_J) / 5` white cells at the times `0 .. n - 1`
+(`stripJ_white`). The proof telescopes in time with a potential on the strip's own cells, a table
+found by shortest paths: `tabJ(next) + 2 J ≤ tabJ(now) + 5 (white cells of the strip)` for every
+value of the strip and of the two cells beside it (`stepJ`, by `decide`). Splitting off strips of
+width 5, every strip of `J ≥ 5` columns has `5 W ≥ 2 J (n - 1)` (`strip_white_ge5`), so lower white
+density at least `2/5`; the orbit of `(11001)^∞` attains `2/5` (`StripWhiteDensity.md`).
+
+The natural-language argument is `StripWhiteDensity.md`, beside this file.
+-/
+
+@[expose] public section
+
+namespace Rule30Open
+namespace StripWhiteDensity
+
+open Ruliology.CellularAutomata.Rule30Jen
+
+/-- `1` for a white cell. -/
+def wh (b : Bool) : Nat := if b then 0 else 1
+
+/-- The bit `1` for a black cell. -/
+def bit (b : Bool) : Nat := if b then 1 else 0
+
+/-- One Rule 30 step of a row. -/
+def step (x : Int → Bool) : Int → Bool := fun p => rule (x (p - 1)) (x p) (x (p + 1))
+
+/-- An orbit of Rule 30: any sequence of rows, each the image of the one before. -/
+def IsOrbit (f : Nat → Int → Bool) : Prop := ∀ t, f (t + 1) = step (f t)
+
+theorem nxt (f : Nat → Int → Bool) (hf : IsOrbit f) (n : Nat) (a : Int) (i : Nat) :
+    f (n + 1) (a + (i : Int)) = rule (f n (a + (i : Int) - 1)) (f n (a + (i : Int))) (f n (a + (i : Int) + 1)) := by
+  rw [hf n]; rfl
+'''
+
+
 GENERAL = r'''
 /-! ### Every width from 5 on -/
 
@@ -101,6 +144,11 @@ theorem strip_white_ge5 (f : Nat → Int → Bool) (hf : IsOrbit f) :
       omega
 '''
 
+CLOSING = '''
+end StripWhiteDensity
+end Rule30Open
+'''
+
 
 def table(J: int) -> list[int]:
     """The potential of width J at the cycle mean 2/5, indexed by the strip read as a binary number."""
@@ -108,138 +156,119 @@ def table(J: int) -> list[int]:
     return [phi[i] for i in range(1 << J)]
 
 
-def _emit(Js: list[int]) -> str:
-    """The module text: a fixed preamble, then one block per width (table, step lemma, telescoping sum)."""
-    out = ['''module
+def cell(t: str, i: int) -> str:
+    """The Lean term for the cell of column a + i at time t."""
+    return f"(f {t} (a + ({i} : Nat)))"
 
-public import Ruliology.CellularAutomata.Rule30Jen
 
-/-!
-# Strips of five to nine adjacent columns of every orbit are at least 2/5 white
+def strip_cells(t: str, J: int) -> str:
+    """The Lean terms for the J cells of the strip at time t, separated by spaces."""
+    return " ".join(cell(t, i) for i in range(J))
 
-For `J = 5, 6, 7, 8, 9`, in every orbit of Rule 30 (any initial row), the strip of columns
-`a .. a + J - 1` has at least `(2 J n - C_J) / 5` white cells at the times `0 .. n - 1`
-(`stripJ_white`). The proof telescopes in time with a potential on the strip's own cells, a table
-found by shortest paths: `tabJ(next) + 2 J ≤ tabJ(now) + 5 (white cells of the strip)` for every
-value of the strip and of the two cells beside it (`stepJ`, by `decide`). Splitting off strips of
-width 5, every strip of `J ≥ 5` columns has `5 W ≥ 2 J (n - 1)` (`strip_white_ge5`), so lower white
-density at least `2/5`; the orbit of `(11001)^∞` attains `2/5` (`StripWhiteDensity.md`).
 
-The natural-language argument is `StripWhiteDensity.md`, beside this file.
--/
+def neighbors(i: int, J: int) -> tuple[str, str]:
+    """The Lean terms for the left and right neighbors at time n of column a + i of a strip of width J; the cells
+    beside the strip are written `a + 0 - 1` and `a + (J - 1) + 1`."""
+    left = "(f n (a + (0 : Nat) - 1))" if i == 0 else cell("n", i - 1)
+    right = f"(f n (a + ({J - 1} : Nat) + 1))" if i == J - 1 else cell("n", i + 1)
+    return left, right
 
-@[expose] public section
 
-namespace Rule30Open
-namespace StripWhiteDensity
+def next_cell_proofs(J: int) -> str:
+    """The `have c<i>` steps of `aux<J>`: each cell at time n + 1 as the rule applied to its cells at time n."""
+    lines: list[str] = []
+    for i in range(J):
+        left, right = neighbors(i, J)
+        lines.append(f"      have c{i} : f (n + 1) (a + ({i} : Nat)) = rule {left} {cell('n', i)} {right} := by")
+        lines.append(f"        rw [nxt f hf n a {i}]")
+        rewrites: list[str] = []
+        if i > 0:
+            lines.append(f"        have u : a + (({i} : Nat) : Int) - 1 = a + (({i - 1} : Nat) : Int) := by omega")
+            rewrites.append("u")
+        if i < J - 1:
+            lines.append(f"        have v : a + (({i} : Nat) : Int) + 1 = a + (({i + 1} : Nat) : Int) := by omega")
+            rewrites.append("v")
+        if rewrites:
+            lines.append(f"        rw [{', '.join(rewrites)}]")
+    return "\n".join(lines)
 
-open Ruliology.CellularAutomata.Rule30Jen
 
-/-- `1` for a white cell. -/
-def wh (b : Bool) : Nat := if b then 0 else 1
-
-/-- The bit `1` for a black cell. -/
-def bit (b : Bool) : Nat := if b then 1 else 0
-
-/-- One Rule 30 step of a row. -/
-def step (x : Int → Bool) : Int → Bool := fun p => rule (x (p - 1)) (x p) (x (p + 1))
-
-/-- An orbit of Rule 30: any sequence of rows, each the image of the one before. -/
-def IsOrbit (f : Nat → Int → Bool) : Prop := ∀ t, f (t + 1) = step (f t)
-
-theorem nxt (f : Nat → Int → Bool) (hf : IsOrbit f) (n : Nat) (a : Int) (i : Nat) :
-    f (n + 1) (a + (i : Int)) = rule (f n (a + (i : Int) - 1)) (f n (a + (i : Int))) (f n (a + (i : Int) + 1)) := by
-  rw [hf n]; rfl
-''']
-    for J in Js:
-        tab=table(J); C=max(tab)
-        bs=[f"b{i}" for i in range(J)]
-        idx=" + ".join(f"{1<<(J-1-i)} * bit b{i}" for i in range(J))
-        nexts=[f"(rule l b0 b1)"]+[f"(rule b{i-1} b{i} b{i+1})" for i in range(1,J-1)]+[f"(rule b{J-2} b{J-1} r)"]
-        whs=" + ".join(f"wh b{i}" for i in range(J))
-        C_=lambda i: f"(f n (a + ({i} : Nat)))"
-        L0="(f n (a + (0 : Nat) - 1))"; R0=f"(f n (a + ({J-1} : Nat) + 1))"
-        left=lambda i: L0 if i==0 else C_(i-1)
-        right=lambda i: R0 if i==J-1 else C_(i+1)
-        nexts_n=[f"(rule {left(i)} {C_(i)} {right(i)})" for i in range(J)]
-        eqlines=[]
-        for i in range(J):
-            eqlines.append(f"      have c{i} : f (n + 1) (a + ({i} : Nat)) = rule {left(i)} {C_(i)} {right(i)} := by")
-            eqlines.append(f"        rw [nxt f hf n a {i}]")
-            if i>0: eqlines.append(f"        have u : a + (({i} : Nat) : Int) - 1 = a + (({i-1} : Nat) : Int) := by omega")
-            if i<J-1: eqlines.append(f"        have v : a + (({i} : Nat) : Int) + 1 = a + (({i+1} : Nat) : Int) := by omega")
-            rw=[x for x,c in (("u",i>0),("v",i<J-1)) if c]
-            if rw: eqlines.append(f"        rw [{', '.join(rw)}]")
-        eqs="\n".join(eqlines)
-        cells=lambda t: " ".join(f"(f {t} (a + ({i} : Nat)))" for i in range(J))
-        out.append(f'''
+def width_block(J: int) -> str:
+    """The Lean text for one width: the table, its bound, the step lemma, and the telescoping sum."""
+    tab = table(J)
+    bound = max(tab)
+    bits = " ".join(f"b{i}" for i in range(J))
+    index = " + ".join(f"{1 << (J - 1 - i)} * bit b{i}" for i in range(J))
+    next_bits = " ".join(
+        ["(rule l b0 b1)"] + [f"(rule b{i - 1} b{i} b{i + 1})" for i in range(1, J - 1)] + [f"(rule b{J - 2} b{J - 1} r)"]
+    )
+    whites = " + ".join(f"wh b{i}" for i in range(J))
+    next_cells = " ".join(f"(rule {neighbors(i, J)[0]} {cell('n', i)} {neighbors(i, J)[1]})" for i in range(J))
+    cells_n = strip_cells("n", J)
+    return f'''
 /-! ### Width {J} -/
 
 /-- The potential table for width {J}, indexed by the strip read from the left as a binary number. -/
 def tab{J} : List Nat := {tab}
 
 /-- The potential of a strip of width {J}. -/
-def phi{J} ({" ".join(bs)} : Bool) : Nat := tab{J}.getD ({idx}) 0
+def phi{J} ({bits} : Bool) : Nat := tab{J}.getD ({index}) 0
 
 set_option maxRecDepth 100000 in
-theorem phi{J}_le ({" ".join(bs)} : Bool) : phi{J} {" ".join(bs)} ≤ {C} := by
-  revert {" ".join(bs)}
+theorem phi{J}_le ({bits} : Bool) : phi{J} {bits} ≤ {bound} := by
+  revert {bits}
   decide
 
 set_option maxRecDepth 100000 in
 /-- **One step for width {J}**, whatever the cells `l` and `r` beside the strip. -/
-theorem step{J} (l {" ".join(bs)} r : Bool) :
-    phi{J} {" ".join(nexts)} + {2*J} ≤ phi{J} {" ".join(bs)} + 5 * ({whs}) := by
-  revert l {" ".join(bs)} r
+theorem step{J} (l {bits} r : Bool) :
+    phi{J} {next_bits} + {2 * J} ≤ phi{J} {bits} + 5 * ({whites}) := by
+  revert l {bits} r
   decide
 
-/-- White cells of the columns `a .. a + {J-1}` at the times `0 .. n - 1`. -/
+/-- White cells of the columns `a .. a + {J - 1}` at the times `0 .. n - 1`. -/
 def W{J} (f : Nat → Int → Bool) (a : Int) : Nat → Nat
   | 0 => 0
-  | n + 1 => W{J} f a n + ({" + ".join(f"wh (f n (a + ({i} : Nat)))" for i in range(J))})
+  | n + 1 => W{J} f a n + ({" + ".join(f"wh {cell('n', i)}" for i in range(J))})
 
 /-- The potential at time `n`. -/
-def pot{J} (f : Nat → Int → Bool) (a : Int) (n : Nat) : Nat := phi{J} {cells("n")}
+def pot{J} (f : Nat → Int → Bool) (a : Int) (n : Nat) : Nat := phi{J} {cells_n}
 
 theorem aux{J} (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) :
-    ∀ n, {2*J} * n + pot{J} f a n ≤ pot{J} f a 0 + 5 * W{J} f a n
+    ∀ n, {2 * J} * n + pot{J} f a n ≤ pot{J} f a 0 + 5 * W{J} f a n
   | 0 => by simp [W{J}]
   | n + 1 => by
     have ih := aux{J} f hf a n
-    have h := step{J} (f n (a + (0 : Nat) - 1)) {cells("n")} (f n (a + ({J-1} : Nat) + 1))
-    have hp : pot{J} f a (n + 1) = phi{J} {" ".join(nexts_n)} := by
+    have h := step{J} (f n (a + (0 : Nat) - 1)) {cells_n} (f n (a + ({J - 1} : Nat) + 1))
+    have hp : pot{J} f a (n + 1) = phi{J} {next_cells} := by
       unfold pot{J}
-{eqs}
+{next_cell_proofs(J)}
       rw [{",".join(f"c{i}" for i in range(J))}]
-    have hq : pot{J} f a n = phi{J} {cells("n")} := rfl
+    have hq : pot{J} f a n = phi{J} {cells_n} := rfl
     simp only [W{J}]
     omega
 
-/-- **Every strip of {J} adjacent columns of every orbit**: `5 W ≥ {2*J} n - {C}`. -/
+/-- **Every strip of {J} adjacent columns of every orbit**: `5 W ≥ {2 * J} n - {bound}`. -/
 theorem strip{J}_white (f : Nat → Int → Bool) (hf : IsOrbit f) (a : Int) (n : Nat) :
-    {2*J} * n ≤ 5 * W{J} f a n + {C} := by
+    {2 * J} * n ≤ 5 * W{J} f a n + {bound} := by
   have h := aux{J} f hf a n
-  have : pot{J} f a 0 ≤ {C} := phi{J}_le _ {" ".join("_" for _ in range(J-1))}
+  have : pot{J} f a 0 ≤ {bound} := phi{J}_le _ {" ".join("_" for _ in range(J - 1))}
   omega
-''')
-    out.append(GENERAL)
-    out.append('''
-end StripWhiteDensity
-end Rule30Open
-''')
-    return ''.join(out)
+'''
 
 
 def emit_lean(Js: list[int] | None = None) -> str:
-    """The text of Rule30Open/Foundations/StripWhiteDensity.lean for the widths Js (default 5 to 9)."""
-    return _emit(Js if Js is not None else [5, 6, 7, 8, 9])
+    """The text of Rule30Open/Foundations/StripWhiteDensity.lean for the widths Js (default 5 to 9): the preamble, one
+    block per width, the general theorem, and the closing lines."""
+    widths = Js if Js is not None else [5, 6, 7, 8, 9]
+    return PREAMBLE + "".join(width_block(J) for J in widths) + GENERAL + CLOSING
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--tables", type=int, nargs="*")
-    ap.add_argument("--emit-lean", action="store_true")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--tables", type=int, nargs="*")
+    parser.add_argument("--emit-lean", action="store_true")
+    args = parser.parse_args()
     if args.emit_lean:
         print(emit_lean(), end="")
     for J in args.tables or []:

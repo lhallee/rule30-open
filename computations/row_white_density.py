@@ -24,16 +24,16 @@ light-cone triangle.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 
 def step(row: np.ndarray) -> np.ndarray:
     """Rule 30 on a window: cell i of the result is row[i] xor (row[i + 1] or row[i + 2]), cells 1..len-2 of row."""
-    # row: (L,) uint8 -> result: (L - 2,) uint8
-    return row[:-2] ^ (row[1:-1] | row[2:])
+    # row: (L,) uint8
+    return row[:-2] ^ (row[1:-1] | row[2:])  # (L - 2,) uint8
 
 
 def black_runs(row: np.ndarray) -> list[tuple[int, int]]:
@@ -43,7 +43,7 @@ def black_runs(row: np.ndarray) -> list[tuple[int, int]]:
     d = np.diff(padded)  # (L + 1,)
     starts = np.flatnonzero(d == 1)  # (r,)
     ends = np.flatnonzero(d == -1) - 1  # (r,)
-    return list(zip(starts.tolist(), ends.tolist()))
+    return list(zip(starts.tolist(), ends.tolist(), strict=True))
 
 
 def run_white_bound(row: np.ndarray) -> list[tuple[int, int]]:
@@ -114,6 +114,8 @@ def triangle_area(k: int) -> int:
 
 @dataclass
 class TriangleCounts:
+    """The counts of the single cell's rows 0..n-1 on their cells -t..t."""
+
     B: np.ndarray  # (n,) black cells of row t on -t..t
     W: np.ndarray  # (n,) white cells of row t on -t..t
     M: np.ndarray  # (n,) longest black run of row t
@@ -122,14 +124,13 @@ class TriangleCounts:
 
 def single_cell_rows(n: int) -> np.ndarray:
     """Rows 0..n-1 of the single cell on cells -n..n."""
-    # result: (n, 2 n + 1) uint8, column n is cell 0
-    rows = np.zeros((n, 2 * n + 1), dtype=np.uint8)
+    rows = np.zeros((n, 2 * n + 1), dtype=np.uint8)  # (n, 2 n + 1), column n is cell 0
     row = np.zeros(2 * n + 5, dtype=np.uint8)  # (2 n + 5,) cell 0 at index n + 2
     row[n + 2] = 1
     for t in range(n):
         rows[t] = row[2:-2]
-        row = np.concatenate(([0], step(row), [0]))
-    return rows
+        row = np.concatenate(([0], step(row), [0]))  # (2 n + 5,)
+    return rows  # (n, 2 n + 1)
 
 
 def triangle_counts(n: int, progress: bool = True) -> TriangleCounts:
@@ -180,19 +181,18 @@ def main() -> None:
     tc = triangle_counts(n)
     A = np.cumsum(tc.B)  # (n,) black cells of rows < t + 1
     Wt = np.cumsum(tc.W)  # (n,)
-    Tsum = np.cumsum(tc.T)  # (n,)
-    Mmax = np.maximum.accumulate(tc.M)  # (n,)
+    area_sums = np.cumsum(tc.T)  # (n,) the sums of T over the rows < t + 1
+    longest = np.maximum.accumulate(tc.M)  # (n,) the longest black run of the rows < t + 1
     slack = 3 * tc.W[:-1] + 6 - 2 * tc.B[1:]  # (n - 1,) slack of row_pair at s = 0..n-2
     # M_n over the rows 0..n-2, checked at every n from 2 to the requested n
-    bound_ok = all(int(A[t]) * (int(Mmax[t - 1]) + 3) >= 2 * (t + 1) ** 2 for t in range(1, n))
+    bound_ok = all(int(A[t]) * (int(longest[t - 1]) + 3) >= 2 * (t + 1) ** 2 for t in range(1, n))
     print(f"rows 0..{n - 1}")
     for t in sorted({t for t in (99, 299, 999, 1999, n - 1) if t < n}):
-        if True:
-            m = t + 1
-            print(f"n={m}: black {A[t] / m**2:.5f}, white {Wt[t] / m**2:.5f}, white bound 2(n-1)(n-2)/5 = "
-                  f"{2 * (m - 1) * (m - 2) / 5 / m**2:.5f}, longest black run of rows < n-1 {Mmax[t - 1]}, "
-                  f"sum T over runs of rows < n-1 {Tsum[t - 1]} >= white {Wt[t]}: {Tsum[t - 1] >= Wt[t]}, "
-                  f"2n^2/(M+3) = {2 * m * m / (Mmax[t - 1] + 3):.0f} <= black {A[t]}")
+        m = t + 1
+        print(f"n={m}: black {A[t] / m**2:.5f}, white {Wt[t] / m**2:.5f}, white bound 2(n-1)(n-2)/5 = "
+              f"{2 * (m - 1) * (m - 2) / 5 / m**2:.5f}, longest black run of rows < n-1 {longest[t - 1]}, "
+              f"sum T over runs of rows < n-1 {area_sums[t - 1]} >= white {Wt[t]}: {area_sums[t - 1] >= Wt[t]}, "
+              f"2n^2/(M+3) = {2 * m * m / (longest[t - 1] + 3):.0f} <= black {A[t]}")
     print(f"A(n)(M_n + 3) >= 2n^2 for every 2 <= n <= {n}: {bound_ok}")
     print(f"slack 3 W(s) + 6 - 2 B(s+1) is 0 at s = {[int(s) for s in np.flatnonzero(slack == 0)]}, "
           f"least over 3 <= s <= {n - 2}: {int(slack[3:].min())}")
@@ -203,7 +203,7 @@ def main() -> None:
     tot = [0, 0, 0]
     for s in range(1, rows.shape[0]):
         r = chain_check(rows[s - 1], rows[s][1:-1])
-        tot = [a + b for a, b in zip(tot, r)]
+        tot = [a + b for a, b in zip(tot, r, strict=True)]
     print(f"white runs of rows 1..{rows.shape[0] - 1}: continuations {tot[0]}, newborn {tot[1]}, other {tot[2]}")
 
 

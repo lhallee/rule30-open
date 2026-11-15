@@ -4,6 +4,7 @@ Right-edge frame: bit e of the code at time t is the cell e places left of the r
 and T(y)_e = y_e xor (y_{e-1} or y_{e-2}) (y_{-1} = y_{-2} = 0).
 
 - `step_slack`: least value of 3 W_J(c) + 2 W_J(T c) - 2 J over all codes of J bits (W_J: white bits among 0 .. J-1).
+- `right_step`: T on the n low bits of a code.
 - `seed_rows`: the codes of the single cell, T^t(1), as bit arrays.
 - `strip_counts`: for each J, the period L_J of bits 0 .. J-1, the number k of doublings among diagonals 1 .. J-1
   (L_J = 2^k), and the black and white cells of diagonals 0 .. J-1 over one period, with the bounds
@@ -16,17 +17,23 @@ from __future__ import annotations
 
 import numpy as np
 
+from computations.cyclic_words import least_array_period
 
-def T(y: int, n: int) -> int:
-    """One step on the n low bits of a code."""
+
+STEPS = 1 << 14  # the times read; a power of two, so every least period of a column divides it
+
+
+def right_step(y: int, n: int) -> int:
+    """T, one step on the n low bits of a code."""
     return (y ^ ((y << 1) | (y << 2))) & ((1 << n) - 1)
 
 
 def step_slack(J: int) -> int:
+    """The least 3 W_J(c) + 2 W_J(T c) - 2 J over the codes c of J bits."""
     best = 10 ** 9
     for c in range(1 << J):
         w0 = J - bin(c).count("1")
-        w1 = J - bin(T(c, J)).count("1")
+        w1 = J - bin(right_step(c, J)).count("1")
         best = min(best, 3 * w0 + 2 * w1 - 2 * J)
     return best
 
@@ -37,26 +44,16 @@ def seed_rows(n: int, steps: int) -> np.ndarray:
     y = 1
     for t in range(steps):
         out[t] = [(y >> e) & 1 for e in range(n)]
-        y = T(y, n)
-    return out
+        y = right_step(y, n)
+    return out  # (steps, n)
 
 
-def least_period(col: np.ndarray) -> int:
-    """Least p (a power of two dividing len(col)) with col periodic of period p; col has shape (m,)."""
-    m = len(col)
-    p = 1
-    while p < m and not np.array_equal(col, np.roll(col, -p)):
-        p *= 2
-    return p
-
-
-def strip_counts(Jmax: int) -> list[tuple[int, int, int, int, int]]:
-    """Rows (J, L_J, k, black, white) for J = 1 .. Jmax."""
-    steps = 1 << 14
-    rows = seed_rows(Jmax, steps)  # (steps, Jmax)
-    per = [least_period(rows[:, e]) for e in range(Jmax)]
+def strip_counts(J_max: int) -> list[tuple[int, int, int, int, int]]:
+    """Rows (J, L_J, k, black, white) for J = 1 .. J_max."""
+    rows = seed_rows(J_max, STEPS)  # (STEPS, J_max)
+    per = [least_array_period(rows[:, e]) for e in range(J_max)]
     out = []
-    for J in range(1, Jmax + 1):
+    for J in range(1, J_max + 1):
         L = max(per[:J])
         k = L.bit_length() - 1
         black = int(rows[:L, :J].sum())

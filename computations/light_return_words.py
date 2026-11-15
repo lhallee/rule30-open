@@ -22,6 +22,7 @@ import sys
 
 from tqdm.auto import tqdm
 
+
 State = tuple[int, int]  # (W_(e-1), W_e), bit t of a word is time t
 
 
@@ -137,7 +138,7 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--k-max", type=int, default=6)
     args = parser.parse_args(argv)
-    for k in tqdm(range(1, args.k_max + 1), file=sys.stderr):
+    for k in tqdm(range(1, args.k_max + 1), desc="periods", file=sys.stderr):
         L = 1 << k
         inner, odd, bad = fertility_counts(L)
         print(f"L = {L:3d}: tree from (P, P): (nodes, depth) = {branch_tree(L)}; inner nodes {inner}, "
