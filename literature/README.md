@@ -4,8 +4,8 @@ The published work around the three Rule 30 Prize problems, by theme. Every sour
 bibliographic record: a publisher or DOI page, an arXiv abstract, Crossref, Semantic Scholar, or the source itself. Each
 summary says only what that record or the source supports, an unrefereed claim is reported as a claim, and each entry
 says where the source bears on this repository. The search covers sources available on November 1, 2026; on that date
-arXiv, ECCC, Zenodo and the prize site were outside this session's network, so their newest records were seen only
-through search results, and each such entry says so.
+arXiv, ECCC, Zenodo and the prize site could not be reached from the network the search used, so their newest records
+were seen only through search results, and each such entry says so.
 
 | File | Problems | What it covers |
 |---|---|---|

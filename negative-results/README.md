@@ -9,4 +9,5 @@ has a `kind`:
 - `barrier`: a reason a whole class of approaches cannot work.
 
 A negative result is only as useful as its stopping point is precise. If you find a way past one, link your entry to it
-rather than deleting it. [CATALOG.md](../CATALOG.md) lists them all by category.
+rather than deleting it. [CATALOG.md](../CATALOG.md) lists them all by category, and [GLOSSARY.md](../GLOSSARY.md)
+defines the terms they use.

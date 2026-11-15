@@ -1,8 +1,24 @@
 # Computations
 
-Each module reproduces the numbers that one or more entries quote, runs as `python -m computations.<module>` from the
-repository root, and is checked by [tests/test_computations.py](../tests/test_computations.py). They need NumPy, SciPy
-and tqdm, and run on a laptop.
+Each module reproduces the numbers that one or more entries quote and runs as `python -m computations.<module>` from the
+repository root. To find the module behind an entry, read the `evidence` field of the entry's front matter, or find the
+entry in the table below. The entry's reproduce section gives the commands it ran. Most modules are checked by
+`tests/test_<module>.py` ([tests](../tests/README.md)); `channel_left`, `class_blocks`, `edge_game`,
+`lock_trap_lists` and `reading_modules` are checked from the tests of the modules that use them.
+
+What a module needs, from [pyproject.toml](../pyproject.toml):
+
+- **Every module.** Python 3.12 or later with NumPy, SciPy, PyYAML and tqdm, installed by
+  `python -m pip install -e .` from the repository root; add `.[test]` for pytest.
+- **The `topology` extra** (ripser and scikit-learn) for `persistence` and the learned projections of `projections`.
+- **The `sat` extra** (python-sat) for the SAT form of the late-onset search, `late_onset.sat_longest`.
+- **A C compiler** for the modules with a C program, listed [below](#c-programs). The module compiles the program on
+  first use through `compiled` in [c_programs.py](c_programs.py), which finds `cc` or `gcc` on the path and keeps the
+  binary in the temporary directory under a hash of the source, the compiler, the flags and the machine, so later runs
+  reuse it. Programs built with `-fopenmp` need a compiler with
+  OpenMP.
+
+The modules run on a laptop, and the Time column gives the time of each command, and its memory where that is large.
 
 | Module | Reproduces | Command | Time |
 |---|---|---|---|
@@ -12,6 +28,8 @@ and tqdm, and run on a laptop.
 | [left_cut.py](left_cut.py) | [The left cut](../negative-results/complexity/left-cut.md) and [LeftCut](../Rule30Open/Complexity/LeftCut.md): left-cut counts, stripe screening and the certificates | `python -m computations.left_cut --t 17 --k 15 --black 2`; `--t 20 --k 18 --family-count 2`; `--t 22 --stripes`; `--t 17 --lean` | 200 s; 5 min; 1 min; 15 s |
 | [min_certificate.py](min_certificate.py) | [MinCertificate](../Rule30Open/Complexity/MinCertificate.md) and [the routing lemma](../negative-results/complexity/min-certificate-routing.md) | `python -m computations.min_certificate --max-t 15 --controls-t 10 --routing-t 14 --stripe-t 16 --dp-t 8` | 8 min, 3 GB |
 | [rule30.py](rule30.py) | The center column and small spacetime diagrams | (library) | |
+| [cyclic_words.py](cyclic_words.py) | Words read cyclically: the least rotation and the least period | (library) | |
+| [c_programs.py](c_programs.py) | The C programs beside the modules, compiled once and kept for later processes | (library) | |
 | [game.py](game.py) | [The finite game](../Rule30Open/Columns/FiniteGame.md)'s certificates and [their bit-mask form](../Rule30Open/Columns/GameBlocks.md) ([to period 16](../Rule30Open/Columns/GameBlocksLong.md)), [the 197 excluded blocks](../findings/columns/game-blocks.md) with the 136 the kit lacks, and [Jen's theorem on farther columns](../negative-results/columns/jen-farther-columns.md) | `python -m computations.game --max-period 16`; `--min-period 17 --max-period 18 --workers 4` for [periods 17 and 18](../findings/columns/game-blocks-18.md), `--min-period 19 --max-period 20` for [19 and 20](../findings/columns/game-blocks-20.md) | 20 min; 17 min; 85 min |
 | [bit_game.py](bit_game.py) | [The game decided without a certificate](../Rule30Open/Columns/BitGame.md): the seven blocks with their parameters, and the same check on every block the game excludes | `python -m computations.bit_game` | 5 s |
 | [class_survey.py](class_survey.py) | [The game with cyclic classes on every primitive block of period 13 to 18](../findings/columns/class-blocks.md): which blocks it closes that the plain game does not, and which of those nothing else excludes | `python -m computations.class_survey --periods 13 16 --width 16 --workers 2`; `python -m computations.class_survey --periods 13 16 --width 17 --workers 2`; `python -m computations.class_survey --block 0000001011011 --width 16` | 18 min; 80 min; a few seconds |
@@ -37,6 +55,7 @@ and tqdm, and run on a laptop.
 | [coin_lock.py](coin_lock.py) | [A fair coin beyond the period-four certificate](../findings/columns/coin-lock.md) | `python -m computations.coin_lock 0001 0011 0111 --widths 14 16 18` | 17 s |
 | [lock_word.py](lock_word.py) | [One word in a column beside the center forces the period-four lock](../Rule30Open/Columns/LockWord.md): the three sequences, run on every window as bit slices, and [the windows beside an alternating center that no sequence brings in](../negative-results/period-two/absorption-route.md) | `python -m computations.lock_word`; `--reach 19 20 21`; `--entropy 13 14 15 16` | 3 s; 3 min; 1 min |
 | [locks.py](locks.py) | [Locks that every window can be steered into](../findings/columns/steerable-locks.md), block by block, with the sequences of [LockBlocks11](../Rule30Open/Columns/LockBlocks11.md) and [LockBlocks12](../Rule30Open/Columns/LockBlocks12.md), the white runs of [LockWhite](../Rule30Open/Columns/LockWhite.md), and [the periods with no locked window](../negative-results/columns/window-locks.md) | `python -m computations.locks --profile --workers 3`; `--white 4,5,6,7,8,9,10,11,12,13,14,15,16`; `--periods 2,3,5,6,7,9 --census 13,16,18` | 5 min; 40 min; 20 min |
+| [lock_trap_lists.py](lock_trap_lists.py) | The trap lists that `lock_chain` builds, checks and prints: the traps, walls, pairs and sets of the modules in `Rule30Open/Columns` | (library) | |
 | [lock_chain.py](lock_chain.py) | [Lock chains](../findings/columns/lock-chains.md): every locked window read as a seed's lock carried leftward, the kit's wall and its trap for 001 as chains, the traps of [WordTraps](../Rule30Open/Columns/WordTraps.md) and [NineTraps](../Rule30Open/Columns/NineTraps.md), the wall of period 9 found as the closure of a driven half's window, and [entry into the traps](../negative-results/columns/trap-entry.md) | `python -m computations.lock_chain --classify 4,8,10,11,12 --workers 3`; `--ether`; `--t001 --verify`; `--natural 2,3,5,6,7,9 --steps 20000`; `--nine --steps 20000`; `--entry trap001011111 --cells 8 --steps 50000`; `--lean` | 2 min; 1 min; 1 min; 5 min; 5 min; 15 min; 1 min |
 | [gap_traps.py](gap_traps.py) | [Reading constraints on column 1 beside a repeating center](../findings/columns/reading-constraints.md): traps that constrain column 1 without making it periodic | `python -m computations.gap_traps --survey 7 --width 14 --cells 10`; `python -m computations.gap_traps --block 001 --width 14 --forced`; `python -m computations.gap_traps --block 011 --width 16 --words 00 010 01110 011110 --cells 16` | 10 min; ; |
 | [reading_certificates.py](reading_certificates.py) | Rank certificates on the readings of column 1: [Runs00001](../Rule30Open/Columns/Runs00001.md) and the blocks of [ReadingWords](../Rule30Open/Columns/ReadingWords.md) | `python -m computations.reading_certificates --survey`; `python -m computations.reading_certificates --block 0011011 --phases 0 --width 10 --words 000 00111` | 20 min; |
@@ -140,3 +159,28 @@ and tqdm, and run on a laptop.
 Several entries quote numbers whose code is not in this repository: the pruned search over seed extensions, the
 period-two searches past support 24, the learned models, the automaton bounds, the coarse-graining closures and the
 invariant searches. Each such entry says so. A port to `computations/`, with a test, is a welcome contribution.
+
+## C programs
+
+Each C program serves the module beside it. All but one are compiled by the module on first use, and
+`held_shift_search.c` is compiled and run by hand, as the reproduce sections of [the shift
+model](../findings/period-two/shift-model.md) and [the structure of K](../findings/period-two/k-structure.md) show.
+
+| Program | Module | Built with OpenMP |
+|---|---|---|
+| [center_classes_census.c](center_classes_census.c) | [center_classes.py](center_classes.py) | no |
+| [doubling_gaps.c](doubling_gaps.c) | [doubling_gaps.py](doubling_gaps.py) | no |
+| [gap_inverse_runs.c](gap_inverse_runs.c) | [gap_inverse_runs.py](gap_inverse_runs.py) | yes |
+| [held_shift_search.c](held_shift_search.c) | [held_shift.py](held_shift.py) and [k_structure.py](k_structure.py) read its output | yes |
+| [letter_words.c](letter_words.c) | [letter_words.py](letter_words.py) | yes |
+| [light_line.c](light_line.c) | [light_line.py](light_line.py) | yes |
+| [query_adversary_sums.c](query_adversary_sums.c) | [query_adversary.py](query_adversary.py) | yes |
+| [query_evasive_sums.c](query_evasive_sums.c) | [query_evasive.py](query_evasive.py) | yes |
+| [relaxed_game.c](relaxed_game.c) | [relaxed_game.py](relaxed_game.py) | no |
+| [right_edge_runs.c](right_edge_runs.c) | [right_edge_runs.py](right_edge_runs.py) | no |
+| [seed_certificate_window.c](seed_certificate_window.c) | [seed_certificate.py](seed_certificate.py) | yes |
+| [seed_onsets_prune.c](seed_onsets_prune.c) | [seed_onsets.py](seed_onsets.py) | yes |
+| [seed_onsets_search.c](seed_onsets_search.c) | [seed_onsets.py](seed_onsets.py) | yes |
+| [stripe_classes.c](stripe_classes.c) | [stripe_classes.py](stripe_classes.py) | no |
+| [walk_eigen.c](walk_eigen.c) | [walk_eigen.py](walk_eigen.py) | no |
+| [wedge_hypotheses.c](wedge_hypotheses.c) | [wedge_hypotheses.py](wedge_hypotheses.py) | yes |

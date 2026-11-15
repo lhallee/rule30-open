@@ -126,11 +126,14 @@ between the order $\sqrt{n}$ that Paterson's theorem needs and the $\sqrt{n} \lo
 
 ## Where to start
 
-[ROADMAP.md](ROADMAP.md) groups every result by route, says which routes are closed and which are open, and lists
-the next steps. [CATALOG.md](CATALOG.md#open-work) lists the open work: conjectures to settle, and findings proved on
-paper or by computation that still want a Lean proof. Before starting
-in a category, read its negative results; each says where an approach stopped and why. [The literature](literature/README.md)
-collects what is published around the problems, from Jen's theorem to the claims made since 2019.
+Each page has one job. This README orients: what the project is, what is proved, where things are, and how to build and
+test. [ROADMAP.md](ROADMAP.md) groups every result by route, says which routes are closed and which are open, and lists
+the next steps. [CATALOG.md](CATALOG.md) is generated from the entries and lists every result, with the open work:
+conjectures to settle, and findings proved on paper or by computation that still want a Lean proof.
+[CONTRIBUTING.md](CONTRIBUTING.md) holds every rule and every how-to, from installing the tools to opening a pull
+request, and [AGENTS.md](AGENTS.md) adds what an AI agent needs beyond it. [GLOSSARY.md](GLOSSARY.md) defines the
+project's terms. [The literature](literature/README.md) collects what is published around the problems, from Jen's theorem to
+the claims made since 2019.
 
 ## Layout
 
@@ -140,15 +143,17 @@ collects what is published around the problems, from Jen's theorem to the claims
 | [`findings/<category>/`](findings/README.md) | Results proved on paper, computed, or conjectured, each with its evidence |
 | [`negative-results/<category>/`](negative-results/README.md) | What was tried and did not work, and why |
 | [`literature/`](literature/README.md) | The published work around the three problems, by theme, tied to the entries here |
-| [`computations/`](computations/README.md) | Python that reproduces the numbers the entries quote |
-| `tests/` | Each computation and each computable Lean statement against an independent check |
+| [`computations/`](computations/README.md) | Python, with a few C programs, that reproduces the numbers the entries quote |
+| [`tests/`](tests/README.md) | Each computation and each computable Lean statement against an independent check |
+| [`templates/`](templates/) | Starting files for each kind of entry, a computation, and its test |
 | [`ROADMAP.md`](ROADMAP.md) | The routes toward each problem, their status, and the next steps |
 | [`categories.yaml`](categories.yaml) | The categories, from foundations to complexity |
 | [`scripts/catalog.py`](scripts/catalog.py) | Checks every entry and generates [CATALOG.md](CATALOG.md) |
 
 ## Check it yourself
 
-Lean 4 (the version in [`lean-toolchain`](lean-toolchain)) with `lake`, and Python 3.12 or later:
+You need Lean 4 through elan (the version in [`lean-toolchain`](lean-toolchain)), Python 3.12 or later, and a C
+compiler, and [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites) says how to get each. Then, from the repository root:
 
 ```bash
 lake build
@@ -158,16 +163,17 @@ python -m pytest
 python scripts/catalog.py check
 ```
 
-`lake build` fetches the prize kit and checks every proof (under a minute after the first build). The audit prints the
-axioms of every headline theorem and fails on anything beyond `propext`, `Classical.choice` and `Quot.sound`. The
-source contains no `sorry`, `native_decide` or new axiom, which `catalog.py check` enforces. The tests run on your
-machine, on a CPU, not in continuous integration, which runs the build, the audit and the catalog check on every push;
-the whole suite runs in under a minute ([tests/README.md](tests/README.md)).
+`lake build` fetches the prize kit and checks every proof. The first build checks about 98 MB of Lean source and takes
+far longer than a rebuild, which takes under a minute. The audit prints the axioms of every headline theorem and fails
+on anything beyond the three the prize allows, and `catalog.py check` refuses `sorry`, `native_decide`, and new axioms
+in the source ([what is checked](CONTRIBUTING.md#what-is-checked)). Continuous integration runs the build, the audit, and
+the catalog check on every push and pull request. The tests run on your machine, on a CPU, and the whole suite is held
+to under a minute ([tests/README.md](tests/README.md)).
 
 ## Contributing
 
-Proofs, findings and negative results are all welcome; a well-documented dead end saves the next person weeks. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for the entry format and [AGENTS.md](AGENTS.md) for AI agents working here.
+Proofs, findings, and negative results are all welcome, and a well-documented dead end saves the next person weeks.
+[CONTRIBUTING.md](CONTRIBUTING.md#first-contribution) walks through a first contribution.
 
 ## License and citation
 

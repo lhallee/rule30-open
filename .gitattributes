@@ -1,0 +1,3 @@
+# Every text file checks out with LF endings on every platform, whatever core.autocrlf says: the tests compare Lean
+# text and the catalog is generated with LF. The repository holds no binary file; Git detects any added later by content.
+* text=auto eol=lf
