@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-
 import numpy as np
 
 from computations.two_index import (
@@ -34,7 +33,8 @@ def _phi(x: np.ndarray, mask: int) -> np.ndarray:
 
 def _bsub(m: np.ndarray, t: np.ndarray) -> np.ndarray:
     """Every binary digit of m is a digit of t (binom(t, m) odd, by Lucas)."""
-    return ((m & t) == m).astype(np.uint8)
+    # m, t: (...), integer arrays that broadcast together
+    return ((m & t) == m).astype(np.uint8)  # (...), their broadcast shape
 
 
 def test_cycle_lengths_against_phi_and_cells() -> None:
@@ -83,8 +83,6 @@ def test_rule90_time_column_sections() -> None:
     """Rule 90 in time and column, x >= 0, against the binomial coefficient, and its sections against the borrow
     form of `TwoIndex.st90_sect_succ`."""
     size = 64
-    t = np.arange(size)[:, None]  # (64, 1)
-    x = np.arange(size)[None, :]  # (1, 64)
     full = diagonal_array(90, 2 * size, size)  # (128, 64), cell(t, t - j) at [j, t]
     cells = np.zeros((size, size), dtype=np.uint8)  # (64, 64), cell(t, x) at [t, x]
     for tt in range(size):

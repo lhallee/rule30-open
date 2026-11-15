@@ -39,23 +39,23 @@ def test_census_against_cells() -> None:
     """The single cell's census over 48 steps, blocks of 5 cells and periods up to 3, is the cell-by-cell census inside
     the light cone."""
     steps, side, max_period = 48, 5, 3
-    result = pd.domain_census(steps, side, max_period)
+    census = pd.domain_census(steps, side, max_period)
     n = 2 * steps + 1
     cells = np.zeros(n, dtype=np.uint8)  # (n,)
     cells[steps] = 1
     rows = spacetime(cells, steps - 1).astype(bool)  # (steps, n), exact on this range since the cone stays inside
     expected = {(t, x - steps, p) for t, x, p in brute_blocks(rows, side, max_period)
                 if abs(x - steps) <= t - side + 1 and abs(x + side - 1 - steps) <= t - side + 1}
-    assert set(result["blocks"]) == expected
-    assert result["left"] == len({(t, x) for t, x, _ in expected if x + side <= 0})
-    assert result["right"] == len({(t, x) for t, x, _ in expected if x > 0})
-    assert result["right"] > 0
+    assert set(census["blocks"]) == expected
+    assert census["left"] == len({(t, x) for t, x, _ in expected if x + side <= 0})
+    assert census["right"] == len({(t, x) for t, x, _ in expected if x > 0})
+    assert census["right"] > 0
 
 
 def test_fixed_background() -> None:
     """The alternating row is fixed by Rule 30, so away from the ends every block of it is a domain of period 2."""
     row = np.tile([True, False], 60)  # (120,)
-    for t, current, blocks in pd.stream(row, 30, 6, 3, "test"):
+    for t, _, blocks in pd.stream(row, 30, 6, 3, "test"):
         if t >= 5:
             assert blocks[1, t + 1: 120 - t - 7].all()
             assert not blocks[0, t + 1: 120 - t - 7].any()

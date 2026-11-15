@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import itertools
-from collections.abc import Iterator
-
 import numpy as np
 import pytest
+
+from collections.abc import Iterator
 
 from computations import cone_screening as cs
 from computations import obdd_orders
@@ -108,6 +108,7 @@ def test_pair_induction_from_the_base_values() -> None:
 def test_subfunction_counts_against_brute_force(table9: np.ndarray) -> None:
     """Counts of the distinct columns and rows of the table by a set of byte strings, at t = 9, and against the diagram
     width of `obdd_orders` at t = 6."""
+    # table9: (2^19,)
     n = 19
     for k in (8, 9, 10):
         left = {bytes(table9.reshape(1 << (n - k), 1 << k)[:, low]) for low in range(1 << k)}
@@ -124,6 +125,7 @@ def test_subfunction_counts_against_brute_force(table9: np.ndarray) -> None:
 def test_left_half_is_not_incompressible(table9: np.ndarray) -> None:
     """The leftmost cell enters additively, the four screened words share two subfunctions, and the count of the left
     half is at most 2^t - 2 at t = 9 (it is 506)."""
+    # table9: (2^19,)
     t, n = 9, 19
     assert cs.flip_leftmost_flips_center(t, table9)
     columns = table9.reshape(1 << (n - t), 1 << t).T  # (2^t, 2^(t+1)), row = left word

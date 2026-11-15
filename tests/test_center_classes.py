@@ -4,21 +4,21 @@ Lean modules (`stripe_classes.rep`), the C census against numpy, and the lemmas 
 
 from __future__ import annotations
 
+import numpy as np
+import pytest
+
 from collections import Counter
 from itertools import product
 from pathlib import Path
-
-import numpy as np
-import pytest
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 
-from computations import seed_onsets
+from computations import c_programs
+from computations import center_classes as cc
 from computations.rule30 import step
 from computations.stripe_classes import (class_size_law, classes_all_pairs, column, formula, rep, s01,
                                          stripe_related, stripe_words)
 
-from computations import center_classes as cc
 
 U64 = np.uint64
 
@@ -32,7 +32,7 @@ def labels_of(keys: list[object]) -> np.ndarray:
 def pair_labels(n: int, related: object) -> np.ndarray:
     """The components of the graph on 0 .. n - 1 whose edges are the pairs that `related(a, b)` accepts."""
     edges = [(a, b) for a in range(n) for b in range(a + 1, n) if related(a, b)]  # type: ignore[operator]
-    a, b = (np.array(e, dtype=np.int64) for e in zip(*edges)) if edges else (np.zeros(0, np.int64),) * 2
+    a, b = (np.array(e, dtype=np.int64) for e in zip(*edges, strict=True)) if edges else (np.zeros(0, np.int64),) * 2
     graph = coo_matrix((np.ones(a.size, dtype=np.int8), (a, b)), shape=(n, n))
     return connected_components(graph, directed=False)[1].astype(np.int64)  # (n,)
 
@@ -128,8 +128,8 @@ def test_parts() -> None:
 
 def test_c_census_against_numpy(monkeypatch: pytest.MonkeyPatch) -> None:
     here = Path(cc.__file__).resolve().parent
-    if not (seed_onsets.HERE / "center_classes_census.c").exists():  # the drafted program beside the drafted module
-        monkeypatch.setattr(seed_onsets, "HERE", here)
+    if not (c_programs.HERE / "center_classes_census.c").exists():  # the drafted program beside the drafted module
+        monkeypatch.setattr(c_programs, "HERE", here)
     for mode, first, B in (("box", 3, 4), ("box", 0, 9), ("part", 1602, 7)):
         rows = cc.box_rows(first, B) if mode == "box" else cc.part_rows(first, B)
         g1, e1, l1 = cc.prefix_groups(rows, B, 128)
@@ -156,7 +156,7 @@ def test_lemmas() -> None:
         right = rows[members] & U64((1 << B) - 1)  # (k,), cells 1 .. B
         assert np.unique(right).size == members.size
         for a, b in product(members.tolist(), repeat=2):
-            for (l1, c1, r1), (l2, c2, r2) in zip(spacetime[a], spacetime[b]):
+            for (l1, c1, r1), (l2, c2, r2) in zip(spacetime[a], spacetime[b], strict=True):  # H cells each
                 assert c1 == c2 and (l1 ^ l2) == (1 - c1) * (r1 ^ r2)
     # every row of [-A, 0] has its own center column (the right half fixes the row)
     for A in range(1, 8):

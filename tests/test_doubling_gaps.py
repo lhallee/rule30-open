@@ -11,6 +11,7 @@ from computations.doubling_gaps import (anti_classes, anti_word, backward_words,
                                         single_cell)
 from computations.settled_words import pair_next
 
+
 U64 = np.uint64
 
 
@@ -88,7 +89,7 @@ def test_source_graph_against_regimes() -> None:
     for P in range(2, 11):
         ys = np.arange(1, 1 << P, dtype=U64)  # (2^P - 1,)
         gap = gaps_numpy(P, ys, 24)  # (2^P - 1,)
-        for y, g in zip(ys.tolist(), gap.tolist()):
+        for y, g in zip(ys.tolist(), gap.tolist(), strict=True):
             if g > 24:
                 continue
             if g < 5:  # only the black word, gap 3 (D_{w+3} is the complement of Y one step later)

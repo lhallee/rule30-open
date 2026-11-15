@@ -4,15 +4,16 @@ enumeration, direct runs of right halves and the Lean module."""
 from __future__ import annotations
 
 import math
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import right_half
 from computations.gate_census import double_step
 from computations.right_channel_language import (determinize, driven_windows, image_chain, is_closed_fixpoint,
                                                  lean_bitmaps, lean_rank, limit_set, run_gate, scc_labels,
                                                  successor_index, window_components, word_counts)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -71,7 +72,7 @@ def test_small_halves_are_read_from_step_20() -> None:
 
 def test_lean_file_lists_the_ranks() -> None:
     """The bitmaps of `Rule30Open.PeriodTwo.ChannelLanguage` are the ranks of the image chain at 14 cells."""
-    text = (ROOT / "Rule30Open" / "PeriodTwo" / "ChannelLanguage.lean").read_text()
+    text = (ROOT / "Rule30Open" / "PeriodTwo" / "ChannelLanguage.lean").read_text(encoding="utf-8")
     _, chain = image_chain(14)
     assert chain == 20
     assert lean_bitmaps(14) in text and lean_rank(14, chain) in text

@@ -4,11 +4,11 @@ against the exhaustive driven maxima, and the cycle means against Karp's algorit
 
 from __future__ import annotations
 
-from collections.abc import Iterator
-from fractions import Fraction
-
 import numpy as np
 import pytest
+
+from collections.abc import Iterator
+from fractions import Fraction
 
 from computations import seed_certificate as sc
 from computations import seed_onsets as so
@@ -54,6 +54,7 @@ def concrete_key(s: int, J: int, h: int, P: int, H: int = 64) -> tuple[int, int,
 
 
 def test_wide_window_is_exact(table10: np.ndarray) -> None:
+    # table10: (2^10, 11)
     run = sc.window_bounds(10, 16, P=8, progress=False)
     M = table10.max(axis=0)  # (11,)
     assert (run.bound == np.maximum.accumulate(M)).all()
@@ -62,10 +63,11 @@ def test_wide_window_is_exact(table10: np.ndarray) -> None:
 
 
 def test_narrow_window_is_sound(table10: np.ndarray) -> None:
+    # table10: (2^10, 11)
     for h in (2, 4):
         run = sc.window_bounds(10, h, P=8, progress=False)
         assert run.keys is not None and run.values is not None
-        found = dict(zip(run.keys.tolist(), run.values.tolist()))
+        found = dict(zip(run.keys.tolist(), run.values.tolist(), strict=True))
         for s in range(0, 1 << 10, 7):
             key, R, T = concrete_key(s, 10, h, 8)
             assert R == np.max(table10[s]) and T == table10[s, 10]
@@ -114,6 +116,7 @@ def test_beam_matches_exhaustive() -> None:
 
 def karp(succ: np.ndarray, weight: np.ndarray) -> Fraction:
     """The largest cycle mean by Karp's theorem, from a virtual source joined to every node."""
+    # succ, weight: (n, 2)
     n = len(succ)
     neg = None
     D = [[0] * n] + [[neg] * n for _ in range(n)]

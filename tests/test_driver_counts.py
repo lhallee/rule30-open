@@ -6,10 +6,10 @@ from __future__ import annotations
 import itertools
 import math
 import random
+import numpy as np
+
 from collections.abc import Sequence
 from fractions import Fraction
-
-import numpy as np
 
 from computations import driver_counts as dc
 from computations.constrained_runs import admissible_run_hist
@@ -87,7 +87,7 @@ def test_counting_lemma_and_first_moment() -> None:
         densest = []
         for bits in itertools.product((0, 1), repeat=n - 1):
             counts = dc.word_counts(n, dc.pack_half(list(bits), n))
-            total = [a + v for a, v in zip(total, counts)]
+            total = [a + v for a, v in zip(total, counts, strict=True)]
             densest.append(max(b for b, v in enumerate(counts) if v > 0))
         assert total == [int(2 ** (n - 1) * dc.mean_count(n, b)) for b in range(n)]
         for k in range(1, n):
@@ -141,24 +141,24 @@ def test_keep_cells() -> None:
 
 
 def test_ratios_and_quoted_numbers() -> None:
-    result = dc.sweep(70, 20)
-    rows = {r.n: r for r in result.rows}
-    assert all(r.mass == 1 for r in result.rows) and result.last == dc.word_counts(70)
+    swept = dc.sweep(70, 20)
+    rows = {r.n: r for r in swept.rows}
+    assert all(r.mass == 1 for r in swept.rows) and swept.last == dc.word_counts(70)
     for n in range(3, 23):  # an independent dynamic program over (half, center, current run, longest run)
         assert rows[n].total == int(admissible_run_hist(n).sum())
     r = rows[40]
     assert r.total == 3_774_663  # the count quoted in driven-left-runs
     assert (r.top_b, r.tail_b, r.densest, r.mean_densest) == (20, 27, 27, 29)
     assert round(float(r.top), 4) == 1.14 and round(float(r.tail or 0), 4) == 0.2231
-    assert result.top[1:] == (23, 12) and round(float(result.top[0]), 4) == 1.3471
-    assert result.tail[1:] == (52, 35) and round(float(result.tail[0]), 4) == 0.6839
+    assert swept.top[1:] == (23, 12) and round(float(swept.top[0]), 4) == 1.3471
+    assert swept.tail[1:] == (52, 35) and round(float(swept.tail[0]), 4) == 0.6839
     # the largest ratio below n = 20 is one word, the single cell's column 1101110
-    assert result.small == (Fraction(16, 5), 7, 5)
+    assert swept.small == (Fraction(16, 5), 7, 5)
     dense = [(1,) + w for w in itertools.product((0, 1), repeat=6) if sum(w[:5]) == 4]
     assert [w for w in dense if admissible_from(w, [0] * 9)] == [tuple(int(v) for v in center_column(7))]
     # the densest word of each length is the max-plus count of driver_density (two 64-bit words from n = 64 on)
     best = [row.best for row in driver_dp(68)]
-    assert all(r.densest == best[r.n - 2] for r in result.rows)
+    assert all(r.densest == best[r.n - 2] for r in swept.rows)
 
 
 def test_first_moment_bound() -> None:
@@ -185,4 +185,4 @@ def test_best_from() -> None:
     for T in range(1, 30):  # the max-plus count against the densest word of the counts, from the same half
         assert exact[T] == max(b for b, v in enumerate(dc.word_counts(T + 2, dc.pack_half(half, T + 2))) if v > 0)
     narrow = dc.best_from(40, start, beam=8)
-    assert all(a <= e for a, e in zip(narrow, exact)) and dc.best_from(40, start, beam=10**6) == exact
+    assert all(a <= e for a, e in zip(narrow, exact, strict=True)) and dc.best_from(40, start, beam=10**6) == exact

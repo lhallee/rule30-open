@@ -5,13 +5,13 @@ from __future__ import annotations
 
 import itertools
 import random
-
 import numpy as np
 
 from computations.constrained_runs import (admissible_run_hist, carry_check, constrained_states, constrained_table,
                                            future_sets, residual_classes, state_depletion, uniform_run_hist,
                                            valuation, window_infinite_run, window_longest_run)
 from computations.rule30 import spacetime
+
 
 T = 12
 

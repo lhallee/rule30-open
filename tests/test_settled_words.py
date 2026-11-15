@@ -4,7 +4,6 @@ enumeration of the longest-run law, and a direct check of the run lemmas on the 
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations.diagonal_cones import diagonal_table
@@ -12,6 +11,7 @@ from computations.settled_slope import Diagonals
 from computations.settled_words import (SettledTable, check_pair_map, class_chi_square, least_rotation, max_run_quantiles, pair_next,
                                         pair_prev, regime_rows, run_law, run_transfer, settled_table, window_fit,
                                         words_from_tail)
+
 
 STEPS, DEPTH, WINDOW = 480, 121, 256
 

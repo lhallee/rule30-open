@@ -37,7 +37,7 @@ def test_controls() -> None:
     assert crossing_bounds.mean_time_bound(thue, ell, 2) < 1e-9
     for cells in [crossing_bounds.random_cells(top, 0), center_column(top)]:
         ratios = crossing_bounds.norm_ratios(crossing_bounds.cut_norms(cells, ell), ell)  # (13,)
-        assert 0.8 < ratios.min() and ratios.max() < 2.0
+        assert ratios.min() > 0.8 and ratios.max() < 2.0
 
 
 def test_bound_shape() -> None:
@@ -77,7 +77,7 @@ def test_lemma_on_random_machines() -> None:
             for low in range(1 << (ell - 1)):
                 a, b = low % (1 << cut), low >> cut
                 groups.setdefault(tuple(runs[low][2][cut - 1]), []).append((a, b))
-            for sequence, members in groups.items():
+            for members in groups.values():
                 rows = {a for a, _ in members}
                 cols = {b for _, b in members}
                 assert len(members) == len(rows) * len(cols)  # a rectangle

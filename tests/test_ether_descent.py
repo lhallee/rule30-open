@@ -4,13 +4,14 @@ section against the module."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import defect_potential as dp
 from computations import ether_certificate as ec
 from computations import ether_descent as ed
+
 
 BITS = ec.closed_bits()
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "EtherCensus16.lean"
@@ -51,8 +52,8 @@ def direct_runs(a: np.ndarray, o: np.ndarray, n: np.ndarray, steps: int, high: n
     0 .. 63 in `n` and 64 .. 126 in `high`, 0 if None) through the background of 128 cells, as `ec.step` steps one:
     the held map of the actual cells, xor the next background."""
     # a, o, n, high: (h,)
-    words = np.array([[[ec.background(ph, off) >> (64 * k) & (2 ** 64 - 1) for k in (0, 1)] for off in range(7)]
-                      for ph in range(4)], dtype=np.uint64)  # (4, 7, 2), the background as two words
+    words = np.array([[[dp.background(ph, off, 0, ec.WIDTH) >> (64 * k) & (2 ** 64 - 1) for k in (0, 1)]
+                       for off in range(7)] for ph in range(4)], dtype=np.uint64)  # (4, 7, 2), background as 2 words
     one, top = np.uint64(1), np.uint64(63)
     lo = n.astype(np.uint64)  # (h,)
     hi = np.zeros(n.size, dtype=np.uint64) if high is None else high.astype(np.uint64)  # (h,)
@@ -110,6 +111,6 @@ def test_descent_is_cheaper() -> None:
 
 def test_lean_census_matches_module() -> None:
     """The census section of the Lean module is the one this module prints for heads of 16 cells."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in ed.lean_descent_census(16, 1 << 12, 79, 110, 4096, 256).splitlines():
         assert line in text

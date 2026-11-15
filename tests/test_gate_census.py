@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import re
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import absorption
 from computations.gate_census import (LOCK_WIDTH, LOCK_WORD, census, double_step, double_steps, gap_entry, lean_classes,
@@ -58,7 +57,8 @@ def test_lock_example_of_the_lean_file() -> None:
 
 def test_lean_file_lists_the_lock() -> None:
     classes, _ = seven_lock(steps=2000)
-    text = Path(__file__).resolve().parents[1].joinpath("Rule30Open/PeriodTwo/SevenLock.lean").read_text()
+    text = Path(__file__).resolve().parents[1].joinpath("Rule30Open/PeriodTwo/SevenLock.lean").read_text(
+        encoding="utf-8")
     assert lean_classes(classes) in text
 
 
@@ -72,7 +72,8 @@ def test_gap_trap_against_runs() -> None:
         if entered is None:
             continue
         blacks = [s for s in range(entered, len(white)) if white[s] & 1]
-        assert all(b - a in (3, 5) for a, b in zip(blacks, blacks[1:]))
+        # consecutive pairs: the shifted list is one shorter by design
+        assert all(b - a in (3, 5) for a, b in zip(blacks, blacks[1:], strict=False))
 
 
 def test_census_small() -> None:

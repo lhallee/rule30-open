@@ -20,7 +20,8 @@ def seed_table(x: list[int], depth: int, steps: int) -> np.ndarray:
     cells[lo] = 1
     cells[lo + 1:lo + 1 + len(x)] = x
     rows = spacetime(cells, steps)  # (steps + 1, n), row t exact on cells t .. n - 1 - t
-    return np.array([[rows[t, lo - t + j] for t in range(steps)] for j in range(depth + 1)], dtype=np.uint8)
+    return np.array([[rows[t, lo - t + j] for t in range(steps)] for j in range(depth + 1)],
+                    dtype=np.uint8)  # (depth + 1, steps)
 
 
 def test_tables_and_onsets() -> None:

@@ -5,12 +5,12 @@ automaton against `held_shift.front_rate`."""
 from __future__ import annotations
 
 import random
-
 import numpy as np
 
 from computations import background_halves as bh
 from computations import defect_potential as dp
 from computations.held_shift import defect_tops, front_rate
+
 
 CLOSED = dp.closed_strips(dp.STRIP)
 
@@ -117,7 +117,7 @@ def test_window_automaton() -> None:
     assert value.max() / rounds == front_rate(dp.ETHER, 7, 5, rounds)
     rate, cycle = dp.max_mean_gain(src, dst, gain, nodes)
     assert abs(rate - 0.28) < 1e-12
-    edge = {(int(s), int(d)): int(g) for s, d, g in zip(src, dst, gain)}
+    edge = {(int(s), int(d)): int(g) for s, d, g in zip(src, dst, gain, strict=True)}
     total = sum(edge[(cycle[i], cycle[(i + 1) % len(cycle)])] for i in range(len(cycle)))
     assert abs(total / len(cycle) - rate) < 1e-12
     assert rate <= value.max() / rounds <= rate + nodes / rounds

@@ -5,7 +5,6 @@ condition of K against direct runs, and the growing windows against direct runs 
 from __future__ import annotations
 
 import functools
-
 import numpy as np
 import pytest
 
@@ -106,7 +105,7 @@ def test_closed_strips_are_closed_under_random_cells_below() -> None:
         c = 35 + (r - 35 - o) % 7  # (c + o) mod 7 = r
         strip = int(rng.choice(np.flatnonzero(closed[a, r])))
         D = (strip << (c - w + 1)) | int(rng.integers(0, 1 << (c - w + 1)))
-        for t, E in enumerate(tc.defect_run(bg, a, o, D, 80)):
+        for E in tc.defect_run(bg, a, o, D, 80):
             assert E.bit_length() - 1 <= c
 
 

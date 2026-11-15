@@ -4,9 +4,6 @@ from __future__ import annotations
 
 import math
 import random
-import shutil
-
-import pytest
 
 from computations import letter_words as lw
 
@@ -31,7 +28,7 @@ def words_by_lists(T: int) -> set[tuple[int, ...]]:
 
 def test_word_counts_against_list_runs() -> None:
     """|W_T| = 4, 10, 22, 50, 104, 208 for T <= 6, and the coded words are the words of the list runs."""
-    for T, count in zip(range(1, 7), (4, 10, 22, 50, 104, 208)):
+    for T, count in zip(range(1, 7), (4, 10, 22, 50, 104, 208), strict=True):
         coded = lw.word_set(T)
         assert len(coded) == count
         assert {tuple(lw.letters_of(w, T)) for w in coded} == words_by_lists(T)
@@ -99,7 +96,6 @@ def test_edge_shifts() -> None:
         assert lw.edge_shift(rng.getrandbits(rng.randint(1, 40)), 16, 70) is not None
 
 
-@pytest.mark.skipif(shutil.which("cc") is None and shutil.which("gcc") is None, reason="no C compiler")
 def test_c_matches_python() -> None:
     """The C program agrees with the Python functions on counts, forbidden words, ranks, N_L and ideal classes."""
     assert int(lw.run_c("count", 7)["count"]) == len(lw.word_set(7))

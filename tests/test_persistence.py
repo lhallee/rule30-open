@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+
 pytest.importorskip("ripser")  # the optional group `topology` of pyproject.toml
 pytest.importorskip("sklearn")
 
@@ -28,7 +29,7 @@ def test_one_hole() -> None:
     window[1:6, 1:6] = 1
     window[2:5, 2:5] = 0
     f = ph.features(window, 1)
-    names = dict(zip(ph.FEATURES, f))
+    names = dict(zip(ph.FEATURES, f, strict=True))
     assert names["clusters4"] == 1 and names["holes"] == 1 and names["largest_hole"] > 2
 
 

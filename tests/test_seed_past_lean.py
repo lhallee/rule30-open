@@ -44,7 +44,7 @@ def test_certificates_against_brute_force() -> None:
 
 def test_checks_accept_and_reject() -> None:
     certs = spl.certificates(tuple(range(0, 13)))
-    for high, low in zip(certs[1:], certs[:-1]):
+    for high, low in zip(certs[1:], certs[:-1], strict=True):
         assert spl.link_ok(high, low)
     for cert in certs:
         assert spl.min_period_ok(cert) and spl.preperiod_ok(cert)

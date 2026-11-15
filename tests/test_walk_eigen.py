@@ -3,9 +3,9 @@ value iteration on the numpy graph, the step against the single cell's walk, and
 
 from __future__ import annotations
 
-from fractions import Fraction
-
 import numpy as np
+
+from fractions import Fraction
 
 from computations.walk_eigen import (
     Step,

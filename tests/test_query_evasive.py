@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import itertools
-from functools import cache
-
 import numpy as np
+
+from functools import cache
 
 from computations import query_adversary as qa
 from computations import query_depth as qd
@@ -52,11 +52,12 @@ def test_derivative_sums_against_table() -> None:
 def plain_games(p0: np.ndarray, p1: np.ndarray, n: int) -> tuple[bool, bool]:
     """(u-last game, GF(2) game) at the root by a recursion over partial rows of S, with parities and constancy taken
     from the rows directly. p0, p1: (2^n,) each, the restrictions u = 0 and u = 1."""
+    # p0, p1: (2^n,)
 
     def rows_of(partial: tuple[int | None, ...]) -> list[int]:
         free = [i for i, v in enumerate(partial) if v is None]
         base = sum(v << i for i, v in enumerate(partial) if v is not None)
-        return [base + sum(b << i for i, b in zip(free, bits))
+        return [base + sum(b << i for i, b in zip(free, bits, strict=True))
                 for bits in itertools.product((0, 1), repeat=len(free))]
 
     @cache
@@ -114,7 +115,7 @@ def test_structure_and_second_corner() -> None:
     assert all(qe.second_corner_holds(t) for t in range(3, 7))
     for t in (3, 4):
         for cells in itertools.product((0, 1), repeat=2 * t + 1):
-            x = dict(zip(range(-t, t + 1), cells))
+            x = dict(zip(range(-t, t + 1), cells, strict=True))
             if x[t - 1] or not x[t - 3]:
                 continue
             same = dict(x)

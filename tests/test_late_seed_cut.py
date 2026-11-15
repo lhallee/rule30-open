@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 import re
+
 from pathlib import Path
 
 from computations import late_seed_cut as ls
@@ -63,7 +64,7 @@ def test_edge_periods() -> None:
 def test_shift_and_suffix() -> None:
     """`lateCen_shift`: from t0 on, the center at t + p with the seed moved 2p cells right is the center at t for the
     left cells run p steps first; `lateCen_suffix`: the white stretch runs the left cells on their own."""
-    a, R, J, p, s0 = 4, 3, 9, 4, 2
+    a, R, _, p, s0 = 4, 3, 9, 4, 2  # the third is J, which this check does not use
     t0 = s0 + R + 1 + (a + 1) // 2
     for t in range(t0, t0 + 6):
         for Rp in range(R + 1):
@@ -87,7 +88,7 @@ def test_scan_small() -> None:
 def test_check_mirror() -> None:
     """The mirrored kernel check passes on the range the module checks for a = 4 and 5, fails just below `lateStart`,
     and agrees with the plain-run separation."""
-    for a, (tA, R, J, p, s0) in [(4, (6, 3, 9, 4, 2)), (5, (7, 4, 11, 4, 6))]:
+    for a, (tA, R, _, p, s0) in [(4, (6, 3, 9, 4, 2)), (5, (7, 4, 11, 4, 6))]:
         t0 = s0 + R + 1 + (a + 1) // 2
         for t in range(tA, t0 + p):
             assert ls.late_check(a, t, R)
@@ -99,7 +100,8 @@ def test_check_mirror() -> None:
 def test_module_parameters() -> None:
     """The thresholds, the largest R and the period data written into LateSeedCut are those computed here (a <= 6),
     and every edge period check of the module states a repetition that holds."""
-    text = (Path(__file__).resolve().parents[1] / "Rule30Open" / "Complexity" / "LateSeedCut.lean").read_text()
+    text = (Path(__file__).resolve().parents[1] / "Rule30Open" / "Complexity" / "LateSeedCut.lean").read_text(
+        encoding="utf-8")
     start = dict((int(a), int(v)) for a, v in re.findall(r"\| (\d+) => (\d+)", text.split("def lateStart")[1].split("def ")[0]))
     rmax = dict((int(a), int(v)) for a, v in re.findall(r"\| (\d+) => (\d+)", text.split("def lateR")[1].split("theorem ")[0]))
     for a in range(2, 7):

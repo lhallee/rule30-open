@@ -6,11 +6,11 @@ is read."""
 from __future__ import annotations
 
 import re
-
 import pytest
 
 from computations import class_blocks as cb
 from computations import class_blocks_split as cbs
+
 
 BLOCK, WIDTH = "0000000001101001", 9  # the class test closes it at 9 cells (`class_blocks.WIDTH`)
 RANGES = ((1, 4), (5, 8), (9, 9))
@@ -64,7 +64,7 @@ def test_every_check_once_on_a_prefix(small: None) -> None:
         names = levels[0].split(", ")
         assert names == [f"cls{BLOCK}L{w}" for w in range(1, len(names) + 1)]  # a prefix of the full widths
         assert set(names) <= defined  # every table read is defined here or in a module before
-        for name, j, phase in re.findall(r"theorem (\S+)_l(\d+)_(\d+) : \1\.levelOk \2 \3 = true", text):
+        for _, j, phase in re.findall(r"theorem (\S+)_l(\d+)_(\d+) : \1\.levelOk \2 \3 = true", text):
             assert int(j) < len(names)  # the check reads widths j and j + 1 only
             checked.append((int(j), int(phase)))
         if part.widths is None:

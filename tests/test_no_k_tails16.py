@@ -5,12 +5,13 @@ section against the Lean module."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import no_k_tails16 as nk
 from computations import tail_census as tc
+
 
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "NoKTails16.lean"
 
@@ -19,6 +20,7 @@ def first_odd_breaks(U: np.ndarray, cells: int, steps: int) -> np.ndarray:
     """For each half (rows of `cells` cells as 0/1 bytes, (n, cells)), the first odd step t <= steps at which cell 0 of
     the held map is 0, by stepping the whole row cell by cell; -1 if there is none: (n,). Cell j of step t is right
     while j + t < cells."""
+    # U: (n, cells) of 0 and 1
     assert steps < cells
     x = U.astype(np.uint8)  # (n, cells)
     out = np.full(U.shape[0], -1, dtype=np.int64)  # (n,)
@@ -31,7 +33,7 @@ def first_odd_breaks(U: np.ndarray, cells: int, steps: int) -> np.ndarray:
         if t % 2 == 1:
             new = (x[:, 0] == 0) & (out < 0)
             out[new] = t
-    return out
+    return out  # (n,)
 
 
 def test_backgrounds_are_the_tail_census() -> None:
@@ -109,6 +111,6 @@ def test_census_against_tail_census() -> None:
 
 def test_lean_section_matches_module() -> None:
     """The background section of the Lean module is the one `lean_section` prints."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in nk.lean_section().splitlines():
         assert line in text

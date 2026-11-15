@@ -6,12 +6,11 @@ from __future__ import annotations
 
 import functools
 import math
-
 import numpy as np
 
 import computations.right_edge_runs as rer
 
-from computations.two_index import (cycle_lengths, diagonal_array, doubling_levels, longest_flat_run,  # noqa: E402
+from computations.two_index import (cycle_lengths, diagonal_array, doubling_levels, longest_flat_run,
                                     mahler_degree, white_runs, white_runs_from_cycles)
 
 
@@ -91,7 +90,7 @@ def test_lift_and_mahler_top() -> None:
     lengths, diagonals = cycle_lengths(26)
     lifted = list(rer.lift(26))
     assert [d.size for _, d, _ in lifted] == lengths
-    for (j, d, _), ref in zip(lifted, diagonals):
+    for (_, d, _), ref in zip(lifted, diagonals, strict=True):
         assert np.array_equal(d, ref) and rer.least_period(d) == d.size
         assert rer.mahler_top(d) == mahler_degree(ref)
     rng = np.random.default_rng(3)
@@ -141,14 +140,16 @@ def test_weight_features_and_rules() -> None:
         b = [int(r1[t % r1.size]) for t in range(size)]
         c = [int(r2[t % r2.size]) for t in range(size)]
         o = [t % 2 for t in range(size)]
-        direct = [sum(a), sum(b), sum(x * y for x, y in zip(a, b)), sum(x * y for x, y in zip(a, c)),
-                  sum(x * y for x, y in zip(b, c)), sum(x * y * z for x, y, z in zip(a, b, c)),
-                  sum(x * y for x, y in zip(a, o)), sum(x * y for x, y in zip(b, o)),
-                  sum(x * y * z for x, y, z in zip(a, b, o))]
+        # a, b, c, o and g all have `size` entries
+        direct = [sum(a), sum(b), sum(x * y for x, y in zip(a, b, strict=True)),
+                  sum(x * y for x, y in zip(a, c, strict=True)), sum(x * y for x, y in zip(b, c, strict=True)),
+                  sum(x * y * z for x, y, z in zip(a, b, c, strict=True)),
+                  sum(x * y for x, y in zip(a, o, strict=True)), sum(x * y for x, y in zip(b, o, strict=True)),
+                  sum(x * y * z for x, y, z in zip(a, b, o, strict=True))]
         assert rer.weight_features(r0, r1, r2) == direct
         if not doubled:
-            g = [x | y for x, y in zip(b, c)]
-            assert sum(g) == 2 * sum(x * y for x, y in zip(a, g))
+            g = [x | y for x, y in zip(b, c, strict=True)]
+            assert sum(g) == 2 * sum(x * y for x, y in zip(a, g, strict=True))
             assert sum(a) % 2 == sum(g[1::2]) % 2
     tested, rules = rer.weight_rules(30, 20)
     assert tested == list(range(3, 29))

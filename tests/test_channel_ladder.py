@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-
 import numpy as np
 
 from computations import channel_ladder as cl

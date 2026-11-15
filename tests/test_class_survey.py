@@ -8,6 +8,7 @@ import pytest
 
 from computations import class_survey as cs
 from computations import game
+from computations.cyclic_words import least_rotation
 
 
 @pytest.mark.parametrize("period,width", [(3, 8), (5, 7), (6, 6), (7, 8), (8, 6)])
@@ -25,7 +26,7 @@ def test_random_blocks_match_game() -> None:
     for _ in range(12):
         period = int(rng.integers(9, 14))
         word = "".join(rng.choice(["0", "1"], size=period).tolist())
-        block = game.least_rotation(word)
+        block = least_rotation(word)
         width = int(rng.integers(6, 11))
         row = cs.classify(block, width)
         assert row.components == sorted(game.component_periods(block, width), reverse=True)

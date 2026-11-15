@@ -15,7 +15,7 @@ def test_batch_matches_scalar() -> None:
     for word in ("0", "1", "10", "01", "0001"):
         for phase in range(2):
             rows = psi_batch(word, phase, rights, 40)  # (40,)
-            for right, row in zip(rights, rows):
+            for right, row in zip(rights, rows, strict=True):
                 assert int(row) == psi(word, phase, int(right), 40)
 
 
@@ -25,8 +25,11 @@ def test_condrey_closed_forms() -> None:
     depth = 12
     rights = np.arange(1 << 9, dtype=U64)  # (512,)
     zero, one = psi_batch("0", 0, rights, depth), psi_batch("1", 0, rights, depth)  # each (512,)
-    for right, z, o in zip(range(1 << 9), zero, one):
-        cell = lambda j: (right >> (j - 1)) & 1 if j <= 9 else 0
+    for right, z, o in zip(range(1 << 9), zero, one, strict=True):
+
+        def cell(j: int) -> int:
+            return (right >> (j - 1)) & 1 if j <= 9 else 0
+
         for j in range(1, depth + 1):
             earlier = any(cell(i) for i in range(1, j))
             expected = int(earlier or cell(j)) if j % 2 else int(bool(cell(j)) and not earlier)

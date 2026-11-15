@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations.rule30 import center_column, spacetime
@@ -39,7 +38,7 @@ def test_run_identities() -> None:
     # each maximal black run is the alternating stretch of its first row, checked directly on a few runs
     cells = single_rows(300, 40)
     starts, lengths, colors = maximal_runs(cells[:, 40])
-    for a, L, c in zip(starts[1:].tolist(), lengths[1:].tolist(), colors[1:].tolist()):
+    for a, L, c in zip(starts[1:].tolist(), lengths[1:].tolist(), colors[1:].tolist(), strict=True):
         if c == 1:
             assert alternating_left(cells, 40, a) == L
 

@@ -9,6 +9,7 @@ from computations.reading_certificates import Spec, certificate, phase_readings
 from computations.reading_modules import (COLLECTIONS, COLUMNS, READING_WORDS, module_parts, reading_module,
                                           statement)
 
+
 PATH = COLUMNS / "ReadingWords.lean"
 
 

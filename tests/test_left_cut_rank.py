@@ -97,5 +97,5 @@ def test_window_two_pow_and_lift() -> None:
         assert np.array_equal(values, np.broadcast_to((u & 1)[:, None], values.shape))
         assert lr.window_floor(a, length, 5)[0] == 1
     for a in (3, 4):
-        result = lr.lift_test(a, a + 2, span=4)
-        assert result["uniform"] == lr.rho(a) and result["base"] == lr.rho(a - 1)
+        lift = lr.lift_test(a, a + 2, span=4)
+        assert lift["uniform"] == lr.rho(a) and lift["base"] == lr.rho(a - 1)

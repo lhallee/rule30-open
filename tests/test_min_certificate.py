@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import min_certificate as mc
 from computations.cone_screening import cone_table, step_slices, variable_slices
+from computations.rule30 import pack_row
 
 
 def plain_center(cells: tuple[int, ...], rule: int = 30) -> int:
@@ -30,7 +30,7 @@ def brute_minimum(t: int, rule: int = 30, listing: list[str] | None = None) -> t
         seen = set()
         for bits in itertools.product((0, 1), repeat=len(free)):
             full = list(partial)
-            for i, b in zip(free, bits):
+            for i, b in zip(free, bits, strict=True):
                 full[i] = b
             seen.add(value[tuple(full)])
         if len(seen) == 1:
@@ -38,7 +38,7 @@ def brute_minimum(t: int, rule: int = 30, listing: list[str] | None = None) -> t
             rows.append("".join("*" if v is None else str(v) for v in partial))
     least = min(sizes)
     if listing is not None:
-        listing += [r for r, s in zip(rows, sizes) if s == least]
+        listing += [r for r, s in zip(rows, sizes, strict=True) if s == least]
     return least, sizes.count(least)
 
 
@@ -88,13 +88,13 @@ def test_shortest_implicant_on_random_functions() -> None:
     for _ in range(12):
         table = (rng.random(8) < 0.7).astype(np.uint8)  # (8,)
         for rd in (False, True):
-            assert mc.shortest_implicant(mc.as_integer(table), 3, right_determined=rd)[0] == brute_implicant(
+            assert mc.shortest_implicant(pack_row(table), 3, right_determined=rd)[0] == brute_implicant(
                 table, 3, rd)
 
 
 def test_packed_table_against_cone_table() -> None:
     """The packed words, chunked or not, give the bit-sliced table of `cone_table` at t = 4."""
-    assert mc.packed_table(4) == mc.packed_table(4, inner=6) == mc.as_integer(cone_table(4))
+    assert mc.packed_table(4) == mc.packed_table(4, inner=6) == pack_row(cone_table(4))
     assert (mc.unpacked_table(3) == cone_table(3)).all()
 
 
@@ -117,7 +117,7 @@ def test_routing_against_partial_rows() -> None:
                 zero = True
                 for bits in itertools.product((0, 1), repeat=len(free)):
                     right = list(partial)
-                    for i, b in zip(free, bits):
+                    for i, b in zip(free, bits, strict=True):
                         right[i] = b
                     rows = [list(prefix) + [x] + right for x in (0, 1)]
                     a, b = (int(table[sum(c << i for i, c in enumerate(r))]) for r in rows)

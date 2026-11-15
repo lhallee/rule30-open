@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import itertools
-from collections import deque
-
 import numpy as np
+
+from collections import deque
 
 from computations.rule30 import spacetime
 from computations.run_slope_routes import (alternating_word, driver_pairs, first_times_by_width, onset_bound,
@@ -109,7 +109,7 @@ def test_skeleton_against_spacetime() -> None:
     assert np.nonzero(a.white_run < 0)[0].tolist() == [2, 7, 28]
     assert int(np.argmax(a.period == 8)) == 29
     # the periodic part of D_j repeats: its cyclic white run is shorter than its period unless it is white
-    assert all(-1 <= g < p for g, p in zip(a.white_run.tolist(), a.period.tolist()))
+    assert all(-1 <= g < p for g, p in zip(a.white_run.tolist(), a.period.tolist(), strict=True))
 
 
 def test_onset_bound_holds_over_every_driver() -> None:

@@ -9,6 +9,7 @@ from computations.front_walker import (front_law, pair_types, phase_chi2, phase_
                                        walk_direct, walk_from_tail, walk_offset, window_max)
 from computations.settled_slope import Diagonals, least_periods, stream, white_runs
 
+
 DEPTH, STEPS, PERIOD, WINDOW = 120, 400, 16, 128
 
 

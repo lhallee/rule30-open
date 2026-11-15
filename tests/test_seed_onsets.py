@@ -3,10 +3,10 @@ table, and the driven relaxation against a scalar run."""
 
 from __future__ import annotations
 
-from collections.abc import Iterator
-
 import numpy as np
 import pytest
+
+from collections.abc import Iterator
 
 from computations import seed_onsets as so
 
@@ -37,11 +37,13 @@ def test_scalar_single_cell_matches_settled_slope() -> None:
 
 
 def test_known_maxima(table12: np.ndarray) -> None:
+    # table12: (2^12, 13)
     assert table12.max(axis=0).tolist() == [0, 1, 2, 2, 4, 5, 6, 8, 7, 11, 12, 14, 14]
 
 
 def test_exhaustive_search_matches_table(table12: np.ndarray) -> None:
-    s = so.exhaustive_max(12, 64)
+    # table12: (2^12, 13)
+    s =so.exhaustive_max(12, 64)
     M = table12.max(axis=0)  # (13,)
     assert (s.best == M).all()
     for j in range(13):
@@ -54,7 +56,8 @@ def test_exhaustive_search_matches_table(table12: np.ndarray) -> None:
 
 
 def test_pruned_search_matches_table(table12: np.ndarray) -> None:
-    M = table12.max(axis=0)  # (13,)
+    # table12: (2^12, 13)
+    M =table12.max(axis=0)  # (13,)
     for K in (0, 6):
         s = so.pruned_max(12, 64, K, split=4)
         assert (s.best == M).all() and s.largest <= 64 - 9
@@ -74,6 +77,7 @@ def test_driven_matches_scalar() -> None:
 
 def test_driven_bound_holds(table12: np.ndarray) -> None:
     """T_{i+k} <= S_i + G_k(pair at S_i) for every seed of 12 cells, the pair read from the seed's own diagonals."""
+    # table12: (2^12, 13)
     J, H = 12, 60
     S = so.pair_onsets(table12)  # (2^J, J + 1)
     for s in range(0, 1 << J, 97):
@@ -89,6 +93,7 @@ def test_driven_bound_holds(table12: np.ndarray) -> None:
 
 
 def test_same_skeleton(table12: np.ndarray) -> None:
+    # table12: (2^12, 13)
     assert so.same_skeleton(table12, 12, 60)
 
 

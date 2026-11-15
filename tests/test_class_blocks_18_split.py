@@ -9,14 +9,15 @@ and the final section states the theorems and the summary that the single-module
 from __future__ import annotations
 
 import re
-from pathlib import Path
-
 import pytest
+
+from pathlib import Path
 
 from computations import class_blocks as cb
 from computations import class_blocks_18 as c18
 from computations import class_blocks_18_split as g
 from computations import class_blocks_split as cbs
+
 
 ROOT = Path(__file__).resolve().parent.parent
 COLUMNS = ROOT / "Rule30Open" / "Columns"
@@ -107,7 +108,7 @@ def test_repository_modules_match_generator() -> None:
     for name, part in g.modules().items():
         path = COLUMNS / f"{name}.lean"
         assert path.with_suffix(".md").exists()
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         previous = f"Rule30Open.Columns.{part.previous}" if part.previous else "Rule30Open.Columns.ClassGame"
         assert text.startswith(f"module\n\npublic import {previous}\n\n/-!\n# {g.part_title(part)}\n")
         base = cbs.cert_name(part.block)
@@ -118,7 +119,7 @@ def test_repository_modules_match_generator() -> None:
             lo, hi = part.widths
             assert cbs.level_checks(cbs.cert_name(part.block, hi), len(part.block), lo, hi) in text
         assert text.endswith("end\n\nend Rule30Open\n")
-    final = (COLUMNS / f"{g.FINAL}.lean").read_text()
+    final = (COLUMNS / f"{g.FINAL}.lean").read_text(encoding="utf-8")
     for block in g.SPLITS:
         assert f"public import Rule30Open.Columns.{g.parts(block)[-1].module}\n" in final
         assert g.levels_proof(block) + "\n" + g.theorems(block) in final

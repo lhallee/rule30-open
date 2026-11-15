@@ -5,7 +5,6 @@ rows), and the starts against the forced runs of `wedge_hypotheses`."""
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import wedge_hypotheses as wh

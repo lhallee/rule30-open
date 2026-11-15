@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-
 import numpy as np
 
 from computations.constrained_left import (CONDITIONS, column_anf, columns_from, count_words, entropy, forced_cells,

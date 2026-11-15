@@ -57,7 +57,7 @@ def test_truncation_entry() -> None:
     states = bp.state_set(t)
     _, phase = bp.block_phase(bg, 0, 0)
     e = bp.truncation_entry(bg, 0, 0, 0, 6, 1, 400)
-    for k, n, u, entry in zip(e.k.tolist(), e.length.tolist(), e.u.tolist(), e.entry.tolist()):
+    for k, _, u, entry in zip(e.k.tolist(), e.length.tolist(), e.u.tolist(), e.entry.tolist(), strict=True):
         half = (bp.half_bits(bg, 0, 0, k)) | (u << k)
         assert entry == plain_entry(t["word"], states, t["cells"], half, phase, 400)
     assert (e.entry >= 0).sum() > 0

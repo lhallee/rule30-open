@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations import conley_index as ci, space_time_periodic
@@ -104,8 +103,8 @@ def test_two_sided_moves_by_cells() -> None:
     radius, width = 2, 5
     for block in ("01", "001", "1"):
         source, target, nodes = ci.two_sided_moves(block, radius)
-        got = set(zip(source.tolist(), target.tolist()))
-        expected = set()
+        got = set(zip(source.tolist(), target.tolist(), strict=True))  # one source and one target per move
+        expected: set[tuple[int, int]] = set()
         for phase, cells in itertools.product(range(len(block)), itertools.product((0, 1), repeat=width)):
             if cells[radius] != int(block[phase]):
                 continue
@@ -122,7 +121,7 @@ def test_two_sided_moves_by_cells() -> None:
 
 def test_small_survey() -> None:
     """Every block of period at most 3 keeps a nontrivial index in the game of 4 cells and with windows of 5 cells."""
-    result = ci.survey(3, [4], [2])
-    for row in result.values():
+    cases = ci.survey(3, [4], [2])
+    for row in cases.values():
         assert row["trivial"] == [] and row["acyclic"] == []
-    assert set(result["game 4"]["excluded"]) == {"0", "1"}
+    assert set(cases["game 4"]["excluded"]) == {"0", "1"}

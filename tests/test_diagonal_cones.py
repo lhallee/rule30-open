@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-
 import numpy as np
 
 from computations.diagonal_cones import (
@@ -46,8 +45,8 @@ def _forced_alternating_cells(run: int, layers: int) -> dict[int, np.ndarray]:
         lo = words[0][0]
         grid = np.array([w for _, w in words])  # (4**s, run + 2 s)
         forced = (grid == grid[0]).all(axis=0)  # (run + 2 s,)
-        out[s] = np.array([lo + i for i in np.nonzero(forced)[0]])
-    return out
+        out[s] = np.array([lo + i for i in np.nonzero(forced)[0]])  # (f_s,), f_s the forced cells of row a - s
+    return out  # out[s]: (f_s,)
 
 
 def test_alternating_trapezoid_is_exactly_the_forced_cells() -> None:

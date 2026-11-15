@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import functools
-
 import numpy as np
 
 from computations import absorption
@@ -106,13 +105,13 @@ def test_basin_and_reach_match_plays() -> None:
             assert ((w, d) in some_by[-1]) == bool((int(seen[w]) >> d) & 1)
     comps, nodes, member = residue(game, basin)
     assert sum(c.size for c in comps) == int((member >= 0).sum())
-    for state, c in zip(nodes.tolist(), member.tolist()):
+    for state, c in zip(nodes.tolist(), member.tolist(), strict=True):
         w, d = divmod(state, COUNTS)
         assert not (int(basin[w]) >> d) & 1
         if c >= 0:  # a state of a component with a cycle has a move that stays in it
             nxt = [v * COUNTS + e for v, e in moves(w, d)]
             pos = np.searchsorted(nodes, nxt)
-            assert any(p < nodes.size and nodes[p] == s and member[p] == c for p, s in zip(pos, nxt))
+            assert any(p < nodes.size and nodes[p] == s and member[p] == c for p, s in zip(pos, nxt, strict=True))
 
 
 def test_family_targets_against_rows() -> None:

@@ -4,7 +4,6 @@ s = 1, the linear rule run cell by cell, and the two criteria of the entry on sm
 from __future__ import annotations
 
 import random
-
 import numpy as np
 
 from computations import column_curves as cc
@@ -78,7 +77,7 @@ def test_patterns_at_s_equal_one() -> None:
         P = 0b10001 | (a << 3) | ((1 ^ b) << 2) | (c << 1)  # z^4 + a z^3 + (1 + b) z^2 + c z + 1
         degrees = trial_factor_degrees(P)
         counts = cc.frobenius_pattern(a, b, c, 0b11)
-        for d, n in zip((1, 2, 3, 4), counts):
+        for d, n in zip((1, 2, 3, 4), counts, strict=True):
             if len(set(degrees)) == len(degrees):  # distinct factor degrees (so squarefree): roots in F_(2^d)
                 assert n == sum(e for e in degrees if d % e == 0)
     assert trial_factor_degrees(0b10111) == [1, 3]  # z^4 + z^2 + z + 1 = (z + 1)(z^3 + z^2 + 1)

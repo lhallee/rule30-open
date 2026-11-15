@@ -5,12 +5,13 @@ background section against the Lean module."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import no_k_tails as nk
 from computations import tail_census as tc
+
 
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "NoKTails.lean"
 
@@ -99,11 +100,11 @@ def test_census_against_tail_census() -> None:
                 # tail_census takes the head as the defect against the background: cells 0 .. 11 are h xor B_0
                 assert step == tc.in_k_steps(bg, a, o, h ^ bg.word(a, o, 0, 12), 40)
     assert lasts == [29, 31, 33, 33]
-    assert 2 * nk.ROUNDS - 1 >= max(lasts) and 2 * nk.ROUNDS <= 64
+    assert max(lasts) <= 2 * nk.ROUNDS - 1 and 2 * nk.ROUNDS <= 64
 
 
 def test_lean_section_matches_module() -> None:
     """The background section of the Lean module is the one `lean_section` prints."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in nk.lean_section().splitlines():
         assert line in text

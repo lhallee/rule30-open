@@ -6,10 +6,10 @@ from __future__ import annotations
 
 import functools
 import itertools
-
 import numpy as np
 
 from computations import wedge_hypotheses as wh
+
 
 SMALL_CONTROL = (1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1)  # kit `smallControl`
 

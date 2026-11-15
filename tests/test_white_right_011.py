@@ -4,12 +4,13 @@ finite rows, and the census section against the Lean module."""
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
+
+from pathlib import Path
 
 from computations import coupled
 from computations import white_right_011 as wr
+
 
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "Columns" / "WhiteRightHalf011.lean"
 
@@ -81,6 +82,6 @@ def test_rows_leave_011() -> None:
 
 def test_lean_section_matches_module() -> None:
     """The census section of the Lean module is the one `lean_section` prints."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in wr.lean_section().splitlines():
         assert line in text

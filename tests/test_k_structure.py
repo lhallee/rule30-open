@@ -5,14 +5,14 @@ and the counts of the k-ether-points finding, and the descent census against run
 from __future__ import annotations
 
 import functools
+import numpy as np
+
 from fractions import Fraction
 from pathlib import Path
 
-import numpy as np
-
 from computations import k_structure as ks
-from computations.ether_certificate import background, held
-from computations.held_shift import cycle_class
+from computations.defect_potential import background
+from computations.held_shift import cycle_class, held
 
 
 @functools.cache
@@ -107,7 +107,7 @@ def test_closure_seven() -> None:
     cl = closure7()
     assert len(cl) == 406 and max(cl.values()) == 14 and max(x[0] for x in cl) == 78
     assert {ks.denominator(x) for x in cl} == {127}
-    ether = {background(a, o, 7) for a in range(4) for o in range(7)}  # cells 7 k .. 7 k + 6 of each alignment
+    ether = {background(a, o, 0, 7) for a in range(4) for o in range(7)}  # cells 7 k .. 7 k + 6 of each alignment
     start = {x: x[0] + (-x[0]) % 7 for x in cl}  # the first multiple of 7 at or above the preperiod
     assert sum(ks.rat_cells(x, start[x] + 7) >> start[x] in ether for x in cl) == 303
     rows, _, _ = ks.closure_levels(set(seeds()), 14, 6)
@@ -131,19 +131,20 @@ def test_descent_against_direct_runs() -> None:
         r = ks.descent(h, a, o, max_steps=40)
         broke: dict[int, int] = {}
         fell: dict[int, int] = {}
-        x = np.array([background(a, o, 64) & ~ks.mask(h)], dtype=np.uint64)
+        x = np.array([background(a, o, 0, 64) & ~ks.mask(h)], dtype=np.uint64)
         leaves = ks.extend(x, h, 0, h).tolist()
-        eth_head = background(a, o, h)
+        eth_head = background(a, o, 0, h)
         leaves = [n for n in leaves if ((n & ks.mask(h)) ^ eth_head) >> (h - 1) == 1]
         assert len(leaves) == r["leaves"]
         for n in leaves:
-            u = (n & ks.mask(h)) | (background(a, o, cells) & ~ks.mask(h))
+            u = (n & ks.mask(h)) | (background(a, o, 0, cells) & ~ks.mask(h))
             for t in range(1, 41):
                 u = held(u) & ks.mask(cells)
                 if t % 2 == 1 and u & 1 == 0:
                     broke[t] = broke.get(t, 0) + 1
                     break
-                if t % 2 == 0 and ((u ^ background(a + t, o, cells)) & ks.mask(cells - t)).bit_length() - 1 < h - 1:
+                defect = (u ^ background(a + t, o, 0, cells)) & ks.mask(cells - t)
+                if t % 2 == 0 and defect.bit_length() - 1 < h - 1:
                     fell[t] = fell.get(t, 0) + 1
                     break
         assert {t: v for t, v in r["broke"].items() if v} == broke
@@ -156,7 +157,7 @@ def test_search_points(tmp_path: Path) -> None:
     x = max((y for y in closure7() if y[0] <= 57), key=lambda y: (y[0], y[2]))
     cells = ks.rat_cells(x, 64)
     path = tmp_path / "hits.txt"
-    path.write_text(f"7 {cells >> 64:016x} {cells & ks.mask(64):016x}\n7 0 2\n")
+    path.write_text(f"7 {cells >> 64:016x} {cells & ks.mask(64):016x}\n7 0 2\n", encoding="utf-8")
     found, how = ks.search_points(str(path), 64)
     assert found == {x} and how == {1: 1, 0: 1}
 

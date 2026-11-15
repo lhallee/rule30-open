@@ -5,11 +5,13 @@ runs, and the Lean tables against the module."""
 from __future__ import annotations
 
 import random
+
 from pathlib import Path
 
 from computations import defect_potential as dp
 from computations import ether_certificate as ec
 from computations.held_shift import held, ring_next
+
 
 BITS = ec.closed_bits()
 MODULE = Path(__file__).resolve().parent.parent / "Rule30Open" / "PeriodTwo" / "EtherCensus.lean"
@@ -33,11 +35,11 @@ def test_step_against_held_map() -> None:
     for _ in range(20):
         a, o, p = rng.randrange(4), rng.randrange(7), rng.randrange(1, 13)
         head = rng.getrandbits(p)
-        U = head | (ec.background(a, o, width) >> p << p)  # (width bits) the head, then the ether from cell p on
-        n = head ^ (ec.background(a, o, p))
+        U = head | (dp.background(a, o, 0, width) >> p << p)  # (width bits) the head, then the ether from cell p on
+        n = head ^ (dp.background(a, o, 0, p))
         for t in range(60):
             mask = (1 << 120) - 1
-            assert n & mask == (U ^ ec.background(a + t, o, width)) & mask
+            assert n & mask == (U ^ dp.background(a + t, o, 0, width)) & mask
             if n >> 120:
                 break
             n = ec.step(a + t, o, n)
@@ -119,7 +121,7 @@ def test_census_counts() -> None:
 
 def test_lean_tables_match_module() -> None:
     """The tables of the Lean module are the ones this module prints."""
-    text = MODULE.read_text()
+    text = MODULE.read_text(encoding="utf-8")
     for line in ec.lean_tables().splitlines():
         assert line in text
     assert "theorem census (a o : Nat)" in ec.lean_census(4, 49, 70, 8)
