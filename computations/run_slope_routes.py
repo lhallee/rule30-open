@@ -33,14 +33,15 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass
-
-import numpy as np
 
 from computations.diagonal_cones import diagonal_table
 from computations.left_diagonals import diagonals
 from computations.run_mechanism import driven_rows
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 1. Right ends of the driven left halves

@@ -26,13 +26,14 @@ import argparse
 import json
 import sys
 import textwrap
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations import class_blocks as cb
 from computations import class_certificate as cc
 from computations import class_survey as cs
+
 
 # Each block with the least width at which the class test closes it (`class_survey.least_class_width`). The plain game
 # closes the first at 16 cells and the other two at 15 (`game.bad_pairs`), and at no width up to 14.
@@ -167,7 +168,7 @@ def report(rows: list[cs.Row]) -> list[Closed]:
 
 def read_rows(path: str) -> list[cs.Row]:
     """The rows that `class_survey --out` wrote."""
-    with open(path) as handle:
+    with open(path, encoding="utf-8") as handle:
         return [cs.Row(**{**d, "components": [tuple(c) for c in d["components"]]}) for d in map(json.loads, handle)]
 
 

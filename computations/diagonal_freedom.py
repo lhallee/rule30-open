@@ -22,9 +22,10 @@ from __future__ import annotations
 
 import argparse
 import random
-from typing import Callable
 
+from collections.abc import Callable
 from tqdm.auto import tqdm
+
 
 Level = Callable[[int, int], int]  # f(i, r): the level function at level i on the residue r = y mod 2^i
 

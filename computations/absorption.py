@@ -90,7 +90,7 @@ def greatest_wall() -> np.ndarray:
     return member  # (4, 2^13)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def kit_wall() -> np.ndarray:
     """The unique terminal strongly connected component of the greatest wall: the kit's 109 wall states. Built once and
     kept, read-only, for the many callers that ask for it."""
@@ -113,14 +113,14 @@ def kit_wall() -> np.ndarray:
     return wall  # (4, 2^13)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def ether_pattern(j0: int, psi: int) -> np.uint64:
     """Columns 1 .. 64 of the ether right of column j0 at phase `psi`, column p at bit p - 1; kept for the calls that
     ask again."""
     return np.uint64(sum(ether(j0 + p, psi) << (p - 1) for p in range(1, 65)))
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def family_terms(word: str, phase: int) -> tuple[np.ndarray, ...]:
     """The tests of `family_depth` at drive phase `phase`, one per alignment of the word and depth k at which a wall can
     start within 64 columns (column j0 + k a B3 column): k, as an integer and as a shift; the mask of columns 1 .. k;
@@ -140,7 +140,7 @@ def family_terms(word: str, phase: int) -> tuple[np.ndarray, ...]:
     out = (depth, shifts, masks, np.array(patterns, dtype=np.uint64), np.array(offsets, dtype=np.int64))  # (K,) each
     for array in out:
         array.flags.writeable = False
-    return out
+    return out  # (K,) each
 
 
 def family_depth(word: str, low: np.ndarray, phase: int, wall: np.ndarray) -> np.ndarray:
@@ -159,6 +159,7 @@ def family_cut(word: str, width: int, wall: np.ndarray) -> np.ndarray:
     """The nodes of the game of `word` at `width` (phase times 2^width plus the window) whose window is the first
     `width` cells of some member of the family: for an alignment and a depth k with column j0 + k a B3 column, the
     ether on columns 1 .. k and then the start of a wall state, or the ether alone when k is at least `width`."""
+    # wall: (4, 2^13), the wall states at each ether phase
     n = 1 << width
     windows = np.arange(n, dtype=np.int64)  # (n,)
     inside = np.zeros(4 * n, dtype=bool)  # (4 n,)
@@ -184,6 +185,7 @@ def family_reach(word: str, width: int, wall: np.ndarray) -> float:
     """The share of the nodes of the game of `word` at `width` from which some values of the cell beyond reach
     `family_cut`. Entry into the family for every finitely supported right half needs 1 at every width: the nodes that
     cannot reach it form a set that no move leaves, and a half that starts there never has a member's first cells."""
+    # wall: (4, 2^13)
     from computations import locks
     return float(locks.back_search(word, width, family_cut(word, width, wall)).mean())
 
@@ -206,7 +208,7 @@ def step_rows(rows: np.ndarray, center: int) -> np.ndarray:
 def absorb(word: str, rows: np.ndarray, phase: int, steps: int, wall: np.ndarray, reach: int) -> np.ndarray:
     """The first time before `steps` at which each right half of `rows` is in the family, or -1. `reach` bounds the
     columns that are not white at time 0, so only the words they can have reached by time t are stepped."""
-    # rows: (n, words)
+    # rows: (n, words); wall: (4, 2^13)
     times = np.full(rows.shape[0], -1, dtype=np.int64)  # (n,)
     index = np.arange(rows.shape[0])  # (n,)
     rows = rows.copy()  # (n, words)
@@ -260,7 +262,7 @@ def leading_ether(word: str, rows: np.ndarray, phase: int, span: int) -> np.ndar
 def deep_depth(word: str, rows: np.ndarray, phase: int, wall: np.ndarray, span: int) -> np.ndarray:
     """`family_depth` for rows of cells at any depth k below `span`, not only within the first 64 columns: the deepest
     k at which each row is in the family, or -1."""
-    # rows: (n, cells), bool
+    # rows: (n, cells), bool; wall: (4, 2^13)
     weights = 1 << np.arange(WALL_CELLS)  # (13,)
     depth = np.full(rows.shape[0], -1, dtype=np.int64)  # (n,)
     for j0, shift in ALIGNMENTS[word]:
@@ -280,6 +282,7 @@ def shield(word: str, ether_cells: int, count: int, phase: int, steps: int, wall
     """Right halves that carry the aligned ether on columns 1 .. ether_cells and random cells beyond: the first step at
     which each is in the family at any depth (or -1), the deepest depth it has then, and how far its first column off
     the ether moved toward the center over the run."""
+    # wall: (4, 2^13)
     j0, shift = ALIGNMENTS[word][0]
     cells = ether_cells + steps + 50
     rows = np.zeros((count, cells), dtype=bool)  # (count, cells)
@@ -304,6 +307,7 @@ def shield(word: str, ether_cells: int, count: int, phase: int, steps: int, wall
 def entry_certificate(word: str, cells: int, phase: int, wall: np.ndarray, steps: int = 4000) -> list[tuple[int, int]]:
     """For each right half below 2^cells, its first step in the family and the least depth k at that step: the Lean
     lists `entries<word>_<phase>` of `SmallRight` in `EmptyRight.lean`."""
+    # wall: (4, 2^13)
     rows = np.zeros((1 << cells, (cells + steps + 2) // 64 + 1), dtype=np.uint64)  # (2^cells, words)
     rows[:, 0] = np.arange(1 << cells, dtype=np.uint64)
     times = absorb(word, rows, phase, steps, wall, cells)  # (2^cells,)
@@ -314,11 +318,12 @@ def entry_certificate(word: str, cells: int, phase: int, wall: np.ndarray, steps
         if now.any():
             depth[now] = family_depth(word, rows[now, 0], (t + phase) % 4, wall)
         rows = step_rows(rows, int(word[(t + phase) % 4]))
-    return list(zip(times.tolist(), depth.tolist()))
+    return list(zip(times.tolist(), depth.tolist(), strict=True))
 
 
 def lean_entries(cells: int, wall: np.ndarray) -> str:
     """The Lean definitions `entries<word>_<phase>` of `entry_certificate`, as `EmptyRight.lean` has them."""
+    # wall: (4, 2^13)
     lines = []
     for word in WORDS:
         for phase in range(4):
@@ -331,6 +336,7 @@ def lean_entries(cells: int, wall: np.ndarray) -> str:
 
 def census(word: str, cells: int, phase: int, steps: int, wall: np.ndarray) -> np.ndarray:
     """The first time each right half of at most `cells` cells, the integers below 2^cells, enters the family."""
+    # wall: (4, 2^13)
     rows = np.zeros((1 << cells, (cells + steps + 2) // 64 + 1), dtype=np.uint64)  # (2^cells, words)
     rows[:, 0] = np.arange(1 << cells, dtype=np.uint64)
     return absorb(word, rows, phase, steps, wall, cells)  # (2^cells,)
@@ -415,7 +421,7 @@ def main() -> None:
                       f"the latest at {int(times.max())}, {tail(times)}; {int((periodic >= 0).sum())} of "
                       f"{periodic.size} periodic halves enter, the latest at {int(periodic.max())}; not entering, "
                       "with the step at which each is the aligned ether: "
-                      + ", ".join(f"{names[i]} ({t})" for i, t in zip(missed.tolist(), pure.tolist())))
+                      + ", ".join(f"{names[i]} ({t})" for i, t in zip(missed.tolist(), pure.tolist(), strict=True)))
     print(f"({time.perf_counter() - started:.0f} s)")
 
 

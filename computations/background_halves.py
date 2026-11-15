@@ -16,12 +16,13 @@ column on the background, for both values of the cell beyond. For the ether it g
 from __future__ import annotations
 
 import argparse
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations import absorption
 from computations import space_time_periodic as stp
+
 
 MASK64 = (1 << 64) - 1
 
@@ -77,6 +78,7 @@ def never_enters(word: str, ring: list[int], x: int, phase: int, period: int, wa
     `period` phases: "ether" when it is the aligned ether, which no wall state follows; "outside" when its ether prefix
     is below 51 columns at every phase, so that the 64 columns `family_depth` reads decide membership at every depth,
     and it is in the family at none; None when it is in the family at some phase."""
+    # wall: (4, 2^13), the kit's wall states by phase
     span = len(ring) * 7 + 64  # past a common period of the ring and the ether
     prefixes = [ether_prefix(word, background_half(ring, x, (phase + s) % period, span), s % 4, span)
                 for s in range(period)]
@@ -118,6 +120,7 @@ def wall_set(ring: list[int], period: int, column: int, width: int) -> np.ndarra
 
 def entry_time(word: str, half: int, cells: int, steps: int, wall: np.ndarray) -> int:
     """The first step at which the half of `cells` columns (white beyond) is in the family, or -1 (`absorption.absorb`)."""
+    # wall: (4, 2^13), the kit's wall states by phase
     words = (cells + steps) // 64 + 3
     rows = np.array([[(half >> (64 * i)) & MASK64 for i in range(words)]], dtype=np.uint64)  # (1, words)
     return int(absorption.absorb(word, rows, 0, steps, wall, cells)[0])

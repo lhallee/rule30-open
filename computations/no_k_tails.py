@@ -32,6 +32,7 @@ from tqdm.auto import tqdm
 
 from computations.held_shift import held, ring_cycle, ring_next
 
+
 # (name of the background as a ring word, cell 0 first; its spatial period L; its temporal period P; Lean tag)
 BACKGROUNDS: tuple[tuple[str, int, int, str], ...] = (
     ("1000", 4, 8, "48"),

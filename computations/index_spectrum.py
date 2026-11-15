@@ -21,12 +21,13 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.algebra import moebius
 from computations.rule30 import center_column
+
 
 OMEGA = np.exp(2j * np.pi / 3)
 

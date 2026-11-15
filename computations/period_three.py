@@ -29,7 +29,6 @@ import time
 import numpy as np
 
 from pathlib import Path
-
 from tqdm.auto import tqdm
 
 from computations.absorption import step_rows
@@ -83,7 +82,7 @@ def report(word: str, halves: list[int], phase: int, steps: int) -> tuple[list[t
                      float(values.mean())))
     white = np.array([word[(t + phase) % 3] == "0" for t in range(steps)])  # (steps,)
     samples = column[white]  # (k, n)
-    return rows, settled_periods(samples, samples.shape[0] // 3)
+    return rows, settled_periods(samples, samples.shape[0] // 3)  # 3 triples, (n,)
 
 
 def settled_from(word: str, half: int, phase: int, steps: int, period: int) -> int:
@@ -96,7 +95,7 @@ def settled_from(word: str, half: int, phase: int, steps: int, period: int) -> i
     return int(times[min(first, len(times) - 1)])
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def trap_keys() -> np.ndarray:
     """The states of the kit's trap t001 as sorted keys strip * 4 + (label mod 3), read from the kit's source once and
     kept, read-only."""
@@ -125,6 +124,7 @@ def in_sorted(values: np.ndarray, keys: np.ndarray) -> np.ndarray:
 
 def trap_entries(halves: list[int], phase: int, steps: int, keys: np.ndarray) -> np.ndarray:
     """The first step before `steps` at which each right half, driven by 001 from `phase`, is in t001, or -1."""
+    # keys: (k,), the states of t001 as strip * 4 + (label mod 3), as `trap_keys` gives them
     keys = distinct(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
@@ -152,6 +152,7 @@ def cut_entries(halves: list[int], phase: int, steps: int, widths: tuple[int, ..
     has its columns 1 .. w equal to those of a state of t001 whose label agrees with the drive's phase, or -1: entry
     into t001 cut to w cells, the event whose rate `lock_chain.t001_coin` gives for a coin in column w + 1. At 47 cells
     it is entry into t001 (`trap_entries`)."""
+    # keys: (k,), the states of t001 as strip * 4 + (label mod 3), as `trap_keys` gives them
     keys = distinct(keys)  # (k,), sorted
     width = max([1] + [half.bit_length() for half in halves])
     rows = np.zeros((len(halves), (width + steps) // 64 + 2), dtype=np.uint64)  # (n, words)
@@ -160,26 +161,26 @@ def cut_entries(halves: list[int], phase: int, steps: int, widths: tuple[int, ..
             rows[i, j // 64] = np.uint64((half >> j) & ((1 << 64) - 1))
     masks = [np.uint64((1 << w) - 1) for w in widths]
     cuts = [distinct(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3))) for mask in masks]
-    first = np.full((len(halves), len(widths)), -1, dtype=np.int64)  # (n, k)
+    first = np.full((len(halves), len(widths)), -1, dtype=np.int64)  # (n, len(widths))
     alive = np.arange(len(halves))  # (m,), the halves still outside t001, row i of `rows` being half alive[i]
     full = np.uint64((1 << TRAP_WIDTH) - 1)
     for t in tqdm(range(steps), desc=f"cuts of t001 phase {phase}", file=sys.stderr, leave=False, mininterval=5):
         drive = np.uint64((t + phase) % 3)
-        for j, (mask, cut) in enumerate(zip(masks, cuts)):
+        for j, (mask, cut) in enumerate(zip(masks, cuts, strict=True)):
             open_ = np.flatnonzero(first[alive, j] < 0)  # (o,), rows not yet in t001 cut to widths[j] cells
             if open_.size:
                 hit = in_sorted((rows[open_, 0] & mask) * np.uint64(4) + drive, cut)  # (o,)
                 first[alive[open_[hit]], j] = t
         inside = in_sorted((rows[:, 0] & full) * np.uint64(4) + drive, keys)  # (m,)
         if inside.any():
-            entered = first[alive[inside]]  # (e, k)
+            entered = first[alive[inside]]  # (e, len(widths))
             first[alive[inside]] = np.where(entered < 0, t, entered)  # in t001, so in every cut of it
             rows, alive = rows[~inside], alive[~inside]  # the trap is closed: an entered half stays in
             if len(alive) == 0:
                 break
         active = (width + t) // 64 + 2  # the half reaches column width + t + 1 at most
         rows[:, :active] = step_rows(rows[:, :active], int("001"[int(drive)]))
-    return first  # (n, k)
+    return first  # (n, len(widths))
 
 
 def coin_entries(halves: list[int], phase: int, steps: int, width: int, keys: np.ndarray,
@@ -187,6 +188,7 @@ def coin_entries(halves: list[int], phase: int, steps: int, width: int, keys: np
     """`cut_entries` at one width with a fair coin in place of the cells beyond the window: columns 1 .. `width` start
     as each half's, column `width` + 1 is a fresh fair coin at every step, and the result is the first step before
     `steps` at which the window is that of a state of t001 whose label agrees with the drive's phase, or -1."""
+    # keys: (k,), the states of t001 as strip * 4 + (label mod 3), as `trap_keys` gives them
     assert width <= 62
     mask, top = np.uint64((1 << width) - 1), np.uint64(width - 1)
     cut = distinct(((keys >> np.uint64(2)) & mask) * np.uint64(4) + (keys & np.uint64(3)))  # (c,)
@@ -235,6 +237,7 @@ def beyond_stats(halves: list[int], phase: int, steps: int, width: int, context:
     """Over the steps before each right half, driven by 001 from `phase`, enters t001: how often cell `width` + 1 is
     white and black, by the phase of the drive and the last `context` cells of the window of `width` cells, as counts
     out[phase, cells, value], the cells read as bits, cell `width` highest."""
+    # keys: (k,), the states of t001 as strip * 4 + (label mod 3), as `trap_keys` gives them
     assert context <= width <= 62
     keys = distinct(keys)  # (k,), sorted
     wide = max([1] + [half.bit_length() for half in halves])
@@ -289,6 +292,7 @@ def constant_rate(done: np.ndarray, start: int = 1260, at: int = 100000) -> tupl
     """Compare entry steps `done` (shape (n,)) with entry at a constant rate per step after `start`: the ratio of the
     mean excess over `start` to the median excess, 1 / ln 2 for exponential entry, and the fraction a constant rate
     fitted to the mean leaves outside at step `at`."""
+    # done: (n,)
     excess = done.astype(np.float64) - start  # (n,)
     return float(excess.mean() / np.median(excess)), float(np.exp(-(at - start) / excess.mean()))
 
@@ -356,7 +360,7 @@ def main() -> None:
                 ratio, left = constant_rate(done)
                 print(f"  constant rate after step 1,260: mean excess / median excess {ratio:.2f} (1 / ln 2 = 1.44); "
                       f"out at step 100,000: {100 * left:.1f}% fitted, {100 * (done > 100000).mean():.1f}% observed")
-            print("  entry steps (count): " + ", ".join(f"{t} ({c})" for t, c in zip(times.tolist(), counts.tolist())))
+            print("  entry steps (count): " + ", ".join(f"{t} ({c})" for t, c in zip(times.tolist(), counts.tolist(), strict=True)))
         print(f"({time.perf_counter() - started:.0f} s)")
         return
     if args.follow:

@@ -31,10 +31,11 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass
 
-import numpy as np
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 1. The single cell's center window and its runs
@@ -103,6 +104,7 @@ def alternating_left(cells: np.ndarray, half: int, t: int) -> int:
 def domain_profile(cells: np.ndarray, half: int, a: int, length: int) -> list[tuple[int, int]]:
     """For a black run of `length` from time a: at row a - s, the alternating domain starts at p = -(length - 1) - s.
     Returns (s, right end q) for s = 0, 1, ... while cell p is in phase and the domain has at least 2 cells."""
+    # cells: (steps, 2 * half + 1)
     out: list[tuple[int, int]] = []
     s = 0
     while a - s >= 0:
@@ -122,6 +124,7 @@ def domain_profile(cells: np.ndarray, half: int, a: int, length: int) -> list[tu
 def white_reading(cells: np.ndarray, half: int, a: int, length: int) -> tuple[int, int, int]:
     """(ell, z, o) for a white run of `length` from time a: ell is the number of white cells right of the center in row
     a (capped at half), and column -1 from time a reads 0^z 1^o then breaks."""
+    # cells: (steps, 2 * half + 1)
     ell = 0
     while ell < half and cells[a, half + 1 + ell] == 0:
         ell += 1
@@ -160,7 +163,7 @@ def mechanism(steps: int, half: int = 64, min_len: int = 12, progress: bool = Tr
     long_black_offset: list[int] = []
     long_white: list[tuple[int, int]] = []
     tail = 2 * half
-    for k, (a, L, c) in enumerate(zip(starts.tolist(), lengths.tolist(), colors.tolist())):
+    for k, (a, L, c) in enumerate(zip(starts.tolist(), lengths.tolist(), colors.tolist(), strict=True)):
         if a == 0 or a + L + 1 >= steps:
             continue
         if progress and k % 200_000 == 0 and k:
@@ -203,14 +206,14 @@ def _shr1(B: np.ndarray) -> np.ndarray:
     # B: (n, W) uint64, word 0 holds bits 0..63
     out = B >> np.uint64(1)  # (n, W)
     out[:, :-1] |= B[:, 1:] << np.uint64(63)
-    return out
+    return out  # (n, W)
 
 
 def _shl1(B: np.ndarray) -> np.ndarray:
     # B: (n, W)
     out = B << np.uint64(1)  # (n, W)
     out[:, 1:] |= B[:, :-1] >> np.uint64(63)
-    return out
+    return out  # (n, W)
 
 
 def driven_step(B: np.ndarray, d: int) -> np.ndarray:
@@ -438,9 +441,10 @@ def run_mechanism(args: argparse.Namespace) -> None:
         print(f"  lifetime / L: min {np.min(life / L):.2f}, median {np.median(life / L):.2f}, max {np.max(life / L):.2f}")
         excess = life - ((L - 2) // 3 + 1)  # (r,), steps beyond the forced lifetime
         vals, counts = np.unique(excess, return_counts=True)
-        print(f"  lifetime beyond the forced trapezoid's: {dict(zip(vals.tolist(), counts.tolist()))}")
+        print(f"  lifetime beyond the forced trapezoid's: {dict(zip(vals.tolist(), counts.tolist(), strict=True))}")
         off, cnt = np.unique(np.array(m.long_black_offset), return_counts=True)
-        print(f"  max over s of |right end + 4s| (0: the forced trapezoid): {dict(zip(off.tolist(), cnt.tolist()))}")
+        print("  max over s of |right end + 4s| (0: the forced trapezoid): "
+              f"{dict(zip(off.tolist(), cnt.tolist(), strict=True))}")
         print(f"  longest domain behind the run / L: min {np.min(grow / L):.2f}, median {np.median(grow / L):.2f}, "
               f"max {np.max(grow / L):.2f}")
 

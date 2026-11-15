@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import math
 
+
 FAN_IN = 3  # the block tree of Rule 30 has fan-in 3
 
 

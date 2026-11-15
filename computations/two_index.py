@@ -29,8 +29,8 @@ from __future__ import annotations
 
 import argparse
 import time
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 
@@ -51,7 +51,7 @@ def cycle_lengths(n: int, progress: bool = False) -> tuple[list[int], list[np.nd
     lengths.append(1)
     diagonals.append(prev1)
     levels = range(1, n)
-    for i in tqdm(levels, desc="levels", disable=not progress, leave=False):
+    for _ in tqdm(levels, desc="levels", disable=not progress, leave=False):
         period = prev1.size
         if prev2.size < period:
             prev2 = np.tile(prev2, period // prev2.size)  # (period,)
@@ -65,7 +65,7 @@ def cycle_lengths(n: int, progress: bool = False) -> tuple[list[int], list[np.nd
         lengths.append(diag.size)
         diagonals.append(diag if diag.size <= 1 << 20 else np.zeros(0, dtype=np.uint8))
         prev2, prev1 = prev1, diag
-    return lengths, diagonals
+    return lengths, diagonals  # diagonals[i]: (L_(i+1),), or (0,) past 2^20
 
 
 def doubling_levels(lengths: list[int]) -> list[int]:
@@ -138,7 +138,7 @@ def diagonal_array(rule: int, rows: int, times: int) -> np.ndarray:
         out[js[ok], t] = row[idx[ok]]
         padded = np.concatenate(([0], row, [0])).astype(np.uint8)  # (width + 2,)
         row = table[4 * padded[:-2] + 2 * padded[1:-1] + padded[2:]]  # (width,)
-    return out
+    return out  # (rows, times)
 
 
 def synthetic_array(kind: str, rows: int, times: int) -> np.ndarray:
@@ -151,7 +151,7 @@ def synthetic_array(kind: str, rows: int, times: int) -> np.ndarray:
         while np.any(x):
             parity ^= x & 1
             x >>= 1
-        return parity.astype(np.uint8)
+        return parity.astype(np.uint8)  # (rows, times)
     if kind == "mod3":
         return ((t - j) % 3 == 0).astype(np.uint8)  # (rows, times)
     raise ValueError(kind)
@@ -160,7 +160,8 @@ def synthetic_array(kind: str, rows: int, times: int) -> np.ndarray:
 def least_period(seq: np.ndarray, start: int = 0) -> int:
     """The least p >= 1 with seq[t + p] = seq[t] for every start <= t < len(seq) - p, searched up to half the length
     after `start`; 0 when none is found."""
-    tail = seq[start:]  # (T,)
+    # seq: (n,)
+    tail = seq[start:]  # (T,), T = n - start
     for p in range(1, tail.size // 2 + 1):
         if np.array_equal(tail[p:], tail[:-p]):
             return p
@@ -169,12 +170,14 @@ def least_period(seq: np.ndarray, start: int = 0) -> int:
 
 def row_periods(array: np.ndarray, start: int = 0) -> list[int]:
     """The least period of each row of `array`, from time `start` on, read on the window it covers."""
+    # array: (rows, times)
     return [least_period(array[j], start) for j in range(array.shape[0])]
 
 
 def window_kernel_counts(array: np.ndarray, window: int, e_max: int) -> list[int]:
     """For e = 0 .. e_max, the number of distinct window x window blocks of the kernel elements
     (v, w) -> array[2^e v + r, 2^e w + s], r, s < 2^e, that fit inside `array`."""
+    # array: (rows, times)
     out: list[int] = []
     for e in range(e_max + 1):
         step = 1 << e
@@ -197,6 +200,7 @@ def window_kernel_counts(array: np.ndarray, window: int, e_max: int) -> list[int
 def mahler_coefficients(seq: np.ndarray) -> np.ndarray:
     """The coefficients a_k, k < P, of a sequence of period P = 2^m in the basis binom(t, k) mod 2, by the Moebius
     transform over the bits of t (Lucas: binom(t, k) is odd iff the bits of k are bits of t)."""
+    # seq: (P,)
     w = seq.astype(np.uint8).copy()  # (P,)
     size = w.size
     i = 1
@@ -209,12 +213,14 @@ def mahler_coefficients(seq: np.ndarray) -> np.ndarray:
 
 def mahler_degree(seq: np.ndarray) -> int:
     """The largest k with a_k = 1, or -1 for the white sequence."""
+    # seq: (P,)
     nz = np.flatnonzero(mahler_coefficients(seq))  # (d,)
     return int(nz[-1]) if nz.size else -1
 
 
 def mahler_degrees(diagonals: list[np.ndarray], count: int) -> list[int]:
     """The Mahler degree of Rd_j on its least period, j < count."""
+    # diagonals: (L_(j+1),) each, Rd_j over one least period
     return [mahler_degree(diagonals[j]) for j in range(count)]
 
 

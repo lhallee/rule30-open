@@ -28,8 +28,8 @@ import argparse
 import itertools
 import math
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 
@@ -71,8 +71,9 @@ def tuple_matrix(k: int, rule: int = 30) -> np.ndarray:
     matrix = np.zeros((len(states), len(states)), dtype=np.int64)  # (states, states)
     for s in states:
         for nxt in itertools.product(range(2), repeat=k):
-            images = {rule_cell(p >> 1, p & 1, c, rule) for p, c in zip(s, nxt)}
-            target = tuple(((p & 1) << 1) | c for p, c in zip(s, nxt))
+            # s and nxt are both k-tuples
+            images = {rule_cell(p >> 1, p & 1, c, rule) for p, c in zip(s, nxt, strict=True)}
+            target = tuple(((p & 1) << 1) | c for p, c in zip(s, nxt, strict=True))
             if len(images) == 1 and target in index:
                 matrix[index[s], index[target]] += 1
     return matrix  # (states, states)

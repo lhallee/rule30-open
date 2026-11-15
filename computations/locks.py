@@ -30,9 +30,9 @@ import functools
 import itertools
 import multiprocessing
 import sys
-from collections.abc import Callable
-
 import numpy as np
+
+from collections.abc import Callable
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order
 from tqdm.auto import tqdm
@@ -61,7 +61,7 @@ def back_closure(seed: np.ndarray, source: np.ndarray, target: np.ndarray,
                  reverse: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None) -> np.ndarray:
     """The nodes from which some walk along the moves reaches the seed: a breadth-first search of the reversed moves
     from the seed, which `reverse` (from `reverse_graph`) lets calls on the same moves share."""
-    # seed: (n,); source, target: (m,)
+    # seed: (n,); source, target: (m,); reverse: (n + 2,), (m,), (m + n,), as `reverse_graph` returns them
     nodes = seed.size
     pointers, predecessors, ones = reverse_graph(source, target, nodes) if reverse is None else reverse
     starts = np.flatnonzero(seed).astype(np.int32)  # (s,), the extra node's successors
@@ -96,27 +96,10 @@ def back_search(word: str, width: int, seen: np.ndarray) -> np.ndarray:
     return seen  # (p n,)
 
 
-def sparse_search(word: str, width: int, start: np.ndarray, cap: int) -> np.ndarray | None:
-    """The nodes of the game of `word` at `width` cells, up to 58, from which some values of the cell beyond reach the
-    nodes `start` (phase * 2^width + window), found backward as `back_search` finds them but holding only the nodes
-    found, in increasing order: for games too wide for a byte per node, when few nodes can reach. None once more than
-    `cap` are found."""
-    # start: (s,)
-    seen = distinct(start.astype(np.uint64))  # (v,)
-    frontier = seen
-    while frontier.size:
-        before = distinct(predecessors(word, width, frontier))  # (m,)
-        frontier = before[~np.isin(before, seen, assume_unique=True)]  # (f,)
-        seen = np.union1d(seen, frontier)  # (v,)
-        if seen.size > cap:
-            return None
-    return seen  # (v,)
-
-
 CHUNK = 11  # cells of the new window that `predecessors` reads at once, by `back_table`
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def back_table(bits: int) -> tuple[np.ndarray, np.ndarray]:
     """The step of `predecessors` over `bits` cells of the new window at once, at most `CHUNK`. An index is a state,
     the old cells right of the chunk (twice the nearer plus the farther), shifted left by `CHUNK`, plus the chunk's
@@ -173,10 +156,11 @@ KEPT_BYTES = 1 << 26  # the most that `KEPT` holds, 64 MB
 def kept(name: str, block: str, width: int, compute: Callable[[str, int], np.ndarray]) -> np.ndarray:
     """`compute(block, width)`, kept read-only for the 256 games asked last while they take at most `KEPT_BYTES`, so
     that the tests and searches that ask for one game again share one search."""
+    # compute: (block, width) -> (p n,), one entry per node of the game
     key = (name, block, width)
     if key in KEPT:
         KEPT[key] = KEPT.pop(key)  # the latest asked last
-        return KEPT[key]
+        return KEPT[key]  # (p n,)
     out = compute(block, width)  # (p n,)
     out.flags.writeable = False
     while KEPT and (len(KEPT) >= 256 or sum(nodes.nbytes for nodes in KEPT.values()) + out.nbytes > KEPT_BYTES):
@@ -287,7 +271,7 @@ def lock_census(periods: list[int], widths: list[int], repeat: int = 1, workers:
                     flags = list(progress(pool.imap(task, repeated, chunksize=1)))
             else:
                 flags = [task(block) for block in progress(repeated)]
-            found[(period, width)] = [block for block, flag in zip(blocks, flags) if flag]
+            found[(period, width)] = [block for block, flag in zip(blocks, flags, strict=True) if flag]
     return found
 
 
@@ -308,7 +292,7 @@ def survey(periods: list[int], width: int, workers: int = 1) -> dict[int, list[s
                 flags = list(progress(pool.imap(task, blocks, chunksize=2)))
         else:
             flags = [task(block) for block in progress(blocks)]
-        found[period] = [block for block, flag in zip(blocks, flags) if flag]
+        found[period] = [block for block, flag in zip(blocks, flags, strict=True) if flag]
     return found
 
 
@@ -506,7 +490,7 @@ def main() -> None:
                     bests = pool.map(task, blocks, chunksize=1)
             else:
                 bests = [task(b) for b in tqdm(blocks, desc="white runs", file=sys.stderr)]
-            for b, best in zip(blocks, bests):
+            for b, best in zip(blocks, bests, strict=True):
                 if best is not None:
                     print(lean_white_entry(b, best[0]) if args.lean_white else
                           f"  {b}: {best[1]} white values in column {best[0] + 1} steer every window of {best[0]} cells")
@@ -523,7 +507,7 @@ def main() -> None:
                     rates = list(tqdm(pool.imap(task, blocks), total=len(blocks), desc="growth", file=sys.stderr))
             else:
                 rates = [task(b) for b in tqdm(blocks, desc="growth", file=sys.stderr)]
-            for b, (share, rate) in zip(blocks, rates):
+            for b, (share, rate) in zip(blocks, rates, strict=True):
                 print(f"  {b}: locked {share:.4f}, growth {rate:.9f}, entropy at most {np.log2(rate):.7f}")
 
 

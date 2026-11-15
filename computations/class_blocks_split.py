@@ -24,12 +24,13 @@ import argparse
 import functools
 import sys
 import textwrap
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations import class_blocks as cb
 from computations import class_certificate as cc
+
 
 WIDTH = 17
 # Each block with the prefix of its modules and the widths of each module of heights; the module after them holds the

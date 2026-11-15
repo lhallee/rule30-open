@@ -30,11 +30,12 @@ import argparse
 import itertools
 import multiprocessing
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations import game
+from computations.cyclic_words import least_rotation
 from computations.wall_segments import in_set_family
 
 
@@ -53,36 +54,40 @@ def window_moves(width: int) -> np.ndarray:
             middle = cells & (n - 1)  # (n,)
             right = (cells >> 1) & (n - 1)  # (n,)
             moves[col, :, free] = left ^ (middle | right)
-    return moves
+    return moves  # (2, n, 2)
 
 
 def step_set(members: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
     """The sorted windows reachable in one step from the sorted windows `members` (shape (s,)), beside `col`."""
+    # members: (s,), moves: (2, n, 2)
     seen = np.zeros(moves.shape[1], dtype=bool)  # (n,)
     seen[moves[col, members, 0]] = True
     seen[moves[col, members, 1]] = True
-    return np.flatnonzero(seen)
+    return np.flatnonzero(seen)  # (s',)
 
 
 def read_word(members: np.ndarray, moves: np.ndarray, word: str) -> np.ndarray:
     """The windows after the column reads `word`, from the windows `members`."""
+    # members: (s,), moves: (2, n, 2)
     for ch in word:
-        members = step_set(members, moves, int(ch))
-    return members
+        members = step_set(members, moves, int(ch))  # (s',)
+    return members  # (s',)
 
 
 def agree(members: np.ndarray) -> bool:
     """Whether every window of `members` has the same cell k + 1 (bit 0): the cell is known."""
-    first = members & 1
+    # members: (s,)
+    first = members & 1  # (s,)
     return bool(first.min() == first.max()) if len(members) else True
 
 
 def limit_sets(block: str, moves: np.ndarray) -> list[np.ndarray]:
     """The limit of the windows that `block` leaves after `m` periods from every window, as m grows: for each phase i,
     the windows just before the column reads `block[i]`. Each is a sorted array of windows."""
+    # moves: (2, n, 2)
     members = np.arange(moves.shape[1], dtype=np.int64)  # (n,)
     while True:
-        after = read_word(members, moves, block)
+        after = read_word(members, moves, block)  # (s,)
         if np.array_equal(after, members):
             break
         members = after
@@ -90,12 +95,13 @@ def limit_sets(block: str, moves: np.ndarray) -> list[np.ndarray]:
     for ch in block:
         sets.append(members)
         members = step_set(members, moves, int(ch))
-    return sets
+    return sets  # len(block) arrays, each (s_i,)
 
 
 def is_good(block: str, moves: np.ndarray) -> bool:
     """Whether the limit windows have one cell k + 1 at every 0 of `block`: then no column repeats `block`."""
-    return all(agree(members) for ch, members in zip(block, limit_sets(block, moves)) if ch == "0")
+    # moves: (2, n, 2)
+    return all(agree(members) for ch, members in zip(block, limit_sets(block, moves), strict=True) if ch == "0")
 
 
 def white_cycle(width: int) -> tuple[int, int]:
@@ -168,12 +174,13 @@ def tails_up_to(length: int) -> list[str]:
 
 def orbit_of_white(members: np.ndarray, moves: np.ndarray) -> tuple[list[np.ndarray], int]:
     """The sets reached from `members` by reading 0s, until one repeats, and the index it returns to."""
+    # members: (s,), moves: (2, n, 2)
     seen: dict[bytes, int] = {}
     orbit: list[np.ndarray] = []
     while True:
         key = members.tobytes()
         if key in seen:
-            return orbit, seen[key]
+            return orbit, seen[key]  # arrays (s_j,), one per step of the orbit
         seen[key] = len(orbit)
         orbit.append(members)
         members = step_set(members, moves, 0)
@@ -182,21 +189,23 @@ def orbit_of_white(members: np.ndarray, moves: np.ndarray) -> tuple[list[np.ndar
 def union_from(orbit: list[np.ndarray], preperiod: int, least: int) -> np.ndarray:
     """The union of the sets of a white orbit after at least `least` steps: past the preperiod every set of the cycle
     recurs, so the union starts at the preperiod when `least` is past it."""
+    # orbit: (s_j,) arrays, one per step
     start = min(least, preperiod)
-    return np.unique(np.concatenate(orbit[start:]))
+    return np.unique(np.concatenate(orbit[start:]))  # (u,)
 
 
 def long_black_states(members: np.ndarray, moves: np.ndarray) -> list[np.ndarray]:
     """The windows after the column reads r 1s from `members`, for every r >= 9: r = 9 and then one more 1 at a time,
     until a set repeats. Windows of many cells keep learning from further 1s, so r = 9 alone does not stand for them."""
+    # members: (s,), moves: (2, n, 2)
     seen: set[bytes] = set()
     states: list[np.ndarray] = []
-    after = read_word(members, moves, "1" * 9)
+    after = read_word(members, moves, "1" * 9)  # (s_9,)
     while after.tobytes() not in seen:
         seen.add(after.tobytes())
         states.append(after)
         after = step_set(after, moves, 1)
-    return states
+    return states  # arrays (s_r,), one per r
 
 
 def consistent(generators: dict[str, int], width: int, long_black: int | None = None
@@ -230,7 +239,7 @@ def consistent(generators: dict[str, int], width: int, long_black: int | None = 
     if long_black is not None and not all(agree(s) for state in long_black_states(members, moves)
                                           for s in orbit_of_white(state, moves)[0]):
         fails.append("1+")
-    return not fails, members, fails
+    return not fails, members, fails  # (), (|Y|,), list
 
 
 def mixture(length: int, white: int, width: int) -> tuple[dict[str, int], list[str]]:
@@ -278,8 +287,11 @@ def kit_excludes(block: str) -> bool:
     pairs = runs_of(block)
     if pairs is None:
         return True
-    categories = lambda black, white: ((black == 1 and white >= 10) or (black == 2 and white >= 8)
-                                       or (black == 4 and white >= 7) or (black >= 9 and white >= 9))
+
+    def categories(black: int, white: int) -> bool:
+        return ((black == 1 and white >= 10) or (black == 2 and white >= 8)
+                or (black == 4 and white >= 7) or (black >= 9 and white >= 9))
+
     if all(black >= 9 for black, _ in pairs) or all(white >= 17 for _, white in pairs):
         return True
     if all(categories(black, white) for black, white in pairs):
@@ -293,13 +305,13 @@ def kit_words(period: int) -> set[str]:
     found = {word for word in game.KIT_WORDS if len(word) == period}
     for tail, white in (("1", 9), ("11", 8), ("10111", 9)):
         if period - len(tail) >= white:
-            found.add(game.least_rotation("0" * (period - len(tail)) + tail))
+            found.add(least_rotation("0" * (period - len(tail)) + tail))
     for tail, white in game.PADDING_FAMILIES:
         if period - len(tail) >= white:
-            found.add(game.least_rotation("0" * (period - len(tail)) + tail))
+            found.add(least_rotation("0" * (period - len(tail)) + tail))
     for block, black in game.BLACK_RUN_BLOCKS:
         if period - len(block) >= black:
-            found.add(game.least_rotation("1" * (period - len(block)) + block))
+            found.add(least_rotation("1" * (period - len(block)) + block))
     return found
 
 
@@ -311,7 +323,7 @@ def necklace_codes(period: int) -> np.ndarray:
     for shift in range(1, period):
         rotated = ((codes << shift) | (codes >> (period - shift))) & mask  # (2^period,)
         keep &= rotated > codes
-    return codes[keep]
+    return codes[keep]  # (necklaces,)
 
 
 def code_word(code: int, period: int) -> str:
@@ -331,7 +343,7 @@ _MOVES: dict[int, np.ndarray] = {}
 def _moves(width: int) -> np.ndarray:
     if width not in _MOVES:
         _MOVES[width] = window_moves(width)
-    return _MOVES[width]
+    return _MOVES[width]  # (2, 2^width, 2)
 
 
 def survey(max_period: int, width: int, workers: int) -> dict[int, list[str]]:
@@ -339,11 +351,11 @@ def survey(max_period: int, width: int, workers: int) -> dict[int, list[str]]:
     found: dict[int, list[str]] = {}
     pool = multiprocessing.get_context("spawn").Pool(workers) if workers > 1 else None
     for period in range(1, max_period + 1):
-        blocks = [game.least_rotation(code_word(int(c), period)) for c in necklace_codes(period)]
+        blocks = [least_rotation(code_word(int(c), period)) for c in necklace_codes(period)]
         tasks = [(block, width) for block in blocks]
         bar = tqdm(tasks, desc=f"period {period}", unit="block", file=sys.stderr, mininterval=5, leave=False)
         flags = list(pool.imap(good_block, bar, chunksize=64)) if pool else [good_block(task) for task in bar]
-        found[period] = sorted(block for block, flag in zip(blocks, flags) if flag)
+        found[period] = sorted(block for block, flag in zip(blocks, flags, strict=True) if flag)
     if pool:
         pool.close()
     return found

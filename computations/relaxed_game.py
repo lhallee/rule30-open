@@ -45,15 +45,16 @@ import itertools
 import random
 import subprocess
 import sys
+import numpy as np
+
 from collections import Counter
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
 
-from computations.seed_onsets import compiled
+from computations.c_programs import compiled
+
 
 PHASE_A = int("10" * 65536, 2)  # bit k - 1 set exactly for even k <= 131,072: the phase-A pattern of cells -1, -2, ...
 
@@ -105,7 +106,7 @@ def cell(x: int, k: int) -> int:
 
 
 def _binary() -> Path:
-    """relaxed_game.c, beside this file, compiled by `seed_onsets.compiled` (kept per source, flags and machine)."""
+    """relaxed_game.c, beside this file, compiled by `c_programs.compiled` (kept per source, flags and machine)."""
     return compiled("relaxed_game", ("-O2", "-w"))
 
 
@@ -127,11 +128,6 @@ def values(T: int, progress: bool = False) -> list[int]:
     for f in _lines(("value", T), T, "values", progress):
         out.append(int(f[2]))
     return out
-
-
-def values_states(T: int, progress: bool = False) -> list[int]:
-    """The number of cut states after each step of `values(T)` (index t - 1 for time t)."""
-    return [int(f[1]) for f in _lines(("value", T), T, "values", progress)]
 
 
 @dataclass(frozen=True, slots=True)
@@ -625,7 +621,7 @@ def run_beam(args: argparse.Namespace) -> None:
         print(f"beam equals E(T) at {len(range(2, len(E), 2)) - len(bad)} of the even T <= {len(E) - 1}; "
               f"differs at {bad}")
     if args.out:
-        Path(args.out).write_text("".join(map(str, b.play)) + "\n")
+        Path(args.out).write_text("".join(map(str, b.play)) + "\n", encoding="utf-8")
 
 
 def run_greedy(args: argparse.Namespace) -> None:

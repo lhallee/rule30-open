@@ -18,10 +18,11 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from scipy import stats
 from tqdm.auto import tqdm
+
 
 LAG = 36  # the period of AAAB
 A_BLOCK = "1000100110"
@@ -40,7 +41,7 @@ def right_rows(steps: int, width: int, phase: int = 0, start: int = 0, progress:
     nbytes = (width + 7) // 8
     low = (1 << width) - 1
     row = start
-    for t in tqdm(range(steps), disable=not progress, mininterval=5.0):
+    for t in tqdm(range(steps), desc="right rows", disable=not progress, mininterval=5.0):
         chunk = np.frombuffer((row & low).to_bytes(nbytes, "little"), dtype=np.uint8)  # (nbytes,)
         rows[t] = np.unpackbits(chunk, bitorder="little")[:width]
         row = ((row << 1) | center_bit(t, phase)) ^ (row | (row >> 1))
@@ -53,7 +54,7 @@ def column_one(steps: int, phase: int = 0, start: int = 0, progress: bool = Fals
     """Column 1 at times 0 .. steps - 1, the first column of `right_rows`, by the same run reading only bit 0."""
     column = bytearray(steps)  # (steps,)
     row = start
-    for t in tqdm(range(steps), disable=not progress, mininterval=5.0):
+    for t in tqdm(range(steps), desc="column 1", disable=not progress, mininterval=5.0):
         column[t] = row & 1
         row = ((row << 1) | ((t + phase) & 1)) ^ (row | (row >> 1))
         if t % 4096 == 0:
@@ -109,11 +110,11 @@ def slip_events(column: np.ndarray, lag: int = LAG, merge: int = LAG) -> tuple[n
     # column: (T,)
     times = np.flatnonzero(column[lag:] != column[:-lag]) + lag  # (m,)
     if times.size == 0:
-        return np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64)
+        return np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64)  # (0,), (0,)
     cut = np.flatnonzero(np.diff(times) >= merge)  # (e - 1,)
     starts = np.concatenate([[times[0]], times[cut + 1]])  # (e,)
     ends = np.concatenate([times[cut], [times[-1]]])  # (e,)
-    return starts, ends
+    return starts, ends  # (e,), (e,)
 
 
 def lock_depth(rows: np.ndarray, lag: int = LAG) -> np.ndarray:
@@ -131,6 +132,7 @@ def renewal_tests(gaps: np.ndarray, lags: int = 5, permutations: int = 2000, see
     """Statistics of interarrival times: mean, coefficient of variation, Spearman correlation of gaps `k` apart for
     k = 1 .. lags with a two-sided permutation p-value, and the Kolmogorov-Smirnov distance to a geometric law with the
     same mean shifted to the least gap (a memoryless renewal process past its dead time), taken over the integers."""
+    # gaps: (n,)
     rng = np.random.default_rng(seed)
     gaps = np.asarray(gaps, dtype=np.float64)  # (n,)
     out: dict[str, object] = {"count": int(gaps.size), "mean": float(gaps.mean()),
@@ -208,7 +210,7 @@ def states_at(times: list[int], steps: int, phase: int = 0, progress: bool = Fal
     want = set(times)
     out: dict[int, int] = {}
     row = 0
-    for t in tqdm(range(steps), disable=not progress, mininterval=5.0):
+    for t in tqdm(range(steps), desc="states", disable=not progress, mininterval=5.0):
         if t in want:
             out[t] = row
         row = ((row << 1) | center_bit(t, phase)) ^ (row | (row >> 1))
@@ -220,6 +222,7 @@ def states_at(times: list[int], steps: int, phase: int = 0, progress: bool = Fal
 def front_slopes(depth: np.ndarray, starts: np.ndarray, before: int = 40) -> np.ndarray:
     """For each slip start s, the slope of the lock depth from its last maximum in s - before .. s - 1 down to s:
     the velocity of the front that closes the locked layer (negative means leftward)."""
+    # depth: (T,), starts: (e,)
     out = []
     for s in starts:
         if s - before < LAG:
@@ -233,7 +236,8 @@ def front_slopes(depth: np.ndarray, starts: np.ndarray, before: int = 40) -> np.
 
 def summarize(column: np.ndarray, label: str) -> dict[str, object]:
     """Slip rate, the event lengths and the renewal tests for one column."""
-    starts, ends = slip_events(column)
+    # column: (T,)
+    starts, ends = slip_events(column)  # (e,), (e,)
     gaps = np.diff(starts)  # (e - 1,)
     out: dict[str, object] = {"label": label, "steps": int(column.size), "events": int(starts.size)}
     if starts.size > 20:
@@ -271,19 +275,21 @@ def gap_runs(column: np.ndarray, phase: int = 0, settle: int = 1000) -> tuple[np
     gaps = np.diff(steps) // 2  # (b - 1,) in white steps
     threes = np.flatnonzero(gaps == 3)  # (r,)
     runs = np.diff(threes) - 1  # (r - 1,) gaps strictly between consecutive gaps of 3
-    return gaps, runs, steps[threes[:-1] + 1]
+    return gaps, runs, steps[threes[:-1] + 1]  # (b - 1,), (r - 1,), (r - 1,)
 
 
 def pair_dependence(seq: np.ndarray, top: int, permutations: int = 1000, seed: int = 0) -> tuple[float, float]:
     """Chi-square statistic of the table of consecutive pairs (seq[i], seq[i + 1]), values above `top` pooled, and its
     permutation p-value against shuffles of the sequence (independent values with the same frequencies)."""
+    # seq: (n,)
     rng = np.random.default_rng(seed)
     seq = np.minimum(np.asarray(seq), top)  # (n,)
-    values = np.unique(seq)
+    values = np.unique(seq)  # (m,)
     code = np.searchsorted(values, seq)  # (n,)
     m = values.size
 
     def chi(c: np.ndarray) -> float:
+        # c: (n,)
         table = np.bincount(c[:-1] * m + c[1:], minlength=m * m).reshape(m, m).astype(np.float64)  # (m, m)
         expect = table.sum(1, keepdims=True) * table.sum(0, keepdims=True) / table.sum()  # (m, m)
         ok = expect > 0
@@ -319,10 +325,12 @@ def run_summary(steps: int) -> None:
     print_summary(summarize(column, "phase 0"))
     gaps, runs, _ = gap_runs(column)
     values, counts = np.unique(gaps, return_counts=True)
-    print("gaps between black cells of column 1 at white steps:", dict(zip(values.tolist(), counts.tolist())))
+    print("gaps between black cells of column 1 at white steps:",
+          dict(zip(values.tolist(), counts.tolist(), strict=True)))
     print(f"gaps of 3 back to back: {int(np.sum((gaps[1:] == 3) & (gaps[:-1] == 3)))}")
     values, counts = np.unique(runs, return_counts=True)
-    print(f"runs of gaps of 5 between gaps of 3 ({runs.size}):", dict(zip(values.tolist(), counts.tolist())))
+    print(f"runs of gaps of 5 between gaps of 3 ({runs.size}):",
+          dict(zip(values.tolist(), counts.tolist(), strict=True)))
     stat, p = pair_dependence(runs, 12)
     print(f"consecutive runs (pooled above 12): chi-square {stat:.1f}, permutation p {p:.4f}")
     locked = (runs == 3).astype(np.int64)  # (r,)
@@ -383,6 +391,7 @@ def run_fronts(steps: int, width: int = 64) -> None:
 def approach_profiles(depth: np.ndarray, starts: np.ndarray, length: int) -> list[tuple[tuple[int, ...], int]]:
     """The lock depth over the last `length` steps up to each slip start, as distinct traces with their counts, most
     common first."""
+    # depth: (T,), starts: (e,)
     counts: dict[tuple[int, ...], int] = {}
     for s in starts:
         if s - length + 1 >= LAG:
@@ -405,22 +414,24 @@ def committed(state: int, t: int, k: int, keep: int, target: int, trials: int, r
 
 def stripe_cells(rows: np.ndarray) -> np.ndarray:
     """Cells of a stripe domain: equal to the cell a step earlier and unlike both neighbors (one row per step)."""
+    # rows: (T, W)
     r = rows.astype(np.int8)  # (T, W)
     out = np.zeros(rows.shape, dtype=bool)  # (T, W)
     out[1:, 1:-1] = (r[1:, 1:-1] == r[:-1, 1:-1]) & (r[1:, 1:-1] != r[1:, 2:]) & (r[1:, 1:-1] != r[1:, :-2])
-    return out
+    return out  # (T, W)
 
 
 def ether_cells(rows: np.ndarray) -> np.ndarray:
     """Cells of an ether domain: on a 3 x 3 block of cells each equal to the cell 4 steps earlier and 7 cells right."""
+    # rows: (T, W)
     r = rows.astype(np.int8)  # (T, W)
     base = np.zeros(rows.shape, dtype=bool)  # (T, W)
     base[4:, :-7] = (r[4:, :-7] == r[:-4, :-7]) & (r[4:, :-7] == r[4:, 7:])
-    out = base.copy()
+    out = base.copy()  # (T, W)
     for d in (1, 2):
         out[:, :-d] &= base[:, d:]
         out[d:] &= base[:-d]
-    return out
+    return out  # (T, W)
 
 
 def run_reach(steps: int, samples: int) -> None:
@@ -435,7 +446,7 @@ def run_reach(steps: int, samples: int) -> None:
     states = states_at(sorted({t - k for t in slips + randoms for k in ks}), steps, progress=True)
     for name, times in (("slip", slips), ("random", randoms)):
         reach_k = np.array([[reach(states[t - k], t - k, k, 1, 48, rng) for k in ks]
-                            for t in tqdm(times, mininterval=5.0)])  # (samples, len(ks))
+                            for t in tqdm(times, desc=f"{name} reach", mininterval=5.0)])  # (samples, len(ks))
         print(f"{name} steps: X(k) for k = {ks}: median {np.median(reach_k, 0).tolist()}, "
               f"max {reach_k.max(0).tolist()}")
         tail = np.polyfit(np.array(ks[-3:], dtype=np.float64), np.median(reach_k, 0)[-3:], 1)

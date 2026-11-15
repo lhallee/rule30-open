@@ -25,9 +25,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.settled_slope import least_periods, stream, white_runs
@@ -179,7 +179,7 @@ def step_pairs(step: np.ndarray, top: int) -> np.ndarray:
     s = np.minimum(step, top) - 1  # (k,)
     M = np.zeros((top, top), dtype=np.int64)  # (top, top)
     np.add.at(M, (s[:-1], s[1:]), 1)
-    return M
+    return M  # (top, top)
 
 
 BLOCKS: list[tuple[int, int]] = [(8, 400), (400, 53207), (53207, 87867), (87867, 200000)]

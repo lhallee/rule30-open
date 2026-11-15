@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import argparse
 import time
-
 import numpy as np
+
 from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.sparse import lil_matrix
 
@@ -36,6 +36,7 @@ def rule_table(rule: int) -> np.ndarray:
 
 def step_row(table: np.ndarray, row: np.ndarray) -> np.ndarray:
     """One step on a finite row with white cells held beyond both ends."""
+    # table: (8,); row: (W,), W the cells of the row
     padded = np.concatenate(([0], row, [0])).astype(np.uint8)  # (W + 2,)
     index = 4 * padded[:-2] + 2 * padded[1:-1] + padded[2:]  # (W,)
     return table[index]  # (W,)
@@ -61,6 +62,7 @@ def true_center(rule: int, steps: int) -> np.ndarray:
 
 def first_strip_error(rule: int, left: int, right: int, steps: int, truth: np.ndarray | None = None) -> int:
     """The first time at most `steps` where the strip -left .. right gives the wrong center, or -1 if none."""
+    # truth: (>= steps + 1,), or None to compute it
     if truth is None:
         truth = true_center(rule, steps)  # (steps + 1,)
     strip = strip_center(rule, left, right, steps)  # (steps + 1,)
@@ -113,7 +115,10 @@ def min_certificate_set(n: int, rule: int = 30) -> set[tuple[int, int]]:
         if left in index:
             rows.append({i: 1.0, index[left]: -1.0})  # y_v - y_left <= 0
             lower.append(-np.inf)
-        value = lambda p: int(x[p[0], p[1] + n]) if abs(p[1]) <= n else 0
+
+        def value(p: tuple[int, int]) -> int:
+            return int(x[p[0], p[1] + n]) if abs(p[1]) <= n else 0
+
         if value(centre) == 0 and value(right) == 0:
             for p in (centre, right):
                 if p in index:
@@ -135,15 +140,15 @@ def min_certificate_set(n: int, rule: int = 30) -> set[tuple[int, int]]:
     matrix[len(rows), index[(n, 0)]] = 1.0
     upper = [0.0] * len(rows) + [1.0]
     lower = lower + [1.0]
-    result = milp(
+    solution = milp(
         c=np.ones(len(cells)),
         constraints=LinearConstraint(matrix.tocsr(), lower, upper),
         integrality=np.ones(len(cells)),
         bounds=Bounds(0, 1),
     )
-    if not result.success:
-        raise RuntimeError(f"integer program failed at n = {n}: {result.message}")
-    return {cell for cell, i in index.items() if result.x[i] > 0.5}
+    if not solution.success:
+        raise RuntimeError(f"integer program failed at n = {n}: {solution.message}")
+    return {cell for cell, i in index.items() if solution.x[i] > 0.5}
 
 
 def min_certificate(n: int, rule: int = 30) -> int:
@@ -219,6 +224,7 @@ def rule90_certificate_size(n: int) -> int:
 
 def dyadic_witnesses(max_k: int, column: np.ndarray | None = None) -> list[tuple[int, int]]:
     """For k = 1 .. max_k, the pair (k, m - 2^(k-1)) for the least m >= 2^(k-1) with c(m) != c(m + 2^k)."""
+    # column: (N,), the center column from time 0, or None to compute it
     need = 2 ** (max_k - 1) + 2 ** max_k + 64
     if column is None:
         column = center_column(need)  # (need,)
@@ -242,6 +248,7 @@ def ray_flip_depths(max_k: int, column: np.ndarray) -> list[tuple[int, int, int]
     on which a one-tape machine halts within k steps; so if every ray has both colors, every machine takes at least
     k + 1 steps on every n >= 2^(k-1). The deepest first flip is the largest, over residues, of the index of the first
     ray element whose color differs from the ray's first element."""
+    # column: (N,), the center column from time 0
     out = []
     for k in range(1, max_k + 1):
         low, period = 2 ** (k - 1), 2**k

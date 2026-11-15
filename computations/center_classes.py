@@ -41,17 +41,18 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+import numpy as np
+
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-
-import numpy as np
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
 
 from computations.stripe_classes import class_size_law, classes_all_pairs, formula, phi
+
 
 U64 = np.uint64
 ONE, TWO, S62, S63 = U64(1), U64(2), U64(62), U64(63)
@@ -161,13 +162,13 @@ def prefix_groups(rows: np.ndarray, B: int, T1: int, progress: bool = False) -> 
     apart = both[left_edges(x[1:][both], B) != left_edges(x[:-1][both], B)]  # (k',)
     lcp_edge = int(lcp[apart].max()) if apart.size else -1
     lcp_groups = int(lcp[new[1:]].max()) if new[1:].any() else -1
-    return group, lcp_edge, lcp_groups
+    return group, lcp_edge, lcp_groups  # group: (n,)
 
 
 def census_binary(optimize: bool = True) -> Path:
-    """computations/center_classes_census.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
-    from computations import seed_onsets
-    return seed_onsets.compiled("center_classes_census", ("-O2" if optimize else "-O0", "-w"))
+    """computations/center_classes_census.c, compiled once and kept for later processes (`c_programs.compiled`)."""
+    from computations.c_programs import compiled
+    return compiled("center_classes_census", ("-O2" if optimize else "-O0", "-w"))
 
 
 def census_c(rows: np.ndarray, mode: str, first: int, B: int, T1: int, optimize: bool = True,
@@ -190,7 +191,7 @@ def census_c(rows: np.ndarray, mode: str, first: int, B: int, T1: int, optimize:
             stats[key] = int(value)
     alone = group < 0  # (n,)
     group[alone] = count + np.arange(int(alone.sum()))
-    return group, stats["lcp_left_edge"], stats["lcp_groups"]
+    return group, stats["lcp_left_edge"], stats["lcp_groups"]  # group: (n,)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -402,12 +403,12 @@ def census(rows: np.ndarray, B: int, T1: int, T2: int, name: str, c_mode: tuple[
     size = np.bincount(group)  # (groups,)
     label = s01_labels(rows, B)  # (n,)
     label0 = s01_labels(rows, B, times=(0,))  # (n,)
-    result = split(rows, B, group, label, T2, progress)
+    component_split = split(rows, B, group, label, T2, progress)
     halves = np.unique(np.stack([label, (rows >> U64(B + 1)).astype(np.int64)], axis=1), axis=0)  # (h, 2)
     parts, part_misses, size_misses, sizes = law_checks(rows, B, label)
     return Census(name=name, B=B, rows=rows.size, groups=int((size >= 2).sum()), members=int(size[size >= 2].sum()),
                   lcp_edge=lcp_edge, lcp_groups=lcp_groups, components=int(label.max()) + 1,
-                  components0=int(label0.max()) + 1, split=result,
+                  components0=int(label0.max()) + 1, split=component_split,
                   mixed=int(halves.shape[0] - (int(label.max()) + 1)), parts=parts, part_misses=part_misses,
                   size_misses=size_misses, sizes=sizes, families=same_partition(label, family_labels(rows, B)))
 
@@ -475,11 +476,6 @@ def _range(text: str) -> list[int]:
         lo, _, hi = piece.partition("-")
         out += list(range(int(lo), int(hi or lo) + 1))
     return out
-
-
-def _pair(text: str) -> tuple[int, int]:
-    a, b = text.split(",")
-    return int(a), int(b)
 
 
 def run_boxes(args: argparse.Namespace) -> None:

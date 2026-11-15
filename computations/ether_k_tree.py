@@ -32,8 +32,10 @@ import sys
 
 from tqdm.auto import tqdm
 
-from computations.ether_certificate import background, closed_bits, run_head
+from computations.defect_potential import background
+from computations.ether_certificate import closed_bits, run_head
 from computations.no_k_tails16 import break_run, column_after
+
 
 HEAD = 28  # the cells of a head in the Lean module
 ROUNDS = 32  # rounds of `breakRun` at a leaf: the odd steps 1, 3, ..., 63
@@ -44,7 +46,7 @@ FUEL = 16  # rounds of `run_head` at a leaf
 def ether_tail(head: int, a: int, o: int) -> int:
     """The ether at the alignment (a, o) in the cells head .. 63, bit j the cell j, and 0 below (the Lean
     `etherTail`)."""
-    return background(a, o, 64) & ~((1 << head) - 1)
+    return background(a, o, 0, 64) & ~((1 << head) - 1)
 
 
 def tree_leaves(head: int, a: int, o: int) -> tuple[list[int], int]:
@@ -74,7 +76,7 @@ def leaf_ok(leaf: int, head: int, a: int, o: int, bits: list[int], rounds: int =
     step, used = break_run(leaf, rounds)
     if step > 0:
         return {"ok": 1, "how": 0, "step": step, "top": -1, "steps": used}
-    n = (leaf ^ background(a, o, 64)) & ((1 << head) - 1)  # the defect of the head at step 0
+    n = (leaf ^ background(a, o, 0, 64)) & ((1 << head) - 1)  # the defect of the head at step 0
     r = run_head(bits, a, o, bound, fuel, n)
     return {"ok": r["ok"], "how": r["how"] if r["ok"] else -1, "step": r["step"], "top": r["top"],
             "steps": used + r["step"] + 4}

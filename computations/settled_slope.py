@@ -25,10 +25,12 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
+
+from computations.rule30 import unpack_row
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,12 +40,6 @@ class Diagonals:
     period: int  # the common period of the onsets
     onset: np.ndarray  # (depth + 1,) least T with D_j(t + period) = D_j(t) for T <= t <= steps - 1 - period
     tail: np.ndarray  # (window, depth + 1) D_j(t) for t = steps - window .. steps - 1
-
-
-def bits(v: int, n: int) -> np.ndarray:
-    """Bits 0 .. n - 1 of v."""
-    raw = v.to_bytes((n + 7) // 8, "little")
-    return np.unpackbits(np.frombuffer(raw, dtype=np.uint8), bitorder="little")[:n]  # (n,)
 
 
 def stream(depth: int, steps: int, period: int = 64, window: int = 256, progress: bool = True) -> Diagonals:
@@ -60,10 +56,10 @@ def stream(depth: int, steps: int, period: int = 64, window: int = 256, progress
             d = v ^ ring[t % period]
             if d:
                 lo = ((d & -d).bit_length() - 1) // 8 * 8  # a byte boundary at or below the lowest change
-                changed = bits(d >> lo, d.bit_length() - lo)  # (hi - lo,)
+                changed = unpack_row(d >> lo, d.bit_length() - lo)  # (hi - lo,)
                 last[np.flatnonzero(changed) + lo] = t - period
         if t >= steps - window:
-            tail[t - (steps - window)] = bits(v, n)
+            tail[t - (steps - window)] = unpack_row(v, n)
         ring[t % period] = v
         v = ((v << 2) ^ ((v << 1) | v)) & mask
     return Diagonals(depth, steps, period, last + 1, tail)

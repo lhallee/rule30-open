@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import itertools
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
@@ -32,10 +31,10 @@ from tqdm.auto import tqdm
 def step_slices(row: list[np.ndarray | np.bool_], steps: int) -> list[np.ndarray | np.bool_]:
     """Rule 30 on bit-sliced rows: entry i of `row` holds cell i for every assignment at once (an array of bools, or a
     constant). Each step drops the two outermost cells, which have an unknown neighbor."""
-    # row: n entries, each (N,) or a scalar
+    # row: (n, N) as a list of n entries (n cells, N assignments), each an (N,) array or a scalar
     for _ in range(steps):
         row = [row[i - 1] ^ (row[i] | row[i + 1]) for i in range(1, len(row) - 1)]  # n - 2 entries
-    return row
+    return row  # (n - 2 steps, N) as a list of entries as above
 
 
 def variable_slices(count: int) -> list[np.ndarray]:
@@ -152,19 +151,22 @@ def right_count(table: np.ndarray, n: int, k: int) -> int:
 
 def left_counts(t: int, table: np.ndarray | None = None) -> list[int]:
     """`left_count` for k = 1 .. 2t."""
+    # table: (2^(2t+1),), or None to build it
     table = cone_table(t) if table is None else table  # (2^(2t+1),)
     return [left_count(table, 2 * t + 1, k) for k in range(1, 2 * t + 1)]
 
 
 def right_counts(t: int, table: np.ndarray | None = None) -> list[int]:
     """`right_count` for k = 1 .. 2t."""
+    # table: (2^(2t+1),), or None to build it
     table = cone_table(t) if table is None else table  # (2^(2t+1),)
     return [right_count(table, 2 * t + 1, k) for k in range(1, 2 * t + 1)]
 
 
 def flip_leftmost_flips_center(t: int, table: np.ndarray | None = None) -> bool:
     """c_t = x_{-t} xor g(the other cells): changing the leftmost cell changes c_t for every assignment."""
-    table = cone_table(t) if table is None else table  # (2^(2t+1),)
+    # table: (2^(2t+1),), or None to build it
+    table =cone_table(t) if table is None else table  # (2^(2t+1),)
     pairs = table.reshape(-1, 2)  # (2^(2t), 2), column 0 is x_{-t} = 0
     return bool(np.all(pairs[:, 0] != pairs[:, 1]))
 

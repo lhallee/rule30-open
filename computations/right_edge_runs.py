@@ -38,19 +38,19 @@ The defaults of the commands, with their running times on one core:
 from __future__ import annotations
 
 import argparse
-import functools
 import itertools
 import subprocess
 import time
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
 
-from computations.seed_onsets import compiled
+from computations.c_programs import compiled
 from computations.two_index import doubling_levels
+
 
 MASK128 = (1 << 128) - 1
 
@@ -99,7 +99,8 @@ class Runs:
     @property
     def stalls(self) -> list[int]:
         """d_k = J_(k+1) - J_k, k = 0 .. K - 1: the number of diagonals of least period 2^(k+1)."""
-        return [b - a for a, b in zip(self.white, self.white[1:])]
+        # strict=False: white[1:] is one shorter, so the pairs are the K consecutive ones
+        return [b - a for a, b in zip(self.white, self.white[1:], strict=False)]
 
     def agreement(self) -> list[int]:
         """v_2(h(2^k) - h(-2^k)) for k = 0 .. K - 2, read modulo 2^(J_K + 1) (Theorem C(ii): J_(k+1) + 1)."""
@@ -109,7 +110,7 @@ class Runs:
 
 
 def _binary(optimize: bool = True) -> Path:
-    """right_edge_runs.c, beside this module, compiled by `seed_onsets.compiled` (kept per source and flags)."""
+    """right_edge_runs.c, beside this module, compiled by `c_programs.compiled` (kept per source and flags)."""
     return compiled("right_edge_runs", ("-O2" if optimize else "-O0", "-w"))
 
 
@@ -278,7 +279,7 @@ def antiderivative(g: np.ndarray) -> np.ndarray:
     out = np.zeros_like(g)  # (H,)
     if g.size > 1:
         np.bitwise_xor.accumulate(g[:-1], out=out[1:])
-    return out
+    return out  # (H,)
 
 
 # ---------------------------------------------------------------------------------------------------------------------

@@ -33,12 +33,13 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.settled_slope import least_periods, stream
+
 
 U64 = np.uint64
 
@@ -62,10 +63,10 @@ def words_from_tail(tail: np.ndarray, P: int) -> np.ndarray:
 
 def rotate(w: np.ndarray, k: int | np.ndarray, P: int) -> np.ndarray:
     """The words read from time k on: bit r of the result is bit (r + k) mod P of w."""
-    # w: (n,)
+    # w: (n,); k: () or (n,)
     k = np.asarray(k, dtype=U64) % U64(P)  # () or (n,)
     m = mask(P)
-    lo = w >> k
+    lo = w >> k  # (n,)
     hi = np.where(k == 0, U64(0), (w << ((U64(P) - k) % U64(64))) & m)  # (n,)
     return (lo | hi) & m  # (n,)
 
@@ -115,7 +116,7 @@ def anti_periodic(w: np.ndarray, P: int) -> np.ndarray:
     """Whether each word of length P (P even) is its own complement after P/2 steps."""
     # w: (n,)
     if P % 2:
-        return np.zeros(len(w), dtype=bool)
+        return np.zeros(len(w), dtype=bool)  # (n,)
     return rotate(w, P // 2, P) == ((~w) & mask(P))  # (n,)
 
 
@@ -212,7 +213,7 @@ def regimes(table: SettledTable) -> list[tuple[int, int]]:
     """The stretches [w + 1, w'] between consecutive white diagonals w < w' (and from depth 0, and to the last depth)."""
     wd = np.flatnonzero(table.weight == 0).tolist()
     cuts = [-1] + wd + [len(table.period) - 1]
-    return [(lo + 1, hi) for lo, hi in zip(cuts[:-1], cuts[1:]) if lo + 1 <= hi]
+    return [(lo + 1, hi) for lo, hi in zip(cuts[:-1], cuts[1:], strict=True) if lo + 1 <= hi]
 
 
 @dataclass(frozen=True, slots=True)
@@ -314,19 +315,19 @@ def max_run_quantiles(table: SettledTable, depths: list[int], qs: tuple[float, .
     nonwhite = table.weight > 0  # (n,)
     periods = sorted(set(reg[nonwhite].tolist()))
     K = max(periods) + 1
-    logF = {}  # P -> (K,) log Pr[g <= k | not white]
+    log_cdf: dict[int, np.ndarray] = {}  # P -> (K,) log Pr[g <= k | not white]
     for P in periods:
         law = np.array(run_law(P)[:P], dtype=np.float64)  # (P,): k = 0 .. P - 1
         cdf = np.cumsum(law) / law.sum()  # (P,)
-        logF[P] = np.log(np.concatenate([cdf, np.ones(K - P)]))  # (K,)
+        log_cdf[P] = np.log(np.concatenate([cdf, np.ones(K - P)]))  # (K,)
     out = np.zeros((len(depths), len(qs)), dtype=np.int64)  # (len(depths), len(qs))
     for r, j in enumerate(depths):
         tot = np.zeros(K)  # (K,)
         for P in periods:
-            tot += np.count_nonzero(nonwhite[1:j + 1] & (reg[1:j + 1] == P)) * logF[P]
+            tot += np.count_nonzero(nonwhite[1:j + 1] & (reg[1:j + 1] == P)) * log_cdf[P]
         cdf = np.exp(tot)  # (K,)
         out[r] = [int(np.argmax(cdf >= q)) for q in qs]
-    return out
+    return out  # (len(depths), len(qs))
 
 
 def white_records(table: SettledTable) -> list[tuple[int, int, int, int]]:
@@ -379,7 +380,7 @@ def window_fit(V: np.ndarray, U: np.ndarray, W: np.ndarray, stretches: list[tupl
     for gi, gam in enumerate(gammas):
         for ki, kap in enumerate(kappas):
             C[gi, ki] = math.ceil(float((V - gam * j - kap * W).max()) - 1e-9)
-    return slopes, C
+    return slopes, C  # C: (len(gammas), len(kappas))
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -446,7 +447,9 @@ def main() -> None:
     q = max_run_quantiles(table, [j for j, *_ in recs] + [args.depth])
     print("records of W_j: depth, W_j, P_j, weight, log2 j, model quantiles 1%, 50%, 99% of W_j (last row: the last depth "
           "and its regime period)")
-    for (j, Wj, P, wt), row in zip(recs + [(args.depth, recs[-1][1], int(regime_period(table)[-1]), -1)], q):
+    # q has one row per record and one for the last depth
+    for (j, Wj, P, wt), row in zip(recs + [(args.depth, recs[-1][1], int(regime_period(table)[-1]), -1)], q,
+                                   strict=True):
         print(f"  {j:>7} {Wj:>3} {P:>3} {wt:>3} {math.log2(j):6.2f}   {row[0]:>3} {row[1]:>3} {row[2]:>3}")
 
     rt = run_transfer(d.tail, Pc)
@@ -464,7 +467,8 @@ def main() -> None:
         for h in tqdm([int(x) for x in args.fit.split(",")], desc="window", file=sys.stderr):
             run = window_bounds_c(args.depth, h, 16, threads=2)
             slopes, C = window_fit(run.onset, run.bound, W, stretches, gammas, kappas)
-            print(f"h = {h}: slope of U_j on " + ", ".join(f"[{lo}, {hi}] {s:.4f}" for (lo, hi), s in zip(stretches, slopes)))
+            print(f"h = {h}: slope of U_j on " + ", ".join(f"[{lo}, {hi}] {s:.4f}"
+                                                         for (lo, hi), s in zip(stretches, slopes, strict=True)))
             for gi, gam in enumerate(gammas):
                 print(f"    V_j <= {gam} j + C + kappa W_j needs C = " +
                       ", ".join(f"{int(C[gi, ki])} (kappa {k})" for ki, k in enumerate(kappas)))

@@ -35,13 +35,12 @@ from __future__ import annotations
 import argparse
 import itertools
 import sys
-from math import comb
-
 import numpy as np
 
+from math import comb
 from tqdm.auto import tqdm
 
-from computations.min_certificate import RULES, as_integer, packed_table, unpacked_table
+from computations.min_certificate import RULES, packed_table, unpacked_table
 from computations.query_depth import inner_slices
 
 
@@ -58,7 +57,7 @@ def mixed_derivative(table: np.ndarray, t: int, cells: list[int]) -> np.ndarray:
         bit = cell + t
         view = out.reshape(-1, 2, 1 << bit)  # (high cells, x_cell, low cells)
         out = (view ^ view[:, ::-1, :]).reshape(-1)  # (2^(2t+1),)
-    return out
+    return out  # (2^(2t+1),)
 
 
 def comb_derivative(t: int, j: int) -> set[int]:
@@ -77,7 +76,7 @@ def anf(table: np.ndarray, n: int) -> np.ndarray:
     for i in range(n):
         view = out.reshape(-1, 2, 1 << i)  # (high, bit i, low)
         view[:, 1, :] ^= view[:, 0, :]
-    return out
+    return out  # (2^n,)
 
 
 def maximal_monomials(t: int) -> list[int]:
@@ -112,6 +111,7 @@ def hitting_number(t: int, most: int = 4) -> tuple[int | None, list[int]]:
 def window_lengths(t: int, longest: int = 9, table: np.ndarray | None = None) -> list[int | None]:
     """W(t, k) for k = 1 .. 2t: the least L <= `longest` such that for every assignment of the cells outside the
     window x_{-t+k} .. x_{-t+k+L-1}, c_t takes both values on the window; None if there is none within the cone."""
+    # table: (2^(2t),), g below, or None to build it
     n = 2 * t  # g = c_t with x_{-t} white; c_t = x_{-t} xor g, so windows right of x_{-t} see g
     g = unpacked_table(t, white_left=True) if table is None else table  # (2^(2t),), bit k-1 is x_{-t+k}
     out: list[int | None] = []

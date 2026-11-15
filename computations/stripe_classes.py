@@ -26,15 +26,15 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
-from functools import lru_cache
 
+from functools import cache
 from tqdm.auto import tqdm
 
+from computations.c_programs import compiled
 from computations.rule30 import step
-from computations.seed_onsets import compiled
 
 
-@lru_cache(maxsize=None)
+@cache
 def stripe_words(n: int) -> frozenset[tuple[bool, ...]]:
     """The kit's `StripeWord` of length n, bit 0 first: zs ++ [1], zs ++ [1, 1], xs ++ [0, 1], with zs all 0."""
     out: set[tuple[bool, ...]] = set()

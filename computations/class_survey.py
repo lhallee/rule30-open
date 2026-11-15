@@ -28,9 +28,9 @@ import json
 import multiprocessing
 import sys
 import time
-from dataclasses import asdict, dataclass
-
 import numpy as np
+
+from dataclasses import asdict, dataclass
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components, shortest_path
 from tqdm.auto import tqdm
@@ -82,6 +82,7 @@ def classify(block: str, width: int) -> Row:
 
     def mixed(key: np.ndarray) -> set[int]:
         """The components in which some key shows both values of the left column."""
+        # key: (m,), a phase or cyclic class for each node that can hold a play
         group = comp * (int(key.max()) + 1) + key  # (m,)
         ones = np.bincount(group, weights=column)  # (groups,)
         count = np.bincount(group)  # (groups,)
@@ -160,7 +161,7 @@ def main() -> None:
     if args.periods:
         rows = survey(blocks_of(range(args.periods[0], args.periods[1] + 1)), args.width, args.workers)
         if args.out:
-            with open(args.out, "w") as handle:
+            with open(args.out, "w", encoding="utf-8") as handle:
                 for row in rows:
                     handle.write(json.dumps(asdict(row)) + "\n")
         print("period | blocks | closed by the game | closed by classes only")

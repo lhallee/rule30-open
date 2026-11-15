@@ -17,11 +17,9 @@ from __future__ import annotations
 
 import argparse
 import time
-
-from collections.abc import Iterator
-
 import numpy as np
 
+from collections.abc import Iterator
 from tqdm.auto import tqdm
 
 
@@ -46,7 +44,7 @@ def periodic_segments(row: np.ndarray, side: int, max_period: int) -> np.ndarray
         starts = n - side + 1
         if starts > 0:
             out[p - 1, :starts] = (prefix[span: span + starts] - prefix[:starts]) == span
-    return out
+    return out  # (max_period, n)
 
 
 def stream(row: np.ndarray, steps: int, side: int, max_period: int,
@@ -92,7 +90,7 @@ def domain_census(steps: int, side: int, max_period: int) -> dict[str, object]:
         left_cells += int(left_mask.sum())
         right_cells += int(right_mask.sum())
         by_period += window.sum(1)
-        for p, x in zip(*np.nonzero(window)):
+        for p, x in zip(*np.nonzero(window), strict=True):  # row and column indices of the same entries
             found.append((t, int(starts[x]), int(p) + 1))
     return {"left": left, "right": right, "left_starts": left_cells, "right_starts": right_cells,
             "by_period": by_period.tolist(), "blocks": found}

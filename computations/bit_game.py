@@ -21,11 +21,13 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations import game, locks
+from computations.rule30 import pack_row
+
 
 # The seven blocks of period at most 16 that the game excludes and the certificates of GameBlocks, GameBlocksLong and
 # the kit leave out, with the least width at which the game excludes each.
@@ -78,6 +80,7 @@ def criterion(block: str, width: int, steps: int | None = None) -> tuple[bool, i
     longest = [0]
 
     def close(seed: np.ndarray, src: np.ndarray, tgt: np.ndarray) -> np.ndarray:
+        # seed: (p n,); src, tgt: (2 p n,), the moves in the direction searched
         found = np.zeros(nodes, dtype=bool)  # (p n,)
         frontier = seed.copy()  # (p n,)
         length = 0
@@ -88,7 +91,7 @@ def criterion(block: str, width: int, steps: int | None = None) -> tuple[bool, i
             found |= frontier
             length += 1
         longest[0] = max(longest[0], length)
-        return found
+        return found  # (p n,)
 
     most = 0
     for phase in range(len(block)):
@@ -122,6 +125,7 @@ def phase_rounds(block: str, width: int) -> list[int]:
     def close(seed: np.ndarray, src: np.ndarray, tgt: np.ndarray) -> np.ndarray:
         """The nodes that walks of one move or more along src -> tgt reach from the seed: those that walks of any
         length reach from the seed's successors, by one breadth-first search."""
+        # seed: (p n,); src, tgt: (2 p n,), the moves in the direction searched
         after = np.zeros(nodes, dtype=bool)  # (p n,)
         after[tgt[seed[src]]] = True
         return locks.back_closure(after, tgt, src, graphs[src is source])  # (p n,)
@@ -253,15 +257,10 @@ class BitTables:
         self.total = self.period * self.size
         self.full = (1 << self.total) - 1
         index = np.arange(self.total, dtype=np.int64)  # (p 2^(K+2),)
-        self.pat = [self._pack(((index >> s) & 1).astype(bool)) for s in range(width + 2)]
+        self.pat = [pack_row(((index >> s) & 1).astype(bool)) for s in range(width + 2)]
         self.npat = [self.full ^ p for p in self.pat]
         col = np.array(self.block, dtype=bool)[index >> (width + 2)]  # (p 2^(K+2),)
-        self.colmask = self._pack(((index >> width) & 1).astype(bool) == col)
-
-    @staticmethod
-    def _pack(bits: np.ndarray) -> int:
-        """The integer with bit i set where `bits[i]`; `bits` has shape (n,)."""
-        return int.from_bytes(np.packbits(bits.astype(np.uint8), bitorder="little").tobytes(), "little")
+        self.colmask = pack_row(((index >> width) & 1).astype(bool) == col)
 
     def ds(self, table: int, mask: int, d: int) -> int:
         """The delta swap of `BitGame.ds`."""
@@ -311,10 +310,11 @@ class BitTables:
         for phase in range(self.period):
             for r in range(1 << self.width):
                 out[(phase << self.width) + r] = (table >> (phase * self.size + r)) & 1
-        return out
+        return out  # (p 2^K,)
 
     def table(self, nodes: np.ndarray) -> int:
         """A node set of shape (p 2^K,) as a canonical table."""
+        # nodes: (p 2^K,)
         out = 0
         for node in np.flatnonzero(nodes).tolist():
             phase, r = divmod(node, 1 << self.width)

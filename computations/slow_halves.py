@@ -24,7 +24,7 @@ from computations import absorption
 def entry_times(word: str, halves: np.ndarray, steps: int, wall: np.ndarray, phase: int = 0) -> np.ndarray:
     """The first step before `steps` at which each right half enters the kit's family, or `steps` if none does; row i
     of `halves` holds the cells of half i, column j being column j + 1."""
-    # halves: (m, n)
+    # halves: (m, n); wall: (4, 2^13), the kit's wall states at each ether phase
     bits = np.zeros((halves.shape[0], halves.shape[1] + steps + 70), dtype=np.uint8)  # (m, cells)
     bits[:, :halves.shape[1]] = halves
     times = absorption.absorb(word, absorption.packed(bits), phase, steps, wall, halves.shape[1])  # (m,)
@@ -35,6 +35,7 @@ def beam_search(word: str, beam: int, start: int, stop: int, steps: int, wall: n
                 phase: int = 0) -> dict[int, tuple[int, np.ndarray]]:
     """For each length n from `start` to `stop`, the latest entry found among halves of at most n cells and one half
     that attains it. All halves of `start` cells are tried; each later length extends the kept halves by one cell."""
+    # wall: (4, 2^13)
     halves = ((np.arange(1 << start)[:, None] >> np.arange(start)[None, :]) & 1).astype(np.uint8)  # (2^start, start)
     times = entry_times(word, halves, steps, wall, phase)  # (2^start,)
     best: dict[int, tuple[int, np.ndarray]] = {}
@@ -47,7 +48,7 @@ def beam_search(word: str, beam: int, start: int, stop: int, steps: int, wall: n
         order = np.argsort(-times, kind="stable")[:beam]  # (beam,)
         halves, times = halves[order], times[order]
         best[n] = (int(times[0]), halves[0].copy())
-    return best
+    return best  # for each length n, the latest entry and a half that attains it, (n,)
 
 
 def main() -> None:

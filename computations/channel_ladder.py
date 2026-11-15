@@ -37,11 +37,11 @@ from __future__ import annotations
 import argparse
 import itertools
 import math
-import resource
 import time
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
+from typing import TypedDict
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order, connected_components
 from tqdm.auto import tqdm
@@ -52,10 +52,11 @@ from computations.rule30 import distinct
 def step(windows: np.ndarray, width: int, center: int, free: int) -> np.ndarray:
     """One step of Rule 30 on columns 1 .. width beside a center reading `center`, with column width + 1 reading
     `free`. `windows` has shape (n,), int64; returns shape (n,)."""
+    # windows: (n,) int64
     mask = np.int64((1 << width) - 1)
     left = ((windows << 1) | np.int64(center)) & mask  # (n,), column x - 1 at bit x - 1
     right = (windows >> 1) | (np.int64(free) << (width - 1))  # (n,), column x + 1 at bit x - 1
-    return left ^ (windows | right)
+    return left ^ (windows | right)  # (n,)
 
 
 def white_reads(block: str) -> tuple[int, ...]:
@@ -78,6 +79,7 @@ class Ladder:
 def graph(block: str, width: int, sets: list[np.ndarray]) -> np.ndarray:
     """The successors (free cell 0, 1) of each node of `sets` (P sorted arrays) among the nodes of `sets`, as global
     node ids in phase order, -1 where the successor is missing. Shape (N, 2)."""
+    # sets: (L_k,) each, k = 0 .. P - 1
     period = len(block)
     sizes = np.array([s.size for s in sets], dtype=np.int64)  # (P,)
     offset = np.concatenate([[0], np.cumsum(sizes)])  # (P + 1,)
@@ -90,12 +92,13 @@ def graph(block: str, width: int, sets: list[np.ndarray]) -> np.ndarray:
             where = np.minimum(where, max(target.size - 1, 0))
             found = (target.size > 0) & (target[where] == after) if target.size else np.zeros(after.size, bool)
             succ[offset[k]:offset[k + 1], free] = np.where(found, where + offset[(k + 1) % period], -1)
-    return succ
+    return succ  # (N, 2)
 
 
 def trim(succ: np.ndarray) -> np.ndarray:
     """The greatest set of nodes in which every node has a predecessor, as a boolean mask (N,): remove the nodes with
     no predecessor among those left until none is left. `succ` has shape (N, 2), -1 for a missing move."""
+    # succ: (N, 2)
     n = succ.shape[0]
     edges = succ.ravel()  # (2N,)
     sources = np.repeat(np.arange(n, dtype=np.int64), 2)  # (2N,)
@@ -116,11 +119,12 @@ def trim(succ: np.ndarray) -> np.ndarray:
         np.subtract.at(indeg, hit, 1)
         hit = distinct(hit)
         dead = hit[(indeg[hit] == 0) & alive[hit]]
-    return alive
+    return alive  # (N,)
 
 
 def restrict(block: str, width: int, candidates: list[np.ndarray]) -> Ladder:
     """The limit sets inside `candidates` (P sorted arrays of windows that contain the limit sets) and their graph."""
+    # candidates: (L_k,) each, k = 0 .. P - 1
     succ = graph(block, width, candidates)  # (N, 2)
     alive = trim(succ)  # (N,)
     sizes = np.array([s.size for s in candidates], dtype=np.int64)  # (P,)
@@ -239,6 +243,7 @@ def period_moves(subset: np.ndarray, block: str, reads: tuple[int, ...], succ: n
     """The moves of the subset automaton over one period from `subset` (sorted local ids at phase 0): for each word of
     readings with a nonempty successor, the word as an integer and the sorted set of local ids it leads to. `succ` has
     shape (m, 2) in local ids (-1 outside the component), `bit` (m,) is column 1 at each node."""
+    # subset: (s,); succ: (m, 2); bit: (m,)
     branches = [(0, subset)]
     for k in range(len(block)):
         split = []
@@ -257,7 +262,7 @@ def period_moves(subset: np.ndarray, block: str, reads: tuple[int, ...], succ: n
             after = distinct(after[after >= 0])
             if after.size:
                 branches.append((word, after))
-    return branches
+    return branches  # each word with its sorted set (s_i,)
 
 
 def perron(matrix: csr_matrix, tolerance: float = 1e-7, rounds: int = 20000) -> tuple[float, float]:
@@ -283,6 +288,7 @@ def period_graph(ladder: Ladder, nodes: np.ndarray, reads: tuple[int, ...]) -> t
     readings each reads over one period (a function of the phase-0 window, since the free column reaches column 1 only
     after `width` steps), and the phase-0 nodes it can reach after one period inside the set. Returns (start (s,),
     word (s,), successors (s, K)) with successors as indices into start, -1 for none, rows without repeats."""
+    # nodes: (m,) sorted global ids
     period = len(ladder.block)
     inside = np.zeros(ladder.succ.shape[0], dtype=bool)  # (N,)
     inside[nodes] = True
@@ -307,7 +313,7 @@ def period_graph(ladder: Ladder, nodes: np.ndarray, reads: tuple[int, ...]) -> t
     local = np.full(ladder.succ.shape[0], -1, dtype=np.int64)  # (N,)
     local[start] = np.arange(start.size)
     successors = np.where(reach >= 0, local[np.maximum(reach, 0)], -1)  # (s, K)
-    return start, word, successors
+    return start, word, successors  # (s,), (s,), (s, K)
 
 
 def subset_automaton(word: np.ndarray, successors: np.ndarray, initial: list[np.ndarray], cap: int = 2_000_000,
@@ -319,11 +325,13 @@ def subset_automaton(word: np.ndarray, successors: np.ndarray, initial: list[np.
     time, all sets of a layer at once; a set is named by its size and two sums of random 64-bit keys of its members
     (two different sets share a name with probability about 2^-128 per pair). Returns (states, sources, targets,
     words, complete), one move per (state, word)."""
+    # word: (s,); successors: (s, K); initial: (s_i,) each; e counts the moves found
     rng = np.random.default_rng(20261102)
     keys = rng.integers(0, 2**63, size=(2, word.size), dtype=np.uint64) * np.uint64(2) + np.uint64(1)  # (2, s)
     names: dict[tuple[int, int, int], int] = {}
 
     def name(members: np.ndarray) -> tuple[int, int, int]:
+        # members: (s_i,) indices into word
         return (int(members.size), int(keys[0, members].sum()), int(keys[1, members].sum()))
 
     owners, members = [], []
@@ -358,13 +366,13 @@ def subset_automaton(word: np.ndarray, successors: np.ndarray, initial: list[np.
             sum0 = np.add.reduceat(keys[0, nxt], first) if first.size else np.zeros(0, np.uint64)  # (g,)
             sum1 = np.add.reduceat(keys[1, nxt], first) if first.size else np.zeros(0, np.uint64)  # (g,)
             target = np.empty(first.size, dtype=np.int64)  # (g,)
-            for i, key in enumerate(zip(size.tolist(), sum0.tolist(), sum1.tolist())):
+            for i, key in enumerate(zip(size.tolist(), sum0.tolist(), sum1.tolist(), strict=True)):  # (g,) each
                 found = names.get(key)
                 if found is None:
                     if len(names) >= cap:
                         bar.close()
                         empty = np.zeros(0, np.int64)
-                        return len(names), empty, empty, empty, False
+                        return len(names), empty, empty, empty, False  # (0,) each
                     found = len(names)
                     names[key] = found
                     new_owner.append(np.full(size[i], found, dtype=np.int64))
@@ -377,11 +385,12 @@ def subset_automaton(word: np.ndarray, successors: np.ndarray, initial: list[np.
         owner = np.concatenate(new_owner) if new_owner else np.zeros(0, np.int64)
         member = np.concatenate(new_member) if new_member else np.zeros(0, np.int64)
     bar.close()
-    return len(names), np.concatenate(sources), np.concatenate(targets), np.concatenate(labels), True
+    return len(names), np.concatenate(sources), np.concatenate(targets), np.concatenate(labels), True  # (e,) each
 
 
 def growth_of(states: int, sources: np.ndarray, targets: np.ndarray) -> tuple[float, float]:
     """Bounds on the Perron root of the automaton's graph: the largest over its strongly connected components."""
+    # sources, targets: (e,), the moves
     matrix = csr_matrix((np.ones(sources.size), (sources, targets)), shape=(states, states))
     matrix.sum_duplicates()
     low = high = 0.0
@@ -457,13 +466,25 @@ def simple_growth(ladder: Ladder, component: Component, reads: tuple[int, ...]) 
 
 def peak_gb() -> float:
     """The peak resident memory of this process, in GB."""
+    try:
+        import resource
+    except ModuleNotFoundError as error:
+        raise RuntimeError("the peak memory is read with the resource module, which only Unix has") from error
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20
 
 
-def describe(ladder: Ladder, reads: tuple[int, ...], cap: int, entropy: bool, progress: bool) -> dict:
+class Rung(TypedDict):
+    """One rung of the ladder as `describe` returns it and `report` prints it."""
+
+    width: int
+    limit: list[int]  # the size of the limit set at each phase
+    components: list[tuple[Component, Growth | None]]
+
+
+def describe(ladder: Ladder, reads: tuple[int, ...], cap: int, entropy: bool, progress: bool) -> Rung:
     """One rung of the ladder: the sizes, the components and, where the automaton fits, their growth per period."""
     comps = classes(ladder, reads)
-    rows = []
+    rows: list[tuple[Component, Growth | None]] = []
     for comp in comps:
         growth = None
         if entropy and not comp.passes:
@@ -472,7 +493,7 @@ def describe(ladder: Ladder, reads: tuple[int, ...], cap: int, entropy: bool, pr
     return {"width": ladder.width, "limit": [int(s.size) for s in ladder.sets], "components": rows}
 
 
-def report(row: dict) -> str:
+def report(row: Rung) -> str:
     """One line per rung and one per component."""
     lines = [f"W {row['width']}: limit set {row['limit']} (phase 0 .. P-1), peak {peak_gb():.2f} GB"]
     for comp, growth in row["components"]:

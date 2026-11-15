@@ -32,16 +32,17 @@ import itertools
 import os
 import subprocess
 import sys
+import numpy as np
+
 from collections.abc import Callable
 from pathlib import Path
-
-import numpy as np
 from scipy.optimize import linprog
 from tqdm.auto import tqdm
 
 from computations import query_adversary as qa
 from computations import query_depth as qd
 from computations.cone_screening import step_slices, variable_slices
+
 
 LOW = 9  # cells bit-sliced in the C program
 
@@ -68,6 +69,7 @@ def diagonal_table(t: int) -> np.ndarray:
 
 def gf2_degree(table: np.ndarray, n: int) -> int:
     """The degree of the GF(2) normal form (-1 for the zero function)."""
+    # table: (2^n,)
     coef = qa.anf(table, n)  # (2^n,)
     support = np.nonzero(coef)[0]  # (k,)
     return max((int(s).bit_count() for s in support), default=-1)
@@ -100,8 +102,8 @@ def previous_level_split(t: int) -> bool:
 
 
 def _binary() -> Path:
-    """computations/query_evasive_sums.c, compiled once and kept for later processes (`seed_onsets.compiled`)."""
-    from computations.seed_onsets import compiled
+    """computations/query_evasive_sums.c, compiled once and kept for later processes (`c_programs.compiled`)."""
+    from computations.c_programs import compiled
     return compiled("query_evasive_sums", ("-O3", "-march=native", "-fopenmp", "-w"))
 
 
@@ -119,6 +121,7 @@ def subcube_depths(table: np.ndarray, n: int) -> tuple[np.ndarray, np.ndarray, n
     """(depth, low, free) over the 3^n subcubes (axis k is variable n - 1 - k, index 2 meaning free): the least depth
     of a tree for the function on the subcube, its least value there, and the number of free cells. The program of
     `query_depth.exact_depth`, keeping every subcube."""
+    # table: (2^n,)
     cube = table.astype(np.int8).reshape([2] * n)  # (2,)*n
     low, high = cube, cube.copy()
     for axis in range(n):
@@ -142,12 +145,13 @@ def subcube_depths(table: np.ndarray, n: int) -> tuple[np.ndarray, np.ndarray, n
         shape = [1] * n
         shape[axis] = 3
         count += (np.arange(3) == 2).astype(np.int8).reshape(shape)
-    return depth, low, count
+    return depth, low, count  # (3,)*n each
 
 
 def subcube_parity(table: np.ndarray, n: int) -> np.ndarray:
     """The parity of the number of 1-rows in each of the 3^n subcubes, the GF(2) coefficient of the product of its
     free cells in the restricted function (same layout as `subcube_depths`)."""
+    # table: (2^n,)
     cube = table.astype(np.uint8).reshape([2] * n)  # (2,)*n
     for axis in range(n):
         a0, a1 = np.take(cube, 0, axis=axis), np.take(cube, 1, axis=axis)
@@ -157,6 +161,7 @@ def subcube_parity(table: np.ndarray, n: int) -> np.ndarray:
 
 def _close(start: np.ndarray, n: int, step: Callable[[np.ndarray, int], np.ndarray]) -> np.ndarray:
     """Iterate W = start and (for every free cell, step(W, axis) on its slice) n times, so every subcube is final."""
+    # start: (3,)*n; step: (3,)*n and an axis -> (3,)*(n-1), the slice of W at index 2 on that axis
     win = start.copy()  # (3,)*n
     for _ in range(n):
         ok = np.ones_like(win)  # (3,)*n
@@ -164,8 +169,8 @@ def _close(start: np.ndarray, n: int, step: Callable[[np.ndarray, int], np.ndarr
             free = [slice(None)] * n
             free[axis] = 2
             ok[tuple(free)] &= step(win, axis)
-        win = start & ok
-    return win
+        win = start & ok  # (3,)*n
+    return win  # (3,)*n
 
 
 def u_last_games(t: int) -> dict[str, bool]:
@@ -189,7 +194,8 @@ def u_last_games(t: int) -> dict[str, bool]:
     pair_constant = (d0 == 0) & (d1 == 0)  # (3,)*n, (P_0, P_1) fixed on the subcube
 
     def exists(win: np.ndarray, axis: int) -> np.ndarray:
-        return np.take(win, 0, axis=axis) | np.take(win, 1, axis=axis)
+        # win: (3,)*n
+        return np.take(win, 0, axis=axis) | np.take(win, 1, axis=axis)  # (3,)*(n-1)
 
     u_last = _close(np.where(free == 0, lowq == 1, ~pair_constant), n, exists)  # (3,)*n
     joint = ev_p & ev_q  # (3,)*n
@@ -197,9 +203,10 @@ def u_last_games(t: int) -> dict[str, bool]:
     par0, parq = subcube_parity(p0, n), subcube_parity(q, n)  # (3,)*n each
 
     def forced(win: np.ndarray, axis: int) -> np.ndarray:
-        top = np.take(parq, 0, axis=axis) == 1  # a Q-top cell: after it Q has full GF(2) degree, a win
+        # win: (3,)*n
+        top = np.take(parq, 0, axis=axis) == 1  # (3,)*(n-1), a Q-top cell: after it Q has full GF(2) degree, a win
         child = np.where(np.take(par0, 0, axis=axis) == 1, np.take(win, 0, axis=axis), np.take(win, 1, axis=axis))
-        return top | child
+        return top | child  # (3,)*(n-1)
 
     gf2_game = _close(free > 0, n, forced)  # a full row of S in this state has Q = 0, a loss
     return {"u_last": bool(u_last[root]), "derivative_evasive": bool(ev_q[root]), "joint_root": bool(joint[root]),
@@ -209,6 +216,7 @@ def u_last_games(t: int) -> dict[str, bool]:
 def structure(table: np.ndarray, n: int) -> tuple[list[int], list[tuple[int, int, tuple[int, ...]]]]:
     """(cells with which the function flips on every row, pairs (i, j) through which it factors by a gate of two
     inputs with the class of each cofactor at (x_i, x_j) = 00, 01, 10, 11, as `query_adversary.pair_gates`)."""
+    # table: (2^n,)
     cube = table.reshape([2] * n)  # (2,)*n, axis a is variable n - 1 - a
     flips = [v for v in range(n)
              if (np.take(cube, 0, axis=n - 1 - v) != np.take(cube, 1, axis=n - 1 - v)).all()]
@@ -273,7 +281,7 @@ def second_corner_holds(t: int) -> bool:
 
 
 def merged_structure(t: int, exact: int = 13) -> tuple[int | None, list[tuple[int | None, int | None, list[int],
-                                                                                  list[tuple]]]]:
+                                                                                  list[tuple[int, int, tuple[int, ...]]]]]]:
     """F_t = G_t with x_{t-3} black and x_t black, so that x_{t-2} carries the AND of the pair (2t - 3 cells): its exact
     depth (when 2t - 3 <= exact) and the structure of F_t and its one-cell restrictions, as `restriction_structure`."""
     g = qa.reduced_table(t)  # (2^(2t-1),)
@@ -299,6 +307,7 @@ def merged_structure(t: int, exact: int = 13) -> tuple[int | None, list[tuple[in
 def approximate_degree(table: np.ndarray, n: int, eps: float = 1 / 3) -> int:
     """The least d such that a real polynomial of degree d is within eps of the function on every row, by linear
     programming over the characters of at most d cells."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     f = table.astype(float)  # (2^n,)
     for d in range(n + 1):
@@ -319,6 +328,7 @@ def approximate_degree(table: np.ndarray, n: int, eps: float = 1 / 3) -> int:
 def automorphisms(table: np.ndarray, n: int) -> int:
     """The number of pairs (perm, neg) with f(x) = f(y), y_{perm[i]} = x_i xor neg[i]: the permutations and negations
     of cells that fix the function. Backtracking on the weights of pairs of cells, then a check of the table."""
+    # table: (2^n,)
     weights = qa.pair_weights(table, n)  # (n, n, 2, 2)
     index = np.arange(1 << n)  # (2^n,)
     perm = [0] * n
@@ -354,6 +364,7 @@ def automorphisms(table: np.ndarray, n: int) -> int:
 
 def monotone_cells(table: np.ndarray, n: int) -> list[int]:
     """The cells in which the function is monotone, increasing or decreasing, on every row."""
+    # table: (2^n,)
     index = np.arange(1 << n)  # (2^n,)
     out = []
     for i in range(n):

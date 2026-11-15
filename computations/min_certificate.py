@@ -32,15 +32,16 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections.abc import Callable
-
 import numpy as np
 
+from collections.abc import Callable
 from tqdm.auto import tqdm
 
 from computations.cone_screening import step_slices, variable_slices
 from computations.query_certificates import free_counts, subcube_constant
 from computations.query_depth import inner_slices
+from computations.rule30 import pack_row, unpack_row
+
 
 Step = Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
 RULES: dict[int, Step] = {
@@ -63,7 +64,7 @@ def packed_table(t: int, rule: int = 30, inner: int = 24, white_left: bool = Fal
             row = [np.zeros(1 << n, dtype=bool)] + row  # (2t + 1) x (2^n,)
         for _ in range(t):
             row = [step(row[i - 1], row[i], row[i + 1]) for i in range(1, len(row) - 1)]  # (len - 2) x (2^n,)
-        return as_integer(row[0])
+        return pack_row(row[0])
     m = min(inner, n)
     slices = inner_slices(m)  # m x (2^(m-6),) uint64, bit b of word w is variable i of assignment 64 w + b
     chunks = []
@@ -74,12 +75,6 @@ def packed_table(t: int, rule: int = 30, inner: int = 24, white_left: bool = Fal
             words = [step(words[i - 1], words[i], words[i + 1]) for i in range(1, len(words) - 1)]  # len - 2
         chunks.append(np.broadcast_to(words[0], slices[0].shape).astype("<u8").tobytes())
     return int.from_bytes(b"".join(chunks), "little")
-
-
-def as_integer(bits: np.ndarray) -> int:
-    """A truth table (entry i is the value at index i) as an integer with bit i set where the entry is 1."""
-    # bits: (2^n,)
-    return int.from_bytes(np.packbits(bits.astype(np.uint8), bitorder="little").tobytes(), "little")
 
 
 def shortest_implicant(h: int, n: int, cap: int | None = None,
@@ -182,9 +177,7 @@ def least_constant_subcube(t: int, rule: int = 30, cap: int | None = None,
 def unpacked_table(t: int, rule: int = 30, white_left: bool = False) -> np.ndarray:
     """c_t for all 2^(2t+1) rows (2^(2t) with white_left) as a uint8 array, entry i at the row with index i."""
     n = 2 * t + 1 - int(white_left)
-    packed = packed_table(t, rule, white_left=white_left).to_bytes(max(1, (1 << n) // 8), "little")
-    bits = np.unpackbits(np.frombuffer(packed, dtype=np.uint8), bitorder="little")  # (max(8, 2^n),)
-    return bits[: 1 << n]  # (2^n,)
+    return unpack_row(packed_table(t, rule, white_left=white_left), 1 << n)  # (2^n,)
 
 
 def ternary_minimum(t: int, rule: int = 30) -> tuple[int, int]:
@@ -214,7 +207,7 @@ def routing(t: int, right_determined: bool = False, progress: bool = False) -> l
             if right_determined:  # x_{u+1} becomes the variable read first, the innermost choice: each chosen cell
                 # is then a function of the cells to its right
                 zero = zero.reshape((2,) * m).transpose(tuple(range(m - 1, -1, -1))).reshape(-1)  # (2^m,)
-            size, _ = shortest_implicant(as_integer(zero), m, None if best is None else best - 1, right_determined)
+            size, _ = shortest_implicant(pack_row(zero), m, None if best is None else best - 1, right_determined)
             if size is not None:
                 best = size
         out.append(m + 1 if best is None else best)
@@ -230,7 +223,7 @@ def stripe_values(t: int) -> tuple[np.ndarray, np.ndarray]:
         left = [np.bool_(first)] + [np.bool_(j % 2 == 0) for j in range(t - 1, 1, -1)]  # x_{-t} .. x_{-2}
         center = step_slices(left + list(free), t)[0]  # (2^(t+2),) or a scalar
         out.append(np.broadcast_to(center, (1 << (t + 2),)).astype(np.uint8))  # (2^(t+2),)
-    return out[0], out[1]
+    return out[0], out[1]  # (2^(t+2),) each
 
 
 def main() -> None:

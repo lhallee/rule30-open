@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import argparse
 import sys
+
 from dataclasses import dataclass
 from pathlib import Path
 
 from computations.gap_traps import word_entropy
 from computations.reading_certificates import Spec, certificate, tables
+
 
 COLUMNS = Path(__file__).resolve().parent.parent / "Rule30Open" / "Columns"
 NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven"}

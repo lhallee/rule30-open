@@ -228,7 +228,7 @@ def necklaces(period: int) -> list[str]:
     return list(necklace_words(period))
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def necklace_words(period: int) -> tuple[str, ...]:
     """The words of `necklaces`, found by trying every word of the length."""
     out = []

@@ -24,10 +24,11 @@ Psi(z) = z^(-p) X(z) B(z) / (r' B(z) - z B'(z)) over the r' small roots of Q plu
 from __future__ import annotations
 
 import argparse
-from itertools import product
-
 import numpy as np
+
+from itertools import product
 from tqdm.auto import tqdm
+
 
 ASYMMETRIC = [(0, 0, 1), (0, 1, 1), (1, 0, 0), (1, 1, 0)]  # (a, b, c) with a != c
 
@@ -139,7 +140,7 @@ def run_row(coeffs: list[int], left: int, row: list[int], q: int, steps: int) ->
     for t in range(1, steps):
         full = np.convolve(rows[t - 1], kernel)  # (width + r + r',)
         rows[t] = full[rp:rp + width] % q
-    return rows, origin
+    return rows, origin  # (steps, width), ()
 
 
 def is_eventually_periodic(column: np.ndarray, pmax: int) -> bool:
@@ -176,7 +177,7 @@ def ep_columns(coeffs: list[int], left: int, q: int, width: int, reach: int, ste
             col = rows[:, origin + p]  # (steps,)
             if is_eventually_periodic(col, pmax):
                 found.append((row, p, col))
-    return found
+    return found  # (row, column, (steps,) column values) for each hit
 
 
 def twisted_symmetric(row: list[int], p: int, a: int, c: int, q: int) -> bool:
@@ -188,7 +189,6 @@ def twisted_symmetric(row: list[int], p: int, a: int, c: int, q: int) -> bool:
         """Cell i of the row, white outside it."""
         return row[i] if 0 <= i < len(row) else 0
 
-    
     span = len(row) + abs(p) + 1
     for m in range(-span, span + 1):
         power = pow(ratio, m, q) if m >= 0 else pow(inv_ratio, -m, q)

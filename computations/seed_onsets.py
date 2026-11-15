@@ -34,29 +34,27 @@ from __future__ import annotations
 
 import argparse
 import functools
-import hashlib
 import os
-import platform
-import shutil
 import subprocess
 import sys
-import tempfile
+import numpy as np
+
 from dataclasses import dataclass
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
 
+from computations.c_programs import compiled
 from computations.settled_slope import stream
 
-HERE = Path(__file__).resolve().parent
+
 U64 = np.uint64
 ALL = U64(0xFFFFFFFFFFFFFFFF)
 
 
 def ceil_three_halves(j: np.ndarray | int) -> np.ndarray | int:
     """ceil(3j/2)."""
-    return -(-3 * j // 2)
+    # j: (n,), or a Python int
+    return -(-3 * j // 2)  # (n,), the shape of j
 
 
 def scalar_onsets(v0: int, depth: int, H: int, P: int) -> np.ndarray:
@@ -93,7 +91,7 @@ def seed_rows(J: int) -> np.ndarray:
             rows[i] = np.packbits(bits, bitorder="little").view(U64)
         else:
             rows[i] = U64(int(sum(int(b) << k for k, b in enumerate(bits))))
-    return rows
+    return rows  # (J + 1, W)
 
 
 def step_rows(D: np.ndarray, left: np.ndarray | None = None) -> np.ndarray:
@@ -120,7 +118,7 @@ def onset_table(J: int, H: int, P: int = 8, progress: bool = False) -> np.ndarra
         D = step_rows(D)
     onsets = (last + 1).T.copy()  # (2^J, J + 1)
     assert onsets.max() <= H - 1 - P, "horizon too short for the onsets"
-    return onsets
+    return onsets  # (2^J, J + 1)
 
 
 def skeleton(depth: int, P: int = 64) -> tuple[np.ndarray, np.ndarray]:
@@ -136,6 +134,7 @@ def skeleton(depth: int, P: int = 64) -> tuple[np.ndarray, np.ndarray]:
 def driven_max(a: np.ndarray, b: np.ndarray, m: int, H: int, P: int = 8) -> np.ndarray:
     """G_0 .. G_m: the largest onset of driven diagonal k over all 2^k initial vectors, the diagonals -2 and -1 being the
     words a and b repeated from time 0 (a, b of length P)."""
+    # a, b: (P,)
     rows = seed_rows(m)[1:] if m >= 1 else np.zeros((0, 1), dtype=U64)  # (m, W): driven diagonal k at bit k - 1
     W = rows.shape[1]
     lanes = 1 << m
@@ -151,13 +150,14 @@ def driven_max(a: np.ndarray, b: np.ndarray, m: int, H: int, P: int = 8) -> np.n
         E = step_rows(E, left)
     G = np.concatenate([[0], last + 1])  # (m + 1,)
     assert G.max() <= H - 1 - P, "horizon too short for the driven onsets"
-    return G
+    return G  # (m + 1,)
 
 
 def driven_scalar(a: np.ndarray, b: np.ndarray, w: int, m: int, H: int, P: int = 8) -> np.ndarray:
     """Onsets of driven diagonals 1 .. m (index 0 unused, 0) from the vector w (bit k - 1 = diagonal k at time 0), one
     time step at a time: the independent check of `driven_max`."""
-    E = [0, 0] + [(w >> (k - 1)) & 1 for k in range(1, m + 1)]  # index k + 1 = driven diagonal k, k = -1 .. m
+    # a, b: (P,)
+    E =[0, 0] + [(w >> (k - 1)) & 1 for k in range(1, m + 1)]  # index k + 1 = driven diagonal k, k = -1 .. m
     hist = np.zeros((H, m + 1), dtype=np.uint8)  # (H, m + 1)
     for t in range(H):
         E[0], E[1] = int(a[t % P]), int(b[t % P])
@@ -167,7 +167,7 @@ def driven_scalar(a: np.ndarray, b: np.ndarray, w: int, m: int, H: int, P: int =
     for k in range(1, m + 1):
         diff = np.flatnonzero(hist[P:, k] != hist[:-P, k])  # (·,)
         out[k] = diff.max() + 1 if diff.size else 0
-    return out
+    return out  # (m + 1,)
 
 
 def relaxation_table(depth: int, m: int, H: int, P: int = 8, progress: bool = True) -> np.ndarray:
@@ -179,12 +179,13 @@ def relaxation_table(depth: int, m: int, H: int, P: int = 8, progress: bool = Tr
         for phi in range(P):
             a, b = tail[phi:phi + P, i - 1], tail[phi:phi + P, i]  # (P,), (P,)
             R[i] = np.maximum(R[i], driven_max(a, b, m, H, P))
-    return R
+    return R  # (depth + 1, m + 1)
 
 
 def same_skeleton(onsets: np.ndarray, J: int, H: int, P: int = 8) -> bool:
     """Whether every seed x_1 .. x_J has, at every depth <= J, the single cell's periodic part shifted in time: checked on
     the times H - P .. H - 1, after every onset."""
+    # onsets: (2^J, J + 1)
     _, tail = skeleton(J)  # (64, J + 1)
     D = seed_rows(J)  # (J + 1, W)
     for _ in range(H - P):
@@ -211,32 +212,9 @@ def same_skeleton(onsets: np.ndarray, J: int, H: int, P: int = 8) -> bool:
 @functools.cache
 def _binary(name: str) -> Path:
     """Compile computations/<name>.c with OpenMP and -O3 for this machine (-O1 when the variable SEED_ONSETS_FAST is
-    not 1), or reuse the binary of an earlier process (`compiled`)."""
+    not 1), or reuse the binary of an earlier process (`c_programs.compiled`)."""
     flags = ("-O3", "-march=native") if os.environ.get("SEED_ONSETS_FAST", "1") == "1" else ("-O1",)
     return compiled(name, (*flags, "-fopenmp", "-w"))
-
-
-@functools.cache
-def compiled(name: str, flags: tuple[str, ...]) -> Path:
-    """Compile computations/<name>.c with `flags`, or reuse the binary an earlier process compiled from the same source
-    with the same compiler and flags on the same machine: it is kept in a directory of the temporary folder that only
-    this user can write, under a hash of all four. The C programs of the other modules are compiled here too."""
-    cc = shutil.which("cc") or shutil.which("gcc")
-    assert cc, "a C compiler is needed for the searches"
-    source = HERE / f"{name}.c"
-    command = [cc, *flags, str(source)]
-    key = hashlib.sha256(source.read_bytes() + repr((command, platform.node(), platform.machine())).encode())
-    folder = Path(tempfile.gettempdir()) / f"rule30-open-{os.getuid()}"
-    folder.mkdir(mode=0o700, exist_ok=True)
-    if folder.stat().st_uid != os.getuid() or folder.stat().st_mode & 0o022:
-        folder = Path(tempfile.mkdtemp(prefix="seed_onsets_"))  # not ours alone, so compile afresh
-    out = folder / f"{name}-{key.hexdigest()[:20]}"
-    if not out.exists():
-        fresh = Path(tempfile.mkdtemp(prefix="seed_onsets_", dir=folder)) / name
-        subprocess.run([*command, "-o", str(fresh)], check=True)
-        os.replace(fresh, out)  # whole, so a process running at the same time never sees half a binary
-        fresh.parent.rmdir()
-    return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -282,36 +260,41 @@ def pruned_max(J: int, H: int, K: int, split: int = 10, hints: list[str] | None 
 
 def offset_over(M: np.ndarray) -> int:
     """The least c with M_j <= ceil(3j/2) + c for every j in the range (negative if M stays below)."""
-    j = np.arange(len(M))  # (n,)
+    # M: (n,)
+    j =np.arange(len(M))  # (n,)
     return int((M - ceil_three_halves(j)).max())
 
 
 def pair_max(M: np.ndarray) -> np.ndarray:
     """M'_j = max(M_{j-1}, M_j), M'_0 = M_0."""
+    # M: (n,)
     out = M.copy()  # (n,)
     out[1:] = np.maximum(M[1:], M[:-1])
-    return out
+    return out  # (n,)
 
 
 def pair_onsets(onsets: np.ndarray) -> np.ndarray:
     """S_j = max(T_{j-1}, T_j) for every seed (S_0 = T_0)."""
+    # onsets: (seeds, J + 1)
     S = onsets.astype(np.int64)  # (seeds, J + 1)
     S[:, 1:] = np.maximum(onsets[:, 1:], onsets[:, :-1])
-    return S
+    return S  # (seeds, J + 1)
 
 
 def increments(onsets: np.ndarray) -> np.ndarray:
     """inc[i, k] = max over seeds of S_{i+k} - S_i, for i + k <= J (-10^9 elsewhere)."""
-    S = pair_onsets(onsets)  # (seeds, J + 1)
+    # onsets: (seeds, J + 1)
+    S =pair_onsets(onsets)  # (seeds, J + 1)
     n = S.shape[1]
     inc = np.full((n, n), -10**9, dtype=np.int64)  # (J + 1, J + 1)
     for i in range(n):
         inc[i, :n - i] = (S[:, i:] - S[:, i:i + 1]).max(axis=0)
-    return inc
+    return inc  # (J + 1, J + 1)
 
 
 def subadditive_failures(Mp: np.ndarray) -> list[tuple[int, int, int]]:
     """The (a, b, excess) with a <= b, a + b in the range and M'_{a+b} > M'_a + M'_b."""
+    # Mp: (n,)
     out = []
     for a in range(1, len(Mp)):
         for b in range(a, len(Mp) - a):
@@ -332,7 +315,7 @@ def random_onsets(depth: int, samples: int, seed: int = 5, progress: bool = True
         seeds.append("".join(str((x >> i) & 1) for i in range(depth)))
         out[k] = scalar_onsets(1 | (x << 1), depth, H, 64)
     assert out.max() <= H - 64 - 1, "horizon too short"
-    return out, seeds
+    return out, seeds  # out: (samples, depth + 1)
 
 
 def main() -> None:
@@ -364,7 +347,7 @@ def main() -> None:
     if args.prune:
         J = args.prune
         H = args.H or 8 * ((2 * J + 48) // 8)
-        hints = Path(args.hints).read_text().split() if args.hints else ["001"]
+        hints = Path(args.hints).read_text(encoding="utf-8").split() if args.hints else ["001"]
         s = pruned_max(J, H, args.K, split=12, hints=hints, threads=args.threads, progress=True)
         assert s.largest <= H - 9, "horizon too short"
         print(f"branch and bound over the seeds x_1 .. x_{J}, horizon {H}, driven bounds to {args.K} diagonals, "

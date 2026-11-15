@@ -36,11 +36,6 @@ from tqdm.auto import tqdm
 ONE = np.uint64(1)
 
 
-def held(U: int) -> int:
-    """One step of the held map on a Python integer: Rule 30 left of a column held at 0, bit j the cell j + 1 away."""
-    return (U >> 1) ^ (U | (U << 1))
-
-
 def first_failures(support: int, phase: int, limit: int = 63) -> np.ndarray:
     """For every U with exactly `support` bits, the first t with t + phase odd at which H^t(U) is even, or `limit` when
     there is none before it. Phase 0 checks the odd steps, phase 1 the even ones."""

@@ -33,15 +33,16 @@ from __future__ import annotations
 import argparse
 import math
 import sys
+import numpy as np
+
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from fractions import Fraction
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.driver_density import dedupe_max, successors
 from computations.run_mechanism import driven_step
+
 
 ONE = np.uint64(1)
 TAIL = Fraction(17, 25)  # the dense tail of the ratios: b >= 0.68 (n - 1)
@@ -145,6 +146,7 @@ class Layer:
 def count_layers(nmax: int, start: np.ndarray | None = None, progress: bool = False) -> Iterator[Layer]:
     """Yield the exact counts N_n(b) of the admissible words of length n, for n = 1 .. nmax, from the white start or
     from the left half `start` (a (W,) array from `pack_half` or `random_half`), every word starting with c(0) = 1."""
+    # start: (W_s,) uint64 with W_s >= W, or None
     W = words_for(nmax)
     field = nmax  # a count of words of length n <= nmax is at most 2^(n - 1) < 2^nmax, so no field overflows
     full = (1 << field) - 1
@@ -172,6 +174,7 @@ def count_layers(nmax: int, start: np.ndarray | None = None, progress: bool = Fa
 
 def word_counts(n: int, start: np.ndarray | None = None) -> list[int]:
     """N_n(b) for b = 0 .. n - 1, from the white start or from `start` (built for at least n cells)."""
+    # start: (W_s,) uint64, or None
     *_, last = count_layers(n, start)
     return last.counts
 
@@ -224,6 +227,7 @@ class Sweep:
 def sweep(nmax: int, nmin: int = 20, start: np.ndarray | None = None, progress: bool = False) -> Sweep:
     """`ratio_row` for every n = 3 .. nmax in one pass, and the largest ratios over nmin <= n <= nmax and below nmin
     (3 < nmin <= nmax)."""
+    # start: (W_s,) uint64, or None
     rows: list[RatioRow] = []
     last: list[int] = [1]
     for layer in count_layers(nmax, start, progress):
@@ -246,6 +250,7 @@ def best_from(steps: int, start: np.ndarray | None = None, beam: int | None = No
     """M(t) for t = 0 .. steps: the most black cells among c(0 .. t) over the drivers with c(0) = 1 admissible from the
     white start or from `start` (exact when `beam` is None; otherwise the `beam` states with the largest counts are
     kept, a lower bound attained by a driver). The cells that no longer matter by time `steps` are cleared."""
+    # start: (W_s,) uint64 with W_s >= W, or None
     W = words_for(steps + 1)
     X = np.zeros((1, W), dtype=np.uint64) if start is None else start[None, :W].copy()  # (1, W)
     X = keep_cells(X, steps)  # (1, W)
@@ -279,26 +284,26 @@ def run_sweep(args: argparse.Namespace) -> None:
           f"log2(3/2) = {math.log2(1.5):.4f} per letter")
     print("loss rho - h(rho) that a bound N_n(b) <= 2^(theta n) E_n(b) for b >= rho (n - 1) may take: "
           + ", ".join(f"{rho}: {rho - entropy(rho):.4f}" for rho in (0.8, 0.85, 0.9, 0.95)))
-    result = sweep(args.nmax, args.nmin, progress=True)
+    swept = sweep(args.nmax, args.nmin, progress=True)
     print("n  words  log2(words)/n  largest ratio (b, b/(n-1))  largest tail ratio (b)  densest b (b/(n-1))  "
           "densest b with E >= 1  coin process: mass, mean - n/2, variance/(n-2)")
-    for r in result.rows:
+    for r in swept.rows:
         if r.n % args.every == 0 or r.n == args.nmax:
             print(f"{r.n:>3} {r.total:>26,} {math.log2(r.total) / r.n:.4f}  {_ratio(r.top)} ({r.top_b}, "
                   f"{r.top_b / (r.n - 1):.3f})  {_ratio(r.tail)} ({r.tail_b})  "
                   f"{r.densest} ({r.densest / (r.n - 1):.4f})"
                   f"  {r.mean_densest}  {r.mass}, {float(r.mean - Fraction(r.n, 2)):.4f}, "
                   f"{float(r.variance / (r.n - 2)):.4f}")
-    tails = [r for r in result.rows if r.n >= args.late and r.tail is not None]
+    tails = [r for r in swept.rows if r.n >= args.late and r.tail is not None]
     if tails:
         print(f"largest tail ratio for {args.late} <= n <= {args.nmax}: between "
               f"{float(min(r.tail for r in tails if r.tail is not None)):.4f} and "
               f"{float(max(r.tail for r in tails if r.tail is not None)):.4f}")
-    for name, (ratio, n, b) in (("every b", result.top), ("b >= 0.68 (n - 1)", result.tail)):
+    for name, (ratio, n, b) in (("every b", swept.top), ("b >= 0.68 (n - 1)", swept.tail)):
         print(f"largest ratio over {args.nmin} <= n <= {args.nmax}, {name}: {float(ratio):.4f} at n = {n}, b = {b}")
-    ratio, n, b = result.small
+    ratio, n, b = swept.small
     print(f"largest ratio over 3 <= n < {args.nmin}: {float(ratio):.4f} at n = {n}, b = {b}")
-    late = [r for r in result.rows if r.n >= args.late]
+    late = [r for r in swept.rows if r.n >= args.late]
     if late:
         worst = max(late, key=lambda r: r.top)
         print(f"largest ratio over {args.late} <= n <= {args.nmax}: {float(worst.top):.4f} at n = {worst.n} "
@@ -323,11 +328,11 @@ def run_halves(args: argparse.Namespace) -> None:
     halves = [("white", None)] + [(f"random {i}", random_half(args.n, rng)) for i in range(args.halves)]
     at = [round(d * (args.n - 1)) for d in densities]
     for name, half in halves:
-        result = sweep(args.n, args.nmin, half)
-        cells = "  ".join(f"{d}: {float(Fraction(result.last[b]) / mean_count(args.n, b)):.3f}"
-                          for d, b in zip(densities, at))
-        print(f"{name:>9}: {cells}  |  every b: {float(result.top[0]):.3f} (n' = {result.top[1]}), "
-              f"tail: {float(result.tail[0]):.3f} (n' = {result.tail[1]})", flush=True)
+        swept = sweep(args.n, args.nmin, half)
+        cells = "  ".join(f"{d}: {float(Fraction(swept.last[b]) / mean_count(args.n, b)):.3f}"
+                          for d, b in zip(densities, at, strict=True))
+        print(f"{name:>9}: {cells}  |  every b: {float(swept.top[0]):.3f} (n' = {swept.top[1]}), "
+              f"tail: {float(swept.tail[0]):.3f} (n' = {swept.tail[1]})", flush=True)
 
 
 def run_random(args: argparse.Namespace) -> None:

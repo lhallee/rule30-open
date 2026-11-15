@@ -66,6 +66,7 @@ def locked_period(word: str, start: int, steps: int, max_multiple: int = 400,
     """The least multiple of the word's length with which column 1, read at the word's white times, repeats over the
     second half of the run, or None. Masked Jen needs only some common period of the center and that column. `column`
     is `column_one` of the run when the caller has it already."""
+    # column: (T,) with T >= steps, when given
     p = len(word)
     column = column_one(word, start, steps) if column is None else column[:steps]  # (steps,)
     white = np.array([word[t % p] == "0" for t in range(steps)])  # (steps,)
@@ -84,6 +85,7 @@ def lock_breaks(word: str, start: int, steps: int, shift: int, after: int,
     """For the right half `start` driven by `word`: the last time at which column 1, at a white time of the word,
     differs from its value `shift` steps later (-1 if never), how many such times come after `after`, and the first of
     them. A lock that holds stays without such times. `column` is `column_one` of the run when the caller has it."""
+    # column: (T,) with T >= steps, when given
     p = len(word)
     column = column_one(word, start, steps) if column is None else column[:steps]  # (steps,)
     white = np.array([word[t % p] == "0" for t in range(steps - shift)])  # (steps - shift,)

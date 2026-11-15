@@ -21,12 +21,12 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
 
 from computations.cone_screening import cone_table, variable_slices
+
 
 RULES = (30, 45, 90, 120, 150)
 
@@ -71,6 +71,7 @@ def walsh(table: np.ndarray) -> np.ndarray:
 
 def sparsity(table: np.ndarray) -> int:
     """The number of nonzero Walsh coefficients of f."""
+    # table: (2^n,)
     return int(np.count_nonzero(walsh(table)))
 
 
@@ -86,6 +87,7 @@ def gf2_rank(matrix: np.ndarray, progress: bool = False) -> int:
     # matrix: (rows, cols)
     rows, cols = matrix.shape
     pad = (-cols) % 64
+    # (rows, cols + pad), every row a whole number of 64-bit words
     padded = np.concatenate([matrix.astype(np.uint8), np.zeros((rows, pad), dtype=np.uint8)], axis=1)
     packed = np.packbits(padded, axis=1, bitorder="little").view(np.uint64).copy()  # (rows, ceil(cols / 64))
     rank = 0
@@ -109,6 +111,7 @@ def gf2_rank(matrix: np.ndarray, progress: bool = False) -> int:
 
 def xor_lift_rank(table: np.ndarray, progress: bool = False) -> int:
     """The GF(2) rank of the XOR lift of f."""
+    # table: (2^n,)
     return gf2_rank(xor_lift(table), progress)
 
 

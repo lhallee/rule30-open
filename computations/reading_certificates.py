@@ -40,13 +40,14 @@ import argparse
 import re
 import sys
 import time
+import numpy as np
+
 from dataclasses import dataclass
 from pathlib import Path
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.gap_traps import word_entropy
+
 
 SECONDS_PER_STATE = (120 / 196_608, 240 / 196_608)  # ThreeRuns: 196,608 states in 2 to 4 minutes under load
 
@@ -80,7 +81,7 @@ def step(w: np.ndarray, width: int, c: int, x: int) -> np.ndarray:
     """One step of windows of columns 1..width with the center c and column width + 1 equal to x."""
     # w: (n,) int64 -> (n,) int64
     mask = (1 << width) - 1
-    return (((w << 1) | c) ^ (w | (w >> 1) | (x << (width - 1)))) & mask
+    return (((w << 1) | c) ^ (w | (w >> 1) | (x << (width - 1)))) & mask  # (n,)
 
 
 def bad_table(words: tuple[str, ...], keep: int) -> np.ndarray:
@@ -90,7 +91,7 @@ def bad_table(words: tuple[str, ...], keep: int) -> np.ndarray:
         for b in (0, 1):
             text = (format(s, f"0{keep}b") if keep else "") + str(b)
             out[s, b] = any(text.endswith(word) for word in words)
-    return out
+    return out  # (2^keep, 2)
 
 
 def transitions(spec: Spec) -> tuple[list[np.ndarray], list[np.ndarray], np.ndarray]:
@@ -113,7 +114,7 @@ def transitions(spec: Spec) -> tuple[list[np.ndarray], list[np.ndarray], np.ndar
             s_new = np.broadcast_to(suf[None, :], (n, sufs))  # (n, S)
         idx0.append(step(win, spec.width, c, 0)[:, None] * sufs + s_new)  # (n, S)
         idx1.append(step(win, spec.width, c, 1)[:, None] * sufs + s_new)  # (n, S)
-    return idx0, idx1, bad
+    return idx0, idx1, bad  # P arrays (n, S), P arrays (n, S), (P, n, S)
 
 
 def certificate(spec: Spec, progress: bool = False) -> tuple[np.ndarray, np.ndarray]:
@@ -146,7 +147,7 @@ def certificate(spec: Spec, progress: bool = False) -> tuple[np.ndarray, np.ndar
         add &= ~done
         if not add.any():
             bar.close()
-            return good, rank
+            return good, rank  # (P, n, S) each
         k += 1
         rank[add] = k
         bar.update()
@@ -345,7 +346,7 @@ def survey(blocks: tuple[str, ...], budget: int, lean_budget: int, halves: int,
         whites = white_phases(block)
         choices = [(p,) for p in whites] + ([whites] if len(whites) > 1 else [])
         rows = [search(block, phases, runs, budget) for phases in choices]
-        for phases, row in zip(choices, rows):
+        for phases, row in zip(choices, rows, strict=True):
             constant = len(constant_phases(runs, phases)) == len(phases)
             out.append((f"cheapest {block} {list(phases)}" + (" (constant in the samples)" if constant else ""), row))
         singles = [r for r in rows[:len(whites)] if r is not None]
@@ -373,6 +374,7 @@ def describe(row: Found) -> str:
 
 def tables(rank: np.ndarray, bits: int) -> list[int]:
     """The packed rank tables: entry S p + s holds the rank of window w in bits `bits` w .. `bits` w + bits - 1."""
+    # rank: (P, n, S)
     period, n, sufs = rank.shape
     out = []
     for p in range(period):
@@ -409,7 +411,7 @@ def main() -> None:
     if args.survey:
         blocks = tuple(args.blocks) if args.blocks else FORCED_BLOCKS + SUBLIST_BLOCKS
         for label, row in survey(blocks, args.budget, args.lean_budget, args.halves, args.steps):
-            print(f"{label}: " + (describe(row) if row else f"nothing within the budget"), flush=True)
+            print(f"{label}: " + (describe(row) if row else "nothing within the budget"), flush=True)
         print(f"({time.perf_counter() - started:.0f} s)", file=sys.stderr)
         return
     phases = tuple(args.phases) if args.phases is not None else white_phases(args.block)

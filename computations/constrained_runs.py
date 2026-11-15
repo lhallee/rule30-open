@@ -33,13 +33,14 @@ from __future__ import annotations
 import argparse
 import itertools
 import sys
+import numpy as np
+
 from collections.abc import Iterator
 from dataclasses import dataclass
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.run_mechanism import black_reach, center_window, driven_rows, driven_step, white_reach, window_cells
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 1. Reachable states under the left-only constraint
@@ -164,7 +165,7 @@ def residual_classes(steps: int, ks: list[int], progress: bool = False) -> list[
     for _, B, C in constrained_states(steps, progress):
         for k in ks:
             win = B[:, 0] & np.uint64((1 << k) - 1)  # (n,)
-            seen[k].update(zip(win.tolist(), C.tolist()))
+            seen[k].update(zip(win.tolist(), C.tolist(), strict=True))  # (n,) each
     out: list[Classes] = []
     for k in ks:
         pairs = np.array(sorted(seen[k]), dtype=np.uint64)  # (m, 2)

@@ -23,15 +23,16 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-
 import numpy as np
+
 from scipy import ndimage, stats
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from tqdm.auto import tqdm
+
 
 CAP = 6.0  # the Rips filtration stops here; a bar alive at CAP counts as dying at CAP
 FEATURES = [
@@ -89,16 +90,18 @@ def diagrams(window: np.ndarray, value: int) -> list[np.ndarray]:
     to CAP."""
     from ripser import ripser
 
+    # window: (size, size)
     points = np.argwhere(window == value).astype(np.float64)  # (p, 2)
     if points.shape[0] < 2:
-        return [np.full((points.shape[0], 2), [0.0, CAP]), np.zeros((0, 2))]
+        return [np.full((points.shape[0], 2), [0.0, CAP]), np.zeros((0, 2))]  # (p, 2), (0, 2)
     dgms = ripser(points, maxdim=1, thresh=CAP)["dgms"]
     return [np.where(np.isinf(d), CAP, d) for d in dgms]  # each (bars, 2)
 
 
 def features(window: np.ndarray, value: int) -> np.ndarray:
     """The numbers of FEATURES for the cells of `window` equal to `value`."""
-    h0, h1 = diagrams(window, value)
+    # window: (size, size)
+    h0, h1 = diagrams(window, value)  # (bars0, 2), (bars1, 2)
     eps = 1e-9
     clusters4 = np.sum(h0[:, 1] > 1 + eps)
     clusters8 = np.sum(h0[:, 1] > math.sqrt(2) + eps)
@@ -112,15 +115,17 @@ def features(window: np.ndarray, value: int) -> np.ndarray:
 
 def feature_matrix(windows: np.ndarray, progress: bool = False) -> np.ndarray:
     """Features of the black cells, then of the white cells, of each window."""
-    rows = [np.concatenate([features(w, 1), features(w, 0)]) for w in tqdm(windows, disable=not progress,
-                                                                           mininterval=5.0)]
+    # windows: (count, size, size)
+    rows = [np.concatenate([features(w, 1), features(w, 0)])  # each (2 * len(FEATURES),)
+            for w in tqdm(windows, desc="windows", disable=not progress, mininterval=5.0)]
     return np.stack(rows)  # (count, 2 * len(FEATURES))
 
 
 def graph_counts(window: np.ndarray, value: int) -> tuple[int, int, int]:
     """The independent check: 4-connected and 8-connected clusters of the cells equal to `value` (scipy labels) and
     the cycle rank E - V + C of their 4-neighbor graph."""
-    cells = window == value
+    # window: (size, size)
+    cells = window == value  # (size, size)
     c4 = ndimage.label(cells)[1]
     c8 = ndimage.label(cells, structure=np.ones((3, 3)))[1]
     edges = int(np.sum(cells[1:] & cells[:-1]) + np.sum(cells[:, 1:] & cells[:, :-1]))
@@ -129,11 +134,13 @@ def graph_counts(window: np.ndarray, value: int) -> tuple[int, int, int]:
 
 def classifier_auc(x: np.ndarray, y: np.ndarray, permutations: int, seed: int = 0) -> tuple[float, float]:
     """Cross-validated AUC of a logistic regression telling the two samples apart, and its permutation p-value."""
+    # x: (n, f), y: (n,)
     rng = np.random.default_rng(seed)
     model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
     folds = StratifiedKFold(5, shuffle=True, random_state=seed)
 
     def auc(labels: np.ndarray) -> float:
+        # labels: (n,)
         score = cross_val_predict(model, x, labels, cv=folds, method="predict_proba")[:, 1]  # (n,)
         return float(roc_auc_score(labels, score))
 
@@ -144,6 +151,7 @@ def classifier_auc(x: np.ndarray, y: np.ndarray, permutations: int, seed: int = 
 
 def energy_test(a: np.ndarray, b: np.ndarray, permutations: int, seed: int = 0) -> tuple[float, float]:
     """The energy distance between two samples of standardized feature vectors, and its permutation p-value."""
+    # a: (n_a, f), b: (n_b, f)
     rng = np.random.default_rng(seed)
     z = np.concatenate([a, b])  # (n, f)
     z = (z - z.mean(0)) / np.where(z.std(0) > 0, z.std(0), 1.0)
@@ -151,6 +159,7 @@ def energy_test(a: np.ndarray, b: np.ndarray, permutations: int, seed: int = 0) 
     n = a.shape[0]
 
     def energy(idx: np.ndarray) -> float:
+        # idx: (n_a + n_b,), a permutation of the pooled rows
         i, j = idx[:n], idx[n:]
         return float(2 * d[np.ix_(i, j)].mean() - d[np.ix_(i, i)].mean() - d[np.ix_(j, j)].mean())
 
@@ -162,6 +171,7 @@ def energy_test(a: np.ndarray, b: np.ndarray, permutations: int, seed: int = 0) 
 
 def compare(a: np.ndarray, b: np.ndarray, label: str, permutations: int) -> None:
     """Print the per-feature Mann-Whitney tests (Bonferroni over the features), the energy test and the classifier."""
+    # a: (n_a, 2 * len(FEATURES)), b: (n_b, 2 * len(FEATURES))
     names = [f"black {f}" for f in FEATURES] + [f"white {f}" for f in FEATURES]
     print(f"{label}: {a.shape[0]} against {b.shape[0]} windows")
     for k, name in enumerate(names):

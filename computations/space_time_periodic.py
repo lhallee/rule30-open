@@ -21,10 +21,12 @@ from __future__ import annotations
 import argparse
 import functools
 import sys
-from collections import Counter
-
 import numpy as np
+
+from collections import Counter
 from tqdm.auto import tqdm
+
+from computations.cyclic_words import least_period, least_rotation
 
 
 @functools.lru_cache(maxsize=4)
@@ -72,16 +74,6 @@ def cycles(period: int) -> tuple[np.ndarray, np.ndarray]:
     return nodes, label  # (c,), (c,)
 
 
-def necklace(word: str) -> str:
-    """The least rotation of a word."""
-    return min(word[i:] + word[:i] for i in range(len(word)))
-
-
-def least_period(word: str) -> int:
-    """The least period of a word read cyclically."""
-    return min(p for p in range(1, len(word) + 1) if len(word) % p == 0 and word == word[p:] + word[:p])
-
-
 def word_of(column: int, period: int) -> str:
     """The column as a word, letter `ph` its bit `ph`."""
     return "".join(str((column >> ph) & 1) for ph in range(period))
@@ -93,7 +85,7 @@ def temporal_periods(period: int) -> dict[int, int]:
     from math import lcm
     nodes, label = cycles(period)  # (c,), (c,)
     found: dict[int, int] = {}
-    for lab, state in zip(label.tolist(), nodes.tolist()):
+    for lab, state in zip(label.tolist(), nodes.tolist(), strict=True):
         found[lab] = lcm(found.get(lab, 1), least_period(word_of(state >> period, period)))
     return found
 
@@ -121,7 +113,7 @@ def backgrounds(period: int) -> list[tuple[int, int, set[str]]]:
     `period` among the columns, each as its least rotation. Sorted by length."""
     nodes, label = cycles(period)  # (c,), (c,)
     mask = (1 << period) - 1
-    cycle_of = dict(zip(nodes.tolist(), label.tolist()))
+    cycle_of = dict(zip(nodes.tolist(), label.tolist(), strict=True))
     sizes = Counter(label.tolist())
 
     def shifted(state: int, shift: int) -> int:
@@ -136,7 +128,8 @@ def backgrounds(period: int) -> list[tuple[int, int, set[str]]]:
         classes.setdefault(min(members), members)
     found = []
     for members in classes.values():
-        blocks = {necklace(word_of(int(state) >> period, period)) for state in nodes[np.isin(label, list(members))]}
+        blocks = {least_rotation(word_of(int(state) >> period, period))
+                  for state in nodes[np.isin(label, list(members))]}
         found.append((sizes[min(members)], len(members), {b for b in blocks if least_period(b) == period}))
     return sorted(found, key=lambda item: (item[0], sorted(item[2])))
 
@@ -157,11 +150,11 @@ def witnesses(period: int) -> set[tuple[str, int]]:
     nodes, _ = cycles(period)  # (c,)
     left = column_map(period)[nodes] >> period  # (c,), the column left of each state's first column
     found = set()
-    for state, column in zip(nodes.tolist(), left.tolist()):
+    for state, column in zip(nodes.tolist(), left.tolist(), strict=True):
         word, neighbor = word_of(state >> period, period), word_of(column, period)
         p = least_period(word)
         if p % least_period(neighbor):
-            found.add((necklace(word[:p]), p))
+            found.add((least_rotation(word[:p]), p))
     return found
 
 
@@ -174,15 +167,15 @@ def background_walls(period: int, cells: int, cap: int = 100000) -> list[tuple[i
     from computations.lock_chain import closure, escapes, fixes_left
     nodes, label = cycles(period)  # (c,), (c,)
     f = column_map(period)  # (4^P,)
-    mask = (1 << period) - 1
     sizes = Counter(label.tolist())  # the states of each cycle
     found = []
-    for length, count, blocks in backgrounds(period):
+    for length, _, blocks in backgrounds(period):
         if not blocks:
             continue
         lab = next(int(lab) for lab in set(label.tolist()) if sizes[lab] == length and
-                   necklace(word_of(lab >> period, period)) in blocks | {necklace(word_of(lab >> period, period))}
-                   and {necklace(word_of(int(st) >> period, period)) for st in nodes[label == lab]
+                   least_rotation(word_of(lab >> period, period))
+                   in blocks | {least_rotation(word_of(lab >> period, period))}
+                   and {least_rotation(word_of(int(st) >> period, period)) for st in nodes[label == lab]
                         if least_period(word_of(int(st) >> period, period)) == period} == blocks)
         states = [lab]
         while (nxt := int(f[states[-1]])) != lab:

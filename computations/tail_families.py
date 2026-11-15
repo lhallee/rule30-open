@@ -28,8 +28,8 @@ import argparse
 import math
 import multiprocessing
 import sys
-
 import numpy as np
+
 from tqdm.auto import tqdm
 
 from computations.limit_windows import block_of, is_good, limit_sets, tails_up_to, window_moves
@@ -40,6 +40,7 @@ def singleton_orbit(white: np.ndarray, start: int) -> tuple[int, int]:
     """The preperiod and period of the sets reached from the window `start` by white steps; `white` (shape (n, 2))
     holds the two windows each window becomes beside a 0. The sets are sorted arrays; a repeat is found by a
     dictionary of their bytes."""
+    # white: (n, 2)
     members = np.array([start], dtype=white.dtype)  # (s,)
     seen: dict[bytes, int] = {}
     step = 0
@@ -83,6 +84,7 @@ def white_cycle_sets(width: int, workers: int = 1, chunks: int = 256) -> tuple[i
 
 def largest_limit(block: str, moves: np.ndarray) -> int:
     """The largest number of windows in a limit set of `block`, over its phases."""
+    # moves: (2, n, 2), column value, window, free cell
     return max(len(members) for members in limit_sets(block, moves))
 
 
@@ -132,27 +134,33 @@ def tail_table(tails: list[str], width: int, preperiod: int, period: int, worker
 
 def image(members: np.ndarray, moves: np.ndarray, col: int) -> np.ndarray:
     """The windows reached in one step beside `col` from the windows marked in `members` (shape (n,), bool)."""
+    # members: (n,) bool
+    # moves: (2, n, 2), column value, window, free cell
     out = np.zeros(moves.shape[1], dtype=bool)  # (n,)
     index = np.flatnonzero(members)  # (s,)
     out[moves[col, index, 0]] = True
     out[moves[col, index, 1]] = True
-    return out
+    return out  # (n,)
 
 
 def read(members: np.ndarray, moves: np.ndarray, word: str) -> np.ndarray:
     """The windows after the column reads `word` from the windows marked in `members` (shape (n,), bool)."""
+    # members: (n,) bool
+    # moves: (2, n, 2), column value, window, free cell
     for ch in word:
-        members = image(members, moves, int(ch))
-    return members
+        members = image(members, moves, int(ch))  # (n,)
+    return members  # (n,)
 
 
 def subset(small: np.ndarray, large: np.ndarray) -> bool:
     """Whether every window marked in `small` is marked in `large` (both shape (n,), bool)."""
+    # small, large: (n,) bool
     return not bool(np.any(small & ~large))
 
 
 def known(members: np.ndarray) -> bool:
     """Whether every window marked in `members` (shape (n,), bool) has the same first cell."""
+    # members: (n,) bool
     first = np.flatnonzero(members) & 1  # (s,)
     return len(first) == 0 or bool(first.min() == first.max())
 
@@ -162,6 +170,7 @@ def cycle_certificate(tail: str, start: int, step: int, periods: int, moves: np.
     Y must satisfy `image of Y under step more white steps is inside Y`; at the last set X the next period must map
     into X, the first cell must be known after each of the first start + step white steps and at each 0 of the tail.
     True proves `0^(start + step m) tail` for every m (with step 0, the word `0^start tail` alone)."""
+    # moves: (2, n, 2), column value, window, free cell
     members = np.ones(moves.shape[1], dtype=bool)  # (n,)
     for left in range(periods, -1, -1):
         after = read(members, moves, "0" * start)  # (n,)
@@ -187,13 +196,15 @@ def cycle_certificate(tail: str, start: int, step: int, periods: int, moves: np.
 def white_union(members: np.ndarray, moves: np.ndarray, least: int) -> np.ndarray:
     """The windows after at least `least` white steps from the windows marked in `members` (shape (n,), bool): the
     union of the white images from `least` on, until it stops growing."""
+    # members: (n,) bool
+    # moves: (2, n, 2), column value, window, free cell
     current = read(members, moves, "0" * least)  # (n,)
     union = current.copy()  # (n,)
     while True:
         current = image(current, moves, 0)
         grown = union | current  # (n,)
         if np.array_equal(grown, union):
-            return union
+            return union  # (n,)
         union = grown
 
 
@@ -202,6 +213,7 @@ def union_certificate(tail: str, least: int, periods: int, moves: np.ndarray) ->
     the union of all white runs of at least `least` steps, then the tail; from all windows, `periods` periods give
     S0; the next period must map into S0, and the first cell must be known after each of the first least - 1 white
     steps, on the union from least - 1 steps on, and at each 0 of the tail."""
+    # moves: (2, n, 2), column value, window, free cell
     members = np.ones(moves.shape[1], dtype=bool)  # (n,)
     for _ in range(periods):
         members = read(white_union(members, moves, least), moves, tail)
@@ -225,6 +237,7 @@ def union_certificate(tail: str, least: int, periods: int, moves: np.ndarray) ->
 
 def least_periods(tail: str, start: int, step: int, moves: np.ndarray, most: int) -> int | None:
     """The least number of periods, up to `most`, at which `cycle_certificate` holds, or None."""
+    # moves: (2, n, 2), column value, window, free cell
     for periods in range(most + 1):
         if cycle_certificate(tail, start, step, periods, moves):
             return periods
@@ -236,6 +249,7 @@ def lean_pieces(tail: str, q0: int, moves: np.ndarray, step: int = 4, most: int 
     """Pieces `(N, d, k)` with `cycle_certificate` that cover every q >= q0: for each residue modulo `step` the least
     N >= q0 that passes with d = step, then each q in [q0, B) that no piece of period `step` covers, alone (d = 0);
     B is the largest N of period `step`. Returns B and the pieces."""
+    # moves: (2, n, 2), column value, window, free cell
     pieces = []
     for residue in range(step):
         start = q0 + residue

@@ -27,13 +27,18 @@ from __future__ import annotations
 
 import argparse
 import sys
+import numpy as np
+
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
-
-import numpy as np
+from typing import TYPE_CHECKING
 from tqdm.auto import tqdm
 
-from computations.rule30 import center_column, step
+from computations.rule30 import center_column, pack_row, step
+
+
+if TYPE_CHECKING:
+    from sklearn.neural_network import MLPRegressor
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -117,7 +122,7 @@ def seed_row(last: int, margin: int = 64) -> tuple[int, int]:
 def random_row(radius: int, last: int, rng: np.random.Generator, margin: int = 64) -> tuple[int, int]:
     """A uniform random row on cells -radius .. radius, white beyond; row t is exact on |x| <= radius - t."""
     bits = rng.integers(0, 2, 2 * radius + 1, dtype=np.uint8)  # (2 radius + 1,), bit k is cell k - radius
-    value = int.from_bytes(np.packbits(bits, bitorder="little").tobytes(), "little")
+    value = pack_row(bits)
     origin = radius + last + margin
     return value << (origin - radius), origin
 
@@ -127,7 +132,9 @@ def diagram_patches(row: int, origin: int, times: list[int], h: int, w: int,
                     ) -> Iterator[tuple[int, np.ndarray, np.ndarray]]:
     """For each time t in `times` (increasing, at least h apart), the left ends x = positions(t) and the patches at
     (t, x) of the diagram that starts from `row` (bit origin + x is cell x)."""
-    assert all(b - a >= h for a, b in zip(times, times[1:]))
+    # positions: (t) -> (n,) left ends at time t
+    # times[1:] is one shorter: each time is paired with the next
+    assert all(b - a >= h for a, b in zip(times, times[1:], strict=False))
     last = times[-1] + h - 1
     nbytes = (row.bit_length() + last + 16) // 8 + 1
     pending = iter(times)
@@ -191,6 +198,7 @@ def chi_square(counts: np.ndarray, probs: np.ndarray) -> ChiSquare:
 
 def pattern_index(codes: np.ndarray, support: np.ndarray) -> np.ndarray:
     """The index of each code in the sorted support; every code must lie in it."""
+    # codes: (m,), support: (K,)
     index = np.searchsorted(support, codes)  # (m,)
     assert np.all(index < len(support)) and np.all(support[np.minimum(index, len(support) - 1)] == codes), \
         "a patch outside the support of the invariant law"
@@ -205,6 +213,7 @@ def position_counts(kind: str, h: int, w: int, t0: int, t1: int, spacing: int, e
                     rng: np.random.Generator, bands: int = 1) -> np.ndarray:
     """Pattern counts of patches with base windows that do not overlap within a row, per time band and per bin of
     `coordinate`: `ratio` bins x / t over the whole row, `edge` bins the distance d = t - x from the right edge."""
+    # edges: (bins + 1,)
     support, probs = exact_law(h, w)  # (K,), (K,)
     times = sample_times(t0, t1, spacing)
     row, origin = make_diagram(kind, times[-1] + h, h, w, rng)
@@ -213,8 +222,8 @@ def position_counts(kind: str, h: int, w: int, t0: int, t1: int, spacing: int, e
 
     def positions(t: int) -> np.ndarray:
         if coordinate == "ratio":
-            return lattice(-t, t - w + 1, stride, rng)
-        return t - lattice(w - 1, min(top, 2 * t), stride, rng)[::-1]
+            return lattice(-t, t - w + 1, stride, rng)  # (n,)
+        return t - lattice(w - 1, min(top, 2 * t), stride, rng)[::-1]  # (n,)
 
     counts = np.zeros((bands, len(edges) - 1, len(probs)), dtype=np.int64)  # (bands, bins, K)
     band_edges = np.geomspace(t0, t1 + 1, bands + 1)  # (bands + 1,)
@@ -229,7 +238,7 @@ def position_counts(kind: str, h: int, w: int, t0: int, t1: int, spacing: int, e
 
 def profile_rows(counts: np.ndarray, probs: np.ndarray) -> list[ChiSquare | None]:
     """The chi-square of each bin, None for an empty bin."""
-    # counts: (bins, K)
+    # counts: (bins, K), probs: (K,)
     return [chi_square(c, probs) if c.sum() > 0 else None for c in counts]
 
 
@@ -247,7 +256,7 @@ def binned_samples(kind: str, h: int, w: int, t0: int, t1: int, spacing: int, bi
     def positions(t: int) -> np.ndarray:
         x = lattice(-t, t - w + 1, stride, rng)  # (n,)
         u = x / t  # (n,)
-        return x[np.any([(u >= lo) & (u < hi) for lo, hi in bins], axis=0)]
+        return x[np.any([(u >= lo) & (u < hi) for lo, hi in bins], axis=0)]  # (n_in,): the left ends in some bin
 
     found: list[list[np.ndarray]] = [[] for _ in bins]
     for t, x, patches in diagram_patches(row, origin, times, h, w, positions):
@@ -258,24 +267,27 @@ def binned_samples(kind: str, h: int, w: int, t0: int, t1: int, spacing: int, bi
     for parts in found:
         sample = np.concatenate(parts)  # (n, h w)
         out.append(sample[rng.permutation(len(sample))[:n_max]])
-    return out
+    return out  # len(bins) arrays, each (<= n_max, h w)
 
 
 def signs(bits: np.ndarray) -> np.ndarray:
+    # bits: (m, d)
     return 2.0 * bits - 1.0  # (m, d)
 
 
 def covariance_distance(bits: np.ndarray, reference: np.ndarray) -> tuple[float, np.ndarray]:
     """Frobenius distance of the second-moment matrix of a sample from `reference`, and its eigenvalues (descending)."""
+    # bits: (m, d), reference: (d, d)
     s = signs(bits)  # (m, d)
     second = s.T @ s / len(s)  # (d, d)
-    return float(np.linalg.norm(second - reference)), np.linalg.eigvalsh(second)[::-1]
+    return float(np.linalg.norm(second - reference)), np.linalg.eigvalsh(second)[::-1]  # (), (d,)
 
 
 def classifier_accuracy(a: np.ndarray, b: np.ndarray, rng: np.random.Generator, model: str = "gb",
                         test_fraction: float = 0.25) -> tuple[float, float]:
     """Held-out accuracy of a classifier trained to tell sample a from sample b (equal sizes), and its standard error
     under chance."""
+    # a: (m_a, d), b: (m_b, d)
     m = min(len(a), len(b))
     X = signs(np.concatenate([a[:m], b[:m]]))  # (2m, d)
     y = np.concatenate([np.zeros(m), np.ones(m)])  # (2m,)
@@ -298,10 +310,11 @@ def classifier_accuracy(a: np.ndarray, b: np.ndarray, rng: np.random.Generator, 
 
 
 def train_autoencoder(null: np.ndarray, bottleneck: int, rng: np.random.Generator, hidden: int = 64,
-                      max_iter: int = 60):
+                      max_iter: int = 60) -> MLPRegressor:
     """An MLP autoencoder d -> hidden -> bottleneck -> hidden -> d trained on invariant patches."""
     from sklearn.neural_network import MLPRegressor
 
+    # null: (m, d)
     X = signs(null)  # (m, d)
     model = MLPRegressor(hidden_layer_sizes=(hidden, bottleneck, hidden), activation="tanh", max_iter=max_iter,
                          early_stopping=True, random_state=int(rng.integers(1 << 31)))
@@ -309,14 +322,16 @@ def train_autoencoder(null: np.ndarray, bottleneck: int, rng: np.random.Generato
     return model
 
 
-def reconstruction_errors(model, bits: np.ndarray) -> np.ndarray:
+def reconstruction_errors(model: MLPRegressor, bits: np.ndarray) -> np.ndarray:
     """Mean squared reconstruction error of each patch."""
+    # bits: (m, d)
     X = signs(bits)  # (m, d)
     return ((model.predict(X) - X) ** 2).mean(axis=1)  # (m,)
 
 
 def mean_difference_z(a: np.ndarray, b: np.ndarray) -> float:
     """Welch's standardized difference of two means."""
+    # a: (m_a,), b: (m_b,)
     return float((a.mean() - b.mean()) / np.sqrt(a.var(ddof=1) / len(a) + b.var(ddof=1) / len(b)))
 
 
@@ -338,6 +353,7 @@ def knn_two_sample(points: np.ndarray, labels: np.ndarray, k: int, rng: np.rando
 
 def jitter(bits: np.ndarray, rng: np.random.Generator, scale: float = 1e-3) -> np.ndarray:
     """Plus/minus one patches with a small Gaussian jitter that breaks the ties between equal patches at random."""
+    # bits: (m, d)
     return signs(bits) + scale * rng.standard_normal(bits.shape)  # (m, d)
 
 
@@ -345,6 +361,7 @@ def tsne_knn(a: np.ndarray, b: np.ndarray, k: int, rng: np.random.Generator) -> 
     """The kNN two-sample test in a two-dimensional t-SNE embedding of the pooled samples."""
     from sklearn.manifold import TSNE
 
+    # a: (m_a, d), b: (m_b, d)
     pooled = jitter(np.concatenate([a, b]), rng)  # (m_a + m_b, d)
     labels = np.concatenate([np.zeros(len(a), dtype=np.int8), np.ones(len(b), dtype=np.int8)])  # (m_a + m_b,)
     embedding = TSNE(n_components=2, perplexity=30, init="pca",
@@ -417,11 +434,12 @@ def hankel_gram(x: np.ndarray, L: int) -> np.ndarray:
         values = (prefix[i + K] - prefix[i]) / K  # (L - lag,)
         gram[i, i + lag] = values
         gram[i + lag, i] = values
-    return gram
+    return gram  # (L, L)
 
 
 def marchenko_pastur_cdf(y: float, grid: np.ndarray) -> np.ndarray:
     """The Marchenko-Pastur distribution function with ratio y <= 1 and unit variance, at `grid`."""
+    # grid: (g,)
     lo, hi = (1 - np.sqrt(y)) ** 2, (1 + np.sqrt(y)) ** 2
     theta = np.linspace(0, np.pi / 2, 20001)  # (20001,): x = lo + (hi - lo) sin^2 theta removes the edge singularities
     sin2, cos2 = np.sin(theta) ** 2, np.cos(theta) ** 2  # each (20001,)
@@ -430,12 +448,13 @@ def marchenko_pastur_cdf(y: float, grid: np.ndarray) -> np.ndarray:
     ratio = np.where(fine > 0, sin2 / np.maximum(fine, 1e-300), 1 / (hi - lo))
     integrand = (hi - lo) ** 2 * ratio * cos2 / (np.pi * y)  # (20001,): density times dx / dtheta
     cdf = np.concatenate([[0.0], np.cumsum((integrand[1:] + integrand[:-1]) / 2 * np.diff(theta))])  # (20001,)
-    return np.interp(grid, fine, cdf / cdf[-1], left=0.0, right=1.0)
+    return np.interp(grid, fine, cdf / cdf[-1], left=0.0, right=1.0)  # (g,)
 
 
 def ks_to_cdf(values: np.ndarray, cdf: Callable[[np.ndarray], np.ndarray]) -> float:
     """Kolmogorov-Smirnov distance of the empirical distribution of `values` from a distribution function."""
-    v = np.sort(values)  # (m,)
+    # values: (m,), cdf: (m,) -> (m,)
+    v =np.sort(values)  # (m,)
     f = cdf(v)  # (m,)
     m = len(v)
     return float(max(np.max(np.arange(1, m + 1) / m - f), np.max(f - np.arange(m) / m)))
@@ -459,6 +478,7 @@ class SpectrumTest:
 
 def two_sided(value: float, null: np.ndarray) -> float:
     """Two-sided Monte Carlo p-value by rank."""
+    # null: (replicas,)
     lo = (np.sum(null <= value) + 1) / (len(null) + 1)
     hi = (np.sum(null >= value) + 1) / (len(null) + 1)
     return float(min(1.0, 2 * min(lo, hi)))
@@ -468,7 +488,9 @@ def spectrum_test(name: str, spectrum: Callable[[np.ndarray], np.ndarray], colum
                   Callable[[np.ndarray], np.ndarray], replicas: int, rng: np.random.Generator) -> SpectrumTest:
     """The largest and smallest eigenvalue and the KS distance to `ks_reference` for the column, against `replicas`
     sequences of independent fair coins of the same length."""
+    # column: (N,); spectrum: (N,) -> (L,), L eigenvalues; ks_reference: (L,) -> (L,)
     def stats(x: np.ndarray) -> tuple[float, float, float]:
+        # x: (N,)
         e = spectrum(x)  # (L,)
         return float(e.max()), float(e.min()), ks_to_cdf(e, ks_reference)
 
@@ -481,18 +503,19 @@ def spectrum_test(name: str, spectrum: Callable[[np.ndarray], np.ndarray], colum
 
 
 def hankel_spectrum(L: int) -> Callable[[np.ndarray], np.ndarray]:
-    return lambda x: np.linalg.eigvalsh(hankel_gram(x, L))
+    return lambda x: np.linalg.eigvalsh(hankel_gram(x, L))  # (N,) -> (L,)
 
 
 def reshaped_spectrum(r: int) -> Callable[[np.ndarray], np.ndarray]:
     """Eigenvalues of the Gram matrix of the column cut into rows of r cells, scaled to the Marchenko-Pastur law:
     m = N // r rows; with m <= r, (1 / r) X X^T; otherwise (1 / m) X^T X."""
     def spectrum(x: np.ndarray) -> np.ndarray:
+        # x: (N,)
         m = len(x) // r
         X = x[:m * r].reshape(m, r)  # (m, r)
         gram = X @ X.T / r if m <= r else X.T @ X / m  # (min, min)
-        return np.linalg.eigvalsh(gram)
-    return spectrum
+        return np.linalg.eigvalsh(gram)  # (min,), min = min(m, r)
+    return spectrum  # (N,) -> (min(N // r, r),)
 
 
 def column_tests(n: int, hankel_lengths: list[int], widths: list[int], replicas: int,
@@ -519,9 +542,10 @@ def column_tests(n: int, hankel_lengths: list[int], widths: list[int], replicas:
 
 
 def print_profile(label: str, edges: np.ndarray, rows: list[ChiSquare | None]) -> None:
+    # edges: (bins + 1,); rows: one per bin
     print(f"\n{label}")
     print(f"{'bin':>18} {'n':>9} {'z':>9} {'divergence':>11} {'sd':>9}")
-    for lo, hi, r in zip(edges[:-1], edges[1:], rows):
+    for lo, hi, r in zip(edges[:-1], edges[1:], rows, strict=True):
         if r is not None:
             print(f"[{lo:7.3f},{hi:7.3f}) {r.n:9d} {r.z:9.2f} {r.divergence:11.5f} {r.divergence_sd:9.5f}")
 
@@ -574,7 +598,7 @@ def run_learned(args: argparse.Namespace) -> None:
     seed_sets = binned_samples("seed", h, w, args.t0, args.t1, args.spacing, bins, n, rng)
     control = binned_samples("random", h, w, args.t0, args.t1, args.spacing, [(-0.05, 0.05)], n, rng)[0]
     planted = planted_patches(n, h, w, rng, args.planted_fraction, args.planted_density)
-    sets = [(f"seed [{lo:+.2f},{hi:+.2f})", s) for (lo, hi), s in zip(bins, seed_sets)]
+    sets = [(f"seed [{lo:+.2f},{hi:+.2f})", s) for (lo, hi), s in zip(bins, seed_sets, strict=True)]
     sets += [("random-row control", control),
              (f"planted {args.planted_fraction} at density {args.planted_density}", planted)]
     reference = null_patches(400_000, h, w, rng)  # (400000, h w)
@@ -618,7 +642,7 @@ def run_recheck(args: argparse.Namespace) -> None:
     seed_sets = binned_samples("seed", h, w, args.t0, args.t1, args.spacing, bins, n, rng)
     control = binned_samples("random", h, w, args.t0, args.t1, args.spacing, bins, n, rng)
     for name, sets in (("seed", seed_sets), ("random-row control", control)):
-        for (lo, hi), sample in zip(bins, sets):
+        for (lo, hi), sample in zip(bins, sets, strict=True):
             accuracies = [classifier_accuracy(sample, null_patches(len(sample), h, w, rng), rng, "gb", 0.5)
                           for _ in range(3)]
             print(f"{name} [{lo:+.2f},{hi:+.2f}): {len(sample)} patches, half held out, gradient boosting "
@@ -657,8 +681,8 @@ def run_front(args: argparse.Namespace) -> None:
         print(f"{lo:>7} .. {hi - 1:>6} {ratio[sel][k]:16.4f} {int(j[sel][k]):7d} {np.median(ratio[sel]):15.4f}")
         lo = hi
     times = np.array([1 << k for k in range(10, 18) if (1 << k) <= args.steps])  # (m,)
-    f = front(onset, times)
-    for t, fj in zip(times, f):
+    f = front(onset, times)  # (m,)
+    for t, fj in zip(times, f, strict=True):
         if fj < top:
             print(f"t = {t:7d}: first diagonal not yet repeating j = {fj:6d}, x / t = {fj / t - 1:+.4f}")
 

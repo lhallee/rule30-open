@@ -32,9 +32,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-from functools import cache
-
 import numpy as np
+
+from functools import cache
 from tqdm.auto import tqdm
 
 from computations.defect_potential import (
@@ -48,6 +48,7 @@ from computations.defect_potential import (
     tops128,
 )
 from computations.held_shift import held
+
 
 U64 = np.uint64
 WIDTH = 400  # cells followed for a random head; the top stays below WIDTH - 2 (checked)
@@ -75,6 +76,7 @@ def random_head(rng: np.random.Generator, length: int) -> tuple[int, int, int]:
 def follow(D: int, phase: int, offset: int, steps: int, closed: np.ndarray) -> tuple[list[int], int, int]:
     """The defects D_0, D_1, ... before entry into a closed strip, the step of entry (-1 if none within `steps`), and
     the defect at that step."""
+    # closed: (4, 7, 2^STRIP)
     trace: list[int] = []
     for t in range(steps):
         if closed_cell_int(D, phase + t, offset, closed) >= 0:
@@ -203,12 +205,13 @@ def bottoms(m: int, t_max: int, phase: int, offset: int) -> np.ndarray:
     for t in range(t_max):
         lo, hi = step128(lo, hi, phase + t, offset)
         out[t + 1] = (lo & U64((1 << m) - 1)).astype(np.int64)
-    return out
+    return out  # (t_max + 1, n)
 
 
 def bottom_spread(bottom: np.ndarray, m: int, T: int, w: int) -> tuple[int, float]:
     """Over the defects on [0, m + T), grouped by their top w cells: the most distinct bottom words of D_T in one group
     and the share of groups with exactly one. bottom: (>= 2^(m + T),) the bottom word of D_T of each defect."""
+    # bottom: (n,) with n >= 2^(m + T)
     L = m + T
     d = np.arange(1 << L, dtype=np.int64)  # (2^L,)
     pairs = np.unique((d >> (L - w)) * (1 << m) + bottom[: 1 << L])  # (pairs,) top word and bottom word
@@ -253,12 +256,13 @@ def highest_tops(bits: int, steps: int) -> np.ndarray:
             best = np.maximum(best, tops128(lo, hi))
         assert best.max() <= 125
         out[a] = best
-    return out
+    return out  # (28, 2^bits)
 
 
 def nerode_classes(table: np.ndarray, m: int, suffix: int, low_prefix: bool) -> int:
     """The number of classes of the 2^m prefixes under: equal outcome for every suffix word at every row. table:
     (alignments, 2^(m + suffix)), the outcome of each word of m + suffix cells (bit i the cell i)."""
+    # table: (alignments, 2^(m + suffix))
     p = np.arange(1 << m)[:, None]  # (2^m, 1)
     s = np.arange(1 << suffix)[None, :]  # (1, 2^suffix)
     words = p | (s << m) if low_prefix else s | (p << suffix)  # (2^m, 2^suffix)

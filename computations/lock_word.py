@@ -28,14 +28,14 @@ period four there are none up to width 20; beside an alternating center, 0101, a
 from __future__ import annotations
 
 import argparse
-
 import numpy as np
 
 from computations import locks
 from computations.absorption import ALIGNMENTS, WALL_CELLS, ether, kit_wall
 from computations.coin_lock import UNREACHED, entry_paths, period_rate
 from computations.lock_certificate import successor_table
-from computations.rule30 import distinct
+from computations.rule30 import distinct, pack_row
+
 
 # The least window width at which the kit's family fits, with the alignment (j0, shift) and depth k used there.
 LEAST = {"0001": (16, 6, 0, 3), "0011": (14, 1, 3, 1), "0111": (13, 2, 2, 0)}
@@ -105,11 +105,6 @@ def universal_word(word: str, member: np.ndarray) -> list[int]:
             values.append(value)
 
 
-def pack(bits: np.ndarray) -> int:
-    """The integer with bit i set where `bits[i]`; `bits` has shape (n,)."""
-    return int.from_bytes(np.packbits(bits.astype(np.uint8), bitorder="little").tobytes(), "little")
-
-
 def slice_run(word: str, width: int, values: list[int]) -> list[int]:
     """Column j + 1 of every window after column W + 1 reads `values`, as one integer: bit p * 2^W + r is the window
     that was r at start phase p. The step is Rule 30 on whole integers, with the center and the column beyond as
@@ -118,7 +113,7 @@ def slice_run(word: str, width: int, values: list[int]) -> list[int]:
     ones = (1 << (4 * size)) - 1
     block = (1 << size) - 1
     windows = np.arange(4 * size, dtype=np.int64) % size  # (4 2^W,), the window of each bit at the start
-    slices = [pack((windows >> j & 1).astype(bool)) for j in range(width)]
+    slices = [pack_row((windows >> j & 1).astype(bool)) for j in range(width)]
     for step, value in enumerate(values):
         center = sum(block << (p * size) for p in range(4) if word[(p + step) % 4] == "1")
         beyond = ones if value else 0

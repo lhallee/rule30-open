@@ -38,14 +38,15 @@ import functools
 import os
 import subprocess
 import sys
+import numpy as np
+
 from collections.abc import Callable
 from dataclasses import dataclass
-
-import numpy as np
 from tqdm.auto import tqdm
 
 from computations.seed_onsets import _binary
 from computations.wedge_hypotheses import PHI, kit_inverse
+
 
 GAP, BINARY, HARD_CORE = 0, 1, 2
 CLASS_NAMES = {GAP: "gap shift", BINARY: "binary", HARD_CORE: "hard-core"}
@@ -104,7 +105,7 @@ def language_counts(cls: int, n: int) -> np.ndarray:
                     new[ns] = new.get(ns, 0) + c
         cur = new
         counts[m] = sum(cur.values())
-    return counts
+    return counts  # (n + 1,)
 
 
 def is_gap_stream(e: list[int] | tuple[int, ...]) -> bool:
@@ -138,7 +139,7 @@ def window_rows(v: list[int] | tuple[int, ...]) -> list[list[int]]:
 def kit_cone(e: tuple[int, ...]) -> Callable[[int, int], int]:
     """The kit's recursion `cone e t j`, memoized, for a finite word (defined while j + t < len(e))."""
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def cone(t: int, j: int) -> int:
         if t == 0:
             return 3 - e[j]
@@ -251,7 +252,7 @@ def brute_counts(cls: int, L: int, rmax: int) -> np.ndarray:
             if not alive.any():
                 break
             out[s, r] = len({row.tobytes() for row in words[alive, s // 2:s + r]})
-    return out
+    return out  # (L + 1, rmax + 1)
 
 
 def c_counts(cls: int, n: int, rmax: int = 40, threads: int = 2, progress: bool = True) -> RunCounts:
@@ -292,12 +293,13 @@ def coin_counts(cls: int, n: int, rmax: int) -> np.ndarray:
     for s in range(2 * n + 1):
         for r in range(1, rmax + 1):
             out[s, r] = 2 * float(lang[(s + 1) // 2 + r]) / 4.0 ** r
-    return out
+    return out  # (2n + 1, rmax + 1)
 
 
 def growth(counts: np.ndarray, r: int, lo: int, hi: int) -> float:
     """The growth factor per two steps of s of N(s, r) over lo <= s <= hi (least squares on the log, both parities
     fitted with their own constant)."""
+    # counts: (2n + 1, rmax + 1), N(s, r) at row s and column r
     xs, ys, par = [], [], []
     for s in range(lo, hi + 1):
         if counts[s, r] > 0:
@@ -381,7 +383,7 @@ def sideways_left(half: int, steps: int, depth: int) -> list[list[int]]:
     rows = driven_rows(half, steps)
     cols = [[1 if t % 2 == 0 else 0 for t in range(steps)]]  # (steps,) column 0
     right = [r & 1 for r in rows]  # (steps,) column 1
-    for k in range(1, depth + 1):
+    for _ in range(depth):  # column -k for k = 1 .. depth
         a, b = cols[-1], right
         cols.append([a[t + 1] ^ (a[t] | b[t]) for t in range(len(a) - 1)])  # (steps - k,)
         right = a
@@ -435,6 +437,7 @@ def trap_streams(halves: list[int], steps: int = 6000) -> list[dict[str, int]]:
 
 
 def report_counts(rc: RunCounts, coin: np.ndarray, rs: tuple[int, ...]) -> None:
+    # coin: (2n + 1, rmax + 1), as `coin_counts` gives it
     rec = rc.record()
     n = rc.n
     print(f"{CLASS_NAMES[rc.cls]}: windows of length <= {n + 1}, s <= {2 * n}; words of length {n}: {rc.words[n]:,}")

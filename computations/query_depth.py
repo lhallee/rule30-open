@@ -25,12 +25,12 @@ from __future__ import annotations
 
 import argparse
 import sys
-
 import numpy as np
 
 from tqdm.auto import tqdm
 
 from computations.cone_screening import cone_table, variable_slices
+
 
 ALL = np.uint64(0xFFFFFFFFFFFFFFFF)
 LOW_PATTERNS = [np.uint64(p) for p in (
@@ -52,13 +52,14 @@ def exact_depth(table: np.ndarray, n: int) -> int:
     """The least depth of a decision tree computing the Boolean function with this truth table on n variables (bit i
     of the index is variable i). Subcubes are indexed in base 3, digit 2 meaning free; a subcube costs 0 if the
     function is constant on it, and otherwise 1 + min over free variables i of the max over the two halves."""
+    # table: (2^n,)
     cube = table.astype(np.int8).reshape([2] * n)  # (2,)*n, axis k is variable n - 1 - k
-    low, high = cube, cube.copy()
+    low, high = cube, cube.copy()  # (2,)*n each
     for axis in range(n):
         l0, l1 = np.take(low, 0, axis=axis), np.take(low, 1, axis=axis)  # (3,)*axis + (2,)*(n-axis-1)
-        h0, h1 = np.take(high, 0, axis=axis), np.take(high, 1, axis=axis)
+        h0, h1 = np.take(high, 0, axis=axis), np.take(high, 1, axis=axis)  # (3,)*axis + (2,)*(n-axis-1)
         low = np.stack([l0, l1, np.minimum(l0, l1)], axis=axis)  # (3,)*(axis+1) + (2,)*(n-axis-1)
-        high = np.stack([h0, h1, np.maximum(h0, h1)], axis=axis)
+        high = np.stack([h0, h1, np.maximum(h0, h1)], axis=axis)  # (3,)*(axis+1) + (2,)*(n-axis-1)
     constant = low == high  # (3,)*n
     depth = np.where(constant, 0, n + 1).astype(np.int8)  # (3,)*n
     for _ in range(n):  # after round r every subcube with at most r free variables is final
@@ -75,6 +76,7 @@ def exact_depth(table: np.ndarray, n: int) -> int:
 
 def signed_sum(table: np.ndarray, n: int) -> int:
     """sum over x of (-1)^{|x|} f(x) for a truth table on n variables, directly."""
+    # table: (2^n,)
     index = np.arange(1 << n, dtype=np.int64)  # (2^n,)
     parity = np.zeros(1 << n, dtype=np.int64)  # (2^n,)
     for i in range(n):
@@ -95,6 +97,7 @@ def inner_slices(m: int) -> list[np.ndarray]:
 def restricted_sums(table: np.ndarray, n: int) -> np.ndarray:
     """R[i, b] = sum over x with x_i = b of (-1)^{|x| - b} f(x), directly: the top real coefficient, up to sign, of
     f with variable i fixed to b, as a function of the other n - 1 variables."""
+    # table: (2^n,)
     index = np.arange(1 << n, dtype=np.int64)  # (2^n,)
     parity = np.zeros(1 << n, dtype=np.int64)  # (2^n,)
     for i in range(n):
@@ -105,7 +108,7 @@ def restricted_sums(table: np.ndarray, n: int) -> np.ndarray:
         bit = (index >> i) & 1  # (2^n,)
         sums[i, 0] = signed[bit == 0].sum()
         sums[i, 1] = -signed[bit == 1].sum()
-    return sums
+    return sums  # (n, 2)
 
 
 def subcube_sums(t: int, fixed: dict[int, int], inner: int = 24, progress: bool = False) -> tuple[int, np.ndarray]:
@@ -126,7 +129,7 @@ def subcube_sums(t: int, fixed: dict[int, int], inner: int = 24, progress: bool 
         table = g[sub][np.argsort(packed[sub])]  # (2^|free|,)
         for pos, k in enumerate(free):
             sums[k] = restricted_sums(table, len(free))[pos]
-        return signed_sum(table, len(free)), sums
+        return signed_sum(table, len(free)), sums  # (), (2t, 2)
     m = min(inner, n)
     words = inner_slices(m)  # m x (2^(m-6),)
     word_index = np.arange(len(words[0]))  # (2^(m-6),)
@@ -142,6 +145,7 @@ def subcube_sums(t: int, fixed: dict[int, int], inner: int = 24, progress: bool 
 
     def signed(bits: np.ndarray) -> int:
         """sum over the inner assignments marked in `bits` of (-1)^{inner weight}."""
+        # bits: (2^(m-6),), m the inner cells
         odd_words = np.bitwise_count(bits & ODD_BITS).astype(np.int64)  # (2^(m-6),)
         even_words = np.bitwise_count(bits & ~ODD_BITS).astype(np.int64)  # (2^(m-6),)
         return int(np.where(word_odd, odd_words - even_words, even_words - odd_words).sum())
@@ -167,7 +171,7 @@ def subcube_sums(t: int, fixed: dict[int, int], inner: int = 24, progress: bool 
             if outer + j not in fixed:
                 sums[outer + j, 0] += sign * signed(g & ~words[j])
                 sums[outer + j, 1] -= sign * signed(g & words[j])
-    return total, sums
+    return total, sums  # (), (2t, 2)
 
 
 def evasive(t: int, fixed: dict[int, int], level: int, inner: int = 24, progress: bool = False) -> bool:

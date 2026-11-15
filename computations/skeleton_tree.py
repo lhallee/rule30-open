@@ -24,14 +24,14 @@ doubling.
 from __future__ import annotations
 
 import argparse
-import resource
 import sys
-from dataclasses import dataclass, field
-
 import numpy as np
+
+from dataclasses import dataclass, field
 from tqdm.auto import tqdm
 
 from computations.settled_slope import least_periods, stream
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Words as Python integers: bit r is the cell at a time congruent to r modulo P
@@ -317,6 +317,10 @@ def main() -> None:
             ones = r.ones / n if n else float("nan")
             print(f"  regime {r.start}..{r.end}: P {r.period}, {n} depths, largest g {r.max_white}, largest m "
                   f"{r.max_alt} (first at {r.alt_at}), walk mean {mean:.4f}, steps of 1 {ones:.4f}")
+    try:
+        import resource
+    except ModuleNotFoundError as error:
+        raise RuntimeError("the peak memory is read with the resource module, which only Unix has") from error
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20
     print(f"\npeak memory {peak:.2f} GB")
 

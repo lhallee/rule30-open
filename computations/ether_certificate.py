@@ -26,12 +26,12 @@ a number, bit j the cell j.
 from __future__ import annotations
 
 import argparse
-import functools
 import sys
 
 from tqdm.auto import tqdm
 
-from computations.defect_potential import ETHER, STRIP, closed_strips
+from computations.defect_potential import ETHER, STRIP, background, closed_strips
+
 
 WIDTH = 128  # cells of background in a step
 MASK = (1 << (WIDTH - 1)) - 1  # a step keeps the cells 0 .. 126
@@ -43,28 +43,14 @@ def eth(a: int, j: int) -> bool:
     return bool((ETHER[a % 4] >> (j % 7)) & 1)
 
 
-def background(a: int, o: int, cells: int = WIDTH) -> int:
-    """The background cells 0 .. cells - 1 at phase a and offset o, bit j the cell j (the Lean `bgL`)."""
-    return _background(a % 4, o % 7, cells)
-
-
-@functools.lru_cache(maxsize=None)
-def _background(a: int, o: int, cells: int) -> int:
-    """`background` for a phase below 4 and an offset below 7, computed once."""
-    return sum(int(eth(a, j + o)) << j for j in range(cells))
-
-
-def held(x: int) -> int:
-    """The held map on a number (the Lean `heldNat`)."""
-    return (x >> 1) ^ (x | (x << 1))
-
-
-BACKGROUNDS = [[_background(a, o, WIDTH) for o in range(7)] for a in range(4)]  # `background` by phase and offset
+# The background cells 0 .. WIDTH - 1 by phase and offset, bit j the cell j (the Lean `bgL`).
+BACKGROUNDS = [[background(a, o, 0, WIDTH) for o in range(7)] for a in range(4)]
 
 
 def step(a: int, o: int, n: int) -> int:
-    """One step of the defect n at phase a and offset o (the Lean `dstep`): `held` of n xor `background(a, o)`, xor
-    `background(a + 1, o)`, read from `BACKGROUNDS` and written out, since the checkers call it millions of times."""
+    """One step of the defect n at phase a and offset o (the Lean `dstep`): the held map (`held_shift.held`, the Lean
+    `heldNat`) of n xor `BACKGROUNDS[a][o]`, xor `BACKGROUNDS[a + 1][o]`, written out, since the checkers call it
+    millions of times."""
     x = n ^ BACKGROUNDS[a % 4][o % 7]
     return (((x >> 1) ^ (x | (x << 1))) ^ BACKGROUNDS[(a + 1) % 4][o % 7]) & MASK
 
@@ -82,9 +68,16 @@ def closed_bits() -> list[int]:
 def strip_step(a: int, r: int, s: int, below: int) -> tuple[int, int]:
     """The strip s at phase a and residue r one step later, with the cell `below` under it, and the new cell c + 1
     (the Lean `stripStep` and `stripRise`). Bit i of s is the cell c - 12 + i, whose background is eth(a, r + 2 + i)."""
-    d = lambda i: below if i == -1 else ((s >> i) & 1 if 0 <= i < STRIP else 0)
-    b = lambda i: int(eth(a, r + 2 + i))
-    cell = lambda i: d(i + 1) ^ (((d(i) ^ b(i)) | (d(i - 1) ^ b(i - 1))) ^ (b(i) | b(i - 1)))
+
+    def d(i: int) -> int:
+        return below if i == -1 else ((s >> i) & 1 if 0 <= i < STRIP else 0)
+
+    def b(i: int) -> int:
+        return int(eth(a, r + 2 + i))
+
+    def cell(i: int) -> int:
+        return d(i + 1) ^ (((d(i) ^ b(i)) | (d(i - 1) ^ b(i - 1))) ^ (b(i) | b(i - 1)))
+
     return sum(cell(i) << i for i in range(STRIP)), cell(STRIP)
 
 
@@ -172,7 +165,7 @@ def lean_tables() -> str:
     """The Lean tables `bgTab` (the background of 128 cells at the 28 alignments, entry 7 a + o) and `closedTab` (the
     closed strips at the four phases, residue 5)."""
     bits = closed_bits()
-    bg = ", ".join(str(background(a, o)) for a in range(4) for o in range(7))
+    bg = ", ".join(str(background(a, o, 0, WIDTH)) for a in range(4) for o in range(7))
     closed = ",\n  ".join(str(bits[7 * a + RESIDUE]) for a in range(4))
     return f"def bgTab : List Nat := [{bg}]\n\ndef closedTab : List Nat := [\n  {closed}]"
 

@@ -21,12 +21,13 @@ running OR of Condrey's Theorem 2; for the alternating word it grows with the nu
 from __future__ import annotations
 
 import argparse
-from collections import Counter
-
 import numpy as np
+
+from collections import Counter
 from tqdm.auto import tqdm
 
 from computations.coupled import center, eventual_period, psi
+
 
 U64 = np.uint64
 MAX_DEPTH = 61  # steps = depth + 1 <= 62 keeps every shifted-out right cell too far to reach column 1 in time
@@ -50,22 +51,23 @@ def psi_batch(word: str, phase: int, rights: np.ndarray, depth: int) -> np.ndarr
     for j in range(depth):
         out |= (a & one) << U64(j)
         a, b = (a >> one) ^ (a | b), a
-    return out
+    return out  # (n,)
 
 
 def lowest_bit(x: np.ndarray) -> np.ndarray:
     """Index of the lowest set bit of each entry of a uint64 array, and -1 where the entry is 0."""
     # x: (n,)
     isolated = x & (~x + U64(1))  # (n,)
-    out = np.full(x.shape, -1, dtype=np.int64)
+    out = np.full(x.shape, -1, dtype=np.int64)  # (n,)
     nonzero = x != 0
     out[nonzero] = np.log2(isolated[nonzero].astype(np.float64)).astype(np.int64)  # exact for powers of two
-    return out
+    return out  # (n,)
 
 
 def run_length(word: str, phase: int, rights: np.ndarray, left_width: int, depth: int) -> np.ndarray:
     """The number of times 0 .. d - 1 at which the best left half of width `left_width` keeps the center on the word, for
     each right half; entries are censored (equal to depth + 1) when Psi(R) has no black cell in depths up to `depth`."""
+    # rights: (n,)
     rows = psi_batch(word, phase, rights, depth)  # (n,)
     beyond = rows >> U64(left_width)
     low = lowest_bit(beyond)  # (n,)
@@ -122,10 +124,10 @@ def subfunction_profile(word: str, phase: int, cells: int, depth: int) -> list[l
     return profile
 
 
-def tail_census(word: str, phase: int, cells: int, depth: int, max_period: int = 200) -> Counter:
+def tail_census(word: str, phase: int, cells: int, depth: int, max_period: int = 200) -> Counter[int | None]:
     """For every right half of at most `cells` cells, the least period (up to `max_period`) with which Psi(R) repeats over
     its outer half out to `depth`, or None: how many right halves end in a spatially periodic tail."""
-    census: Counter = Counter()
+    census: Counter[int | None] = Counter()
     for right in tqdm(range(1 << cells), desc=f"tails {word}/{phase}", leave=False):
         found = eventual_period(psi(word, phase, right, depth), depth, max_period)
         census[None if found is None else found[1]] += 1

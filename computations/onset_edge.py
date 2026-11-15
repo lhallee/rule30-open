@@ -30,12 +30,13 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-
 import numpy as np
+
+from dataclasses import dataclass
 from tqdm.auto import tqdm
 
 from computations.settled_slope import stream
+
 
 LEFT, STAY, RETREAT_ONE, RETREAT_MORE = -1, 0, 1, 2
 
@@ -176,7 +177,7 @@ def move_table(edge: np.ndarray, depth: int, bounds: list[int]) -> list[MoveRow]
     mv = moves(edge)[live]  # (k,)
     at = edge[live]  # (k,)
     rows = []
-    for lo, hi in zip(bounds[:-1], bounds[1:]):
+    for lo, hi in zip(bounds[:-1], bounds[1:], strict=True):  # both slices hold len(bounds) - 1 entries
         sel = (at >= lo) & (at < hi)
         if sel.sum() > 0:
             rows.append(move_row(f"depths {lo} .. {hi - 1}", mv[sel]))
@@ -312,7 +313,7 @@ def background_words(P: int, n: int, rng: np.random.Generator) -> np.ndarray:
             D[i] = pair_next(D[i - 2], D[i - 1])
             ok = bool(D[i].any())
         if ok:
-            return D
+            return D  # (n, P)
 
 
 def background_row(D: np.ndarray, t: int) -> int:

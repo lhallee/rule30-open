@@ -37,6 +37,7 @@ from computations import absorption as ab
 from computations import lock_certificate
 from computations.lock_certificate import step_windows
 
+
 WORDS = ab.WORDS
 WALL_CELLS = ab.WALL_CELLS
 
@@ -118,7 +119,7 @@ def entry_times(word: str, cells: int, phase: int, rank: np.ndarray, steps: int,
     (any depth up to 51, `absorption.family_depth`) and the first step at which its window lies in the basin whose
     ranks are `rank`; -1 if not within `steps`. A half in the family at a depth whose wall does not fit in the window
     keeps that depth, so its window may never reach the basin."""
-    # rank: (4, 2^width)
+    # rank: (4, 2^width); wall: (4, 2^13), the kit's wall states at each ether phase
     width = rank.shape[1].bit_length() - 1
     rows = np.zeros((1 << cells, (cells + steps + 2) // 64 + 2), dtype=np.uint64)  # (2^cells, words)
     rows[:, 0] = np.arange(1 << cells, dtype=np.uint64)
@@ -170,6 +171,7 @@ def lean_wide(word: str, width: int, size: int, wall: np.ndarray) -> str:
     """The checkpoints, their kernel checks and the theorem `forcedBasin_<word>_<width>` of
     `Rule30Open.Columns.ForcedBasin18`: the basin's rounds cut into parts of at most `size`, each part checked from the
     stored set of the last."""
+    # wall: (4, 2^13)
     rank = basin_ranks(word, width, family_target(word, width, wall))  # (4, n)
     inside = rank >= 0  # (4, n)
     rounds, counts = int(rank.max()), inside.sum(axis=1).tolist()
@@ -229,6 +231,7 @@ set_option Elab.async false
 
 def lean_module(width: int, size: int, wall: np.ndarray) -> str:
     """The module `Rule30Open.Columns.ForcedBasin<width>` for the three words."""
+    # wall: (4, 2^13)
     body = "\n".join(lean_wide(word, width, size, wall) for word in WORDS)
     return WIDE_HEADER.format(width=width, size=size) + body + "\nend Rule30Open\n"
 

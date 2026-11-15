@@ -38,6 +38,7 @@ from tqdm.auto import tqdm
 from computations.held_shift import held
 from computations.no_k_tails import background, lean_list, ring_cell, ring_step_ok
 
+
 # (a state of the background as a ring word, cell 0 first; its spatial period L; its temporal period P; Lean tag),
 # in the order of the table of the tail census, without the stripes and the ether
 BACKGROUNDS: tuple[tuple[str, int, int, str], ...] = (

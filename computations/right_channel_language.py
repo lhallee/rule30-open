@@ -38,14 +38,16 @@ import hashlib
 import math
 import sys
 import time
-from dataclasses import dataclass
-
 import numpy as np
 import scipy.sparse as sp
+
+from dataclasses import dataclass
 from scipy.sparse.csgraph import connected_components
 from tqdm.auto import tqdm
 
 from computations.gate_census import double_steps
+from computations.rule30 import pack_row
+
 
 CHUNK = 1 << 22  # windows per block when the double steps are computed in blocks
 
@@ -56,7 +58,7 @@ def successors_of(codes: np.ndarray, width: int) -> np.ndarray:
     out = np.empty((len(codes), 4), dtype=np.int64)  # (n, 4)
     for lo in range(0, len(codes), CHUNK):
         out[lo:lo + CHUNK] = double_steps(codes[lo:lo + CHUNK], width)
-    return out
+    return out  # (n, 4)
 
 
 def image_chain(width: int, progress: bool = False) -> tuple[np.ndarray, int]:
@@ -80,7 +82,7 @@ def image_chain(width: int, progress: bool = False) -> tuple[np.ndarray, int]:
         rank += cur
         bar.update(1)
     bar.close()
-    return rank, chain
+    return rank, chain  # (2^W,)
 
 
 def limit_set(width: int, progress: bool = False) -> tuple[np.ndarray, int]:
@@ -91,14 +93,16 @@ def limit_set(width: int, progress: bool = False) -> tuple[np.ndarray, int]:
 
 def successor_index(codes: np.ndarray, width: int) -> np.ndarray:
     """The four double steps of each window of E_W as indices into `codes` (E_W is closed, so each lands in it)."""
+    # codes: (|E|,) sorted
     succ = successors_of(codes, width)  # (|E|, 4)
     idx = np.searchsorted(codes, succ)  # (|E|, 4)
     assert (codes[np.minimum(idx, len(codes) - 1)] == succ).all()  # image(E_W) is inside E_W
-    return idx.astype(np.int32)
+    return idx.astype(np.int32)  # (|E|, 4)
 
 
 def is_closed_fixpoint(codes: np.ndarray, width: int) -> bool:
     """Whether the image of the set `codes` under the double step with every input is exactly the set."""
+    # codes: (n,)
     img = np.unique(successors_of(codes, width))  # (|image|,)
     return bool(np.array_equal(img, np.unique(codes)))
 
@@ -115,8 +119,9 @@ class Component:
 
 def scc_labels(src: np.ndarray, dst: np.ndarray, m: int) -> tuple[int, np.ndarray]:
     """The strongly connected components of a directed graph on m nodes."""
+    # src, dst: (e,), the edges
     graph = sp.coo_matrix((np.ones(len(src), dtype=np.int8), (src, dst)), shape=(m, m)).tocsr()
-    return connected_components(graph, directed=True, connection="strong")
+    return connected_components(graph, directed=True, connection="strong")  # labels (m,)
 
 
 def cycle_gcd(nodes: np.ndarray, src: np.ndarray, dst: np.ndarray) -> tuple[int, dict[int, int]]:
@@ -125,7 +130,7 @@ def cycle_gcd(nodes: np.ndarray, src: np.ndarray, dst: np.ndarray) -> tuple[int,
     # nodes: (k,), src, dst: (e,) the inner edges
     level = {int(nodes[0]): 0}
     adj: dict[int, list[int]] = {}
-    for a, b in zip(src.tolist(), dst.tolist()):
+    for a, b in zip(src.tolist(), dst.tolist(), strict=True):
         adj.setdefault(a, []).append(b)
     frontier = [int(nodes[0])]
     while frontier:
@@ -137,13 +142,14 @@ def cycle_gcd(nodes: np.ndarray, src: np.ndarray, dst: np.ndarray) -> tuple[int,
                     nxt.append(b)
         frontier = nxt
     g = 0
-    for a, b in zip(src.tolist(), dst.tolist()):
+    for a, b in zip(src.tolist(), dst.tolist(), strict=True):
         g = math.gcd(g, abs(level[a] + 1 - level[b]))
     return g, level
 
 
 def window_components(codes: np.ndarray, succ_idx: np.ndarray, width: int) -> list[Component]:
     """The strongly connected components of the double-step graph on E_W that hold a cycle, largest first."""
+    # codes: (m,) the windows of E_W; succ_idx: (m, 4)
     from computations.three_set_game import ether_cycle
     ether = [w for w, _ in ether_cycle(width)]
     entry = None
@@ -190,6 +196,7 @@ def determinize(codes: np.ndarray, succ_idx: np.ndarray, cap: int = 2_000_000, p
                 ) -> Automaton:
     """The subset construction from E_W. A subset waits in the queue as a sorted int32 index array; once expanded only
     its 16-byte digest stays, as the key of its state number."""
+    # codes: (|E|,); succ_idx: (|E|, 4)
     bits = (codes & 1).astype(np.int8)  # (|E|,) column 1 of each window
     start = np.arange(len(codes), dtype=np.int32)  # (|E|,)
     ids = {hashlib.blake2b(start.tobytes(), digest_size=16).digest(): 0}
@@ -368,7 +375,7 @@ def lean_bitmaps(width: int) -> str:
     lines = [f"/-! The ranks at `W = {width}`: the chain stops after {chain} images, with {size} windows in the limit "
              "set. -/"]
     for j in range(max(1, chain.bit_length())):
-        m = int.from_bytes(np.packbits(((rank >> j) & 1).astype(np.uint8), bitorder="little").tobytes(), "little")
+        m = pack_row((rank >> j) & 1)
         lines += ["", f"/-- Bit {j} of the ranks at `W = {width}`. -/", f"def rank{width}Bit{j} : Nat :=", f"  0x{m:x}"]
     return "\n".join(lines)
 

@@ -30,41 +30,45 @@ import itertools
 import math
 import os
 import subprocess
-from fractions import Fraction
-
 import numpy as np
+
+from fractions import Fraction
 from tqdm.auto import tqdm
+
 
 RULE30, RULE120, RULE180, RULE45 = 14, 8, 4, 13
 
 
 def eta_of(tt: int, u: np.ndarray, v: np.ndarray) -> np.ndarray:
     """eta(u, v) for the truth table tt, elementwise on 0/1 arrays of any shape."""
-    out = np.zeros_like(u)  # same shape as u
+    # u, v: (...), one shape for both
+    out = np.zeros_like(u)  # (...), the shape of u
     for a, b in itertools.product((0, 1), repeat=2):
         if (tt >> (2 * a + b)) & 1:
             out |= ((u == a) & (v == b)).astype(u.dtype)
-    return out
+    return out  # (...)
 
 
 def light_step(rows: np.ndarray, tt: int = RULE30) -> np.ndarray:
     """One step of H on a batch of half-lines: rows (M, n) -> (M, n - 2), the cells whose cone is inside."""
-    return rows[:, :-2] ^ eta_of(tt, rows[:, 1:-1], rows[:, 2:])
+    # rows: (M, n)
+    return rows[:, :-2] ^ eta_of(tt, rows[:, 1:-1], rows[:, 2:])  # (M, n - 2)
 
 
 def light_lines(rows: np.ndarray, T: int, j: int = 0, tt: int = RULE30) -> np.ndarray:
     """The light line j up to time T of every half-line of the batch rows (M, n), n >= j + 2T + 1: (M, T + 1)."""
+    # rows: (M, n)
     out = [rows[:, j]]  # T + 1 arrays (M,)
     for _ in range(T):
-        rows = light_step(rows, tt)
+        rows = light_step(rows, tt)  # (M, n - 2i) after step i
         out.append(rows[:, j])
-    return np.stack(out, axis=1)
+    return np.stack(out, axis=1)  # (M, T + 1)
 
 
 def all_rows(n: int) -> np.ndarray:
     """Every row of n cells: (2^n, n), row r has cell i equal to bit i of r."""
     r = np.arange(1 << n, dtype=np.int64)  # (2^n,)
-    return ((r[:, None] >> np.arange(n)[None, :]) & 1).astype(np.uint8)
+    return ((r[:, None] >> np.arange(n)[None, :]) & 1).astype(np.uint8)  # (2^n, n)
 
 
 def rho_bruteforce(k: int, tt: int = RULE30) -> Fraction:
@@ -88,7 +92,7 @@ def letter_law(K: int, tt: int = RULE30) -> dict[tuple[int, ...], int]:
     """The exact law of the letters (eta(c^j_t, c^{j+1}_t), c^j_t), t < K, as counts out of 4^K: mu_K is the
     transducer applied twice to mu_{K-1} with any letter appended (the appended letter is outside the light cone)."""
     law: dict[tuple[int, ...], int] = {(): 1}
-    for k in range(1, K + 1):
+    for _ in range(K):  # mu_1 .. mu_K
         cur = {w + (0,): c for w, c in law.items()}
         for _ in range(2):
             nxt: dict[tuple[int, ...], int] = {}
@@ -112,14 +116,14 @@ def law_statistics(law: dict[tuple[int, ...], int], K: int) -> tuple[int, float,
 
 
 def _binary() -> str:
-    """computations/light_line.c, compiled once (`seed_onsets.compiled`)."""
-    from computations.seed_onsets import compiled
+    """computations/light_line.c, compiled once (`c_programs.compiled`)."""
+    from computations.c_programs import compiled
     return str(compiled("light_line", ("-O3", "-fopenmp", "-w")))
 
 
-def exact(Kmax: int, tt: int = RULE30) -> list[tuple[int, int, float, int, int, int]]:
-    """The exact law in C for K = 1 .. Kmax <= 31: (K, support, entropy bits, rho, rhoPi, rhoDet numerators / 4^K)."""
-    run = subprocess.run([_binary(), "exact", str(tt), str(Kmax)], stdout=subprocess.PIPE, text=True, check=True)
+def exact(k_max: int, tt: int = RULE30) -> list[tuple[int, int, float, int, int, int]]:
+    """The exact law in C for K = 1 .. k_max <= 31: (K, support, entropy bits, rho, rhoPi, rhoDet numerators / 4^K)."""
+    run = subprocess.run([_binary(), "exact", str(tt), str(k_max)], stdout=subprocess.PIPE, text=True, check=True)
     out = []
     for line in run.stdout.split("\n"):
         if line:
@@ -208,12 +212,12 @@ def main() -> None:
     ap.add_argument("--transitive", type=int, help="level transitivity of group 2369 to this level")
     a = ap.parse_args()
     if a.exact:
-        prevH = 0.0
+        h_prev = 0.0
         for K, supp, H, r1, r2, r3 in exact(a.exact, a.eta):
             D = 4 ** K
-            print(f"K={K:2d} support={supp:>10d} H={H:.9f} H_K-H_(K-1)={H - prevH:.6f} "
+            print(f"K={K:2d} support={supp:>10d} H={H:.9f} H_K-H_(K-1)={H - h_prev:.6f} "
                   f"rho={r1}/4^{K}={r1 / D:+.9e} rhoPi={r2 / D:+.6e} rhoDet={r3 / D:+.6e}")
-            prevH = H
+            h_prev = H
     if a.siblings:
         for tt, name in ((RULE30, "Rule 30"), (RULE120, "Rule 120"), (RULE180, "Rule 180"), (RULE45, "Rule 45")):
             rows = exact(a.siblings, tt)
