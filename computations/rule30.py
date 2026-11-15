@@ -1,4 +1,5 @@
-"""Rule 30 rows as Python integers, and the single black cell's center column.
+"""Rule 30 rows as Python integers, packed from and unpacked to arrays of cells, and the single black cell's center
+column.
 
 A row is the integer whose bit i is cell `origin + i`, so cell x - 1 is the bit below cell x and one step of the rule,
 x' = x_(-1) xor (x or x_(+1)), is `(row << 1) ^ (row | (row >> 1))`. Bits below 0 read as white, which is exact while
@@ -13,6 +14,18 @@ import numpy as np
 def step(row: int) -> int:
     """One step of Rule 30 on a row held as an integer."""
     return (row << 1) ^ (row | (row >> 1))
+
+
+def pack_row(cells: np.ndarray) -> int:
+    """The integer with bit i set where `cells[i]` is 1, for cells of 0 and 1 or booleans."""
+    # cells: (n,)
+    return int.from_bytes(np.packbits(cells.astype(np.uint8), bitorder="little").tobytes(), "little")
+
+
+def unpack_row(row: int, n: int) -> np.ndarray:
+    """Bits 0 .. n - 1 of a row below 2^(8 ceil(n / 8)), as cells of 0 and 1."""
+    raw = row.to_bytes((n + 7) // 8, "little")
+    return np.unpackbits(np.frombuffer(raw, dtype=np.uint8), bitorder="little")[:n]  # (n,)
 
 
 def distinct(values: np.ndarray) -> np.ndarray:
